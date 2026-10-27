@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ai.spaincos.com — open-weight gateway</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='5' fill='%230f172a'/><path d='M7 12l3 3 6-7' stroke='%232dd4bf' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b1220; --surface: #101a2c; --surface2: #152036; --line: #1e2c46;
+  --text: #dbe4f0; --muted: #8294ad; --accent: #2dd4bf; --accent-ink: #06251f;
+  --warn: #fbbf24; --err: #f87171; --radius: 12px;
+  --text-sm: 0.875rem; --text-base: 0.9375rem;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: "Satoshi", "Inter", system-ui, sans-serif;
+  font-size: var(--text-base); line-height: 1.55;
+  min-height: 100vh;
+  background-image: radial-gradient(1100px 480px at 78% -10%, rgba(45,212,191,0.07), transparent 60%);
+}
+.wrap { max-width: 920px; margin: 0 auto; padding: 28px 20px 64px; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+h1 .ai { color: var(--accent); }
+.sub { color: var(--muted); font-size: var(--text-sm); margin-bottom: 20px; }
+.badge { font-size: 0.75rem; font-weight: 700; color: var(--accent-ink); background: var(--accent); padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.card .name { font-weight: 700; margin-bottom: 2px; }
+.card .meta { color: var(--muted); font-size: var(--text-sm); margin-bottom: 8px; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.dot.ok { background: var(--accent); box-shadow: 0 0 8px rgba(45,212,191,.6); }
+.dot.warn { background: var(--warn); }
+.card .use { font-size: var(--text-sm); color: var(--muted); }
+.chat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.chat h2 { font-size: 1rem; margin-bottom: 10px; }
+select, textarea {
+  width: 100%; background: var(--surface2); color: var(--text);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  font-family: inherit; font-size: var(--text-base); resize: vertical;
+}
+select { max-width: 320px; margin-bottom: 10px; }
+textarea { min-height: 96px; margin-bottom: 10px; }
+.row { display: flex; justify-content: flex-end; gap: 10px; }
+button {
+  background: var(--accent); color: var(--accent-ink); font-weight: 700;
+  border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-size: var(--text-base);
+}
+button:disabled { opacity: .5; cursor: wait; }
+button.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+.out { margin-top: 12px; white-space: pre-wrap; background: var(--surface2); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; min-height: 52px; font-size: var(--text-sm); }
+.out .placeholder { color: var(--muted); }
+.out .err { color: var(--err); }
+footer { margin-top: 28px; color: var(--muted); font-size: 0.8125rem; line-height: 1.7; }
+footer b { color: var(--text); }
+@media (max-width: 480px) { h1 { font-size: 1.1rem; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="ai">ai</span>.spaincos.com</h1>
+    <span class="badge">$0 · open weights</span>
+  </header>
+  <p class="sub">Spain Companies open-weight model gateway — every request routes to free-tier open-weight models. No Perplexity credits.</p>
+
+  <div class="grid">
+    <div class="card">
+      <div class="name"><span class="dot ok"></span>Qwen3.8-27B</div>
+      <div class="meta">Groq free tier · summary + general</div>
+      <div class="use">Fast summarization, digests, weekday report composition.</div>
+    </div>
+    <div class="card">
+      <div class="name"><span class="dot warn"></span>Flint v1.0</div>
+      <div class="meta">OpenRouter free tier · coding + agent</div>
+      <div class="use">Shared pool — occasional upstream rate limits; falls back to Qwen.</div>
+    </div>
+    <div class="card">
+      <div class="name"><span class="dot ok"></span>Auto router</div>
+      <div class="meta">OpenRouter free models</div>
+      <div class="use">Routes to whatever free model fits the task.</div>
+    </div>
+  </div>
+
+  <div class="chat">
+    <h2>Interactive gateway</h2>
+    <p class="use" style="color:var(--muted);font-size:var(--text-sm)">Direct chat is gated behind the authenticated gateway (in progress). The runner and report rail already use these models for M2 automations — the ledger is <b>ops.llm_requests</b>. This page tracks the fleet.</p>
+    <div class="out" id="out"><span class="placeholder">M2 automations call Qwen3.8-27B (Groq free) and Flint v1.0 (OpenRouter free) via the call-model edge function. Zero credits.</span></div>
+  </div>
+
+  <footer>
+    <b>$0 path:</b> free hosted open weights (call-model) → Cloudflare Workers AI free tier → LiteLLM self-host on own hardware (GLM-5.3) → cheap hosted open weights.<br>
+    Deterministic work runs on the Spain Runner report rail; model-assisted work (M2) routes through these models. Ledger: <b>ops.llm_requests</b>.
+  </footer>
+</div>
+</body>
+</html>
