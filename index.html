@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='5' fill='%230f172a'/><path d='M7 12l3 3 6-7' stroke='%232dd4bf' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --bg: #0b1220; --surface: #101a2c; --surface2: #152036; --line: #1e2c46;
@@ -28,6 +29,7 @@ h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
 h1 .ai { color: var(--accent); }
 .sub { color: var(--muted); font-size: var(--text-sm); margin-bottom: 20px; }
 .badge { font-size: 0.75rem; font-weight: 700; color: var(--accent-ink); background: var(--accent); padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+h2 { font-size: 1rem; margin-bottom: 10px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 20px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
 .card .name { font-weight: 700; margin-bottom: 2px; }
@@ -35,29 +37,37 @@ h1 .ai { color: var(--accent); }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
 .dot.ok { background: var(--accent); box-shadow: 0 0 8px rgba(45,212,191,.6); }
 .dot.warn { background: var(--warn); }
+.dot.err { background: var(--err); }
 .card .use { font-size: var(--text-sm); color: var(--muted); }
-.chat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
-.chat h2 { font-size: 1rem; margin-bottom: 10px; }
-select, textarea {
+.card .test { font-size: 0.75rem; color: var(--muted); margin-top: 6px; border-top: 1px dashed var(--line); padding-top: 6px; }
+select, textarea, input {
   width: 100%; background: var(--surface2); color: var(--text);
   border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
   font-family: inherit; font-size: var(--text-base); resize: vertical;
 }
 select { max-width: 320px; margin-bottom: 10px; }
-textarea { min-height: 96px; margin-bottom: 10px; }
-.row { display: flex; justify-content: flex-end; gap: 10px; }
+textarea { min-height: 72px; margin-bottom: 10px; }
+.row { display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
 button {
   background: var(--accent); color: var(--accent-ink); font-weight: 700;
   border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-size: var(--text-base);
 }
 button:disabled { opacity: .5; cursor: wait; }
 button.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
-.out { margin-top: 12px; white-space: pre-wrap; background: var(--surface2); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; min-height: 52px; font-size: var(--text-sm); }
-.out .placeholder { color: var(--muted); }
-.out .err { color: var(--err); }
+.chat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 20px; }
+.thread { margin: 10px 0; max-height: 340px; overflow-y: auto; }
+.msg { border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; font-size: var(--text-sm); white-space: pre-wrap; }
+.msg.user { background: var(--surface2); border: 1px solid var(--line); }
+.msg.assistant { background: rgba(45,212,191,.07); border: 1px solid rgba(45,212,191,.25); }
+.msg .who { font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: .04em; }
+.auth-note { color: var(--muted); font-size: var(--text-sm); }
+.auth-row { display: flex; gap: 10px; }
+.auth-row input { flex: 1; }
+.err-text { color: var(--err); font-size: var(--text-sm); margin-top: 6px; }
+.ok-text { color: var(--accent); font-size: var(--text-sm); margin-top: 6px; }
 footer { margin-top: 28px; color: var(--muted); font-size: 0.8125rem; line-height: 1.7; }
 footer b { color: var(--text); }
-@media (max-width: 480px) { h1 { font-size: 1.1rem; } }
+@media (max-width: 480px) { h1 { font-size: 1.1rem; } .auth-row { flex-direction: column; } }
 </style>
 </head>
 <body>
@@ -66,36 +76,163 @@ footer b { color: var(--text); }
     <h1><span class="ai">ai</span>.spaincos.com</h1>
     <span class="badge">$0 · open weights</span>
   </header>
-  <p class="sub">Spain Companies open-weight model gateway — every request routes to free-tier open-weight models. No Perplexity credits.</p>
+  <p class="sub">Spain Companies open-weight model gateway — authenticated chat on free-tier open-weight models. No Perplexity credits.</p>
 
-  <div class="grid">
-    <div class="card">
-      <div class="name"><span class="dot ok"></span>Qwen3.8-27B</div>
-      <div class="meta">Groq free tier · summary + general</div>
-      <div class="use">Fast summarization, digests, weekday report composition.</div>
+  <div class="chat" id="chatCard">
+    <h2>Chat</h2>
+    <div id="authBox">
+      <p class="auth-note">Sign in with your email — we'll send a 6-digit code. The gateway only accepts authenticated users.</p>
+      <div class="auth-row" style="margin-top:10px">
+        <input id="email" type="email" placeholder="you@spaincos.com" autocomplete="email">
+        <button id="sendCodeBtn">Send code</button>
+      </div>
+      <div class="auth-row" id="codeRow" style="display:none; margin-top:10px">
+        <input id="code" type="text" inputmode="numeric" placeholder="6-digit code" autocomplete="one-time-code">
+        <button id="verifyBtn">Verify</button>
+      </div>
+      <div class="err-text" id="authErr"></div>
     </div>
-    <div class="card">
-      <div class="name"><span class="dot warn"></span>Flint v1.0</div>
-      <div class="meta">OpenRouter free tier · coding + agent</div>
-      <div class="use">Shared pool — occasional upstream rate limits; falls back to Qwen.</div>
-    </div>
-    <div class="card">
-      <div class="name"><span class="dot ok"></span>Auto router</div>
-      <div class="meta">OpenRouter free models</div>
-      <div class="use">Routes to whatever free model fits the task.</div>
+    <div id="chatBox" style="display:none">
+      <div class="row" style="justify-content:space-between; margin-bottom:6px">
+        <span class="auth-note">Signed in as <b id="whoami"></b></span>
+        <button class="ghost" id="logoutBtn" style="padding:4px 12px; font-size:0.8rem">Sign out</button>
+      </div>
+      <select id="modelSel">
+        <option value="flint">Flint v1.0 — coding + agent (OpenRouter free)</option>
+        <option value="summary">Qwen3.8-27B — fast general (Groq free)</option>
+        <option value="general">Auto router — best free fit (OpenRouter)</option>
+      </select>
+      <div class="thread" id="thread"></div>
+      <textarea id="prompt" placeholder="Ask anything. Every answer costs $0."></textarea>
+      <div class="row">
+        <button id="sendBtn">Send</button>
+      </div>
+      <div class="err-text" id="chatErr"></div>
     </div>
   </div>
 
-  <div class="chat">
-    <h2>Interactive gateway</h2>
-    <p class="use" style="color:var(--muted);font-size:var(--text-sm)">Direct chat is gated behind the authenticated gateway (in progress). The runner and report rail already use these models for M2 automations — the ledger is <b>ops.llm_requests</b>. This page tracks the fleet.</p>
-    <div class="out" id="out"><span class="placeholder">M2 automations call Qwen3.8-27B (Groq free) and Flint v1.0 (OpenRouter free) via the call-model edge function. Zero credits.</span></div>
+  <h2>Model status</h2>
+  <div class="grid" id="statusGrid">
+    <div class="card"><div class="name"><span class="dot warn"></span>Loading…</div></div>
+  </div>
+  <div class="row" style="justify-content:flex-start; margin-bottom: 20px">
+    <button class="ghost" id="retestBtn">Run tests now</button>
+    <span class="auth-note" id="testedAt"></span>
   </div>
 
   <footer>
     <b>$0 path:</b> free hosted open weights (call-model) → Cloudflare Workers AI free tier → LiteLLM self-host on own hardware (GLM-5.3) → cheap hosted open weights.<br>
-    Deterministic work runs on the Spain Runner report rail; model-assisted work (M2) routes through these models. Ledger: <b>ops.llm_requests</b>.
+    Chat is authenticated (Supabase email code); the gateway-chat function rejects unauthenticated calls server-side. Status tests run live against each model. Ledger: <b>ops.llm_requests</b>.
   </footer>
 </div>
+
+<script>
+const SUPABASE_URL = "https://dcyjmftriqayqaonitlx.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjeWptZnRyaXFheXFvbml0bHgiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc3OTY4Nzk1OSwiZXhwIjoyMDk1MjYzOTU5OX0.ycGQ1gqFNJupCoUchWBfWVJOKPp-w94w2eyYAZNPBsI";
+const GATEWAY = SUPABASE_URL + "/functions/v1";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ---- AUTH ----
+const authBox = document.getElementById("authBox"), chatBox = document.getElementById("chatBox");
+const authErr = document.getElementById("authErr");
+document.getElementById("sendCodeBtn").onclick = async () => {
+  authErr.textContent = "";
+  const email = document.getElementById("email").value.trim();
+  if (!email) return (authErr.textContent = "Enter your email first.");
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  if (error) return (authErr.textContent = error.message);
+  document.getElementById("codeRow").style.display = "flex";
+  document.getElementById("sendCodeBtn").textContent = "Resend code";
+};
+document.getElementById("verifyBtn").onclick = async () => {
+  authErr.textContent = "";
+  const email = document.getElementById("email").value.trim();
+  const token = document.getElementById("code").value.trim();
+  const { error } = await sb.auth.verifyOtp({ email, token, type: "email" });
+  if (error) return (authErr.textContent = error.message);
+  location.reload();
+};
+document.getElementById("logoutBtn").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+sb.auth.getSession().then(({ data }) => {
+  if (data?.session) {
+    authBox.style.display = "none";
+    chatBox.style.display = "block";
+    document.getElementById("whoami").textContent = data.session.user.email;
+  }
+});
+
+// ---- CHAT ----
+const thread = document.getElementById("thread");
+let history = [];
+document.getElementById("sendBtn").onclick = async () => {
+  const chatErr = document.getElementById("chatErr");
+  chatErr.textContent = "";
+  const prompt = document.getElementById("prompt").value.trim();
+  if (!prompt) return;
+  const purpose = document.getElementById("modelSel").value;
+  history.push({ role: "user", content: prompt });
+  renderMsg("user", prompt);
+  document.getElementById("prompt").value = "";
+  const btn = document.getElementById("sendBtn");
+  btn.disabled = true; btn.textContent = "Thinking…";
+  try {
+    const { data: s } = await sb.auth.getSession();
+    const res = await fetch(GATEWAY + "/gateway-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
+      body: JSON.stringify({ messages: history, purpose, max_tokens: 512 }),
+    });
+    const data = await res.json();
+    if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
+    if (!res.ok) throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
+    const content = data?.choices?.[0]?.message?.content ?? "(empty response)";
+    history.push({ role: "assistant", content });
+    renderMsg("assistant", content + (data?.model ? "\n— " + data.model : ""));
+  } catch (e) {
+    chatErr.textContent = String(e.message ?? e);
+  } finally {
+    btn.disabled = false; btn.textContent = "Send";
+  }
+};
+document.getElementById("prompt").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) document.getElementById("sendBtn").click();
+});
+function renderMsg(role, content) {
+  const div = document.createElement("div");
+  div.className = "msg " + role;
+  div.innerHTML = '<div class="who">' + role + "</div>";
+  div.appendChild(document.createTextNode(content));
+  thread.appendChild(div);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+// ---- STATUS ----
+async function loadStatus(force) {
+  const grid = document.getElementById("statusGrid");
+  const url = GATEWAY + "/gateway-status" + (force ? "?force=1" : "");
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    document.getElementById("testedAt").textContent = data.cached ? "cached · tested " + new Date(data.tested_at).toLocaleTimeString() : "tested " + new Date(data.tested_at).toLocaleTimeString();
+    grid.innerHTML = "";
+    for (const r of data.results) {
+      const dot = r.status === "pass" ? "ok" : "err";
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML =
+        '<div class="name"><span class="dot ' + dot + '"></span>' + r.name + "</div>" +
+        '<div class="meta">' + r.provider + " · " + r.model + "</div>" +
+        '<div class="use">' + r.use + "</div>" +
+        '<div class="test">' + (r.status === "pass" ? "PASS" : "FAIL") + " · " + r.latency_ms + "ms · " + (r.error ?? "responded correctly") + "</div>";
+      grid.appendChild(card);
+    }
+  } catch (e) {
+    grid.innerHTML = '<div class="card"><div class="name"><span class="dot err"></span>Status endpoint unreachable</div></div>';
+  }
+}
+document.getElementById("retestBtn").onclick = () => loadStatus(true);
+loadStatus(false);
+</script>
 </body>
 </html>
