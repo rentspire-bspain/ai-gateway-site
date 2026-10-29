@@ -1,0 +1,16 @@
+{
+  "name": "ai-gateway-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Gateway with Perplexity-style UX and ZIP5 geocoding worker",
+  "main": "api/geocode.js",
+  "scripts": {
+    "start": "node api/geocode.js"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
