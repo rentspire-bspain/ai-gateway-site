@@ -1075,7 +1075,7 @@ document.getElementById("authBack").onclick = () => {
 };
 
 // ============ SEARCH FLOW ============
-const searchingSteps = ["Parsing query", "Searching sources", "Reading results", "Synthesizing answer"];
+const searchingSteps = ["Parsing question", "Routing to model", "Drafting answer", "Finalizing"];
 function renderSearching(container, query) {
   container.innerHTML = "";
   const q = document.createElement("div");
@@ -1103,14 +1103,8 @@ function renderSearching(container, query) {
 }
 
 function extractSources(text) {
-  // Extract sources from the response or generate placeholder sources
-  const domains = [
-    { domain: "hud.gov", title: "HUD Official Data" },
-    { domain: "census.gov", title: "US Census Bureau" },
-    { domain: "rentspire.com", title: "RentSpire Data" },
-    { domain: "spaincos.com", title: "Spain Companies Research" }
-  ];
-  return domains.slice(0, 4);
+  // No fabricated citations: this chat has no retrieval, so it returns no sources.
+  return [];
 }
 
 function generateRelated(query) {
@@ -1215,6 +1209,12 @@ function renderAnswer(container, text, sources, related) {
   }
 }
 
+const SYSTEM_PROMPT = [
+  "You are the Spain Companies research assistant, running on open-weight models.",
+  "Domain: US multifamily and affordable housing underwriting -- HUD Fair Market Rents (FMR), Small Area FMR, Section 8 / Housing Choice Vouchers, rent reasonableness (24 CFR 982.507), LIHTC, Qualified Census Tracts (QCT) and Difficult Development Areas (DDA), AMI and income limits, PHAs, NSPIRE inspections, cap rates, DSCR, NOI, IRR, and property-level scoring.",
+  "Rules: (1) Answer directly in the first sentence, then give short supporting detail. (2) Be accurate; if you are not sure of a figure, rule, or date, say so plainly -- never invent numbers, statutes, or citations. (3) You have no live access to Spain Terminal data or the web in this chat, so do not claim to have looked anything up or to cite sources; name the authoritative source the user should check (for example HUD User FMR tables, 24 CFR, the IRS LIHTC rules, the Census ACS). (4) For questions about a specific property's data or score, explain how the measure works and what would drive it, and say the property's actual values must be read in the Spain Terminal. (5) Keep answers under 250 words unless asked for more, in plain prose with short lists where helpful. (6) Use prior turns for follow-up questions."
+].join(" ");
+
 async function performSearch(query) {
   if (isSearching || !query.trim()) return;
   isSearching = true;
@@ -1243,7 +1243,8 @@ async function performSearch(query) {
   }
   
   const purpose = document.getElementById("modelSel").value;
-  const history = [{ role: "user", content: query }];
+  const prior = (thread.messages || []).slice(-8).map(m => ({ role: m.role, content: String(m.content || "").slice(0, 1500) }));
+  const history = [{ role: "system", content: SYSTEM_PROMPT }, ...prior, { role: "user", content: query }];
   
   try {
     const { data: s } = await sb.auth.getSession();
