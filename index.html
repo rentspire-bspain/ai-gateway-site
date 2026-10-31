@@ -1216,6 +1216,44 @@ const SYSTEM_PROMPT = [
   "Rules: (1) Answer directly in the first sentence, then give short supporting detail. (2) Be accurate; if you are not sure of a figure, rule, or date, say so plainly -- never invent numbers, statutes, or citations. (3) You have no live access to Spain Terminal data or the web in this chat, so do not claim to have looked anything up or to cite sources; name the authoritative source the user should check (for example HUD User FMR tables, 24 CFR, the IRS LIHTC rules, the Census ACS). (4) For questions about a specific property's data or score, explain how the measure works and what would drive it, and say the property's actual values must be read in the Spain Terminal. (5) Keep answers under 250 words unless asked for more, in plain prose with short lists where helpful. (6) Use prior turns for follow-up questions."
 ].join(" ");
 
+// Reads the gateway-chat SSE stream and paints tokens as they arrive. Returns the final "done" event.
+async function readAnswerStream(res, content, query, interval, state, t0) {
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "", live = null, text = "", done = null;
+  window.__ttft = null;
+  const ensureLive = () => {
+    if (live) return;
+    clearInterval(interval);
+    content.innerHTML = "";
+    const q = document.createElement("div");
+    q.className = "question-header";
+    q.textContent = query;
+    content.appendChild(q);
+    live = document.createElement("div");
+    live.className = "answer-text";
+    live.style.whiteSpace = "pre-wrap";
+    content.appendChild(live);
+  };
+  for (;;) {
+    const { value, done: fin } = await reader.read();
+    if (fin) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf("\n\n")) >= 0) {
+      const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
+      const line = chunk.split("\n").find(l => l.startsWith("data:"));
+      if (!line) continue;
+      let ev; try { ev = JSON.parse(line.slice(5)); } catch (_e) { continue; }
+      if (ev.t === "think") { const el = state && state.querySelector(".searching-text"); if (el && !live) el.textContent = "Thinking..."; }
+      else if (ev.t === "d") { ensureLive(); if (window.__ttft === null) window.__ttft = Math.round(performance.now() - t0); text += ev.c; live.textContent = text; }
+      else if (ev.t === "done") done = ev;
+    }
+  }
+  if (!done) throw new Error("The response stream ended early. Please try again.");
+  return done;
+}
+
 async function performSearch(query) {
   if (isSearching || !query.trim()) return;
   isSearching = true;
@@ -1249,15 +1287,24 @@ async function performSearch(query) {
   
   try {
     const { data: s } = await sb.auth.getSession();
+    const t0 = performance.now();
     const res = await fetch(GATEWAY + "/gateway-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-      body: JSON.stringify({ messages: history, purpose, max_tokens: 2048 }),
+      body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true }),
     });
-    const data = await res.json();
-    if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
-    if (!res.ok) throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
-    const answer = data?.choices?.[0]?.message?.content ?? "(empty response)";
+    let data, answer;
+    if (res.ok && (res.headers.get("content-type") || "").includes("text/event-stream")) {
+      data = await readAnswerStream(res, content, query, interval, state, t0);
+      if (data.error) throw new Error(data.error);
+      answer = data.content;
+    } else {
+      data = await res.json();
+      if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
+      if (!res.ok) throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
+      answer = data?.choices?.[0]?.message?.content ?? "(empty response)";
+    }
+    window.__lastTiming = { client_total_ms: Math.round(performance.now() - t0), server: data.x_timing_ms || null, ttft_ms: window.__ttft || null };
     
     // Clear searching state
     clearInterval(interval);
