@@ -1,0 +1,1799 @@
+{
+ "OLD_auto_nosys": [
+  {
+   "id": "Q01",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 14548,
+   "err": null
+  },
+  {
+   "id": "Q02",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "For HUD Qualified Census Tract (QCT) designations, the population cap in a metropolitan area is **20% of the metropolitan area\u2019s total population**. In other words, the aggregate population of all QCTs designated within a metro area cannot exceed **20 percent** of that metro area\u2019s population. This cap does not apply in the same way to nonmetropolitan areas. When eligible tracts exceed the cap, HUD ranks/selects tracts to stay within it.",
+   "finish": "stop",
+   "tokens": 512,
+   "ms": 3657,
+   "err": null
+  },
+  {
+   "id": "Q03",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 13279,
+   "err": null
+  },
+  {
+   "id": "Q04",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A **Difficult Development Area (DDA)** is a U.S. Department of Housing and Urban Development (HUD) designation used mainly in the **Low-Income Housing Tax Credit (LIHTC)** program. A DDA is an area\u2014typically a metropolitan area or a nonmetropolitan county\u2014where **construction, land, and utility costs are high relative to area median gross income**. Because affordable housing is harder to develop in such places, LIHTC projects located in a DDA can qualify for an **up to 30% increase in eligible basis**, which increases the tax credits available to the project.\n\nDDAs are designated annually by HUD and are distinct from **Qualified Census Tracts (QCTs)**, though both receive the same LIHTC basis boost.",
+   "finish": "stop",
+   "tokens": 433,
+   "ms": 3621,
+   "err": null
+  },
+  {
+   "id": "Q05",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "HUD Fair Market Rents (FMRs) generally represent the **40th percentile of gross rents**\u2014rent plus utilities\u2014for standard-quality rental units in a given area and bedroom size.\n\nException: HUD may set FMRs at the **50th percentile** in certain designated areas to expand housing choice for voucher holders.",
+   "finish": "stop",
+   "tokens": 427,
+   "ms": 2716,
+   "err": null
+  },
+  {
+   "id": "Q06",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "New HUD Fair Market Rents (FMRs) generally take effect on **October 1 each year**, the start of the federal fiscal year. HUD typically publishes them in late summer/early fall, and they remain in effect until the next annual FMRs take effect\u2014unless HUD issues special or revised FMRs with a different effective date.",
+   "finish": "stop",
+   "tokens": 180,
+   "ms": 1530,
+   "err": null
+  },
+  {
+   "id": "Q07",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A PHA can set its Housing Choice Voucher payment standard **between 90% and 110% of the Fair Market Rent (FMR)** for the unit size **without HUD approval**.\n\nPayment standards above 110%\u2014up to 120% of FMR\u2014require HUD approval.",
+   "finish": "stop",
+   "tokens": 592,
+   "ms": 5877,
+   "err": null
+  },
+  {
+   "id": "Q08",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 4036,
+   "err": null
+  },
+  {
+   "id": "Q09",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "At initial lease-up in the Housing Choice Voucher program, the family\u2019s share of rent generally may not exceed **40% of adjusted monthly income**. This is the \u201cinitial rent burden\u201d limit, subject to limited HUD exceptions.",
+   "finish": "stop",
+   "tokens": 815,
+   "ms": 4424,
+   "err": null
+  },
+  {
+   "id": "Q10",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 9420,
+   "err": null
+  },
+  {
+   "id": "Q11",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "Fair Market Rents (FMRs) are governed by HUD regulations at **24 CFR Part 888**, specifically **24 CFR \u00a7 888.113** (\u201cFair Market Rents\u201d). This implements **Section 8(c)(1) of the U.S. Housing Act of 1937** (**42 U.S.C. \u00a7 1437f(c)(1)**). HUD establishes and publishes FMRs annually under that regulation.",
+   "finish": "stop",
+   "tokens": 534,
+   "ms": 3818,
+   "err": null
+  },
+  {
+   "id": "Q12",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The requirement is in **24 CFR \u00a7 982.507**, titled **\u201cRent reasonableness.\u201d** Specifically, **\u00a7 982.507(a)** makes the PHA responsible for determining whether the rent to owner is reasonable for a voucher unit compared with rents for comparable unassisted units.",
+   "finish": "stop",
+   "tokens": 312,
+   "ms": 2973,
+   "err": null
+  },
+  {
+   "id": "Q13",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 10776,
+   "err": null
+  },
+  {
+   "id": "Q14",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "HUD\u2019s income limits are generally set as percentages of the area median family income (AMI):\n\n- **Very low-income (VLI) limit:** **50% of AMI**\n- **Low-income (LI) limit:** **80% of AMI**\n\nHUD also has an **extremely low-income (ELI)** limit at **30% of AMI**.",
+   "finish": "stop",
+   "tokens": 254,
+   "ms": 1919,
+   "err": null
+  },
+  {
+   "id": "Q15",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "HUD generally computes the four-person low-income limit as:\n\n**4-person Low-Income Limit = 4-person Very Low-In",
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 6596,
+   "err": null
+  },
+  {
+   "id": "Q16",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "LIHTC credits are generally claimed over **10 years**\u2014the annual credit is taken each year for 10 years, beginning in the year the building is placed in service (with the first year often prorated). The **15-year compliance period** is separate from the 10-year credit-claiming period.",
+   "finish": "stop",
+   "tokens": 204,
+   "ms": 3029,
+   "err": null
+  },
+  {
+   "id": "Q17",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The LIHTC **initial compliance period is 15 years**. It begins with the first taxable year of the 10-year credit period. This is typically followed by a **15-year extended use period**, for a total affordability period of at least 30 years (unless a longer period is required by the state).",
+   "finish": "stop",
+   "tokens": 215,
+   "ms": 1111,
+   "err": null
+  },
+  {
+   "id": "Q18",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The federal minimum total affordability period for LIHTC properties allocated after 1989 is **30 years**: a **15-year compliance period** plus a **minimum 15-year extended use period**. State allocating agencies may require a longer extended-use period.",
+   "finish": "stop",
+   "tokens": 268,
+   "ms": 1080,
+   "err": null
+  },
+  {
+   "id": "Q19",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The two classic LIHTC minimum set-aside tests are:\n\n1. **20/50 test** \u2014 At least **20%** of the project\u2019s residential units must be rent-restricted and occupied by households at or below **50% of area median gross income (AMGI)**.\n2. **40/60 test** \u2014 At least **40%** of the project\u2019s residential units must be rent-restricted and occupied by households at or below **60% of AMGI**.\n\nThese are the traditional minimum set-aside elections under IRC \u00a742(g)(1), separate from the newer average-income test.",
+   "finish": "stop",
+   "tokens": 386,
+   "ms": 2325,
+   "err": null
+  },
+  {
+   "id": "Q20",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 5245,
+   "err": null
+  },
+  {
+   "id": "Q21",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "There is no single dollar maximum; the max gross rent for a LIHTC unit depends on the unit",
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 3642,
+   "err": null
+  },
+  {
+   "id": "Q22",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "Roughly:\n\n- **9% LIHTC credits** are designed to generate a present value of about **70% of the qualified/eligible basis** over the 10-year credit period.\n- **4% LIHTC credits** are designed to generate a present value of about **30% of the qualified/eligible basis**.\n\nSo, for every **$100 of qualified cost/eligible basis**, the credits are roughly worth:\n\n- **9% credits:** ~**$70 present value**\n- **4% credits:** ~**$30 present value**\n\nCaveat: these are IRS target present values based on the credit period and discount assumptions. Actual investor equity/pricing can differ due to market yield, timing, syndication costs, state rules, and whether the basis is eligible. Also, \u201cqualified cost\u201d here generally means **eligible basis**, not total development cost.",
+   "finish": "stop",
+   "tokens": 622,
+   "ms": 3004,
+   "err": null
+  },
+  {
+   "id": "Q23",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 4403,
+   "err": null
+  },
+  {
+   "id": "Q24",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 10889,
+   "err": null
+  },
+  {
+   "id": "Q25",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 4268,
+   "err": null
+  },
+  {
+   "id": "Q26",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 3448,
+   "err": null
+  },
+  {
+   "id": "Q27",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The NSPIRE final rule was published in the Federal Register on **May 11, 2023**. It replaces HUD\u2019s **Uniform Physical Condition Standards (UPCS)** and **Housing Quality Standards (HQS)** with the **National Standards for the Physical Inspection of Real Estate (NSPIRE)** across HUD-assisted housing programs.",
+   "finish": "stop",
+   "tokens": 306,
+   "ms": 2390,
+   "err": null
+  },
+  {
+   "id": "Q28",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7571,
+   "err": null
+  },
+  {
+   "id": "Q29",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 12538,
+   "err": null
+  },
+  {
+   "id": "Q30",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The minimum public housing flat rent is generally **80% of the applicable Fair Market Rent (FMR)** for a comparable unit. In other words, a PHA\u2019s flat rent cannot be set below **80% of FMR** (subject to HUD rules/exceptions).",
+   "finish": "stop",
+   "tokens": 429,
+   "ms": 2218,
+   "err": null
+  },
+  {
+   "id": "Q31",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7100,
+   "err": null
+  },
+  {
+   "id": "T01",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 5812,
+   "err": null
+  },
+  {
+   "id": "T02",
+   "ok": true,
+   "model": "openai/gpt-6-luna",
+   "answer": "I can\u2019t access the Spain Terminal or its property records from this chat, so I can\u2019t reliably identify which assets are in its scorable multifamily universe. Share an export or screenshot, and I can list the properties and summarize the criteria that make them scorable.",
+   "finish": "stop",
+   "tokens": 349,
+   "ms": 4165,
+   "err": null
+  },
+  {
+   "id": "T03",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "No. In a terminal, a property being \u201cscored\u201d generally means the system has assigned a score/derived value to it\u2014not that its underlying inputs are \u201creal\u201d (actual, reported, real-time, or non-estimated). It could be model-derived or based on proxies/estimates/delayed data. You\u2019d need to check that field\u2019s definition/source flags to know whether the inputs are real. If you mean a specific terminal/platform, tell me which one and I can be more precise.",
+   "finish": "stop",
+   "tokens": 859,
+   "ms": 6047,
+   "err": null
+  },
+  {
+   "id": "T04",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 9275,
+   "err": null
+  },
+  {
+   "id": "T05",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7883,
+   "err": null
+  },
+  {
+   "id": "T06",
+   "ok": true,
+   "model": "openai/gpt-6-luna",
+   "answer": "I don\u2019t have the property data needed to calculate that. Please share the dataset (or the counts of terminal properties and those with no rent signal source). The share is:\n\n**terminal properties with no rent signal source \u00f7 all terminal properties**.",
+   "finish": "stop",
+   "tokens": 151,
+   "ms": 2156,
+   "err": null
+  },
+  {
+   "id": "T07",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I don't have visibility into your terminal or running processes, so I can't tell you directly. Here are some ways to check:\n\n**If you know the process name:**\n```bash\nps aux | grep -i parcels_general\n```\n\n**If it's a Python script:**\n```bash\nps aux | grep -i rescoring\n# or\npgrep -af python\n```\n\n**If it's running in a specific terminal, check that terminal** \u2014 look for:\n- Recent output lines with timestamps\n- A cursor (not returned to prompt) indicating an active job\n- `Ctrl+C` test (only if you're willing to interrupt it)\n\n**If it's a scheduler/queue job:**\n```bash\n# Slurm\nsqueue -u $USER\n\n# Or check log files it might write to\nls -lt *.log 2>/dev/null | head\ntail -f <relevant>.log\n```\n\n**Check CPU activity** as a proxy:\n```bash\ntop -u $USER\n# or\nhtop\n```\n\nIf you tell me the command you used to launch it (or share a snippet of the terminal output), I can help you interpret what you're seeing.",
+   "finish": "stop",
+   "tokens": 312,
+   "ms": 2960,
+   "err": null
+  },
+  {
+   "id": "T08",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I don\u2019t have access to the terminal\u2019s `properties_base` table or its schema, so I can\u2019t determine the row count or the duplicate/junk fraction from the information provided.\n\nTo compute it, run something like:\n\n```sql\nSELECT\n  COUNT(*) AS total_rows,\n  SUM(CASE WHEN is_duplicate OR is_junk THEN 1 ELSE 0 END) AS flagged_rows,\n  SUM(CASE WHEN is_duplicate OR is_junk THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS flagged_fraction\nFROM properties_base;\n```\n\nIf duplicates and junk are tracked in separate columns, replace the condition with the actual column names, e.g.:\n\n```sql\nSUM(CASE WHEN duplicate_flag = 1 OR junk_flag = 1 THEN 1 ELSE 0 END)\n```\n\nWithout the table/schema or query results, the exact row count and fraction are unknown.",
+   "finish": "stop",
+   "tokens": 409,
+   "ms": 1922,
+   "err": null
+  },
+  {
+   "id": "T09",
+   "ok": true,
+   "model": "openai/gpt-6-luna",
+   "answer": "I can\u2019t access ai.spaincos.com live from this chat, so I can\u2019t reliably confirm its current per-question cost or which models it uses. If you share the site\u2019s pricing page or a screenshot, I can summarize both.",
+   "finish": "stop",
+   "tokens": 337,
+   "ms": 3771,
+   "err": null
+  }
+ ],
+ "QWEN_sys": [
+  {
+   "id": "Q01",
+   "ok": true,
+   "model": "qwen/qwen3.8-27b",
+   "answer": "HUD defines a Qualified Census Tract (QCT) under the Low-Income Housing Tax Credit (LIHTC) program as a census tract with a low-to-moderate area status, meaning at least 20.0% of the households in the tract receive income below 80% of the area median income (AMI), or at least 40.0% of the households receive income below 120% of the AMI.\n\nTo be precise:\n*   **20% Rule:** At least 20% of households earn <80% AMI.\n*   **Cape Porpoise Alternative:** If a state or local agency designates a \"Cape Porpoise\" alternative, at least 10% of households must earn <50% AMI and at least 10% of households must earn between 50% and 100% AMI (though the 20%/<80% AMI standard is the primary federal definition for QCTs).\n\nThe United States Census Bureau provides the necessary household income data through the American Community Survey (ACS). State Housing Finance Agencies (HFAs) typically update and designate QCTs periodically (often every two years) based on the latest available ACS data. Developers targeting LIHTC QCT points receive a 1-point bonus in the DH (points system) scoring, which can significantly impact the competitiveness of a bid.\n\nYou should verify current QCT designations and specific income thresholds using the most recent ACS data and your state HFA\u2019s published QCT list, as these definitions and specific tracts are updated periodically.",
+   "finish": "stop",
+   "tokens": 342,
+   "ms": 2073,
+   "err": null
+  },
+  {
+   "id": "Q02",
+   "ok": true,
+   "answer": null,
+   "ms": 149,
+   "err": null
+  },
+  {
+   "id": "Q03",
+   "ok": true,
+   "answer": null,
+   "ms": 174,
+   "err": null
+  },
+  {
+   "id": "Q04",
+   "ok": true,
+   "model": "qwen/qwen3.8-27b",
+   "answer": "A Difficult Development Area (DDA) is a housing market location where the construction and acquisition costs for new multifamily housing are so high that standard Low-Income Housing Tax Credit (LIHTC) equity and debt financing are insufficient to make the project viable.\n\nUnder the Internal Revenue Code (Section 42), the IRS assigns DDAs a higher \"funding factor\" (typically 0.20 compared to the standard 0.14) when calculating Qualified Basis. This metric allows developers to secure more equity for their projects to remain financially successful. A location generally qualifies as a DDA if the weighted average construction costs in its Metropolitan Statistical Area or non-metropolitan county are at least 20% higher than the national average. These lists are updated annually for the pricing calendar year, and the authoritative source for current designations is the IRS Publication 514 and its accompanying annual notices.",
+   "finish": "stop",
+   "tokens": 187,
+   "ms": 1698,
+   "err": null
+  },
+  {
+   "id": "Q05",
+   "ok": true,
+   "model": "qwen/qwen3.8-27b",
+   "answer": "HUD Fair Market Rents (FMRs) represent the 40th percentile of gross market rents for reasonably efficient, average-finish units in non-submarket housing.\n\nThis 40th percentile level was established by Congress in the Multifamily Housing Modernization Act of 1992 and is codified in 24 CFR 982.306. It is intended to cover the cost of typical rents in the area without assuming premium finishes or locations. \n\nPlease note that these national standards are being phased out in favor of Small Area FMRs (SAFMRs) in many jurisdictions, which operate under similar percentile principles but with more granular geographic specificity. To verify the current effective 40th percentile values for a specific market, you must consult the latest HUD User Fair Market Rent tables.",
+   "finish": "stop",
+   "tokens": 171,
+   "ms": 642,
+   "err": null
+  },
+  {
+   "id": "Q06",
+   "ok": true,
+   "model": "qwen/qwen3.8-27b",
+   "answer": "New HUD Fair Market Rents (FMRs) typically take effect on October 1 of a given year.\n\nUnder standard HUD practice, the final FMRs for a specific area are published in the Federal Register no earlier than 90 days before the effective date, which aligns with the October 1 start. This timing allows Public Housing Agencies (PHAs) and housing providers to update their admission guidelines and rent limitations policies for the upcoming fiscal cycle.\n\nIt is important to note that this date applies to standard FMR areas. For Small Area FMR (SAFMR) areas, the effective date is also generally October 1, but PHAs must provide additional notices to existing tenants regarding potential rent increases or decreases based on the specific SAFMR standards for their unit size and location.\n\nTo confirm the exact effective date for a specific year or to handle exceptions, you should check the official FMR publication notice in the Federal Register and verify the local PHA\u2019s policy adoption timeline, as local implementation can vary slightly.",
+   "finish": "stop",
+   "tokens": 210,
+   "ms": 800,
+   "err": null
+  },
+  {
+   "id": "Q07",
+   "ok": true,
+   "answer": null,
+   "ms": 108,
+   "err": null
+  },
+  {
+   "id": "Q08",
+   "ok": true,
+   "answer": null,
+   "ms": 100,
+   "err": null
+  },
+  {
+   "id": "Q09",
+   "ok": true,
+   "answer": null,
+   "ms": 146,
+   "err": null
+  },
+  {
+   "id": "Q10",
+   "ok": true,
+   "model": "qwen/qwen3.8-27b",
+   "answer": "An FMR includes only the basic structure charge (rent), covering the unit itself and common areas, but it excludes all ancillary tenant charges.\n\nSpecifically, FMRs do not include:\n*   Utilities (water, sewer, trash, gas, electricity)\n*   Cable or internet service\n*  Parking fees\n*   Pet rent or pet deposits\n*   Amenities like laundry facilities, club rooms, or fitness centers\n*   Security fees or move-in fees\n\nWhen determining rent reasonableness for Housing Choice Voucher (HCV) contracts, the unit\u2019s rent is compared to the FMR (or Small Area FMR) for the appropriate bedroom size. If the initial contract includes ancillary charges, the regulator must evaluate whether the total payment standard remains reasonable by comparing the rent portion to the FMR and assessing if the ancillary charges are market-rate and not excessive. You can verify current FMR levels and definitions in the HUD User FMR tables and 24 CFR 982.507.",
+   "finish": "stop",
+   "tokens": 214,
+   "ms": 709,
+   "err": null
+  },
+  {
+   "id": "Q11",
+   "ok": true,
+   "answer": null,
+   "ms": 186,
+   "err": null
+  },
+  {
+   "id": "Q12",
+   "ok": true,
+   "answer": null,
+   "ms": 146,
+   "err": null
+  },
+  {
+   "id": "Q13",
+   "ok": true,
+   "answer": null,
+   "ms": 143,
+   "err": null
+  },
+  {
+   "id": "Q14",
+   "ok": true,
+   "answer": null,
+   "ms": 112,
+   "err": null
+  },
+  {
+   "id": "Q15",
+   "ok": true,
+   "answer": null,
+   "ms": 159,
+   "err": null
+  },
+  {
+   "id": "Q16",
+   "ok": true,
+   "answer": null,
+   "ms": 156,
+   "err": null
+  },
+  {
+   "id": "Q17",
+   "ok": true,
+   "answer": null,
+   "ms": 247,
+   "err": null
+  },
+  {
+   "id": "Q18",
+   "ok": true,
+   "answer": null,
+   "ms": 419,
+   "err": null
+  },
+  {
+   "id": "Q19",
+   "ok": true,
+   "answer": null,
+   "ms": 145,
+   "err": null
+  },
+  {
+   "id": "Q20",
+   "ok": true,
+   "answer": null,
+   "ms": 125,
+   "err": null
+  },
+  {
+   "id": "Q21",
+   "ok": true,
+   "answer": null,
+   "ms": 194,
+   "err": null
+  },
+  {
+   "id": "Q22",
+   "ok": true,
+   "answer": null,
+   "ms": 111,
+   "err": null
+  },
+  {
+   "id": "Q23",
+   "ok": true,
+   "answer": null,
+   "ms": 75,
+   "err": null
+  },
+  {
+   "id": "Q24",
+   "ok": true,
+   "answer": null,
+   "ms": 159,
+   "err": null
+  },
+  {
+   "id": "Q25",
+   "ok": true,
+   "answer": null,
+   "ms": 177,
+   "err": null
+  },
+  {
+   "id": "Q26",
+   "ok": true,
+   "answer": null,
+   "ms": 147,
+   "err": null
+  },
+  {
+   "id": "Q27",
+   "ok": true,
+   "answer": null,
+   "ms": 157,
+   "err": null
+  },
+  {
+   "id": "Q28",
+   "ok": true,
+   "answer": null,
+   "ms": 155,
+   "err": null
+  },
+  {
+   "id": "Q29",
+   "ok": true,
+   "answer": null,
+   "ms": 104,
+   "err": null
+  },
+  {
+   "id": "Q30",
+   "ok": true,
+   "answer": null,
+   "ms": 164,
+   "err": null
+  },
+  {
+   "id": "Q31",
+   "ok": true,
+   "answer": null,
+   "ms": 90,
+   "err": null
+  },
+  {
+   "id": "T01",
+   "ok": true,
+   "answer": null,
+   "ms": 89,
+   "err": null
+  },
+  {
+   "id": "T02",
+   "ok": true,
+   "answer": null,
+   "ms": 173,
+   "err": null
+  },
+  {
+   "id": "T03",
+   "ok": true,
+   "answer": null,
+   "ms": 87,
+   "err": null
+  },
+  {
+   "id": "T04",
+   "ok": true,
+   "answer": null,
+   "ms": 151,
+   "err": null
+  },
+  {
+   "id": "T05",
+   "ok": true,
+   "answer": null,
+   "ms": 80,
+   "err": null
+  },
+  {
+   "id": "T06",
+   "ok": true,
+   "answer": null,
+   "ms": 132,
+   "err": null
+  },
+  {
+   "id": "T07",
+   "ok": true,
+   "answer": null,
+   "ms": 78,
+   "err": null
+  },
+  {
+   "id": "T08",
+   "ok": true,
+   "answer": null,
+   "ms": 128,
+   "err": null
+  },
+  {
+   "id": "T09",
+   "ok": true,
+   "answer": null,
+   "ms": 162,
+   "err": null
+  }
+ ],
+ "FLINT_sys": [
+  {
+   "id": "Q01",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 9917,
+   "err": null
+  },
+  {
+   "id": "Q02",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 10624,
+   "err": null
+  },
+  {
+   "id": "Q03",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7820,
+   "err": null
+  },
+  {
+   "id": "Q04",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7820,
+   "err": null
+  },
+  {
+   "id": "Q05",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 9779,
+   "err": null
+  },
+  {
+   "id": "Q06",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "New HUD Fair Market Rents generally take effect each year on **July 1**. HUD typically issues its annual FMR updates around that time, and the new effective date applies to Section 8 and related rental subsidy calculations, including Small Area FMR.\n\nFor a specific year, the authoritative source to check is HUD\u2019s Fair Market Rent schedule/user tables, which should list the effective date for that year\u2019s FMR. If you\u2019re looking at a particular property or voucher, the actual rent reasonableness and effective timing can also depend on the specific program and approval date.",
+   "finish": "stop",
+   "tokens": 1006,
+   "ms": 10673,
+   "err": null
+  },
+  {
+   "id": "Q07",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7835,
+   "err": null
+  },
+  {
+   "id": "Q08",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8019,
+   "err": null
+  },
+  {
+   "id": "Q09",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 10332,
+   "err": null
+  },
+  {
+   "id": "Q10",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 11386,
+   "err": null
+  },
+  {
+   "id": "Q11",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7959,
+   "err": null
+  },
+  {
+   "id": "Q12",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8328,
+   "err": null
+  },
+  {
+   "id": "Q13",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8179,
+   "err": null
+  },
+  {
+   "id": "Q14",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "HUD\u2019s very low-income threshold is **50% of Area Median Income (AMI)**, and its low-income threshold is **80% of AMI**.\n\nIn plain terms: a household is considered **very low income**",
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 11367,
+   "err": null
+  },
+  {
+   "id": "Q15",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7970,
+   "err": null
+  },
+  {
+   "id": "Q16",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8327,
+   "err": null
+  },
+  {
+   "id": "Q17",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "The LIHTC initial compliance period is generally **15 years**.\n\nIt begins on the date the building is placed in service and runs during the 15-year credit period, during which the owner must meet the required low-income occupancy and rent limits under IRC \u00a742. If the building was placed in service **before Jan. 1, 1999**, the compliance period is generally **10 years** instead.\n\nAfter the initial compliance period, recapture rules may apply during the subsequent five-year period if the property is disposed of. For the exact period, check the IRS LIHTC rules and the specific credit allocation documents.",
+   "finish": "stop",
+   "tokens": 689,
+   "ms": 5098,
+   "err": null
+  },
+  {
+   "id": "Q18",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 10875,
+   "err": null
+  },
+  {
+   "id": "Q19",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7929,
+   "err": null
+  },
+  {
+   "id": "Q20",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8050,
+   "err": null
+  },
+  {
+   "id": "Q21",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8286,
+   "err": null
+  },
+  {
+   "id": "Q22",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7986,
+   "err": null
+  },
+  {
+   "id": "Q23",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 22809,
+   "err": null
+  },
+  {
+   "id": "Q24",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8114,
+   "err": null
+  },
+  {
+   "id": "Q25",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8126,
+   "err": null
+  },
+  {
+   "id": "Q26",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8019,
+   "err": null
+  },
+  {
+   "id": "Q27",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 22817,
+   "err": null
+  },
+  {
+   "id": "Q28",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7590,
+   "err": null
+  },
+  {
+   "id": "Q29",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8213,
+   "err": null
+  },
+  {
+   "id": "Q30",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8036,
+   "err": null
+  },
+  {
+   "id": "Q31",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 22117,
+   "err": null
+  },
+  {
+   "id": "T01",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "I can\u2019t determine the letter grade for a property with a score of 66 from here. I don\u2019t have live access to the Spain Terminal\u2019s scorecard or its score-to-grade mapping, and a raw score like 66 may not map to one fixed letter grade without knowing the full grading scale and cutoffs.\n\nThe letter grade would depend on the Terminal\u2019s specific thresholds\u2014for example, where 66 falls within A/B/C/D bands or pass/fail ranges. I don\u2019t have that mapping loaded, so I can\u2019t responsibly assign one.\n\nTo get the accurate grade, check the property\u2019s scorecard in the Spain Terminal. If you share the property\u2019s score report or the relevant grading criteria, I can help interpret what a score of 66 likely means or how the grade is calculated.",
+   "finish": "stop",
+   "tokens": 825,
+   "ms": 6247,
+   "err": null
+  },
+  {
+   "id": "T02",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "I don\u2019t have access to the Spain Terminal\u2019s underlying database, so I can\u2019t confirm exactly which properties make up its scorable multifamily universe. You\u2019d need to check the Terminal itself for that.\n\nWhat I can say is how such a universe is usually constructed in this space: it typically includes market-rate multifamily properties (often at least 10\u201320 units) and possibly affordable/social housing assets, subject to the asset\u2019s eligibility for the specific score or program being modeled. The Terminal may further filter by geography, asset class, year built, and operational vintage before listing a property as scorable.\n\nFor the authoritative answer, check the Spain Terminal\u2019s methodology or data dictionary. If you can tell me the property\u2019s actual address or identifier, I can explain what would drive its score and how each input (FMR, AMI, LIHTC status, QCT/DDA designation, etc.) would be applied.",
+   "finish": "stop",
+   "tokens": 283,
+   "ms": 2494,
+   "err": null
+  },
+  {
+   "id": "T03",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 8081,
+   "err": null
+  },
+  {
+   "id": "T04",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "I don\u2019t know the current scoring model version in the Spain Terminal, and I can\u2019t verify it from here.\n\nThe Spain Terminal isn\u2019t something I have live access to in this chat, so I can\u2019t read its current model version or confirm whether one has changed. I don\u2019t want to guess or invent a version number, because that wouldn\u2019t be reliable.\n\nFor the authoritative answer, check:\n- The Spain Terminal\u2019s own version or model metadata within the application\n- Your deployment\u2019s release notes or documentation from the vendor\n\nIf you have a specific property or score you\u2019re trying to interpret, I can explain how the underlying measure works and what would drive it \u2014 but the property\u2019s actual values would need to be read directly in the Spain Terminal. What scoring question can I help with?",
+   "finish": "stop",
+   "tokens": 626,
+   "ms": 16013,
+   "err": null
+  },
+  {
+   "id": "T05",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "I can\u2019t provide the mean property score after the v50.0 res",
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 10914,
+   "err": null
+  },
+  {
+   "id": "T06",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "I can\u2019t determine that share from here. I don\u2019t have live access to Spain Terminal data or a current export, so I can\u2019t read the property-level rent signal source field or calculate the percentage.\n\nIf \u201crent signal source\u201d is a field in your terminal data, the share with none recorded would be calculated as:\n\n(# terminal properties where rent_signal_source is null/blank/none) \u00f7 (total terminal properties) \u00d7 100.\n\nYou\u2019d need to run that query in Spain Terminal or your underlying database to get the current figure. Conceptually, properties with no rent signal source would lack a recorded basis for FMR, Small Area FMR, rent reasonableness under 24 CFR 982.507, or rent comparability, and would likely be excluded from or flagged in rent-estimate underwriting.\n\nFor the actual current share, check the Spain Terminal data directly. If you\u2019re asking about a specific property, I can explain how the rent signal source drives its rent reasonableness, but the property\u2019s actual value must be read in Spain Terminal.",
+   "finish": "stop",
+   "tokens": 881,
+   "ms": 6925,
+   "err": null
+  },
+  {
+   "id": "T07",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "I can\u2019t tell you whether the parcels_general rescoring is running right now in the terminal. I don\u2019t have live access to Spain Terminal or its current job status, so I can\u2019t check the runtime queue or logs from here. That kind of operational status would need to be confirmed directly in the terminal\u2019s job monitor or logs.\n\nIf you\u2019re asking whether a specific property\u2019s score is being rescored, that depends on triggers like updated rent/FMR data, income limits, LIHTC status, or QCT/DDA designations. The actual property values and score would need to be read in Spain Terminal.",
+   "finish": "stop",
+   "tokens": 932,
+   "ms": 7814,
+   "err": null
+  },
+  {
+   "id": "T08",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "I can't give you a real number \u2014 I don't have live access to the Spain Terminal's data in this chat, so I can't verify how many rows the `properties_base` table has or what fraction is flagged as duplicates or junk. Any specific figure I offered would be invented, and I won't do that.\n\nFor the accurate figures, you'd need to check the terminal itself (or the underlying source it draws from) for:\n\n- The total row count in `properties_base`\n- The definition of the duplicate/junk flag and its current distribution\n\nIf you paste a query result or export from the terminal into the chat, I'm happy to help you interpret the flag logic, sanity-check duplicates, or compute the flagged fraction. And if you have a follow-up question about how duplicate or junk flags are supposed to work under the underwriting rules we discussed, I can walk through that framework too.",
+   "finish": "stop",
+   "tokens": 529,
+   "ms": 17106,
+   "err": null
+  },
+  {
+   "id": "T09",
+   "ok": true,
+   "model": "recursive/flint-v1.0:free",
+   "answer": "I don\u2019t have a confirmed answer on either the cost or the model used at ai.spaincos.com. I don\u2019t have pricing details for asking a question there, and the specific open-weight model version or deployment isn\u2019t identified in the information available to me here.\n\nIf you mean this Spain Companies research assistant, it\u2019s described as running on open-weight models, but I can\u2019t verify the exact model family/version or whether usage is free, metered, subscription-based, or tied to research access. I also can\u2019t browse ai.spaincos.com or the Spain Terminal from this chat, so I can\u2019t check current pricing or model disclosures.\n\nFor accurate figures, check directly with Spain Companies, on ai.spaincos.com, or through your account/contract. The authoritative source for those operational details would be Spain Companies\u2019 product or contract documentation, not me.",
+   "finish": "stop",
+   "tokens": 1020,
+   "ms": 8038,
+   "err": null
+  }
+ ],
+ "AUTO_sys": [
+  {
+   "id": "Q01",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A Qualified Census Tract (QCT) is a census tract that HUD designates annually because it meets one of two statutory tests: at least 50% of households have income below 60% of area median gross income, or the tract has a poverty rate of at least 25%. The definition is in IRC \u00a742(d)(5)(B)(ii), and HUD publishes the official QCT lists and methodology each year through HUD User.\n\nFor LIHTC, QCT status matters because it can make a new building eligible for the 30% basis boost under \u00a742(d)(5)(B), subject to the statute\u2019s conditions\u2014most notably that the building is not federally subsidized and the boost is allowed for new construction. HUD\u2019s designation uses the most recent census estimates available; check the current HUD User QCT/DDA tables for the exact tract list and the applicable year.",
+   "finish": "stop",
+   "tokens": 901,
+   "ms": 6681,
+   "err": null
+  },
+  {
+   "id": "Q02",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The cap is 20 percent: HUD may not designate QCTs whose combined population exceeds 20 percent of a metropolitan statistical area's total population (IRC \u00a742(d)(5)(B)).\n\nHow it works in practice:\n- A tract qualifies if 50%+ of households have income below 60% of area median gross income, or it has a poverty rate of at least 25% (with the metro/non-metro distinctions in the statute).\n- When the qualifying tracts in an MSA would push the QCT population over 20%, HUD ranks tracts by poverty rate (highest first) and takes tracts until the",
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 7655,
+   "err": null
+  },
+  {
+   "id": "Q03",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A LIHTC building in a QCT or DDA is eligible for up to a 30% increase in eligible basis \u2014 i.e., eligible basis \u00d7 130% \u2014 which raises the credit amount, under IRC \u00a742(d)(5)(B).\n\nKey points:\n- The boost applies to new construction or substantial rehabilitation eligible basis, and to acquisition basis only if the state agency allows it? Need accuracy: Actually acquisition costs are excluded? Let's recall: eligible basis includes acquisition, construction, rehab. The boost under 42(d)(5)(B) applies to \"eligible basis of a building\" but acquisition basis? I think acquisition is included? Hmm. Need not overdetail if unsure. Say applies to eligible basis of the building as determined under the statute; state agency confirms.\n- QCT boost requires the project to contribute to a concerted community revitalization plan; DDA boost does not.\n- HUD designates QCTs and DDAs annually; check HUD User.\n- State allocating agency must confirm and document; the boost is not automatic in practice for QCT without CCRP.\n- The property's actual eligible basis and credit must be read in Spain Terminal / tax credit documents.",
+   "finish": "stop",
+   "tokens": 804,
+   "ms": 4495,
+   "err": null
+  },
+  {
+   "id": "Q04",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A Difficult Development Area (DDA) is a HUD-designated geographic area where construction and land costs are high relative to area incomes, so LIHTC developments there receive a basis boost. Under IRC \u00a742(d)(5)(B), buildings in a DDA (or a Qualified Census Tract) may use up to 130% of eligible basis when calculating credits\u2014subject to the minimum-credit floor rules. HUD designates DDAs annually, generally as whole metropolitan statistical areas or non-metropolitan counties, and publishes the lists on HUD User alongside QCTs. Unlike QCTs, which are Census-tract based and tied to income/poverty thresholds, DDAs are broader cost-relative designations. Practical underwriting effect: the boost raises eligible basis, so it can increase 4% or 9% credit equity without changing unit count or rents\u2014check whether the property's census tract or county appears on the current HUD DDA list, and confirm the specific basis-boost election with the allocating agency and tax counsel. For authoritative figures and current lists, see HUD User's QCT/DDA page and IRC \u00a742(d)(5)(B); actual property-level values must be read in Spain Terminal.",
+   "finish": "stop",
+   "tokens": 377,
+   "ms": 2128,
+   "err": null
+  },
+  {
+   "id": "Q05",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "HUD FMRs are generally set at the **40th percentile** of gross rents (rent plus utilities) for recently-moved, standard-quality units with 2 bedrooms in the metro area or county \u2014 meaning 40 percent of such units rent for less.\n\nKey qualifiers:\n\n- **50th percentile areas:** HUD may set FMRs at the median instead of the 40th percentile in certain areas meeting criteria in 24 CFR 888.113 \u2014 historically places with low vacancy, a high percentage of renter households paying more than 30 percent of income on rent, or where voucher holders are concentrated in low-rent areas. HUD publishes the current list of 50th-percentile FMR areas each year.\n- **Small Area FMRs (SAFMRs):** set at the 40th percentile of ZIP-code-level rents, so a metro's SAFMRs vary widely by neighborhood.\n- **History:** FMRs were set at the 45th percentile before the mid-1990s; HUD moved to the 40th percentile to reduce the share of vouchers absorbed by rent increases.\n- **Unit size:** separate percentiles are computed for each bedroom count (efficiency through 4-bedroom), with the 2-bedroom FMR anchoring the payment standard.\n\nBecause 40th percentile rents fall below what most market-rate landlords charge, voucher payment standards (typically 90\u2013110 percent of FMR) often trail asking rents in tight submarkets. Check the HUD User FMR documentation and 24 CFR 888.113 for the authoritative methodology and current 50th-percentile list.",
+   "finish": "stop",
+   "tokens": 640,
+   "ms": 5278,
+   "err": null
+  },
+  {
+   "id": "Q06",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "New HUD Fair Market Rents generally take effect on October 1 each year, the start of the federal fiscal year, and HUD publishes them in late August or early September via a Federal Register notice and the HUD User FMR tables.\n\nSupporting detail: the same annual cycle usually applies to Small Area FMRs and to the FMR-based rent ceilings PHAs use for Housing Choice Vouchers. HUD can issue revised or emergency FMRs outside that schedule in limited circumstances, and occasionally publication or effective dates shift, so confirm the specific year\u2019s notice in the Federal Register or on HUD User rather than assuming October 1.",
+   "finish": "stop",
+   "tokens": 237,
+   "ms": 2503,
+   "err": null
+  },
+  {
+   "id": "Q07",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A PHA can set its voucher payment standard between 90% and 110% of the applicable Fair Market Rent without HUD approval.\n\nThat \u201cbasic range\u201d is in 24 CFR 982.503. Setting a payment standard below 90% or above 110% requires HUD approval\u2014typically an exception payment standard, which HUD may approve up to 120% of the FMR under its exception procedures, and only higher than that under specific HUD authority. If the PHA operates under Small Area FMRs, the same 90%\u2013110% basic range applies to the SAFMR. Check the current regulation and HUD\u2019s payment standard guidance on HUD User before relying on a specific percentage.",
+   "finish": "stop",
+   "tokens": 584,
+   "ms": 10288,
+   "err": null
+  },
+  {
+   "id": "Q08",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "HAP is the lesser of two amounts: (1) the PHA\u2019s payment standard minus the family\u2019s total tenant payment (TTP), or (2) the gross rent minus TTP. Gross rent is contract rent plus the utility allowance.\n\nTTP is generally 30% of adjusted monthly income, subject to the minimum rent and other HCV rules. The payment standard is set by the PHA between 90% and 110% of the applicable FMR (with HUD approval for exceptions).\n\nIf gross rent exceeds the payment standard, the family pays the difference, so its share rises above 30% of income; at initial occupancy the family\u2019s share is generally capped at 40% of adjusted monthly income. The HAP is paid to the owner, and the family pays the balance.\n\nAuthoritative sources: 24 CFR 982.505 (HAP formula), 982.503 (payment standards), and 982.508\u2013982.515 (TTP/family share).",
+   "finish": "stop",
+   "tokens": 409,
+   "ms": 1735,
+   "err": null
+  },
+  {
+   "id": "Q09",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "At initial lease-up, a voucher family\u2019s total tenant payment may not exceed **40% of adjusted monthly income** (24 CFR 982.508). The standard family share is generally 30% of adjusted monthly income, but HUD\u2019s initial-occupancy rule caps the family\u2019s rent contribution at 40% so a new voucher household is not immediately overburdened. This is a ceiling, not a target; the actual family share depends on the payment standard, gross rent, and the PHA\u2019s utility allowance. Verify the precise rule text in 24 CFR 982.508 and the PHA\u2019s administrative plan.",
+   "finish": "stop",
+   "tokens": 397,
+   "ms": 7428,
+   "err": null
+  },
+  {
+   "id": "Q10",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "An FMR is a **gross-rent estimate**: contract rent plus tenant-paid utilities, excluding telephone, cable/satellite TV, and internet.\n\n**Generally included**\n- Shelter rent (contract rent)\n- Tenant-paid heating and cooking fuel\n- Electricity, water, sewer, and trash\n- Utilities embedded in contract rent when the landlord pays them\n\n**Generally excluded**\n- Telephone, cable/satellite, and internet service\n- Security deposits, application fees, pet fees, and other non-rent charges\n- Optional parking or amenity charges, unless HUD guidance treats them as rent\n- Furniture and other non-housing costs\n\nAn FMR is **not** a payment standard or a rent-reasonableness determination; it is a market rent benchmark. For the precise utility treatment, check HUD User\u2019s FMR documentation and the PHA\u2019s utility allowance schedule.",
+   "finish": "stop",
+   "tokens": 946,
+   "ms": 17154,
+   "err": null
+  },
+  {
+   "id": "Q11",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The federal regulation is **24 CFR 888.113**, \u201cFair market rents,\u201d issued under Section 8(c)(1) of the U.S. Housing Act of 1937. It governs HUD\u2019s annual FMR publication, including the metropolitan-area and nonmetropolitan FMR determinations and the mechanics for Small Area FMRs. HUD\u2019s current methodology and timing are set out in associated Federal Register notices and HUD FMR documentation, which you should check on HUD User for the specific year.",
+   "finish": "stop",
+   "tokens": 286,
+   "ms": 1296,
+   "err": null
+  },
+  {
+   "id": "Q12",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The core rule is **24 CFR 982.507**, \"Rent to owner: Reasonableness of rent,\" which requires the PHA to determine that the rent to owner is reasonable before the unit is assisted. The underlying statute is Section 8(o)(10) of the U.S. Housing Act of 1937 (42 U.S.C. 1437f(o)(10)).\n\nSupporting detail:\n\n- **982.507(a)** sets the general requirement that the PHA determine rent reasonableness; **(b)** lists the comparability factors \u2014 location, quality, size, unit type, age, amenities, housing services, maintenance, and utilities \u2014 against unassisted units in the market.\n- The determination must be made **before execution of the HAP contract**; that timing obligation sits in the HAP contract execution provisions at 24 CFR 982.305 (I'd verify the specific paragraph in the current eCFR text rather than rely on my recollection of the lettering).\n- Rent reasonableness is distinct from the **payment standard** (982.503) and from **rent-to-owner increases** (982.508), though all three interact: the rent to owner must be reasonable *and* within the applicable limits.\n- PHAs typically document the determination with a rent reasonableness worksheet retained in the tenant file; HUD does not prescribe a single national form.\n\nFor the authoritative text, check the current eCFR Title 24 Part 982, and HUD's Rent Reasonableness guidance on HUD.gov.",
+   "finish": "stop",
+   "tokens": 560,
+   "ms": 3583,
+   "err": null
+  },
+  {
+   "id": "Q13",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "HUD defines an extremely low-income (ELI) family as one whose income is at or below 30% of the area median income (AMI), adjusted for family size. That definition comes from the Housing Act and HUD regulations (42 U.S.C. 1437a(b)(2); 24 CFR 5.603), and HUD publishes ELI income limits annually for each area. In practice, HUD\u2019s published ELI limit is generally 30% of AMI, but the statute and HUD methodology can apply floors or hold-harmless adjustments\u2014so the controlling number is the HUD income limit table for the specific area and family size, not simply 30% of a locally quoted AMI. For a property-level affordability test, use the HUD User income limits for the county/metro and the correct household size; actual property values must be read in Spain Terminal.",
+   "finish": "stop",
+   "tokens": 662,
+   "ms": 5883,
+   "err": null
+  },
+  {
+   "id": "Q14",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "HUD's very low-income limit is 50% of area median family income (AMI), and its low-income limit is 80% of AMI. HUD also publishes an extremely low-income limit at 30% of AMI.\n\nSupporting details:\n- These are the standard national percentages used in HUD income limit tables; they are adjusted for household size (1\u20138 persons).\n- In high-cost areas, HUD may hold income limits above the straight percentage or apply ceilings/floors, so the published limit is not always exactly 50% or 80% of the area median.\n- Section 8/Housing Choice Voucher eligibility generally uses the very low-income limit, with PHA preferences and targeting rules layered on top.\n- LIHTC uses different income limits based on AMI (often 50% or 60%), set through IRS/state rules, not HUD's low-income limit.\n\nCheck HUD User's Income Limits dataset for the authoritative figures by area and household size.",
+   "finish": "stop",
+   "tokens": 277,
+   "ms": 2958,
+   "err": null
+  },
+  {
+   "id": "Q15",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "Generally, HUD does **not** derive the four-person low-income limit from the very low-income limit; it computes both from the area\u2019s estimated median family income. The four-person very low-income limit is 50% of the four-person median, and the four-person low-income limit is 80% of that median\u2014so, absent special adjustments, the low-income limit is **1.6 times** the four-person very low-income limit (80 \u00f7 50).\n\nCaveats: HUD applies family-size adjustment factors, ceilings/floors, and hold-harmless provisions, and those can apply differently to the 50% and 80% limits. So multiplying by 1.6 is only a rule of thumb; the official values must come from HUD User\u2019s Income Limits tables and methodology documentation.",
+   "finish": "stop",
+   "tokens": 864,
+   "ms": 3461,
+   "err": null
+  },
+  {
+   "id": "Q16",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "LIHTC credits are claimed annually over a 10-year credit period, beginning in the year the building is placed in service (or, at the taxpayer's election, the following year). Both the 9% and 4% credit streams follow this 10-year schedule. The applicable percentage and eligible basis determine the annual credit amount; the 10-year period is the standard federal rule under IRC Section 42, which you should confirm in the IRS LIHTC guidance and Section 42 itself.",
+   "finish": "stop",
+   "tokens": 160,
+   "ms": 1999,
+   "err": null
+  },
+  {
+   "id": "Q17",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The LIHTC initial compliance period is 15 years. Under IRC Section 42, the credit period runs 10 years, but the project must remain in compliance with the low-income use restrictions for the 15-year compliance period that begins with the first credit year. Most projects also carry an extended-use period\u2014commonly another 15 years\u2014imposed through a Land Use Restrictive Agreement. Check IRC \u00a742 and IRS LIHTC guidance (26 CFR \u00a71.42) for the controlling rules.",
+   "finish": "stop",
+   "tokens": 167,
+   "ms": 1895,
+   "err": null
+  },
+  {
+   "id": "Q18",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "**30 years total: the 15-year LIHTC compliance period plus a 15-year extended use period.** That is the statutory minimum for buildings placed in service after 1989 under IRC \u00a742(h)(6), which requires a recorded extended low-income housing commitment barring eviction or nonrenewal of low-income tenants without cause and enforcing the income/rent restrictions for at least 15 years beyond the credit period.\n\nDetails worth keeping straight:\n- State allocating agencies may impose a longer period (many use 30+ years, and some extend to 40\u201355 years), so 30 years is a floor, not a uniform rule.\n- The extended use period can end early under the **qualified contract** procedure: the owner may request one no earlier than the end of the 14th year of the compliance period, and the extended use obligation terminates if the agency cannot produce a buyer within one year (\u00a742(h)(6)(E)\u2013(F)). Several states now bar or restrict qualified contracts.\n- A \"year 15\" disposition is therefore a compliance-period event, not the end of affordability.\n\nVerify the specific project's commitment in the recorded extended use agreement and the agency's land use restriction agreement, not just the credit allocation; IRS \u00a742 and the agency's QAP are the authoritative sources.",
+   "finish": "stop",
+   "tokens": 562,
+   "ms": 4925,
+   "err": null
+  },
+  {
+   "id": "Q19",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The two classic LIHTC minimum set-aside tests are the **20/50** and **40/60** tests: at least 20% of units must be rent-restricted and occupied by households at or below 50% of AMI, or at least 40% of units at or below 60% of AMI. The election is made under IRC \u00a742(g)(1) and is binding once made. A later option, the average-income test (up to 60% AMI with a 30% average floor), is not one of the two classic tests. Check IRS \u00a742 and Treasury Regulation \u00a71.42-15 for the authoritative rules.",
+   "finish": "stop",
+   "tokens": 193,
+   "ms": 2107,
+   "err": null
+  },
+  {
+   "id": "Q20",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 11930,
+   "err": null
+  },
+  {
+   "id": "Q21",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "There is no single maximum\u2014the LIHTC gross rent limit is 30% of the applicable AMI-based income limit for the unit\u2019s imputed household size, divided by 12.\n\nSupporting detail:\n- The income limit depends on the metro/county, the unit\u2019s AMI set-aside (e.g., 50% or 60%), and bedroom count; LIHTC imputes 1.5 persons per bedroom (so a 2BR is treated as a 3-person household).\n- Gross rent includes tenant-paid utilities. The maximum tenant rent is the gross rent limit minus the utility allowance.\n- The limit is not a fixed HUD FMR figure; it comes from HUD income limits and IRS LIHTC rules (26 USC 42(g)(2); IRS Form 8823 guide).\n- Check HUD User income limits for the specific area and the property\u2019s recorded set-aside; actual unit limits must be read in Spain Terminal or the property\u2019s rent roll/compliance file.",
+   "finish": "stop",
+   "tokens": 443,
+   "ms": 7593,
+   "err": null
+  },
+  {
+   "id": "Q22",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "Roughly, the 9% LIHTC yields about **70% of qualified cost** in present value, and the 4% credit yields about **30%**\u2014these are the long-standing \u201c70%\u201d and \u201c30%\u201d present-value targets behind the 9% and 4% rates.\n\nThe mechanics: the credit is claimed annually for 10 years on the qualified basis (roughly depreciable construction/rehab cost, excluding land and certain other items). A 9% annual credit over 10 years, discounted at the rate Treasury assumed when setting the program, has a present value near 70% of qualified basis; a 4% credit similarly lands near 30%. The actual applicable percentages are set monthly by Treasury and are not exactly 9.00% or 4.00%, and the 4% credit is commonly used with tax-exempt bond financing.\n\nCaveats: present value depends on the investor\u2019s discount rate and pricing, syndication costs, and whether the basis is boosted. Check IRS Section 42 and Treasury applicable-percentage tables for authoritative figures.",
+   "finish": "stop",
+   "tokens": 377,
+   "ms": 3378,
+   "err": null
+  },
+  {
+   "id": "Q23",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 11937,
+   "err": null
+  },
+  {
+   "id": "Q24",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The One Big Beautiful Bill Act (the 2025 reconciliation law, H.R. 1, signed July 4, 2025) lowered the tax-exempt bond financing threshold for 4% LIHTC deals from 50% to 30% of a building's aggregate basis, making it easier to pair bonds with 4% credits.\n\nSupporting detail:\n\n- **The old rule.** Under IRC \u00a742(h)(4), a building financed with tax-exempt private activity bonds qualified for credits without a separate allocation only if at least 50% of the aggregate basis (building plus land) was financed by those bonds. That 50% test gated most 4% executions.\n- **The change.** The threshold drops to 30%, so a smaller bond issuance \u2014 and smaller bond-financed share of total basis \u2014 can carry the 4% credit. This matters most where land is expensive or where the bond capacity needed to hit 50% was the binding constraint.\n- **Related LIHTC provisions** in the same law: the 9% minimum credit rate was made permanent (no more sunset risk), and per-capita/volume allocation authority was increased and indexed.\n\n**Caveats:** I am not certain of the precise effective date and transition language (whether it keys off bond issuance date or placed-in-service date) \u2014 confirm that in the statute text or IRS guidance (IRS Notice / \u00a742 revision and the IRS LIHTC page). Also verify whether the 30% figure is measured on the same aggregate-basis definition as before.\n\nNothing here comes from live data; check the enacted statutory text and IRS guidance before modeling a specific deal.",
+   "finish": "stop",
+   "tokens": 787,
+   "ms": 2831,
+   "err": null
+  },
+  {
+   "id": "Q25",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A LIHTC project gets the automatic 4% credit when it is either **bond-financed** or **federally subsidized**, rather than receiving a competitive 9% allocation.\n\nThe main routes:\n\n- **Tax-exempt private activity bonds** issued under IRC \u00a7142(d), where at least **50% of the project\u2019s aggregate basis** is financed by those bonds and the bonds are subject to the private activity bond volume cap. This is under IRC \u00a742(h)(4).\n- **Certain federal subsidies** for new construction or substantial rehabilitation \u2014 chiefly **below-market federal loans** as defined in IRC \u00a742(i)(2), such as qualifying HUD/FHA-insured loans or other federal below-market financing. Not every federal grant or loan qualifies.\n- **Acquisition of an existing building** generally uses the 4% rate, subject to the 10-year rule and other requirements.\n\nThe 4% rate is fixed by statute under IRC \u00a742(b), but the project still needs a state credit allocation and compliance. State HFAs administer this; confirm details in IRC \u00a742(b), \u00a742(h)(4), \u00a742(i)(2), \u00a7142(d), and IRS Form 8609 instructions.",
+   "finish": "stop",
+   "tokens": 730,
+   "ms": 8088,
+   "err": null
+  },
+  {
+   "id": "Q26",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": null,
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 3507,
+   "err": null
+  },
+  {
+   "id": "Q27",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The NSPIRE final rule was published in the Federal Register on May 11, 2023, with an effective date of July 13, 2023. It replaces HUD\u2019s Uniform Physical Condition Standards (UPCS) and Housing Quality Standards (HQS) with a single, consolidated physical inspection standard for HUD-assisted housing, including public housing, Housing Choice Vouchers, and multifamily properties. Check the Federal Register and HUD\u2019s NSPIRE page for the official text and implementation dates.",
+   "finish": "stop",
+   "tokens": 320,
+   "ms": 2898,
+   "err": null
+  },
+  {
+   "id": "Q28",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I can't give you a reliable date from memory \u2014 HUD set the scoring timeline through implementation notices rather than the rule itself, and I don't want to invent one. Check HUD's NSPIRE page and the relevant Federal Register notices and PIH/HUD notices for the current effective date.\n\nWhat I can say with confidence about the structure:\n\n- The NSPIRE final rule (published May 2023, effective July 1, 2023) replaced UPCS with the NSPIRE standards and set the inspection and scoring framework.\n- HUD used a phased rollout. During early implementation, a subset of standards \u2014 including several \"affirmative\" standards that require the presence of a feature (e.g., smoke alarms, carbon monoxide detectors, handrails, guards) rather than the absence of a defect \u2014 were inspected and recorded but **not** counted in the score. HUD signaled it would begin scoring them after a transition period.\n- Because the scoring start date for those deferred standards was set by notice and has been adjusted, any figure I gave you could be stale.\n\nFor a property-level view, the Spain Terminal would show the NSPIRE score and the deficiency detail; whether deferred standards are scored affects the score composition, not the physical condition itself. If you need the exact date for a compliance memo, the authoritative sources are HUD's NSPIRE implementation notices and the Federal Register.",
+   "finish": "stop",
+   "tokens": 896,
+   "ms": 8023,
+   "err": null
+  },
+  {
+   "id": "Q29",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A success-rate payment standard is a payment standard an agency sets to hit a target leasing success rate \u2014 the share of voucher holders who successfully lease a unit within their search period \u2014 rather than the standard 90\u2013110%-of-FMR range in 24 CFR 982.503. It is primarily a Moving to Work (MTW) flexibility, not a mainstream Section 8 feature.\n\nHow it works: the agency models the rent distribution in its market and picks a payment standard (or a set of them by ZIP/area) calibrated so that, say, 95% of families searching can find an affordable, rent-reasonable unit. Lower payment standards save HUD money but push success rates down; higher ones raise success but cost more. The success-rate approach makes that trade-off explicit instead of relying on 90\u2013110% of FMR as a proxy.\n\nCautions: the definition and permitted methodology are spelled out in HUD's MTW Operations Notice (published in the Federal Register) and individual MTW agency Annual Plans, not in the Section 8 regulations themselves. I'm not confident of the precise HUD wording or the exact target-success-rate thresholds some agencies use, so treat those as things to verify. For the authoritative text, check the current MTW Operations Notice on HUD.gov, 24 CFR 982.503 for the standard rule, and the agency's approved MTW Annual Plan. Non-MTW agencies generally cannot use a success-rate standard outside a HUD waiver or demonstration.",
+   "finish": "stop",
+   "tokens": 688,
+   "ms": 3647,
+   "err": null
+  },
+  {
+   "id": "Q30",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The minimum public housing flat rent is **80% of the applicable Fair Market Rent (FMR)** for the unit size. Under HUD\u2019s public housing rent rules, a PHA\u2019s flat rent must be based on market rent and may not be set below 80% of the FMR; the authoritative rule is **24 CFR 960.253**. Check HUD\u2019s public housing flat rent guidance and the current HUD User FMR tables for the actual applicable FMR.",
+   "finish": "stop",
+   "tokens": 462,
+   "ms": 1540,
+   "err": null
+  },
+  {
+   "id": "Q31",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "There is no separate per-capita rate for each state \u2014 the 9% credit ceiling is one national dollar figure per capita multiplied by each state's population, subject to a uniform small-state minimum. But I don't have the 2026 figures, and I won't guess them: the per-capita amount and small-state floor are set each year in an IRS revenue procedure (the annual \"inflation adjustments\" Rev. Proc., typically issued in the fall before the year begins; the 2025 numbers came in Rev. Proc. 2024-40, and 2026's would be in the corresponding 2025 release). Check that Rev. Proc. and IRS Form 8610 instructions for the authoritative 2026 numbers.\n\nWhat would drive the state-by-state table:\n- **Population:** each state's ceiling = per-capita rate \u00d7 population (Census-based, with the specific population series the IRS uses).\n- **Small-state minimum:** states whose computed ceiling falls below the floor get the floor. Historically that has been roughly a dozen low-population states plus territories (e.g., Wyoming, Vermont, Alaska, North Dakota, South Dakota, Delaware, Rhode Island, Montana, and Puerto Rico), but the exact list moves with both the per-capita rate and population estimates.\n- **One-time nuance:** the Consolidated Appropriations Act, 2021 included a temporary 12.5% bump to state 9% ceilings for 2023\u20132025; confirm in the Rev. Proc. whether anything similar applies to 2026.\n\nAlso note population revisions can shift a state on or off the floor from year to year, so read the table rather than assuming continuity.",
+   "finish": "stop",
+   "tokens": 850,
+   "ms": 2745,
+   "err": null
+  },
+  {
+   "id": "T01",
+   "ok": true,
+   "model": "z-ai/glm-5.3-flash",
+   "answer": "I can't tell you the exact letter grade for a score of 66 \u2014 the score-to-grade mapping is defined inside the Spain Terminal, and I don't have access to that scale in this chat, so I won't guess a specific letter.\n\nWhat I can tell you is how such a mapping typically works and what would drive it:\n\n- **Typical grading bands.** Property scoring systems usually break scores into bands (for example, A = 80\u2013100, B = 65\u201379, C = 50\u201364, D/F below that). A 66 would often fall at the boundary between two grades, which is exactly why you should confirm the cutoff in the Terminal rather than rely on an outside assumption \u2014 a one-point difference can change the letter.\n- **What the score reflects.** In a multifamily/affordable housing underwriting context, the composite score typically blends factors like: FMR or Small Area FMR positioning versus asking rents, voucher payment standard coverage, LIHTC/affordability constraints (QCT/DDA status, income limit headroom), submarket rent growth and vacancy, physical condition proxies (NSPIRE-style risk), and deal metrics such as cap rate, DSCR, and projected NOI stability.\n- **Where to verify.** Open the property's detail page in the Spain Terminal \u2014 the grade legend or rubric is shown alongside the score, and that is the authoritative mapping.\n\nIf you can share the grade bands shown in your Terminal view, I can interpret what a 66 means for that property's underwriting profile.",
+   "finish": "stop",
+   "tokens": 402,
+   "ms": 18845,
+   "err": null
+  },
+  {
+   "id": "T02",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I can't enumerate the actual properties \u2014 the scorable universe is defined inside the Spain Terminal, and its contents must be read there; I have no live access to it in this chat.\n\nWhat generally defines such a universe, and what to look for in the Terminal:\n\n- **Asset type**: multifamily and affordable housing \u2014 market-rate apartments, LIHTC properties, Section 8/Housing Choice Voucher\u2013supported projects, and HUD-assisted stock.\n- **Eligibility filters**: properties need enough data to score \u2014 rent rolls or unit counts, subsidy/regulatory status, location (tract, FMR area, QCT/DDA flag), and financials for NOI, DSCR, and cap-rate work.\n- **Geographic scope**: typically limited to the metros, counties, or FMR areas the platform covers.\n- **Exclusions**: properties missing key underwriting inputs or outside the covered geography are usually screened out or flagged unscored.\n\nTo get the actual list, check the Terminal's universe/screener view and its documentation of inclusion criteria \u2014 that's the authoritative record, not this chat. If you tell me a specific property, I can explain what would drive its score (rent reasonableness against FMRs under 24 CFR 982.507, QCT/DDA status, DSCR, NOI) and you can read the actual values in the Terminal.",
+   "finish": "stop",
+   "tokens": 341,
+   "ms": 2884,
+   "err": null
+  },
+  {
+   "id": "T03",
+   "ok": true,
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "No \u2014 a property being \"scored\" means the scoring model produced an output from whatever inputs are on file, not that those inputs are verified or complete.\n\nA few things that distinction covers:\n\n- **Provenance:** Inputs may be reported by the sponsor, estimated, or carried over from a prior record. A score doesn't certify where a number came from.\n- **Coverage:** Many scoring models will still emit a score with gaps, either by imputing defaults, using submarket averages, or zero-weighting missing fields. So a score can exist alongside thin data.\n- **Staleness:** A score reflects the inputs at the time it was run; rent rolls, FMRs, and inspection results change.\n- **Quality flags:** Whether the terminal surfaces a completeness/confidence indicator alongside the score is something to check directly \u2014 I can't confirm its behavior in this chat.\n\nWhat would drive a score: NOI and DSCR (with stress-tested debt service), cap rate versus submarket, rent reasonableness against FMR/SAFMR and 24 CFR 982.507 comps, LIHTC QCT/DDA status and applicable fraction, AMI/income-limit fit, and NSPIRE inspection status.\n\nTo know whether a specific property's inputs are real, verify each field's source and as-of date in the Spain Terminal, and cross-check the anchor figures against HUD User FMR tables, the PHA's rent reasonableness file, and the property's own rent roll and inspection reports.",
+   "finish": "stop",
+   "tokens": 371,
+   "ms": 4206,
+   "err": null
+  },
+  {
+   "id": "T04",
+   "ok": true,
+   "model": "openai/gpt-6-luna",
+   "answer": "I can\u2019t see the Spain Terminal in this chat, so I can\u2019t verify its current scoring model version. Check the scoring-model version shown in the Terminal itself.",
+   "finish": "stop",
+   "tokens": 56,
+   "ms": 1413,
+   "err": null
+  },
+  {
+   "id": "T05",
+   "ok": true,
+   "model": "openai/gpt-6-luna",
+   "answer": "I can\u2019t see the Spain Terminal data here, so I can\u2019t report the mean property score after the v50.0 rescore. Check the terminal\u2019s v50.0 rescore results and calculate the mean across the included properties.",
+   "finish": "stop",
+   "tokens": 79,
+   "ms": 1506,
+   "err": null
+  },
+  {
+   "id": "T06",
+   "ok": true,
+   "model": "openai/gpt-6-luna",
+   "answer": "I can\u2019t determine that share without access to Spain Terminal data. It is the number of terminal properties with no rent signal source recorded divided by the total number of terminal properties; the actual counts must be read in Spain Terminal.",
+   "finish": "stop",
+   "tokens": 97,
+   "ms": 2100,
+   "err": null
+  },
+  {
+   "id": "T07",
+   "ok": true,
+   "model": "z-ai/glm-5.3-flash",
+   "answer": "I can't tell from here \u2014 I have no live connection to the Spain Terminal in this chat, so I can't see whether a `parcels_general` rescoring job is currently queued or running.\n\nTo check it yourself in the Terminal:\n\n- **Jobs / pipeline panel** \u2014 look for a `parcels_general` rescoring entry with a status of queued, running, or completed, plus a start timestamp and progress indicator.\n- **Recent activity or audit log** \u2014 completed rescoring runs usually show a finish time and the number of parcels re-scored.\n- **Parcels layer metadata** \u2014 a \"last scored\" or \"data as of\" stamp on the parcels layer will tell you when the last rescoring finished, which is often enough to infer whether one is in flight.\n\nIf you tell me what you see in the Terminal (status, timestamps, parcel counts), I can help you interpret it \u2014 for example, whether the run looks stuck, or why a rescoring might have been triggered (new FMR or income-limit data loads, refreshed QCT/DDA boundaries, or NSPIRE-related scoring changes typically prompt a full `parcels_general` re-score).",
+   "finish": "stop",
+   "tokens": 282,
+   "ms": 14762,
+   "err": null
+  },
+  {
+   "id": "T08",
+   "ok": true,
+   "model": "z-ai/glm-5.3-flash",
+   "answer": "I can't give you those numbers \u2014 I have no live access to the Spain Terminal in this chat, so I can't see the row count in `properties_base` or the duplicate/junk flag rates, and I won't guess at them.\n\nHere's how to read them yourself once you're in the terminal:\n\n- **Row count**: run a simple count on `properties_base` (e.g., `SELECT COUNT(*) FROM properties_base`). Note whether the table is the raw ingest or a deduplicated/modeled version, since pipelines often keep raw, staged, and final tables with different counts.\n- **Duplicate or junk fraction**: look for flag columns (names like `is_duplicate`, `is_junk`, `data_quality_flag`, or a confidence score) and compute the share, e.g. the count of rows where the flag is true divided by total rows. If no explicit flag exists, duplicates are usually detected on a key like (address, city, state, zip) or a geocoded point, and \"junk\" typically means rows failing validity checks \u2014 nulls in required fields, impossible unit counts, placeholder addresses, or out-of-range values.\n\nIf you paste the table's column list or a few sample rows into the chat, I can help you write the exact query and interpret the flags.",
+   "finish": "stop",
+   "tokens": 398,
+   "ms": 5816,
+   "err": null
+  },
+  {
+   "id": "T09",
+   "ok": true,
+   "model": "openai/gpt-6-luna",
+   "answer": "I can\u2019t verify the current cost or model lineup for ai.spaincos.com from this chat. Check the site\u2019s pricing or account page for per-question charges, credits, or subscription limits, and its model selector or documentation for the models available; these can change over time.",
+   "finish": "stop",
+   "tokens": 119,
+   "ms": 1995,
+   "err": null
+  }
+ ],
+ "QWEN_nosys": [
+  {
+   "id": "Q01",
+   "ok": true,
+   "model": "qwen/qwen3.8-27b",
+   "answer": "The U.S. Department of Housing and Urban Development (HUD) defines a **Qualified Census Tract (QCT)** in the context of the Low-Income Housing Tax Credit (LIHTC) program based on the economic and demographic characteristics of the area.\n\n### Core Definition\n\nA **Qualified Census Tract (QCT)** is a census tract, as defined by the U.S. Census Bureau, that meets **one** of the following two criteria:\n\n1.  **Income-Based Test**:  \n    At least **20% of the households** in the tract are **low-income**.  \n    - *\u201cLow-income\u201d household* means a household whose income is **at or below 80% of the median family income (MFI)** for the applicable area (either metro or non-metro, as determined by the IRS).\n\n2.  **Poverty-Based Test**:  \n    At least **20% of the persons** in the tract are **poor**.  \n    - *\u201cPoor\u201d person* means an individual with an income **at or below the federal poverty guidelines** (as published annually by HHS) for their household size.\n\n---\n\n### Key Details\n\n- **Purpose of QCTs**:  \n  QCTs are used to identify areas of significant poverty or low-income populations. LIHTC projects located in QCTs are eligible for a **bonus credit** (up to a 30% tax credit) under the **Basis Boost** or **QCT Bonus** provisions, in addition to the standard 4% or 9% credits.\n\n- **Annual Determination**:  \n  QCT status is **re-evaluated annually**. HUD and the IRS use the latest available Census data (typically Decennial Census or American Community Survey data) and poverty/income guidelines to determine which tracts qualify in a given tax year.\n\n- **Documentation**:  \n  Developers and investors verify QCT status using the **IRS LIHTC Qualified Census Tract Map** or the **HUD Income Limits and Census Tract data** published for the applicable year.\n\n- **Statutory Authority**:  \n  The definition is codified in the **Internal Revenue Code (IRC) Section 42(f)(2)** and implemented through HUD and IRS guidelines.\n\n---\n\n### Summary Table\n\n| Criterion | Threshold | Metric |\n|-----------|-----------|--------|\n| **Low-Income Households** | \u2265 20% | Households with income \u2264 80% of MFI |\n| **Poverty Rate** | \u2265 20% | Persons with income \u2264 Federal Poverty Guidelines |\n\nA census tract qualifies as a QCT if it meets **either** test.\n\n> **Note**: For the most current list of QCTs, consult the **IRS Publication 514 (Low-Income Housing Tax Credit for Individuals and Businesses)** or the **IRS LIHTC Qualified Census Tract Map** for the specific tax year.",
+   "finish": "stop",
+   "tokens": 616,
+   "ms": 1634,
+   "err": null
+  },
+  {
+   "id": "Q02",
+   "ok": true,
+   "model": "qwen/qwen3.8-27b",
+   "answer": "Based on the federal guidelines established for transportation planning (specifically under U.S. DOT and FHWA regulations, typically outlined in **23 CFR Part 450** and **Executive Order 12898/14008** contexts regarding Title VI and environmental justice), the population cap for a Qualified Contracting Area (QCA) or more commonly referred to in the context of metropolitan Transportation Improvement Program (TIP) and Unified Planning Worksheet (UPW) designations as a \"QCT\" (Qualified Community Entity or similar local designation, though strictly speaking, **QCT** often refers to **Qualified Concentration Thresholds** or specific local zoning terms, in the context of Federal-aid highway programmatic duties, the term usually refers to **QCTA** or simply **Metropolitan Area** thresholds).\n\nHowever, in the most common regulatory context involving population caps for metropolitan designations related to federal transportation funding and planning (specifically for **Large Urbanized Areas** vs. **Non-urbanized Areas** or for the transition from **TPG** to **TPTEP**), the term \"QCT\" is not a standard federal acronym.\n\nLet us assume you are referring to the standard **Metropolitan Statistical Area (MSA)** population thresholds that determine which set of federal planning and reporting requirements apply (e.g., LEPA, SAG, I-80/I-90 corridors, etc.). Alternatively, if \"QCT\" is a typo for **QCTA** (Qualified Contracting Area/Territory) or refers to specific state/local grants:\n\n### Most Likely Interpretation: Federal Metropolitan Planning Thresholds\nThe primary population cap/threshold that defines the tier of federal transportation planning requirements in the U.S. is:\n\n*   **200,000 People**: This is the population threshold for an **Urbanized Area (UA)** to be designated as a **Large Urbanized Area**.\n    *   **Implication**: metropolitan planning organizations (MPOs) serving areas with a population of **\u2265 200,000** are subject to more rigorous planning, environmental review, and financial management requirements (e.g., preparing a Transportation-System-GMO Plan, participating in federal-aid highway programmatic duties with higher scrutiny).\n    *   Below 200,000: The area is considered a **Non-Large Urbanized Area**, and the planning requirements are less stringent.\n\n### Alternative Interpretation: \"QCT\" as a Typo for \"QCTA\" or Context-Specific Local Grant\nIf \"QCT\" refers to a specific state or local program (e.g., in some states, \"QCT\" might stand for **Qualified Community Transition** or **Quoted Construction Term**), there is no single federal cap. However, in the context of **Environmental Justice (EJ) and Title VI** compliance, agencies often use **census tract data** rather than metro caps.\n\n### Conclusion\nIn the standard U.S. federal transportation planning framework, the critical population threshold that dictates the level of planning, reporting, and environmental review stringency for a metropolitan area is **200,000**.\n\n*   **If the metro area's population is 200,000 or greater**, it is classified as a **Large Urbanized Area**, and the MPO must comply with the full suite of 23 CFR Part 450 planning responsibilities, including the development of a Comprehensive Long-Range Transportation Plan (STVMS/TPF) with extensive public involvement and environmental justice analysis.\n*   **If the population is less than 200,000**, the area is a **Non-Large Urbanized Area**, and while planning is still required, the scope and frequency of certain environmental studies and project selection processes are less onerous.\n\n**Answer:** The standard population threshold (cap/dividing line) for determining heightened federal transportation planning obligations in a metro area is **200,000**.\n\n*(Note: If \"QCT\" refers to a specific local ordinance or non-federal state program not covered by 23 CFR, please provide the specific state or jurisdiction, as local caps can vary.)*",
+   "finish": "stop",
+   "tokens": 882,
+   "ms": 2063,
+   "err": null
+  },
+  {
+   "id": "Q03",
+   "ok": true,
+   "answer": null,
+   "ms": 112,
+   "err": null
+  },
+  {
+   "id": "Q04",
+   "ok": true,
+   "answer": null,
+   "ms": 74,
+   "err": null
+  },
+  {
+   "id": "Q05",
+   "ok": true,
+   "answer": null,
+   "ms": 156,
+   "err": null
+  },
+  {
+   "id": "Q06",
+   "ok": true,
+   "answer": null,
+   "ms": 166,
+   "err": null
+  },
+  {
+   "id": "Q07",
+   "ok": true,
+   "answer": null,
+   "ms": 130,
+   "err": null
+  },
+  {
+   "id": "Q08",
+   "ok": true,
+   "answer": null,
+   "ms": 195,
+   "err": null
+  },
+  {
+   "id": "Q09",
+   "ok": true,
+   "answer": null,
+   "ms": 166,
+   "err": null
+  },
+  {
+   "id": "Q10",
+   "ok": true,
+   "answer": null,
+   "ms": 167,
+   "err": null
+  },
+  {
+   "id": "Q11",
+   "ok": true,
+   "answer": null,
+   "ms": 110,
+   "err": null
+  },
+  {
+   "id": "Q12",
+   "ok": true,
+   "answer": null,
+   "ms": 145,
+   "err": null
+  },
+  {
+   "id": "Q13",
+   "ok": true,
+   "answer": null,
+   "ms": 122,
+   "err": null
+  },
+  {
+   "id": "Q14",
+   "ok": true,
+   "answer": null,
+   "ms": 69,
+   "err": null
+  },
+  {
+   "id": "Q15",
+   "ok": true,
+   "answer": null,
+   "ms": 103,
+   "err": null
+  },
+  {
+   "id": "Q16",
+   "ok": true,
+   "answer": null,
+   "ms": 153,
+   "err": null
+  },
+  {
+   "id": "Q17",
+   "ok": true,
+   "answer": null,
+   "ms": 115,
+   "err": null
+  },
+  {
+   "id": "Q18",
+   "ok": true,
+   "answer": null,
+   "ms": 189,
+   "err": null
+  },
+  {
+   "id": "Q19",
+   "ok": true,
+   "answer": null,
+   "ms": 117,
+   "err": null
+  },
+  {
+   "id": "Q20",
+   "ok": true,
+   "answer": null,
+   "ms": 102,
+   "err": null
+  },
+  {
+   "id": "Q21",
+   "ok": true,
+   "answer": null,
+   "ms": 187,
+   "err": null
+  },
+  {
+   "id": "Q22",
+   "ok": true,
+   "answer": null,
+   "ms": 105,
+   "err": null
+  },
+  {
+   "id": "Q23",
+   "ok": true,
+   "answer": null,
+   "ms": 119,
+   "err": null
+  },
+  {
+   "id": "Q24",
+   "ok": true,
+   "answer": null,
+   "ms": 155,
+   "err": null
+  },
+  {
+   "id": "Q25",
+   "ok": true,
+   "model": "qwen/qwen3.8-27b",
+   "answer": "It is crucial to correct a fundamental misconception in the premise of your question: **There is no such thing as an \"automatic 4% credit\" in the Low-Income Housing Tax Credit (LIHTC) program.**\n\n### 1. The LIHTC Credit Levels Are Based on Market Comparables\nThe percentage of the LIHTC credit (either **%** based on total eligible completed basis) is determined by the **comparability ratio**\u2014a comparison of the project\u2019s imputed rent to comparable market rents in the area. It is **not** fixed at 4% or any other automatic percentage based solely on a type of financing.\n\nThe standard credit percentages are:\n- **Low credit (4%)**: Applies to properties where units are available to low-income households and are compliant, but the imputed rent is **not** significantly below market-rate comparable rents.\n- **High credit (9%)**: Applies to properties where units are available to low-income households and the imputed rent is **significantly below** market-rate comparable rents (typically 30% or more below).\n\n> **Key Point:** A project *may* receive a 4% credit, but it is **not \"automatic.\"** It is the result of a specific set of affordability and rent-level determinations made during the application process.\n\n### 2. Eligibility Requirements for a 4% LIHTC Credit\nTo qualify for **any** LIHTC credit (including the 4% low credit), a project must meet **all** of the following core requirements:\n\n#### A. Compliance with Income Eligibility\n- If the property receives **tax credits on a basis other than a direct pay loan or other subsidy**, at least **20%** of the units (or the required set-aside) must be occupied by households with incomes at or below the low-income threshold set by the allocated basis.\n- Alternatively, the project may meet the **100%/60% test** under Section 42(i), where 100% of units are occupied by households at or below 60% of Area Median Income (AMI).\n\n#### B. Required Allocations\n- The property must maintain the required affordable unit set-aside (e.g., 20% of units at or below 60% AMI, or other approved options).\n- Rent restrictions must be enforced to ensure units remain affordable for the compliance period (typically 30 years, with a 15-year initial compliance period and an extended use period).\n\n#### C. Subsidy Limitations\n- The project must not receive certain other federal, state, or local subsidies that would cause it to exceed the **Subsidy Limitation** under Section 42(d)(5).\n\n#### D. Structural and Operational Standards\n- The project must meet the minimum standards of the **Uniform Residential Energy Code (UREC)** or applicable local codes.\n- The project must be owned by an eligible owner (e.g., a person, corporation, partnership, etc.) as defined in Section 42(g).\n\n### 3. Financing That *Affects* the Credit Percentage\nWhile no specific financing automatically triggers a 4% credit, certain financing structures **can influence** which credit percentage (4% vs. 9%) applies, primarily through their impact on **imputed rent**.\n\n#### Imputed Rent and the Comparability Test\n- **Imputed Rent** is the monthly rent a hypothetical market-rate tenant would pay for a unit, excluding actual tenant-paid rent.\n- If the project has significant **debt service (P&I)**, **operating costs**, or **taxes**, these increase the imputed rent.\n- If the imputed rent is **high relative to comparable market rents**, the project is more likely to qualify only for the **4% credit** (low credit), because the unit is not \"significantly below\" market rate.\n- If the project has **low or no debt** (e.g., financed with equity or permanent subsidy), the imputed rent may be low enough to qualify for the **9% credit** (high credit).\n\n#### Examples of Financing Impact:\n| Financing Type | Impact on Imputed Rent | Likely Credit Outcome |\n|----------------|------------------------|------------------------|\n| **High Leverage** (e.g., 70\u201380% debt) | High P&I \u2192 High Imputed Rent | More likely 4% credit (low) |\n| **Equity-Heavy** (e.g., LIHTC equity + foundation/grant equity) | Low/no debt \u2192 Low Imputed Rent | More likely 9% credit (high) |\n| **Permanent Subsidy** (e.g., HOPE VI, Section 8 Project-Based Voucher) | Reduces rent burden for tenants, but imputed rent calculation still applies | Varies; often supports 9% credit if",
+   "finish": "length",
+   "tokens": 1024,
+   "ms": 2510,
+   "err": null
+  },
+  {
+   "id": "Q26",
+   "ok": true,
+   "answer": null,
+   "ms": 209,
+   "err": null
+  },
+  {
+   "id": "Q27",
+   "ok": true,
+   "answer": null,
+   "ms": 147,
+   "err": null
+  },
+  {
+   "id": "Q28",
+   "ok": true,
+   "answer": null,
+   "ms": 109,
+   "err": null
+  },
+  {
+   "id": "Q29",
+   "ok": true,
+   "model": "qwen/qwen3.8-27b",
+   "answer": "In the context of U.S. government contracting, specifically within **Voucher Programs** (often referring to Federal Supply Schedule or specialty IT/telecom contracting vehicles), a **Success-Rate Payment Standard** (sometimes called an \"Incentive Fee Structure\" or \"Earned Value Success Rate\") is a contractual mechanism designed to align the contractor's financial incentives with successful performance outcomes.\n\n### Core Concept\nA Success-Rate Payment Standard is **not** a fixed fee paid simply for completing a task. Instead, it is a **variable component of compensation** that is paid **only if** or **in proportion to** the contractor achieving specific, pre-defined success metrics (e.g., system uptime, user adoption, reduced breach rates, or successful integration milestones).\n\n### How It Works in Voucher Programs\n1.  **Base Payment**: The contractor receives a base fee or cost-reimbursed amount to cover expenses and ensure operational viability.\n2.  **Success Metrics**: The contract defines quantifiable \"success rates\" (e.g., \"99.5% system availability,\" \"on-time delivery of 100% of modules,\" or \"customer satisfaction score > 4.5/5\").\n3.  **Variable Payout**: An additional incentive or a portion of the total contract value is withheld and only released if the success rate is met or exceeded.\n\n### Common Contexts\nWhile \"Voucher Program\" can refer to specific federal acquisition vehicles, this term is most frequently encountered in:\n*   **Telecommunications Vouchers**: Where payment may be tied to service level agreements (SLAs) such as call completion rates or network uptime.\n*   **IT Modernization Vouchers**: Where success is tied to system performance benchmarks, migration completion rates, or security incident reduction.\n*   **Outcomes-Based Acquisition (OBA)**: A newer federal initiative where payments are explicitly tied to verified outcomes rather than inputs.\n\n### Key Components\n- **Performance Metrics**: Clearly defined, measurable indicators of success.\n- **Verification Process**: An independent or government-led method to measure and verify the success rate (e.g., automated monitoring, audits).\n- **Payment Triggers**: Conditions under which the success-rate payment is released (e.g., \"Paid quarterly if success rate \u2265 90%\").\n- **Cap/Floor**: Maximum and minimum success rates at which the bonus is paid.\n\n### Purpose\n- **Risk Sharing**: Shifts some performance risk from the government to the contractor.\n- **Quality Incentive**: Encourages contractors to focus on long-term success rather than merely delivering low-cost outputs.\n- **Value Maximization**: Ensures federal funds are tied to actual results.\n\n### Example\n> A government agency uses an IT Voucher Program to modernize its legacy systems. The contract includes:\n> - **Base Fee**: $1 million for development work.\n> - **Success-Rate Payment**: An additional $200,000 paid only if the new system achieves \u2265 99.9% uptime over the first 12 months **and** reduces helpdesk tickets by 30%.\n>\n> If either metric is not met, the $200,000 is reduced proportionally or withheld entirely, per the contract terms.\n\n### Important Note\nThe exact implementation of \"Success-Rate Payment Standards\" varies by:\n- **Agency** (DOD, GSA, SSA, etc.)\n- **Specific Voucher Program** (e.g., FedRAMP, SATSOI, or custom IDIQ contracts)\n- **Contract Type** (Firm-fixed-price, Cost-Reimbursable with Incentives, or T&M)\n\nAlways refer to the **specific contract\u2019s Performance-Based Service Agreement (PBSA)** or **Incentive Clause** (e.g., FAR Part 16.4) for the precise definition and calculation method applicable to a given voucher program.",
+   "finish": "stop",
+   "tokens": 821,
+   "ms": 1971,
+   "err": null
+  },
+  {
+   "id": "Q30",
+   "ok": true,
+   "answer": null,
+   "ms": 175,
+   "err": null
+  },
+  {
+   "id": "Q31",
+   "ok": true,
+   "answer": null,
+   "ms": 102,
+   "err": null
+  },
+  {
+   "id": "T01",
+   "ok": true,
+   "answer": null,
+   "ms": 148,
+   "err": null
+  },
+  {
+   "id": "T02",
+   "ok": true,
+   "answer": null,
+   "ms": 173,
+   "err": null
+  },
+  {
+   "id": "T03",
+   "ok": true,
+   "answer": null,
+   "ms": 112,
+   "err": null
+  },
+  {
+   "id": "T04",
+   "ok": true,
+   "answer": null,
+   "ms": 172,
+   "err": null
+  },
+  {
+   "id": "T05",
+   "ok": true,
+   "answer": null,
+   "ms": 155,
+   "err": null
+  },
+  {
+   "id": "T06",
+   "ok": true,
+   "answer": null,
+   "ms": 132,
+   "err": null
+  },
+  {
+   "id": "T07",
+   "ok": true,
+   "answer": null,
+   "ms": 375,
+   "err": null
+  },
+  {
+   "id": "T08",
+   "ok": true,
+   "answer": null,
+   "ms": 105,
+   "err": null
+  },
+  {
+   "id": "T09",
+   "ok": true,
+   "answer": null,
+   "ms": 144,
+   "err": null
+  }
+ ]
+}
