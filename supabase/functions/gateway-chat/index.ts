@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
     const res = await fetch(url + "/functions/v1/call-model", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + serviceKey },
-      body: JSON.stringify({ messages: capped, purpose, model, max_tokens: Math.min(Number(max_tokens) || 512, 1024) }),
+      body: JSON.stringify({ messages: capped, purpose, model, max_tokens: Math.min(Number(max_tokens) || 2048, 2048) }),
       signal: AbortSignal.timeout(60_000),
     });
     const data = await res.json();
