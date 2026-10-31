@@ -1,5 +1,5 @@
 // BM25 retrieval over the bundled Spain Terminal corpus (corpus.json). Pure functions, no network.
-export type Chunk = { id: number; src: string; lines: string; text: string };
+export type Chunk = { id: number; tier?: string; src: string; lines: string; text: string };
 const STOP = new Set("a an and are as at be by can do does for from has have how i if in is it its me my of on or our so than that the their this to was we what when where which who why will with you your about into tell show give get any all there these those they them been being was were than then also not no yes".split(" "));
 export function tokenize(s: string): string[] {
   const base = (s.toLowerCase().match(/[a-z0-9_.$%]+/g) || []).map((t) => t.replace(/^[._]+|[._]+$/g, "")).filter((t) => t.length > 1);
@@ -13,12 +13,12 @@ export function buildIndex(chunks: Chunk[]) {
   const avg = docs.reduce((a, d) => a + d.len, 0) / Math.max(1, docs.length);
   return { docs, df, avg, n: docs.length };
 }
-export function search(idx: ReturnType<typeof buildIndex>, chunks: Chunk[], query: string, k = 5, minScore = 6) {
+export function search(idx: ReturnType<typeof buildIndex>, chunks: Chunk[], query: string, k = 5, minScore = 6, allowInternal = false) {
   const q = [...new Set(tokenize(query))]; const k1 = 1.4, b = 0.75;
   const scored = idx.docs.map((d, i) => {
     let s = 0;
     for (const w of q) { const f = d.tf.get(w); if (!f) continue; const df = idx.df.get(w) || 0; const idf = Math.log(1 + (idx.n - df + 0.5) / (df + 0.5)); s += idf * (f * (k1 + 1)) / (f + k1 * (1 - b + b * d.len / idx.avg)); }
     return { i, s };
-  }).filter((x) => x.s >= minScore).sort((a, b) => b.s - a.s).slice(0, k);
+  }).filter((x) => x.s >= minScore && (allowInternal || chunks[x.i].tier === "public")).sort((a, b) => b.s - a.s).slice(0, k);
   return scored.map((x) => ({ chunk: chunks[x.i], score: Math.round(x.s * 10) / 10 }));
 }
