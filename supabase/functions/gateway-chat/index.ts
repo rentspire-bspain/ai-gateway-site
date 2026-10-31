@@ -59,6 +59,7 @@ Deno.serve(async (req) => {
         capped.splice(firstNonSystem < 0 ? capped.length : firstNonSystem, 0, { role: "system", content: CONTEXT_RULES + "\n\n" + ctx });
       }
     } catch (e) { retrievalError = String(e).slice(0, 200); /* best-effort: fall back to plain model */ }
+    const tModel0 = Date.now();
     const res = await fetch(url + "/functions/v1/call-model", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + serviceKey },
@@ -66,6 +67,7 @@ Deno.serve(async (req) => {
       signal: AbortSignal.timeout(60_000),
     });
     const data = await res.json();
+    if (data && typeof data === "object") data.x_timing_ms = { pre_model: tModel0 - started, model: Date.now() - tModel0 };
     if (data && typeof data === "object") data.x_corpus_tier = isOwner ? "internal+public" : "public";
     // Attach the sources actually retrieved; strip any [S#] citation the model made up.
     if (hits.length && data?.choices?.[0]?.message && typeof data.choices[0].message.content === "string") {
@@ -77,30 +79,25 @@ Deno.serve(async (req) => {
       data.x_retrieved = hits.map((h, i) => ({ n: i + 1, src: h.chunk.src, lines: h.chunk.lines, score: h.score }));
     }
     if (retrievalError && data && typeof data === "object") data.x_retrieval_error = retrievalError;
-    // Ledger every call (best-effort via plain PostgREST insert — never blocks the chat).
+    // Ledger every call via RPC public.ops_log_llm_request (service_role only; inserts into ops.llm_requests). Best-effort, never blocks the chat.
     try {
-      await fetch(url + "/rest/v1/llm_requests", {
+      await fetch(url + "/rest/v1/rpc/ops_log_llm_request", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + serviceKey,
-          "apikey": serviceKey,
-          "Prefer": "return=minimal",
-        },
-        body: JSON.stringify({
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + serviceKey, "apikey": serviceKey },
+        body: JSON.stringify({ p: {
           caller: "gateway-chat",
           product: "ai.spaincos.com",
-          alias: purpose ?? model ?? null,
+          alias: purpose ?? model ?? "general",
           resolved_model: data?.model ?? null,
-          served_by: data?.provider ?? (data?.x_groq ? "groq" : null),
-          data_class: "public",
+          served_by: res.ok ? "hosted" : "error",
+          data_class: isOwner ? "internal_code" : "public_record",
           prompt_tokens: data?.usage?.prompt_tokens ?? null,
           completion_tokens: data?.usage?.completion_tokens ?? null,
           latency_ms: Date.now() - started,
           status: res.ok ? "ok" : "error",
           request_id: data?.id ?? null,
           error: res.ok ? null : String(data?.error ?? "upstream error").slice(0, 200),
-        }),
+        } }),
         signal: AbortSignal.timeout(10_000),
       });
     } catch (_ledgerError) { /* ledger is best-effort */ }
