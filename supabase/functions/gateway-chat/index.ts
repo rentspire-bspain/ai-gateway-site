@@ -29,13 +29,30 @@ Deno.serve(async (req) => {
       role: m.role === "assistant" || m.role === "user" || m.role === "system" ? m.role : "user",
       content: String(m.content || "").slice(0, 4000),
     }));
+    // Who is asking? The platform has already verified the JWT (verify_jwt=true); read its claims, and for an
+    // owner candidate confirm with the auth server that the email is confirmed. Owner = service role or OWNER_EMAILS.
+    let isOwner = false; let viewer = "anonymous";
+    try {
+      const tokenStr = (req.headers.get("authorization") || "").replace(/^Bearer /i, "");
+      const claims = JSON.parse(atob(tokenStr.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+      const owners = (Deno.env.get("OWNER_EMAILS") || "bspain@spaincos.com").toLowerCase().split(",").map((x) => x.trim());
+      if (claims.role === "service_role") { isOwner = true; viewer = "service"; }
+      else if (claims.email) {
+        viewer = String(claims.email).toLowerCase();
+        if (owners.includes(viewer)) {
+          const u = await fetch(url + "/auth/v1/user", { headers: { "Authorization": "Bearer " + tokenStr, "apikey": serviceKey }, signal: AbortSignal.timeout(4000) });
+          const uj = u.ok ? await u.json() : null;
+          isOwner = !!(uj && String(uj.email).toLowerCase() === viewer && (uj.email_confirmed_at || uj.confirmed_at));
+        }
+      }
+    } catch (_e) { isOwner = false; }
     // Retrieval: BM25 over the last two user turns (follow-ups keep context); inject cited excerpts as a system message.
     let hits: { chunk: Chunk; score: number }[] = [];
     let retrievalError: string | null = null;
     try {
       const { c, idx } = await corpus();
       const userTurns = capped.filter((m) => m.role === "user").slice(-2).map((m) => m.content).join(" ");
-      hits = search(idx, c.chunks, userTurns, 6, 5);
+      hits = search(idx, c.chunks, userTurns, 6, 5, isOwner);
       if (hits.length) {
         const ctx = hits.map((h, i) => `[S${i + 1}] (${h.chunk.src}, lines ${h.chunk.lines})\n${h.chunk.text}`).join("\n\n");
         const firstNonSystem = capped.findIndex((m) => m.role !== "system");
@@ -49,6 +66,7 @@ Deno.serve(async (req) => {
       signal: AbortSignal.timeout(60_000),
     });
     const data = await res.json();
+    if (data && typeof data === "object") data.x_corpus_tier = isOwner ? "internal+public" : "public";
     // Attach the sources actually retrieved; strip any [S#] citation the model made up.
     if (hits.length && data?.choices?.[0]?.message && typeof data.choices[0].message.content === "string") {
       const used = new Set<number>();

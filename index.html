@@ -1139,7 +1139,7 @@ function renderAnswer(container, text, sources, related) {
   // Answer section
   const ansSec = document.createElement("div");
   ansSec.className = "answer-section";
-  ansSec.innerHTML = '<div class="answer-label">Answer</div>';
+  ansSec.innerHTML = '<div class="answer-label">Answer' + (window.__tierNote ? ' <span style="font-weight:400;opacity:.65;font-size:11px;text-transform:none;letter-spacing:0">· ' + window.__tierNote + '</span>' : '') + '</div>';
   const content = document.createElement("div");
   content.className = "answer-content";
   // Convert markdown-like formatting and add citations
@@ -1270,6 +1270,8 @@ async function performSearch(query) {
     content.appendChild(q);
     
     // Render answer with sources and related
+    const tierNote = data.x_corpus_tier === "internal+public" ? "Terminal docs: full corpus (owner)" : "Terminal docs: public-safe corpus only";
+    window.__tierNote = tierNote;
     const termSources = (data.x_sources || []).map(x => ({ domain: "Terminal docs [S" + x.n + "]", title: String(x.src).split("@")[0] + " lines " + x.lines }));
     const sources = [...termSources, ...extractSources(answer)];
     const related = generateRelated(query);
