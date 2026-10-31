@@ -1,0 +1,558 @@
+{
+ "owner": [
+  {
+   "id": "H01",
+   "ms": 2892,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A+ now starts at a score of 82 and A at 80 (previously 90 and 85), per the October 28, 2026 recalibration approved by Brett Spain [S2].\n\nSupporting detail:\n- A- moves to 78 (was 80), holding 7 properties; B+ stays at 75, holding 8 [S2].\n- Resulting top-band counts: A+ 5 rows, A 14, A- 7, B+ 8 \u2014 about 0.002% and 0.005% of the 258,240-property cohort for A+ and A respectively [S2].\n- Everything at B (70) and below keeps its old threshold; B- 65, C+ 60, C 52, D 40, F below 40 [S2].\n- Grades are derived in engine o15 rather than stored, so changing the bands re-grades instantly without rescoring; only the v50.0 draft engine's score inputs table was changed, and older draft engines are untouched [S2].\n- Cached grades in published data refresh only on the next data build [S1].\n- Caveat: the engine grades the unrounded score while the stored score is rounded to 0.1, so a property within 0.05 of a boundary can show a grade one band off [S2][S5].\n\nNote the earlier October 23 coverage measurement used the older reconstructed bands (A+ 90, A 85) [S4], so figures from that document won't match the post-recalibration grade mix.",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_DATA_COVERAGE.md:136-152",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/SCORING_DATA_COVERAGE.md:136-152",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37",
+    "docs/SCORING_DATA_COVERAGE.md:102-118"
+   ],
+   "err": null
+  },
+  {
+   "id": "H02",
+   "ms": 3558,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "Five properties land in A+ after the recalibration, versus none before. Under the new threshold of 82 (down from 90) the A+ band holds 5 rows; under the old threshold it held 0 [S1], per the v50.0 band recalibration dated Oct 28, 2026 [S2].\n\nDetail worth knowing:\n\n- The counts are computed over the 258,240 `v43.score_local` scores in the top of the cohort, not the whole 634,930-property universe; the top of that distribution is max 84.5, with 5 rows at or above 82 and 19 at or above 80 [S1].\n- The same recalibration moved A from 85 to 80 (0 \u2192 14), A- from 80 to 78 (19 \u2192 7), and B+ stayed at 75 (15 \u2192 8); B and below are unchanged [S1].\n- Grade is derived in engine o15 rather than stored, so the band change re-grades instantly without rescoring anything; only `v43.score_inputs_ctx_draft_o15` changes [S1]. Cached grades in published data refresh on the next data build [S3].\n- Rows within 0.05 of a boundary can differ by a grade because the engine grades the unrounded score, while the counts use stored scores [S1].\n\nOne caution: the inputs-options note describes the v50.0 re-ranks moving the top band \"A+ 456 to 8,\" which is a different measurement (live re-rank movement) from the band counts above \u2014 the two shouldn't be read as the same number [S5].\n\nFor the actual grade of a given property, check the Spain Terminal record.",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/SCORING_INPUTS_OPTIONS.md:5-9"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/SCORING_INPUTS_OPTIONS.md:16-18",
+    "docs/SCORING_INPUTS_OPTIONS.md:5-9"
+   ],
+   "err": null
+  },
+  {
+   "id": "H03",
+   "ms": 2023,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "No \u2014 no rescoring was needed. Grade is derived in engine o15 rather than stored, so moving the band thresholds re-grades properties instantly and nothing is rescored [S1]. The only artifact that changes is the `v43.score_inputs_ctx_draft_o15` context that engine v50.0 runs; older draft engines are untouched [S1].\n\nThe apply step (`scoring/apply_grade_bands.py`) patches only the grade statement in a single transaction, checks every band has content and counts sum to the cohort, and prints the prior definition for rollback [S5]. Two caveats: the recalibration was authorized Oct 28 (Brett Spain, `band_recalibration`, o15) and `tests/scoring_state.py` now fails if live bands move without that record [S5]; and the UI shows grades it is given, so cached grades in published data refresh only on the next data build [S5]. Note also that rows within 0.05 of a boundary can differ by a grade because the engine grades the unrounded score, while the published counts use stored scores [S1].",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:51-53",
+    "docs/v50-coverage-measurement-2026-10-23.md:10-26",
+    "docs/SCORING_DATA_COVERAGE.md:136-152",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:17-32"
+   ],
+   "err": null
+  },
+  {
+   "id": "H04",
+   "ms": 2239,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The engine grades the **unrounded score**; the stored `risk_adjusted_score` is only rounded to 0.1 for display/storage [S1]. Near a band boundary, a property whose unrounded score sits within 0.05 of the threshold could show a grade one band different from what you would infer from the stored rounded value [S1]. This affects only a handful of rows and does not materially change counts [S1]. The grade itself is derived in engine `o15` rather than persisted, so band changes re-grade without rescoring [S2]. For a specific property, check the actual score and grade in the Spain Terminal rather than reconstructing the grade from the rounded value.",
+   "cited": [
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37"
+   ],
+   "retrieved": [
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:5-16",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:17-32",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:51-53",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41"
+   ],
+   "err": null
+  },
+  {
+   "id": "H05",
+   "ms": 2505,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The hunt concluded that 634,930 was never a different definition of the universe \u2014 it was a true Oct 23 count that no longer holds: the universe shrank by about 376,691 rows between Oct 23 and Oct 27, consistent with a data regression (a restore or a units reset) rather than a redefinition, and no filter reproduces 634,930 from current data [S1][S3]. The recommended replacement is the operational cohort: 258,239 of 258,239 clean rows with units \u2265 5 on v50.0 (100% scored), i.e. restate the gate to that figure and open a separate item to find what reverted the ~376k rows' units and scores [S3].\n\nTwo caveats. First, the earlier \"634,930 of 634,930\" claim should read 258,239 of 258,239 [S2]. Second, the same reconciliation put the gate back to RED: on the real cohort the grade mix is A+ 0, A 0, A- 19, B+ 15, B 150, B- 1,009, C+ 6,287, C 21,429, D 128,264, F 101,067, so the \"no empty grade\" threshold fails, and the published A+ 8 / A 369 sit in rows outside this cohort [S2]. Note the cohort figures are from the Oct 28 snapshot docs and are dated.",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:3-13",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:43-50",
+    "docs/SCORING_BAND_RECALIBRATION.md:14-16"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:3-13",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:43-50",
+    "docs/SCORING_BAND_RECALIBRATION.md:14-16",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/SCORING_DATA_COVERAGE.md:154-168",
+    "docs/SCORING_DATA_COVERAGE.md:1-4"
+   ],
+   "err": null
+  },
+  {
+   "id": "H06",
+   "ms": 4127,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The new bands ship as a small, transactional patch to the engine's grade definition, not as a rescore. Per the Terminal docs [S2], `scoring/apply_grade_bands.py` patches only the grade statement in a single transaction, re-reads the definition, verifies every band has content and that the counts sum to the cohort, and prints the prior definition for rollback.\n\nThe path to production is: dry run on the PR (passed, then rolled back), merge, then run the dispatch-only workflow `scoring-apply-bands` with `dry=false`. The authorization record lives in `docs/scoring_authorizations.json` (`band_recalibration`, engine o15, Brett Spain, 2026-10-28), and `tests/scoring_state.py` now fails if the live bands move without that record [S2].\n\nTwo consequences worth knowing. Because grade is derived in engine o15 and not stored, the change re-grades instantly and rescoring nothing \u2014 only `v43.score_inputs_ctx_draft_o15` (the context the v50.0 engine reads) changes, and older draft engines are untouched [S1]. And the UI shows whatever grades it is handed, so cached grades in published data update only on the next data build [S2].\n\nOne caveat: the engine grades the unrounded score while the stored score is rounded to 0.1, so rows within 0.05 of a boundary can display a different grade than a band applied to the stored value [S3].",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37",
+    "docs/SCORING_INPUTS_OPTIONS.md:5-9",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:51-53",
+    "docs/SCORING_DATA_COVERAGE.md:136-152"
+   ],
+   "err": null
+  },
+  {
+   "id": "H07",
+   "ms": 2011,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The `properties_base` spine has 407 columns [S1], with source, method, and confidence columns present for only some fields [S1].\n\nJoin-key coverage as documented:\n\n- **Tract:** 84.6%\n- **APN:** 48.1%\n- **Housing-authority link:** 7.2%\n- **County FIPS:** used as a key but no coverage percentage given in the excerpt\n\n[S1] frames these as the joins everything else hangs on, and argues that raising tract and APN coverage first multiplies every later join [S1]. Related context from the same documentation set: rent observations and arm's-length sales comps were 0.7% and 0.13% filled, respectively, which is why joining them to the spine is treated as the highest-value near-term coverage fix [S2]; observed asking rents sit at 0.8% from the listing pipeline [S3].\n\nFor the exact as-of date and current per-field coverage on `properties_base`, check `v_coverage_latest` and `v43.input_coverage` in the Terminal \u2014 the figures above come from the coverage documentation, and field coverage moves with each nightly run [S1].",
+   "cited": [
+    "docs/SCORING_DATA_COVERAGE.md:86-91",
+    "docs/SCORING_INPUTS_OPTIONS.md:10-15",
+    "docs/SCORING_DATA_COVERAGE.md:62-65"
+   ],
+   "retrieved": [
+    "docs/SCORING_DATA_COVERAGE.md:86-91",
+    "docs/SCORING_INPUTS_OPTIONS.md:10-15",
+    "docs/SCORING_DATA_COVERAGE.md:62-65",
+    "docs/v50-coverage-measurement-2026-10-23.md:27-56",
+    "docs/v50-coverage-measurement-2026-10-23.md:117-143",
+    "docs/SCORING_BAND_RECALIBRATION.md:3-13"
+   ],
+   "err": null
+  },
+  {
+   "id": "H08",
+   "ms": 2335,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The hazard index is joined from `public.tract_risk` \u2014 FEMA's National Risk Index, covering 85,154 tracts \u2014 matched to properties by Census tract, and in the v254 dry run (Oct 21, 2026, read-only) it filled 137,927 records, lifting coverage from 65.3% to 88.7% [S1].\n\nThe measured post-run figure was slightly higher, 88.8% across 587,787 records, and the record count matched the dry run exactly [S1]. Remaining gaps are properties without a tract geocode; the documentation puts the ceiling at roughly 84.6% tract coverage before the county-FIPS step, so the join effectively exhausted the tract-linked population [S3].\n\nTwo caveats worth noting: the join fills NULLs only and records its method per row, and updating that input column re-queues affected rows for v43 rescoring, so scores move once the queue drains [S1]. Hazard is a medium-weight input in the score (default 40 where missing) [S6]. For actual per-property hazard values, check the Spain Terminal.",
+   "cited": [
+    "docs/SCORING_DATA_COVERAGE.md:70-84",
+    "docs/SCORING_DATA_COVERAGE.md:50-56",
+    "docs/SCORING_DATA_COVERAGE.md:33-47"
+   ],
+   "retrieved": [
+    "docs/SCORING_DATA_COVERAGE.md:70-84",
+    "docs/SCORING_DATA_COVERAGE.md:5-14",
+    "docs/SCORING_DATA_COVERAGE.md:50-56",
+    "docs/SCORING_DATA_COVERAGE.md:85-85",
+    "docs/SCORING_INPUTS_OPTIONS.md:10-15",
+    "docs/SCORING_DATA_COVERAGE.md:33-47"
+   ],
+   "err": null
+  },
+  {
+   "id": "H09",
+   "ms": 4572,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The Terminal documentation I have here doesn't cover the PHA register, so I can't give you its freshness SLA or row-count band. The retrieved excerpts are all from the scoring band recalibration doc (v50.0, dated Oct 28, 2026) and only address grade thresholds, cohort counts and grading caveats [S1][S2][S3] \u2014 nothing about a PHA register, its refresh cadence, or an expected row count.\n\nWhat those excerpts do establish, for context on datedness: the snapshot statistics (258,240 scored rows, max 84.5, p99 63.7) are as of that Oct 28, 2026 recalibration [S1], and grades are derived at read time rather than stored, so they can shift at boundaries [S3].\n\nTo find the PHA register SLA and row-count band, check the Terminal's own data-source or register documentation directly (look for a register/data-contract page rather than the scoring docs), or ask whoever owns the ingestion pipeline. As a general rule for HUD-derived registers, the authoritative upstream source is HUD's PHA contact dataset (published via HUD.gov / HUD Open Data), which HUD refreshes periodically rather than in real time \u2014 so any SLA the Terminal sets is internal and would be defined in that register's contract, not in HUD's publication schedule. I can't state a specific cadence or band without that document.",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37"
+   ],
+   "err": null
+  },
+  {
+   "id": "H10",
+   "ms": 5047,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I don't have documentation of a \"freshness job\" for parcels_general in the excerpts provided \u2014 the Terminal docs I was given cover the scoring jobs, not a freshness monitor, so I can't tell you what such a job would report.\n\nWhat [S1] does say about parcels_general and the nightly jobs:\n\n- The nightly cron `v49-score-local-nightly` runs `v43.refresh_score_local()`, which reads only `public.properties_base` (5+ units, no dq flag) and rewrites `v43.score_local` percentile ranks. It never references `parcels_general` and scores nothing there.\n- The scoring writer, `v43.recompute_batch` (`v43-weekly-drain` / `v43-recompute`), updates only `public.properties_base`, claiming ids from `v43.score_dirty`. So neither job writes parcels_general, and the nightly cron cannot rescore it.\n- Unrelated open question: `parcels_general.v43_scored_at` carries values dated Oct 21 to Oct 26 on roughly 378k rows even though the docs say it was never rescored. Something outside those two jobs wrote them; identifying the writer is a separate follow-up, and the scoring-state job's watermark guard (nothing newer than 2026-10-26) covers further movement.\n\nPer [S2], `parcels_general` stays on hold (#321) regardless of the A/B/C input decision.\n\nIf you need the actual freshness signal for that table, it must be read in the Spain Terminal \u2014 I'd check whether an equivalent job exists rather than assume one does.",
+   "cited": [
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:38-42",
+    "docs/SCORING_INPUTS_OPTIONS.md:25-29"
+   ],
+   "retrieved": [
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:38-42",
+    "docs/SCORING_INPUTS_OPTIONS.md:25-29",
+    "docs/SCORING_BAND_RECALIBRATION.md:3-13"
+   ],
+   "err": null
+  },
+  {
+   "id": "H11",
+   "ms": 3320,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The excerpt I was given does not cover that \u2014 it's measurement evidence for the v50.0 rescore (executed SQL against the Terminal database, October 23, 2026), and contains nothing about a fleet charter, Playwright, or a dead-control sweep.\n\nMore plainly: I have no \"fleet charter\" in front of me, and nothing in my Spain Terminal documentation set describes browser-automation policy or a QC sweep for dead controls. I won't guess at what such a charter says.\n\nTwo things I can offer:\n\n- If the charter is a document in the Terminal's docs tree, point me at the path or ask again with a keyword from it and I can check whether an excerpt matches.\n- If you're asking a general housing-finance question that happened to use that phrasing (for example, a control in an underwriting model that never triggers), tell me which control and I can explain what it should do and what would drive it \u2014 with the property-level values read in Spain Terminal.\n\nFor the record, the only dated material I have here is the October 23, 2026 rescore evidence [S1], which is about coverage measurement queries, not automation policy.",
+   "cited": [
+    "docs/v50-coverage-measurement-2026-10-23.md:1-9"
+   ],
+   "retrieved": [
+    "docs/v50-coverage-measurement-2026-10-23.md:1-9"
+   ],
+   "err": null
+  },
+  {
+   "id": "H12",
+   "ms": 3048,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I can't answer that from the material I have: the only Terminal documentation provided here covers scoring-input options (SCORING_INPUTS_OPTIONS.md) and says nothing about a fleet roster, agent counts, or an Anomaly and Drift agent's mission [S1].\n\nThe excerpt I do have addresses a related but different topic \u2014 a proposed re-rank with risks around thin-field properties appearing equally scored, evidence-quality drift in rent-evidence downgrade rules, a required backtest before serving, and a staged approval gate keeping v50.0 served until a v51 report is approved [S1]. That mentions \"drift\" only in the sense of evidence-quality drift and notes calibration movement (F share rising from 35.7% to 43.0%) [S1]. It does not describe an agent, its mission, or how many agents exist.\n\nSo: no roster count, and no Anomaly and Drift agent mission statement, is available to me in this chat. To get the actual figures, check the Terminal's own agent/roster documentation or the operational runbook in Spain Terminal directly rather than relying on this answer \u2014 I won't invent a count or a mission description.",
+   "cited": [
+    "docs/SCORING_INPUTS_OPTIONS.md:16-18"
+   ],
+   "retrieved": [
+    "docs/SCORING_INPUTS_OPTIONS.md:16-18"
+   ],
+   "err": null
+  },
+  {
+   "id": "H13",
+   "ms": 2209,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I don't know \u2014 I have no visibility into Spain Terminal job schedules from this chat, and I won't guess at a cron expression or run time.\n\nTo find it, check the Terminal's scheduling configuration directly (the job registry or scheduler settings for `policy_radar`), or ask whoever administers the pipeline. If the job's cadence matters to your underwriting workflow \u2014 say, how fresh FMR or QCT/DDA policy-change flags are \u2014 confirm both the schedule and the last-run timestamp there rather than relying on an assumption.\n\nIf you can tell me what the job is supposed to watch (HUD FMR releases, QCT/DDA designations, PHA notices), I can tell you how often those sources actually update, which is often a better guide than the job's cron.",
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H14",
+   "ms": 2421,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The excerpts I have don't cover how `fl_nal_loader` is triggered \u2014 the only relevant line just notes that the FL NAL ingest expanded the scorable universe from 587,802 to 634,930 properties [S1], with no detail on scheduling or invocation. I won't guess at the mechanism.\n\nWhat I can say: loader jobs in a pipeline like this are typically kicked off one of four ways \u2014 a scheduled orchestrator run (e.g., an Airflow/cron DAG), a manual CLI or admin-panel trigger, an upstream file-arrival/sensor event, or a chained call at the end of a prior ingest step. Which one applies here is documented in the Terminal's job orchestration docs, not in the scoring-coverage note I was given.\n\nTo find it, check in the Terminal: the DAG/scheduler definition for ingest jobs, the loader's own README or module docstring, and the ops runbook for the nightly snapshot. Also worth confirming whether the FL NAL load is a one-time backfill or a recurring job \u2014 that changes the trigger story entirely.\n\nIf you can point me at the orchestration doc or paste the relevant section, I can walk through the trigger path and what it implies for snapshot freshness and re-scoring.",
+   "cited": [
+    "docs/SCORING_DATA_COVERAGE.md:1-4"
+   ],
+   "retrieved": [
+    "docs/SCORING_DATA_COVERAGE.md:1-4"
+   ],
+   "err": null
+  },
+  {
+   "id": "H15",
+   "ms": 3292,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The excerpts I have don't define any \"three reconciliation states,\" so I can't name them \u2014 that term isn't in the coverage documentation I was given.\n\nWhat the documentation does cover, from [S2]: the spine is `properties_base` with 407 columns, carrying source, method and confidence columns for only some fields; the stated target is every scoring input stored as an observation (property id, field, value, source, method, as-of date, confidence) with `properties_base` as the current-value projection. Join keys are tract (84.6%), APN (48.1%), housing-authority link (7.2%) and county FIPS. Coverage is treated as a contract: `v_coverage_latest` and `v43.input_coverage` exist, with a target per field and a nightly run that fails when a field drops. [S1] adds source-level caveats \u2014 APN on 48.1%, sale prices missing even where dates exist partly due to non-disclosure states (needing a separate flag so they don't read as gaps), Fannie/Freddie/CMBS loan tapes as the distress signal, and FBI crime data labeled at agency grain rather than property-level.\n\nSo the mechanism for flagging missing-versus-not-applicable data is described in principle, but the specific reconciliation-state names you're asking about aren't in these excerpts. Check the full `docs/SCORING_DATA_COVERAGE.md` or the schema docs for the field-level state definitions, or ask whoever owns the coverage contract.",
+   "cited": [
+    "docs/SCORING_DATA_COVERAGE.md:57-61",
+    "docs/SCORING_DATA_COVERAGE.md:86-91"
+   ],
+   "retrieved": [
+    "docs/SCORING_DATA_COVERAGE.md:57-61",
+    "docs/SCORING_DATA_COVERAGE.md:86-91"
+   ],
+   "err": null
+  },
+  {
+   "id": "H16",
+   "ms": 3458,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I can't answer that from the material I have \u2014 the excerpts provided don't mention a Riverside case or any comparison of mf-key versus full-key link rates, so I won't guess at figures.\n\nWhat the Terminal documentation I was given does cover is the options memo on scoring inputs [S1]: it notes that address matching infrastructure already exists (an mf_addr_key reconciliation at 96.8% fill and a California arm's-length rule from v268), and that rent observations (32.8M) and arm's-length sales comps (6.9M) are only 0.7% and 0.13% joined to properties today \u2014 which is the gap Option B proposes to close. That's a join-coverage figure, not a like-for-like comparison of mf-key against full-key link rates, so it doesn't stand in for the Riverside result.\n\nIf you want the Riverside numbers, check the Terminal's backtest or reconciliation documentation directly \u2014 the v267/v268 matching notes would be the natural place. If you paste that excerpt in, I'll walk through what it shows and what would drive the difference between the two link rates.",
+   "cited": [
+    "docs/SCORING_INPUTS_OPTIONS.md:10-15"
+   ],
+   "retrieved": [
+    "docs/SCORING_INPUTS_OPTIONS.md:10-15"
+   ],
+   "err": null
+  },
+  {
+   "id": "H17",
+   "ms": 5979,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The Terminal documentation I was given contains no record of a PHA loader run on 2026-10-28, so I can't tell you what it found.\n\nThe retrieved excerpts cover only scoring and coverage: the v50.0 coverage measurement [S2], the 634,930 universe reconciliation and the scorable cohort of 258,239 [S1][S6], and the grade-band recalibration authorization signed 2026-10-28 [S4]. That last item is the only 2026-10-28 event in these excerpts, and it is a band-recalibration authorization, not a PHA load \u2014 I would not treat it as evidence about a loader.\n\nSo this looks like a gap in the documentation supplied to me rather than a confirmed empty result. To answer it you would need the loader's own run log or ingest report in the Terminal (something like an ingest or pipeline-run doc for the PHA source, with the date stamp), plus the row counts it wrote and any rejects. If you can point me at that document, I can read it and tell you what the run found.",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:3-13",
+    "docs/SCORING_DATA_COVERAGE.md:97-101",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:43-50"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:3-13",
+    "docs/SCORING_DATA_COVERAGE.md:97-101",
+    "docs/v50-coverage-measurement-2026-10-23.md:144-145",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/v50-coverage-measurement-2026-10-23.md:117-143",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:43-50"
+   ],
+   "err": null
+  },
+  {
+   "id": "H18",
+   "ms": 4119,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I can't give you that figure \u2014 I don't have property-level values in this chat, and the Terminal's own coverage data says advertised rent is on file for only about 0.7% of properties.\n\nWhat the snapshot shows (October 23, 06:28 UTC, universe of 634,930):\n\n- Observed rent (`rent_latest_advertised` / `rent_latest_effective`): 4,722 records, 0.7% [S3].\n- FMR 2-bedroom (`fmr_2br`): 626,169 records, 98.6% [S3].\n\nSo the odds that 412 Oak Street has an actual advertised rent are low. To check, read `rent_latest_advertised` and `rent_latest_effective` for that property in the Spain Terminal. If those fields are null, the rent line on that property is modeled, not observed \u2014 falling back to FMR and area income, which is exactly the weakness the coverage note flags as the biggest lever in the score [S2].\n\nThe one thing that would change this: properties in active pursuit are being prioritized for the listing pipeline to grow observed asking rents [S1]. If 412 Oak Street is in pursuit, its rent evidence may be richer than the 0.7% base rate suggests \u2014 but you'd still have to read the field in the Terminal to confirm.\n\nFor a market-level sanity check instead, HUD's published Fair Market Rent for the Tampa-St. Petersburg-Clearwater HUD Metro FMR Area is the authoritative benchmark, available on HUD User.",
+   "cited": [
+    "docs/SCORING_DATA_COVERAGE.md:62-65",
+    "docs/SCORING_DATA_COVERAGE.md:5-14",
+    "docs/SCORING_DATA_COVERAGE.md:154-168"
+   ],
+   "retrieved": [
+    "docs/SCORING_DATA_COVERAGE.md:62-65",
+    "docs/SCORING_DATA_COVERAGE.md:5-14",
+    "docs/SCORING_DATA_COVERAGE.md:154-168",
+    "docs/v50-coverage-measurement-2026-10-23.md:96-116",
+    "docs/SCORING_DATA_COVERAGE.md:92-96"
+   ],
+   "err": null
+  },
+  {
+   "id": "H19",
+   "ms": 3642,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "I don\u2019t have Spain Terminal\u2019s revenue figure for last month, and I can\u2019t retrieve it in this chat. I have no live access to Spain Terminal data, internal financials, or the web, so I can\u2019t verify or estimate that number without inventing it.\n\nRevenue last month would be an internal finance/company metric, not a housing-underwriting data point I can derive from FMRs, LIHTC rules, or property-level scoring. To get the actual figure, check the authoritative internal source \u2014 the company\u2019s finance system, monthly close package, or executive dashboard \u2014 rather than a research assistant.\n\nIf you meant a specific property\u2019s **rental revenue** or **NOI** last month, that also must be read in the Spain Terminal; I can explain how those measures work and what would drive them, but not supply the property\u2019s actual values here.",
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  }
+ ],
+ "viewer": [
+  {
+   "id": "H01",
+   "ms": 3267,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "A+ requires a score of 82 or above and A requires 80 or above (from the Terminal's Oct 28, 2026 recalibration) [S2][S3].\n\nSupporting detail from the docs you gave me:\n\n- The full top of the ladder is A+ 82, A 80, A- 78, B+ 75, with B and below unchanged (B 70, B- 65, C+ 60, C 52, D 40, F below 40) [S2].\n- Under the old thresholds (A+ 90, A 85) both bands held zero properties; the new bands hold 5 A+ and 14 A [S2].\n- Grade is derived in engine o15 rather than stored, so a band change re-grades instantly without rescoring; only `v43.score_inputs_ctx_draft_o15` changes, and older draft engines are untouched [S2]. The live apply is the dispatch-only workflow `scoring-apply-bands` with dry=false, authorized in `docs/scoring_authorizations.json` [S1].\n- Two caveats worth knowing: the engine grades the unrounded score while the stored value is rounded to 0.1, so rows within 0.05 of a boundary can differ by one grade [S2][S5]; and cached grades in published data only refresh on the next data build [S1].\n\nNote that older coverage documentation cites the pre-recalibration A+ 90 / A 85 bands [S4] \u2014 that reconstruction predates the Oct 28 change.\n\nFor any specific property's grade, read the actual score in the Spain Terminal rather than inferring from thresholds.",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/SCORING_DATA_COVERAGE.md:136-152",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/SCORING_DATA_COVERAGE.md:136-152",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37",
+    "docs/SCORING_DATA_COVERAGE.md:102-118"
+   ],
+   "err": null
+  },
+  {
+   "id": "H02",
+   "ms": 2397,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The recalibration puts 5 properties in the A+ band; before it, there were 0 [S1].\n\nA+ now begins at a score of 82 rather than 90, so the 5 rows scoring 82 or above (out of 258,240 scores) land in the top band \u2014 about 0.002% of the cohort, since the maximum score is 84.5 [S1]. The A band moved from 85 to 80 and now holds 14, and A- from 80 to 78 holds 7; the A+ and A counts together split the old top 19 [S1]. Bands at B and below were unchanged [S1]. Grades are computed in engine o15 from the unrounded score, so rows within 0.05 of a boundary can differ by a grade even when stored scores look identical [S1]. The change was approved by Brett on Oct 28, 2026 and applied via the `scoring-apply-bands` workflow [S1][S3].",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/SCORING_INPUTS_OPTIONS.md:16-18",
+    "docs/SCORING_INPUTS_OPTIONS.md:5-9"
+   ],
+   "err": null
+  },
+  {
+   "id": "H03",
+   "ms": 4063,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "No \u2014 the recalibration was designed so that no property was rescored. Because the grade is derived inside engine o15 rather than stored, changing the thresholds re-grades the existing scores instantly, and the change touches only `v43.score_inputs_ctx_draft_o15` (the input the v50.0 engine runs); older draft engines are left untouched [S1]. The apply script (`scoring/apply_grade_bands.py`) patches only the grade statement in a single transaction, re-reads the definition, and checks that every band has content and that the counts sum to the cohort [S5]. The live apply runs through the dispatch-only `scoring-apply-bands` workflow after merge, authorised in `docs/scoring_authorizations.json` (`band_recalibration`, o15, Brett Spain, 2026-10-28) [S5].\n\nTwo caveats worth knowing. First, the UI displays whatever grades it is given, so any grades cached in published data do not refresh until its next data build [S5]. Second, rows within 0.05 of a boundary can land in different grades because the engine grades the unrounded score, while the published band counts use stored scores [S1]. The new bands move A+ to 82, A to 80, A- to 78, leave B+ at 75 and everything below unchanged, and shift roughly the top 19 rows \u2014 5 at A+, 14 at A \u2014 out of a 258,240-row cohort [S1].",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:51-53",
+    "docs/v50-coverage-measurement-2026-10-23.md:10-26",
+    "docs/SCORING_DATA_COVERAGE.md:136-152",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:17-32"
+   ],
+   "err": null
+  },
+  {
+   "id": "H04",
+   "ms": 3830,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The engine grades the **unrounded score**, not the rounded stored `risk_adjusted_score` [S1]. The stored value is rounded to 0.1, so a property whose unrounded score sits within 0.05 of a boundary can display a grade one band different from what the stored rounded value alone would imply [S1][S2]. The documented impact is small \u2014 \u201ca handful of rows at most\u201d \u2014 and does not materially change counts [S1]. The grade itself is derived in the engine rather than persisted, so regrading follows the live band statement [S2][S3]. For an exact property-level check, read the actual score and grade in Spain Terminal; the snapshot caveat is dated in the Oct 28 verification documentation [S1].",
+   "cited": [
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:5-16"
+   ],
+   "retrieved": [
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:33-37",
+    "docs/SCORING_BAND_RECALIBRATION.md:17-37",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:5-16",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:17-32",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:51-53",
+    "docs/SCORING_BAND_RECALIBRATION.md:39-41"
+   ],
+   "err": null
+  },
+  {
+   "id": "H05",
+   "ms": 2138,
+   "tier": "public",
+   "model": "deepseek/deepseek-v4.1-flash-1017",
+   "answer": "The hunt concluded that no definition reproduces 634,930 today, and none needs to: it was a true Oct 23 value that no longer holds. The recommendation is to restate the coverage gate to the operational cohort \u2014 258,239 of 258,239 on v50.0 (100%) \u2014 and open a separate item to find what reverted roughly 376k rows' units and scores [S1][S3].\n\nSupporting detail: the Oct 23 SQL filter (`dq_status IS NULL AND units >= 5`) returned 634,930, versus 587,802 on Oct 21 before the FL NAL ingest; the same filter run server-side on 2026-10-27 returned 258,239 [S1]. So the universe shrank by 376,691 rows between Oct 23 and Oct 27 rather than being redefined \u2014 the evidence points to a data regression after Oct 23 (a restore or a units reset), not a different cohort definition [S1][S3]. The reconciliation addendum confirms 258,239 clean rows with units \u2265 5, all scored, with an empty score queue, and that the original coverage SQL is gone and the doc's 587,648 baseline pairs are not reproducible [S2]. Restoring the ~376k-row cohort would be a scoring change requiring its own authorization [S3]. Note the addendum also records that two grades (A+ and A) are empty on the real cohort, so the \"no empty grade\" acceptance threshold fails [S2].",
+   "cited": [
+    "docs/SCORING_BAND_RECALIBRATION.md:3-13",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:43-50",
+    "docs/SCORING_BAND_RECALIBRATION.md:14-16"
+   ],
+   "retrieved": [
+    "docs/SCORING_BAND_RECALIBRATION.md:3-13",
+    "docs/V50_GRADE_MAPPING_VERIFICATION.md:43-50",
+    "docs/SCORING_BAND_RECALIBRATION.md:14-16",
+    "docs/SCORING_BAND_RECALIBRATION.md:1-2",
+    "docs/SCORING_DATA_COVERAGE.md:154-168",
+    "docs/SCORING_DATA_COVERAGE.md:1-4"
+   ],
+   "err": null
+  },
+  {
+   "id": "H06",
+   "ms": 52,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H07",
+   "ms": 46,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H08",
+   "ms": 43,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H09",
+   "ms": 57,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H10",
+   "ms": 56,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H11",
+   "ms": 71,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H12",
+   "ms": 19,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H13",
+   "ms": 35,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H14",
+   "ms": 18,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H15",
+   "ms": 73,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H16",
+   "ms": 27,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H17",
+   "ms": 19,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H18",
+   "ms": 25,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  },
+  {
+   "id": "H19",
+   "ms": 20,
+   "answer": null,
+   "cited": [],
+   "retrieved": [],
+   "err": null
+  }
+ ]
+}
