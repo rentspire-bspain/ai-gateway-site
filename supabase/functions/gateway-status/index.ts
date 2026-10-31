@@ -8,7 +8,7 @@ async function testModel(purpose: string, name: string, provider: string, model:
     const res = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/call-model`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` },
-      body: JSON.stringify({ purpose, messages: [{ role: "user", content: "Reply with exactly: OK" }], max_tokens: 128 }),
+      body: JSON.stringify({ purpose, messages: [{ role: "user", content: "Reply with exactly: OK" }], max_tokens: 512 }),
       signal: AbortSignal.timeout(25_000),
     });
     const data = await res.json();
@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
   const results = await Promise.all([
     testModel("summary", "Qwen3.8-27B", "Groq free tier", "qwen/qwen3.8-27b", "Fast summarization, digests, weekday report composition."),
     testModel("flint", "Flint v1.0", "OpenRouter free tier", "recursive/flint-v1.0:free", "Coding + agent work. Fixed 2026-10-28: the flint purpose now routes correctly."),
-    testModel("general", "Auto (pinned: Qwen3.8-27B)", "Groq free tier", "qwen/qwen3.8-27b", "Default for general Q&A. Pinned 2026-10-30; falls back to Flint if Groq is rate-limited."),
+    testModel("general", "Auto (DeepSeek V4.1 Flash)", "OpenRouter (paid, fractions of a cent per call)", "deepseek/deepseek-v4.1-flash-1017", "Default for general Q&A. Pinned 2026-10-31 after eval (74.2% vs Qwen 19.4%); falls back to Flint on error."),
   ]);
   CACHE.at = Date.now();
   CACHE.results = results;

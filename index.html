@@ -821,7 +821,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <select class="model-select" id="modelSel">
-          <option value="general">Auto (Qwen3.8-27B)</option>
+          <option value="general">Auto (DeepSeek V4.1 Flash)</option>
           <option value="flint">Flint v1.0</option>
           <option value="summary">Qwen3.8-27B (fast summary)</option>
         </select>
@@ -1251,7 +1251,7 @@ async function performSearch(query) {
     const res = await fetch(GATEWAY + "/gateway-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-      body: JSON.stringify({ messages: history, purpose, max_tokens: 1024 }),
+      body: JSON.stringify({ messages: history, purpose, max_tokens: 2048 }),
     });
     const data = await res.json();
     if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
