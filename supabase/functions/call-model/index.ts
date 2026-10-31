@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: "unauthorized gateway token" }), { status: 401, headers: { ...cors, "Content-Type": "application/json" } });
       }
     }
-    const { prompt, model, backend, messages, purpose, max_tokens, stream } = await req.json();
+    const { prompt, model, backend, messages, purpose, max_tokens, stream, reasoning_effort } = await req.json();
     // THE FREE HOSTED MODELS (no hardware, no cost):
     //   - OpenRouter's free Flint (recursive/flint-v1.0:free) — the coding/agent model
     //   - OpenRouter's Free Models Router — the auto-routing free tier
@@ -67,12 +67,14 @@ Deno.serve(async (req) => {
       const key = Deno.env.get("MODEL_BACKEND_KEY") || (g ? Deno.env.get("GROQ_API_KEY") : Deno.env.get("OPENROUTER_API_KEY")) || "";
       const msgs = messages ? messages : [{ role: "user", content: prompt || "" }];
       const r = await fetch(url, { method: "POST", headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: m, messages: msgs, max_tokens: mt }), signal: AbortSignal.timeout(55_000) });
+        body: JSON.stringify({ model: m, messages: msgs, max_tokens: mt, ...reasoningFor(m) }), signal: AbortSignal.timeout(55_000) });
       let d: any; try { d = await r.json(); } catch (_e) { d = { error: "bad upstream response" }; }
       const content = d?.choices?.[0]?.message?.content;
       return { ok: r.ok && !d?.error && typeof content === "string" && content.length > 0, d };
     };
     // max_tokens: Groq free tier enforces OTPM 1000 (cap 1024); OpenRouter reasoning models get 2048.
+    const effort = ["minimal", "low", "medium", "high"].includes(String(reasoning_effort)) ? String(reasoning_effort) : (Deno.env.get("REASONING_EFFORT") || "");
+    const reasoningFor = (m: string) => (effort && !isGroqId(m) ? { reasoning: { effort } } : {});
     const capFor = (m: string) => Math.min(Number(max_tokens) > 0 ? Number(max_tokens) : 2048, isGroqId(m) ? 1024 : 2048);
     // STREAMING (opt-in, stream:true): pass the upstream SSE body straight through for the primary model.
     // If the upstream is not OK we fall through to the normal non-streaming path (with its fallback chain).
@@ -82,7 +84,7 @@ Deno.serve(async (req) => {
         const surl = backend || Deno.env.get("MODEL_BACKEND_URL") || (g ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions");
         const skey = Deno.env.get("MODEL_BACKEND_KEY") || (g ? Deno.env.get("GROQ_API_KEY") : Deno.env.get("OPENROUTER_API_KEY")) || "";
         const sr = await fetch(surl, { method: "POST", headers: { "Authorization": `Bearer ${skey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ model: chosen, messages, max_tokens: capFor(chosen), stream: true, stream_options: { include_usage: true } }), signal: AbortSignal.timeout(55_000) });
+          body: JSON.stringify({ model: chosen, messages, max_tokens: capFor(chosen), stream: true, stream_options: { include_usage: true }, ...reasoningFor(chosen) }), signal: AbortSignal.timeout(55_000) });
         if (sr.ok && sr.body && (sr.headers.get("content-type") || "").includes("text/event-stream")) {
           if (paid && !budgetExceeded && sbUrl) {
             const obj = `${dayKey}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.json`;
