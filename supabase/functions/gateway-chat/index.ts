@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
   try {
     const url = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const { messages, purpose, model, max_tokens, stream } = await req.json();
+    const { messages, purpose, model, max_tokens, stream, effort } = await req.json();
     if (!Array.isArray(messages) || messages.length === 0) {
       return new Response(JSON.stringify({ error: "messages array required" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
     }
@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
     const res = await fetch(url + "/functions/v1/call-model", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + serviceKey },
-      body: JSON.stringify({ messages: capped, purpose, model, max_tokens: Math.min(Number(max_tokens) || 2048, 2048), stream: stream === true }),
+      body: JSON.stringify({ messages: capped, purpose, model, max_tokens: Math.min(Number(max_tokens) || 2048, 2048), reasoning_effort: effort ?? "low", stream: stream === true }),
       signal: AbortSignal.timeout(60_000),
     });
     if (stream === true && (res.headers.get("content-type") || "").includes("text/event-stream") && res.body) {
@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
           if (!full.trim()) { // reasoning ate the budget or upstream failed mid-stream: fall back to the non-streaming path with its fallback chain
             try {
               const r2 = await fetch(url + "/functions/v1/call-model", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + serviceKey },
-                body: JSON.stringify({ messages: capped, purpose, model, max_tokens: Math.min(Number(max_tokens) || 2048, 2048) }), signal: AbortSignal.timeout(55_000) });
+                body: JSON.stringify({ messages: capped, purpose, model, max_tokens: Math.min(Number(max_tokens) || 2048, 2048), reasoning_effort: effort ?? "low" }), signal: AbortSignal.timeout(55_000) });
               const d2 = await r2.json(); const c2 = d2?.choices?.[0]?.message?.content;
               if (typeof c2 === "string" && c2) { full = c2; usedFallback = true; usage = d2.usage ?? usage; upstreamModel = d2.model ?? upstreamModel; upstreamId = d2.id ?? upstreamId; send({ t: "d", c: c2 }); }
             } catch (_e) { /* give up below */ }
