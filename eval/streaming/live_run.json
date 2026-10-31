@@ -1,0 +1,131 @@
+{
+ "runs": [
+  {
+   "q": "What does the Anomaly and Drif",
+   "stream": false,
+   "status": 200,
+   "headers_ms": 15458,
+   "total_ms": 15458,
+   "chars": 908,
+   "timing": {
+    "pre_model": 14,
+    "model": 14703
+   }
+  },
+  {
+   "q": "What does the Anomaly and Drif",
+   "stream": true,
+   "status": 200,
+   "headers_ms": 805,
+   "think_ms": 807,
+   "ttft_ms": 11920,
+   "total_ms": 13904,
+   "chars": 836,
+   "timing": {
+    "pre_model": 21,
+    "first_byte": 672,
+    "first_content": 11788,
+    "model_total": 13123,
+    "streamed": true
+   },
+   "tier": "public"
+  },
+  {
+   "q": "How many agents are in the fle",
+   "stream": false,
+   "status": 200,
+   "headers_ms": 3849,
+   "total_ms": 3849,
+   "chars": 416,
+   "timing": {
+    "pre_model": 1,
+    "model": 2903
+   }
+  },
+  {
+   "q": "How many agents are in the fle",
+   "stream": true,
+   "status": 200,
+   "headers_ms": 914,
+   "think_ms": 914,
+   "ttft_ms": 1168,
+   "total_ms": 1919,
+   "chars": 139,
+   "timing": {
+    "pre_model": 11,
+    "first_byte": 799,
+    "first_content": 1060,
+    "model_total": 1128,
+    "streamed": true
+   },
+   "tier": "public"
+  },
+  {
+   "q": "What is the Spain Terminal sco",
+   "stream": false,
+   "status": 200,
+   "headers_ms": 39445,
+   "total_ms": 39445,
+   "chars": 2247,
+   "timing": {
+    "pre_model": 1,
+    "model": 38681
+   }
+  },
+  {
+   "q": "What is the Spain Terminal sco",
+   "stream": true,
+   "status": 200,
+   "headers_ms": 1034,
+   "think_ms": 1034,
+   "ttft_ms": 15814,
+   "total_ms": 26903,
+   "chars": 2299,
+   "timing": {
+    "pre_model": 14,
+    "first_byte": 926,
+    "first_content": 15711,
+    "model_total": 26286,
+    "streamed": true
+   },
+   "tier": "public"
+  },
+  {
+   "q": "Which model does the AI gatewa",
+   "stream": false,
+   "status": 200,
+   "headers_ms": 3327,
+   "total_ms": 3327,
+   "chars": 453,
+   "timing": {
+    "pre_model": 16,
+    "model": 2487
+   }
+  },
+  {
+   "q": "Which model does the AI gatewa",
+   "stream": true,
+   "status": 200,
+   "headers_ms": 883,
+   "think_ms": 883,
+   "ttft_ms": 1077,
+   "total_ms": 2655,
+   "chars": 231,
+   "timing": {
+    "pre_model": 15,
+    "first_byte": 769,
+    "first_content": 969,
+    "model_total": 1273,
+    "streamed": true
+   },
+   "tier": "public"
+  }
+ ],
+ "auth_user_ms": [
+  234,
+  235,
+  257,
+  237,
+  237
+ ]
+}
