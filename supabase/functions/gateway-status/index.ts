@@ -19,7 +19,8 @@ async function testModel(purpose: string, name: string, provider: string, model:
       status: ok ? "pass" : "fail",
       latency_ms: Date.now() - started,
       returned_model: data?.model ?? null,
-      error: ok ? null : (data?.error?.message ?? data?.error ?? "no content returned"),
+      fallback_from: data?.x_fallback_from ?? null,
+      error: ok ? (data?.x_fallback_from ? `served by fallback (${data?.model}); ${data.x_fallback_from} failed` : null) : (data?.error?.message ?? data?.error ?? "no content returned"),
       tested_at: new Date().toISOString(),
     };
   } catch (e: any) {
