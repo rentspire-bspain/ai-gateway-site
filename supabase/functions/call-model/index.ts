@@ -29,34 +29,78 @@ Deno.serve(async (req) => {
       summary: "qwen/qwen3.8-27b",   // Groq's fast free summarization
       general: "deepseek/deepseek-v4.1-flash-1017", // PINNED 2026-10-31: DeepSeek V4.1 Flash via OpenRouter (PAID, ~$0.0003/call). Eval: 74.2% vs Qwen 19.4% (eval/RESULTS.md)
     };
-    const chosen = model || DEFAULTS[purpose] || DEFAULTS.general;
-    // Route to the correct API based on the model (Groq models → Groq, others → OpenRouter)
-    const isGroq = chosen.startsWith("qwen/") || chosen.includes("groq");
-    const url = backend || Deno.env.get("MODEL_BACKEND_URL") || (isGroq ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions");
-    const key = Deno.env.get("MODEL_BACKEND_KEY") || (isGroq ? Deno.env.get("GROQ_API_KEY") : Deno.env.get("OPENROUTER_API_KEY")) || "";
-    // max_tokens: Groq's free tier enforces OTPM 1000 (cap 1024); reasoning models on OpenRouter need headroom (cap 2048).
-    const limit = isGroq ? 1024 : 2048;
-    const cap = Math.min(Number(max_tokens) > 0 ? Number(max_tokens) : limit, limit);
-    const body = messages
-      ? { model: chosen, messages, max_tokens: cap }
-      : { model: chosen, messages: [{ role: "user", content: prompt || "" }], max_tokens: cap };
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    let data = await res.json();
-    if (!res.ok && chosen !== DEFAULTS.flint && !model && !backend && !Deno.env.get("MODEL_BACKEND_URL")) {
-      // Default model errored/rate-limited: fall back to the named free Flint model (visible in data.model).
-      const fb = DEFAULTS.flint; // note: Flint is a reasoning model, may return empty content if it exhausts max_tokens
-      const r2 = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${Deno.env.get("OPENROUTER_API_KEY") || ""}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ ...body, model: fb, max_tokens: Math.min(body.max_tokens, 2048) }),
-      });
-      const d2 = await r2.json();
-      if (r2.ok) { data = d2; data.x_fallback_from = chosen; }
+    let chosen = model || DEFAULTS[purpose] || DEFAULTS.general;
+    const isGroqId = (m: string) => m.startsWith("qwen/") || m.includes("groq");
+    const isFree = (m: string) => isGroqId(m) || m.endsWith(":free");
+    const sbUrl = Deno.env.get("SUPABASE_URL") || "";
+    const sbKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const sbHeaders = { "Authorization": `Bearer ${sbKey}`, "apikey": sbKey };
+    const custom = !!backend || !!Deno.env.get("MODEL_BACKEND_URL");
+    // SPEND TRIPWIRE: every paid call writes one tiny object to the private Storage bucket 'gateway-meter'
+    // under today's UTC date prefix (no DB migration needed). Past DAILY_PAID_CALL_CAP objects per UTC day
+    // (default 2000, about $0.60 at $0.0003/call) paid models are downgraded to free Qwen and the response
+    // carries x_budget_exceeded. Meter errors fail open (availability over a few cents).
+    const DAILY_CAP = Number(Deno.env.get("DAILY_PAID_CALL_CAP")) || 2000;
+    const dayKey = new Date().toISOString().slice(0, 10);
+    let budgetExceeded = false;
+    const paid = !custom && !isFree(chosen);
+    let paidToday: number | null = null;
+    let meterDiag = "";
+    if (paid && sbUrl) {
+      try {
+        const l = await fetch(`${sbUrl}/storage/v1/object/list/gateway-meter`, { method: "POST",
+          headers: { ...sbHeaders, "Content-Type": "application/json" },
+          body: JSON.stringify({ prefix: dayKey, limit: DAILY_CAP, offset: 0 }), signal: AbortSignal.timeout(5000) });
+        meterDiag = `list:${l.status}`;
+        if (!l.ok) {
+          await fetch(`${sbUrl}/storage/v1/bucket`, { method: "POST", headers: { ...sbHeaders, "Content-Type": "application/json" },
+            body: JSON.stringify({ id: "gateway-meter", name: "gateway-meter", public: false }), signal: AbortSignal.timeout(5000) })
+            .then((cr) => { meterDiag += ` create:${cr.status}`; });
+          paidToday = 0;
+        } else if (l.ok) { const arr = await l.json(); paidToday = Array.isArray(arr) ? arr.length : null; }
+      } catch (e) { meterDiag += ` err:${String(e).slice(0, 80)}`; }
+      if (paidToday !== null && paidToday >= DAILY_CAP) { budgetExceeded = true; chosen = DEFAULTS.summary; }
     }
+    const callOne = async (m: string, mt: number) => {
+      const g = isGroqId(m);
+      const url = backend || Deno.env.get("MODEL_BACKEND_URL") || (g ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions");
+      const key = Deno.env.get("MODEL_BACKEND_KEY") || (g ? Deno.env.get("GROQ_API_KEY") : Deno.env.get("OPENROUTER_API_KEY")) || "";
+      const msgs = messages ? messages : [{ role: "user", content: prompt || "" }];
+      const r = await fetch(url, { method: "POST", headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: m, messages: msgs, max_tokens: mt }), signal: AbortSignal.timeout(55_000) });
+      let d: any; try { d = await r.json(); } catch (_e) { d = { error: "bad upstream response" }; }
+      const content = d?.choices?.[0]?.message?.content;
+      return { ok: r.ok && !d?.error && typeof content === "string" && content.length > 0, d };
+    };
+    // max_tokens: Groq free tier enforces OTPM 1000 (cap 1024); OpenRouter reasoning models get 2048.
+    const capFor = (m: string) => Math.min(Number(max_tokens) > 0 ? Number(max_tokens) : 2048, isGroqId(m) ? 1024 : 2048);
+    let { ok, d: data } = await callOne(chosen, capFor(chosen));
+    if (paid && !budgetExceeded && sbUrl) {
+      const obj = `${dayKey}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.json`;
+      const put = () => fetch(`${sbUrl}/storage/v1/object/gateway-meter/${obj}`, { method: "POST", headers: { ...sbHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: chosen, purpose: purpose ?? null, ok, usage: data?.usage ?? null }), signal: AbortSignal.timeout(5000) });
+      try {
+        let pr = await put();
+        if (!pr.ok) { // bucket missing on first use: create it, then retry once
+          await fetch(`${sbUrl}/storage/v1/bucket`, { method: "POST", headers: { ...sbHeaders, "Content-Type": "application/json" },
+            body: JSON.stringify({ id: "gateway-meter", name: "gateway-meter", public: false }), signal: AbortSignal.timeout(5000) });
+          pr = await put();
+        }
+        meterDiag += ` put:${pr.status}`;
+      } catch (e) { meterDiag += ` puterr:${String(e).slice(0, 60)}`; }
+    }
+    // Fallback chain (only when the caller did not pin a model/backend): Qwen on Groq (free, works), then Flint.
+    if (!ok && !model && !custom) {
+      const chain = [DEFAULTS.summary, DEFAULTS.flint].filter((m) => m !== chosen);
+      for (const fb of chain) {
+        try {
+          const r2 = await callOne(fb, capFor(fb));
+          if (r2.ok) { data = r2.d; data.x_fallback_from = chosen; ok = true; break; }
+        } catch (_e) { /* try next */ }
+      }
+    }
+    if (paid && data && typeof data === "object") data.x_meter = { paid_today: paidToday, cap: DAILY_CAP, diag: meterDiag };
+    if (budgetExceeded && data && typeof data === "object") data.x_budget_exceeded = { cap: DAILY_CAP, paid_calls_today: paidToday };
     return new Response(JSON.stringify(data), { headers: { ...cors, "Content-Type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
