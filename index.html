@@ -853,7 +853,7 @@ a { color: inherit; text-decoration: none; }
           <button class="suggestion-chip" data-q="Explain HUD rent reasonableness requirements">HUD requirements</button>
         </div>
         <p class="landing-footer">
-          Powered by open-weight models · <a href="#" id="statusLink">Model status</a> · Every answer costs $0
+          Powered by open-weight models · <a href="#" id="statusLink">Model status</a> · Answers cost a fraction of a cent
         </p>
       </div>
     </div>
@@ -897,7 +897,7 @@ a { color: inherit; text-decoration: none; }
       <div class="logo-mark" style="width:36px;height:36px;font-size:18px">P</div>
     </div>
     <h2 class="auth-title">Welcome to ai.spaincos</h2>
-    <p class="auth-subtitle">Sign in to start searching — every answer costs $0</p>
+    <p class="auth-subtitle">Sign in to start searching — answers cost a fraction of a cent</p>
     <div id="authStep1">
       <div class="auth-input-group">
         <input class="auth-input" id="authEmail" type="email" placeholder="you@spaincos.com" autocomplete="email">
@@ -1148,7 +1148,8 @@ function renderAnswer(container, text, sources, related) {
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
     .replace(/`(.+?)`/g, "<code>$1</code>")
-    .replace(/\[(\d+)\]/g, '<span class="citation">$1</span>');
+    .replace(/\[(\d+)\]/g, '<span class="citation">$1</span>')
+    .replace(/\[S(\d+)\]/g, '<span class="citation">S$1</span>');
   // Split into paragraphs
   const paragraphs = html.split(/\n\n+/).filter(p => p.trim());
   paragraphs.forEach(p => {
@@ -1269,7 +1270,8 @@ async function performSearch(query) {
     content.appendChild(q);
     
     // Render answer with sources and related
-    const sources = extractSources(answer);
+    const termSources = (data.x_sources || []).map(x => ({ domain: "Terminal docs [S" + x.n + "]", title: String(x.src).split("@")[0] + " lines " + x.lines }));
+    const sources = [...termSources, ...extractSources(answer)];
     const related = generateRelated(query);
     renderAnswer(content, answer, sources, related);
     

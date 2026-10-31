@@ -1,0 +1,1752 @@
+[
+ {
+  "id": "Q01",
+  "answer": "A Qualified Census Tract is a census tract that HUD designates annually because it meets one of two statutory tests: at least 50% of its households have incomes at or below 60% of area median gross income, or its poverty rate is at least 25% (IRC \u00a742(d)(5)(B)(ii)).\n\nSupporting detail:\n\n- **Who designates:** HUD, not the IRS or the state agency. HUD publishes the QCT list each year (with the DDA list) on HUD User and in a Federal Register notice; states must use the list in effect for that year's LIHTC allocations.\n- **Population cap:** Designated QCTs may not contain more than 20% of the population of the relevant metropolitan area, so HUD applies a ranking/truncation rule when too many tracts qualify. That is why a tract can qualify on the raw numbers yet not appear on the list.\n- **Why it matters:** A building in a QCT or DDA that the state agency designates can receive up to a 30% boost in eligible basis (130% instead of 100%), which raises credit dollars without extra equity.\n- **Caveat:** HUD moved from 2010 to 2020 Census-based designations in the mid-2020s; I'm not certain of the exact first effective year, so confirm against the current HUD User QCT page before relying on a specific tract.\n\nFor a property, the terminal's QCT flag depends on tract geocode coverage \u2014 verify the actual value in Spain Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 10.9
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "50-56",
+    "score": 10.8
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "70-84",
+    "score": 6.5
+   },
+   {
+    "n": 4,
+    "src": "docs/FRESHNESS_SLA.md@78c4d2d",
+    "lines": "1-12",
+    "score": 6.5
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "169-187",
+    "score": 5.5
+   },
+   {
+    "n": 6,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "9-25",
+    "score": 5.3
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q02",
+  "answer": "**In metropolitan areas, QCT designations are capped so that the designated tracts together hold no more than 20% of the metro area's population.** The statutory rule is in IRC \u00a742(d)(5)(C)(ii): a QCT must have at least 25% of households below the poverty line (or 50%+ of households at or below 60% of area median gross income), and HUD must limit designations so the aggregate population of designated tracts in a metropolitan statistical area does not exceed 20% of the MSA's population. Non-metro tracts meeting the income test do not face that 20% cap \u2014 HUD designates all tracts that qualify outside MSAs.\n\nPractical points: when more than 20% of an MSA's population lives in qualifying tracts, HUD must choose among them, and it uses a stated methodology (tie-breakers favoring greater distress, and it holds back a share of the cap for \"most difficult\" tracts each year). Designations are re-published annually on HUD User's QCT/DDA page; check that list plus the current-year Federal Register notice for the exact population vintage (decennial or ACS-based estimates) HUD used \u2014 I don't want to guess which vintage is in force this year.\n\nThe QCT/DDA boost is the 30% basis increase in LIHTC; don't confuse it with DDA treatment, which is a separate designation.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "15-32",
+    "score": 11.1
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "score": 9.7
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 9.4
+   },
+   {
+    "n": 4,
+    "src": "docs/SPINE_COVERAGE_DOCTRINE.md@78c4d2d",
+    "lines": "19-24",
+    "score": 8.1
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "50-56",
+    "score": 7.9
+   },
+   {
+    "n": 6,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "32-40",
+    "score": 7.6
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q03",
+  "answer": "A LIHTC building in a Qualified Census Tract or Difficult Development Area gets a 30% basis boost: its eligible basis is multiplied by 1.30, which raises the credit allocation by the same proportion (IRC \u00a742(d)(5)(B), added by HERA 2008 and made permanent by the 2015 PATH Act).\n\nKey mechanics:\n\n- It is available **by right** \u2014 the allocating state agency doesn't have to designate the building; the QCT/DDA status itself triggers it. HUD publishes the QCT and DDA lists annually (QCTs from ACS tract data, DDAs from construction-cost-to-income comparisons); check HUD User for the current year's lists, since designations change.\n- A building gets **one** 30% boost, not a stacked one for being in both a QCT and a DDA.\n- The boost applies to eligible basis for new construction and substantial rehab; state agencies apply it within their qualified allocation plans, and the practical effect is a larger credit per dollar of basis, which usually shows up as more feasible 9% or 4%/bond deals in those tracts.\n- Separately, under Treasury's 2022 final regulations, agencies may award a boost of up to 30% to buildings *outside* QCTs/DDAs where needed for financial feasibility (and there are rural set-aside rules), but that requires affirmative agency action.\n\nI'm not certain of every nuance on how the boost interacts with acquisition basis, so confirm deal-specific treatment with the state agency's QAP and \u00a742 counsel. I have no live data access here.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "92-96",
+    "score": 6
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 5.7
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "15-32",
+    "score": 5
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q04",
+  "answer": "A Difficult Development Area (DDA) is a HUD-designated geographic area where construction, land, and development costs are high relative to area incomes; LIHTC properties there can qualify for up to a 30% basis boost (130% of eligible basis) under IRC Section 42(d)(5)(B). DDAs are designated annually by HUD, generally for metropolitan areas or nonmetropolitan counties, and are separate from Qualified Census Tracts (QCTs), though both can trigger the boost. Designation depends on cost-income ratios and is published with effective dates; check HUD User's DDA/QCT lists for the applicable year. A property's actual DDA status and any boost must be read in Spain Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": null,
+  "retrieved": null,
+  "err": null
+ },
+ {
+  "id": "Q05",
+  "answer": "HUD's Fair Market Rents are set at the **40th percentile of gross rent** \u2014 including utilities \u2014 for **standard-quality units occupied by recent movers** (households that moved in within the past two years), measured from ACS data, so they are a modest-rent benchmark, not a market median.\n\nSupporting detail:\n- **Recent-mover basis:** HUD uses the most recent mover rents because FMRs serve voucher recipients searching now; the 40th percentile keeps the subsidy from being priced to the top of the market.\n- **50th percentile exceptions:** HUD may publish 50th-percentile FMRs in areas where the rental stock is limited or where using the 40th would materially reduce voucher holders' options (e.g., some disaster-impacted areas). Those are area-specific \u2014 check HUD User's FMR documentation rather than assume.\n- **Small Area FMRs** follow the same 40th-percentile recent-mover logic at the ZIP level.\n- **Payment standards** are a separate layer: a PHA may set them at 90\u2013110% of the FMR (with HUD approval for exceptions), so actual voucher ceilings differ from the FMR itself. Rent reasonableness under 24 CFR 982.507 then caps the unit rent against the unassisted market.\n\nAuthoritative source: HUD User's FMR documentation and the FY FMR schedules; 24 CFR Part 888 for the FMR mechanics.\n\nIn the Terminal, FMR 2BR is the input present for 99.2% of in-scope properties, which is why modeled rents lean on it [S1].",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "244-258",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "244-258",
+    "score": 9.9
+   },
+   {
+    "n": 2,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "18-31",
+    "score": 8.2
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "score": 5.9
+   },
+   {
+    "n": 4,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "76-82",
+    "score": 5.5
+   },
+   {
+    "n": 5,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "160-171",
+    "score": 5.4
+   },
+   {
+    "n": 6,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "84-95",
+    "score": 5.2
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q06",
+  "answer": "HUD's Fair Market Rent schedules take effect on October 1 each year \u2014 the start of the federal fiscal year \u2014 and normally publish in August or September after a Federal Register notice and comment period. So the FY2026 FMRs (effective October 1, 2025) are what properties are being underwritten against through September 30, 2026.\n\nA few caveats worth knowing: HUD sometimes slips the publication date and issues the new schedule late, sometimes retroactively effective to October 1; FMRs can also be revised mid-year for specific areas after a disaster or major rent shock; and Small Area FMRs are published on the same annual cycle. Housing Choice Voucher renewal rents and payment standards track the FMR in effect on the relevant anniversary or effective date, so a late schedule can ripple into PHA paperwork. For exact dates, check the annual FMR notice in the Federal Register and the HUD User FMR datasets page \u2014 I can't verify a specific year's publication date from memory.\n\nOn the Terminal side: the retrievable documentation I have doesn't cover FMR effective-date handling. What it does show is that the 2-bedroom FMR is the score's main revenue driver, present on 99.3% of properties as of the audit run in the snapshot [S6], with rent modeled from FMR and area income for the other 99% [S3]. Nothing in those excerpts tells me which FMR vintage a given score used or whether the store refreshes on the October 1 cycle \u2014 that would need to be read in the Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "cited": true
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "15-32",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "244-258",
+    "score": 11.6
+   },
+   {
+    "n": 2,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "18-31",
+    "score": 8.2
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "score": 7.9
+   },
+   {
+    "n": 4,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "76-82",
+    "score": 7.4
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "70-84",
+    "score": 7.3
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "15-32",
+    "score": 6.8
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q07",
+  "answer": "A PHA may set its payment standard between 90% and 110% of the published FMR \u2014 including the Small Area FMR where applicable \u2014 without HUD approval; going above 110% (up to 120%) requires HUD approval or qualifying authority.\n\nSupporting detail:\n- The basic range is 90\u2013110% of the FMR for the unit size, per 24 CFR 982.503(b). A PHA adopts a single payment standard per unit size within that band.\n- Up to 120% of FMR is allowed only with HUD approval (the PHA must request it and justify it, typically on rent-burden or availability grounds). Some PHAs hold broader latitude via MTW agreements or approved exception payment standards for specific zip codes/areas.\n- Separately, the *rent reasonableness* determination (24 CFR 982.507) caps the rent actually paid at the unit \u2014 a payment standard within range does not by itself justify a rent above reasonableness.\n- Practical note: the total tenant payment plus subsidy cannot exceed the payment standard, so the 90\u2013110% choice is the main policy lever a PHA has for voucher success rates and rent burden.\n\nConfirm the current percentages and any HUD-published exception payment standards in HUD's Housing Choice Voucher Guidebook and the Federal Register notices on FMRs; I can't verify the live figures here.\n\nThe Spain Terminal documentation excerpts I was given cover data freshness, PHA registry counts, and scoring coverage, not payment standard rules \u2014 so nothing cited above comes from the Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "118-134",
+    "score": 7.4
+   },
+   {
+    "n": 2,
+    "src": "docs/FRESHNESS_SLA.md@78c4d2d",
+    "lines": "1-12",
+    "score": 7.3
+   },
+   {
+    "n": 3,
+    "src": "docs/FLEET.md@78c4d2d",
+    "lines": "8-15",
+    "score": 6.9
+   },
+   {
+    "n": 4,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "160-171",
+    "score": 5.9
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 5.9
+   },
+   {
+    "n": 6,
+    "src": "AGENTS.md@78c4d2d",
+    "lines": "29-37",
+    "score": 5.9
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q08",
+  "answer": "HAP is the gross rent minus the family's total tenant payment (TTP), capped so the subsidy never exceeds the payment standard minus TTP \u2014 roughly, 24 CFR 982.505 (payment standard) and 982.508 (family share).\n\nThe mechanics:\n\n- **TTP** is the greatest of 30% of adjusted monthly income, 10% of gross income, the welfare rent (if applicable), or the PHA's minimum rent (typically $50, with hardship exemptions).\n- **Gross rent** = contract rent + the PHA's utility allowance for tenant-paid utilities.\n- **Rent reasonableness:** the contract rent must be reasonable compared with unassisted rents for comparable units in the market (24 CFR 982.507). If it isn't, the PHA can't approve it and the tenant would bear the excess.\n- **Payment standard:** set between 90% and 110% of the FMR for the unit size, and the PHA may use the Small Area FMR. If gross rent exceeds the payment standard, the family pays the difference on top of TTP \u2014 that's the \"maximum family share\" rule, generally capped at 40% of adjusted income at initial occupancy.\n\nSo: **HAP = gross rent \u2212 TTP**, subject to HAP \u2264 payment standard \u2212 TTP.\n\nThe Terminal documentation excerpts I was given cover map coverage, scoring inputs, and property-level chips \u2014 they don't address HAP calculation, so the above is general program knowledge. Verify against HUD's Housing Choice Voucher Guidebook and 24 CFR Part 982.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "171-189",
+    "score": 6
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 5.9
+   },
+   {
+    "n": 3,
+    "src": "AGENTS.md@78c4d2d",
+    "lines": "29-37",
+    "score": 5.9
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "25-29",
+    "score": 5.6
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "92-96",
+    "score": 5.5
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q09",
+  "answer": "40% of adjusted monthly income is the cap at initial occupancy under 24 CFR 982.508 (\"Maximum family share at initial occupancy\").\n\nHow it works:\n- The family share is normally the total tenant payment, generally 30% of adjusted monthly income (or the 10% of gross income alternative, or the welfare-rent minimum, whichever applies per 24 CFR 5.628).\n- At initial lease-up, the PHA must not approve a tenancy where the family's share would exceed 40% of adjusted monthly income. This bites when gross rent exceeds the payment standard and the family would otherwise be over-housed relative to its voucher.\n- The 40% ceiling is a one-time test at initial occupancy. It does not constrain later rent increases or income declines \u2014 HUD's \"rent burden\" rule of thumb allows the share to rise above 40% afterward, which is why the Rent vs. FMR headroom signal in Spain Terminal matters at acquisition: a property priced with rents well above the area payment standard can be hard to lease up to voucher holders.\n- Rent must also pass rent reasonableness (24 CFR 982.507) independent of the affordability test.\n\nThe Terminal excerpts provided here cover data coverage and scoring, not program rules, so check the regulation text at 24 CFR 982.508 and the PHA's administrative plan for local policy choices.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "66-78",
+    "score": 11.1
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 10.1
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "50-56",
+    "score": 8.5
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 8.5
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "15-32",
+    "score": 7.9
+   },
+   {
+    "n": 6,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "9-25",
+    "score": 7.4
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q10",
+  "answer": "An FMR is a **gross-rent estimate**: contract rent plus tenant-paid utilities, **except telephone**, for a standard-quality unit.\n\n**Included:** shelter rent and necessary utilities paid by the tenant\u2014electricity, gas, heating/cooking fuel, water, sewer, and trash\u2014where applicable. HUD generally derives FMRs from the 40th percentile gross rent of standard-quality units.\n\n**Excluded:** telephone; typically cable/internet and optional services; security deposits, application fees, pet fees, and other non-rent charges; and any rental subsidy. FMRs are not unit-specific and do not reflect a property\u2019s actual condition, amenities, or location within a metro except through Small Area FMRs.\n\nCheck HUD\u2019s FMR documentation and the PHA\u2019s utility allowance schedule for the exact treatment of utilities and fees in a given area.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": null,
+  "retrieved": null,
+  "err": null
+ },
+ {
+  "id": "Q11",
+  "answer": "**24 CFR Part 888, Subpart B \u2014 specifically 24 CFR 888.113 (\"Fair Market Rents\")** \u2014 is the regulation that governs how HUD establishes FMRs; the underlying statutory authority is Section 8(c)(1) of the U.S. Housing Act of 1937 (42 U.S.C. 1437f(c)(1)).\n\nSupporting detail:\n\n- \u00a7888.113 sets the definition (the 40th percentile of gross rents for standard-quality recent-mover units in a market area, with the 50th percentile used where HUD determines a higher rent standard is needed), the data sources, and the annual Federal Register publication cycle.\n- Small Area FMRs are set under the same section, as amended after Congress authorized SAFMR designation; they use ZIP-code-level rent distributions rather than whole-metro ones.\n- Neighboring rules you may be thinking of: 24 CFR 982.503 governs a PHA's *payment standard* (which is set as a percentage of the FMR), and 24 CFR 982.507 governs *rent reasonableness* \u2014 neither establishes the FMR itself.\n- To verify current methodology and the exact percentile determinations, check the annual HUD FMR notice in the Federal Register and the FMR documentation system on HUD User.\n\nI don't have a Terminal excerpt covering FMR rulemaking, so the above is general housing-finance knowledge, not a Terminal citation.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "171-189",
+    "score": 7.6
+   },
+   {
+    "n": 2,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "244-258",
+    "score": 6.7
+   },
+   {
+    "n": 3,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "18-31",
+    "score": 6.3
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "score": 5.9
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q12",
+  "answer": "24 CFR 982.507 \u2014 \"Rent reasonableness for assistance to the family\" \u2014 is the provision that requires the PHA to determine that the rent to owner is reasonable before assisting a family in a voucher unit.\n\nSupporting detail:\n\n- The PHA must determine rent reasonableness **before approving the tenancy** (see 24 CFR 982.305, PHA approval of assisted tenancy) and must re-determine it on each rent change and at least annually. The requirement is restated in the HUD-52641 Tenancy Addendum, which is part of the lease.\n- 982.507(b) sets the test: the rent to owner may not exceed rent for comparable unassisted units in the market, considering location, quality, size, unit type, age, amenities, housing services, maintenance and utilities. The PHA documents this with at least three comparables.\n- It is distinct from the payment standard (24 CFR 982.503) and from the FMR. The FMR sets the payment standard ceiling; rent reasonableness caps what the owner can actually charge. A unit can be at or below the payment standard and still fail rent reasonableness.\n- The owner must certify comparability data to the PHA, and HUD requires the PHA to keep the rent-reasonableness determination in the tenant file.\n\nAuthoritative sources to check: 24 CFR Part 982 (eCFR), HUD's Housing Choice Voucher Program Guidebook (7420.10G), and HUD-52641.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "207-220",
+    "score": 8.8
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 6.1
+   },
+   {
+    "n": 3,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "18-31",
+    "score": 5.4
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "66-78",
+    "score": 5.4
+   },
+   {
+    "n": 5,
+    "src": "docs/FLEET.md@78c4d2d",
+    "lines": "16-25",
+    "score": 5.2
+   },
+   {
+    "n": 6,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "221-232",
+    "score": 5
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q13",
+  "answer": "HUD defines an extremely low-income (ELI) family as one whose income is at or below 30% of the area median income (AMI), adjusted for family size \u2014 and, in the voucher/Section 8 context, the greater of that 30% figure or the federal poverty guideline for a family of that size. The definitions sit in HUD's consolidated regulations at 24 CFR 5.603 and are published annually as the ELI column of HUD's Section 8 income limits on HUD User (check the current-year \"Income Limits\" dataset and methodology briefing).\n\nPractical points:\n\n- ELI is a subset of very low-income (VLI, 50% of AMI): a family cannot be ELI without also being VLI.\n- For the Housing Choice Voucher program, PHAs must target at least 75% of new admissions to ELI families, per their PHA plan and HUD guidance \u2014 this is with the same statutory basis.\n- ELI is not a LIHTC income ceiling: LIHTC uses 50%/60% AMI elections and the 20/50 or 40/60 minimum set-aside tests, though ELI thresholds matter for pooled bond deals, some HOME and NHTF programs, and DDA/QCT basis-boost analysis where the rent ceiling is tied to 30% or 50% of AMI.\n\nI don't have the specific regulatory citation in front of me beyond 24 CFR 5.603, so confirm the paragraph there and in the current HUD income-limit methodology before quoting it in a memo. The Terminal documentation excerpts I was given cover data coverage and scoring inputs, not income definitions.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 8.1
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "50-56",
+    "score": 7.4
+   },
+   {
+    "n": 3,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "160-171",
+    "score": 5.8
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "15-32",
+    "score": 5.5
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "244-258",
+    "score": 5.3
+   },
+   {
+    "n": 6,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "76-82",
+    "score": 5.1
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q14",
+  "answer": "HUD's headline percentages are 50% of area median family income for very-low-income (VLIL) and 80% for low-income; extremely low is 30%.\n\nDetails that matter for underwriting:\n\n- **Very low-income:** 50% of AMI, adjusted for family size. This is the anchor for Section 8 / Housing Choice Voucher eligibility and for the rent-reasonableness comparison set.\n- **Low-income:** 80% of AMI, the ceiling for most affordable-program eligibility.\n- **Extremely low-income:** 30% of AMI, or the poverty guideline, whichever is higher \u2014 the target for many vouchers, project-basing, and PBRA.\n- **LIHTC candidate ceilings:** 50% and 60% of AMI (the 60% test is the common tax-exempt bond and DDA/QCT baseline), with the 20/50 and 40/60 set-asides; HERA (2008) allows the average-income 60% test.\n- HUD doesn't publish a raw 50%/80% of a single number: it applies the statutory hold-harmless, high/low housing-cost adjustments and ceilings/floors, so the published limit can deviate from exactly 50%/80% of the stated median.\n\nAuthoritative source: HUD User Income Limits datasets (the \"Section 8 Income Limits\" and the LIHTC/Multifamily Tax Subsidy Project tables), checked by FY. The Terminal's own snapshot carries FY VLIL projections (`vlil4_fy2027`, `vlil4_fy2028`) alongside FMR projections, populated on 98.3% of properties as of the October 23 rescore [S4]; read actual limits in the Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "169-187",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "50-56",
+    "score": 15.2
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 14.1
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "15-32",
+    "score": 9.4
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "169-187",
+    "score": 7.9
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "score": 7.7
+   },
+   {
+    "n": 6,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "244-258",
+    "score": 7.6
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q15",
+  "answer": "HUD does not generally derive the 4",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 8.1
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "70-84",
+    "score": 8
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "50-56",
+    "score": 7.4
+   },
+   {
+    "n": 4,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "83-88",
+    "score": 6.6
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "66-69",
+    "score": 5.6
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "15-32",
+    "score": 5.5
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q16",
+  "answer": "LIHTC credits are claimed over 10 years \u2014 the credit period \u2014 typically beginning in the year the building is placed in service (or, for new construction, the first year the building is placed in service if the taxpayer elects to defer, often the year after).\n\nA few related points worth separating from the 10-year credit period:\n\n- **Compliance period:** 15 years, starting the first year of the credit period. The 10-year credit stream sits entirely inside it, with five more years of ongoing compliance obligations.\n- **Extended use period:** a further 15 years (30 total) unless the owner exercises the qualified contract option, per Section 42(h)(6).\n- **Annual credit:** the applicable percentage (roughly 9% or 4%, both now fixed monthly-floor rates) times qualified basis, taken each year for the 10 years.\n\nCheck IRS Notice 2024-44 for current applicable percentages and IRS Form 8609 instructions for the first-year/deferral election. Note the Terminal's rail shows \"LIHTC year 15\" as a compliance milestone, but the documentation I was given does not detail how credit-period years are modeled \u2014 that would need to be read in the Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "70-84",
+    "score": 7.3
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "92-96",
+    "score": 7.3
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q17",
+  "answer": "The LIHTC initial compliance period is 15 years, under IRC \u00a742(i)(1).\n\nSupporting detail: the 15-year compliance period begins with the first taxable year the building is placed in service and receives a credit allocation. Most owners also sign an extended use agreement (EUA) running a further 15 years, for 30 years total, as a condition of the credit under \u00a742(h)(6); state agencies can require longer. During the initial period, the owner must keep the minimum set-aside and applicable fraction, and the credit can be recaptured if compliance fails. Note that the 15-year compliance period is distinct from the 10-year credit period over which the credits are claimed. Check IRS Form 8609 instructions and IRC \u00a742 for the authoritative rules.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "160-171",
+    "score": 6.3
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q18",
+  "answer": "**30 years total \u2014 a 15-year compliance period followed by a 15-year extended-use period \u2014 is the statutory minimum for LIHTC properties allocated after 1989.**\n\nDetail: IRC \u00a742(h)(6)(A)\u2013(B) requires a recorded extended-use agreement barring eviction or rent increases without cause for at least 15 years beyond the initial 15-year compliance period, giving 30 years from the placed-in-service/credit period start. Note two caveats:\n\n- State allocating agencies can and often do require longer extended-use periods in their Qualified Allocation Plans (30+ years, sometimes 40 or the property's useful life), so the binding term for a specific property is the LIHTC land-use restriction agreement, not the statute alone.\n- The three-year \"termination\" path (\u00a742(h)(6)(E)) can shorten the tail only after the extended-use period has begun and only if the agency cannot find a qualified buyer.\n\nOn the Terminal side: the documentation excerpts I was given do not cover LIHTC extended-use or affordability-period rules. The closest thing they show is that a year-15 date is on file for only 46% of the 42,144 LIHTC-flagged properties [S4] \u2014 that field marks the end of the compliance period, not the end of extended use, so a property's actual extended-use expiration must be read from its recorded agreement in the Spain Terminal, or verified with the allocating agency. Authoritative sources: IRC \u00a742(h)(6), IRS Form 8609 instructions, and the state HFA's QAP/restrictive covenant.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 8.5
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "62-65",
+    "score": 6.8
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "102-118",
+    "score": 6.3
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 5.7
+   },
+   {
+    "n": 5,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "152-159",
+    "score": 5.6
+   },
+   {
+    "n": 6,
+    "src": "docs/SPINE_COVERAGE_DOCTRINE.md@78c4d2d",
+    "lines": "19-24",
+    "score": 5.4
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q19",
+  "answer": "The two classic LIHTC minimum set-aside tests are the **20/50 test** and the **40/60 test**, both from IRC \u00a742(g)(1).\n\n- **20/50**: at least 20% of the residential rental units must be rent-restricted and occupied by households whose income is 50% or less of area median gross income (the applicable fraction), and\n- **40/60**: at least 40% of the units must be rent-restricted and occupied by households at 60% or less of AMI.\n\nKey points: the election is made on Form 8609, is irrevocable once made, and is applied project by project (a project is defined in the \u00a742 regs, generally the building or buildings on contiguous land under common ownership). Noncompliance with the set-aside starts the \"noncompliance period\" and can trigger recapture.\n\nNote: since the 2018 changes, a **third option** exists \u2014 the average income test (roughly 25/60, with a 60% ceiling and average of 60%), which is why the 20/50 and 40/60 are now called the \"classic\" tests. Check IRS \u00a742(g) and Form 8609 instructions for the controlling language; state agencies' QAPs may also impose stricter thresholds.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "1-4",
+    "score": 9.7
+   },
+   {
+    "n": 2,
+    "src": "docs/CRONS.md@78c4d2d",
+    "lines": "23-25",
+    "score": 7.6
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 5.4
+   },
+   {
+    "n": 4,
+    "src": "docs/FRESHNESS_SLA.md@78c4d2d",
+    "lines": "1-12",
+    "score": 5.3
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q20",
+  "answer": "The LIHTC income-averaging set-aside is the third minimum set-aside option under IRC \u00a742(g)(1)(C), added by the Consolidated Appropriations Act, 2018: a project qualifies as low-income if the *average* imputed income limit of its low-income units is 60% of AMI or less, with no single unit designated above 80% of AMI.\n\nKey mechanics (verify against IRS \u00a742 and Treasury/IRS guidance \u2014 Rev. Rul. 2020-4 and the Form 8609 instructions \u2014 before relying on any of it):\n- Designated limits must be in 10-point increments (20, 30, 40, 50, 60, 70, 80% of AMI), so averaging is done in those steps, not continuously.\n- The floor permits shallow and deep units to offset each other; a project can hold 80% units only if enough 20\u201340% units pull the mean to 60% or below.\n- The election is made on Form 8609 with the allocating agency and is generally irrevocable; the \"next available unit\" rule and ongoing average compliance apply for the 15-year compliance period.\n- I'm not certain whether the originally enacted requirement that at least 10% of units sit at 30% AMI or below survived into final law \u2014 treat that detail as needing confirmation from the statute text.\n\nOn the Terminal side, [S2] notes a \"LIHTC 60-percent ceiling\" is a regime-scoped component of the FY2027/FY2028 forward-outlook read, but its coverage share was not measured (snapshot October 23, 06:28 UTC).",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "169-187",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 6.1
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "169-187",
+    "score": 5.5
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q21",
+  "answer": "There is no single dollar figure \u2014 the LIHTC maximum gross rent is a formula: **30% of the applicable AMI income limit for the imputed household size, divided by 12, less the utility allowance**. The unit's set-aside election (e.g., 60% AMI) fixes which income limit applies, and 26 USC \u00a742(g)(2) sets the 30% test.\n\nMechanics:\n- **Imputed household size** is 1.5 persons per bedroom (studio = 1), so a 1BR uses the 2-person limit, a 2BR the 3-person limit, a 3BR the 5-person limit; confirm your state HFA's rounding convention.\n- **Gross rent** includes tenant-paid rent plus the utility allowance, so the tenant can only be charged the limit minus the UA.\n- **Floor.** LIHTC limits are published annually by HUD as state/county income limits; the rent limit is the lesser of the AMI-based limit or the applicable FMR-based limit in some state agency interpretations (a few states cap at the FMR), so check your allocating agency's rent and income limit schedule.\n\nExample: if the 3-person 60% AMI limit is $54,000, the 2BR gross rent cap is $54,000 \u00d7 30% \u00f7 12 = $1,350/month, less the unit's utility allowance.\n\nCheck the current figures at HUD User (income limits), the IRS \u00a742 regulations, and your state HFA's annual rent limit chart.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "92-96",
+    "score": 8.1
+   },
+   {
+    "n": 2,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "207-220",
+    "score": 5.6
+   },
+   {
+    "n": 3,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "18-31",
+    "score": 5.4
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 5.4
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "66-78",
+    "score": 5.4
+   },
+   {
+    "n": 6,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "221-232",
+    "score": 5
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q22",
+  "answer": "Roughly 70% of qualified basis for 9% credits and 30% for 4% credits, measured as the present value of the 10-year credit stream \u2014 these are the two statutory targets in IRC \u00a742(b)(2) (the \"70% / 30%\" present-value tests), and the floating applicable percentages are published monthly by the IRS to hit them.\n\nSupporting detail:\n\n- **Qualified basis** = eligible basis \u00d7 applicable fraction. Eligible basis excludes land, and generally excludes commercial space and non-qualifying costs, so the credit dollars attach to depreciable residential basis, not total development cost.\n- **9% credits** (new construction / substantial rehab without other federal subsidy) target a 70% PV subsidy; the rate floats but has carried a 9% minimum since the 2021 Consolidated Appropriations Act.\n- **4% credits** (acquisition, or federally subsidized rehab, typically paired with tax-exempt bonds) target 30% PV; the 4% floor is likewise permanent post-2021, where the rate used to float lower.\n- **Investor equity** is a step further: credits typically price at roughly the high 80s to mid 90s cents per credit dollar, so equity is often ~60-65% of qualified basis on a 9% deal and ~25-30% on a 4% deal \u2014 that pricing depends on market, not statute.\n\nCheck IRS \u00a742 and the monthly revenue procedure for current applicable percentages. The Terminal excerpts provided here cover scoring data coverage and FIPS matching, not LIHTC credit math.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "92-96",
+    "score": 5.9
+   },
+   {
+    "n": 2,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "160-162",
+    "score": 5.6
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q23",
+  "answer": "The 2025 One Big Beautiful Bill Act (signed July 4, 2025) permanently raised the annual 9% LIHTC per-capita allocation to roughly $4.00 per capita for 2026, up from $2.75 base (as bumped to about $3.09 in 2025 by the temporary 12.5% increase), with inflation indexing going forward. It also raised the small-state minimum allocation and reduced the private-activity-bond financing threshold needed to qualify for 4% credits from 50% to 25% of basis.\n\nCaveats worth flagging: I am not certain of every figure \u2014 the exact per-capita dollar amount, the small-state floor number, and the precise effective dates should be confirmed against the IRS's annual inflation-adjusted LIHTC revenue procedure (the 2026 per-capita and small-state figures), the statute text, and NCSHA/Novogradac's summary of H.R. 1's housing provisions. Treat the numbers above as approximate until you check those.\n\nOn the Terminal side: the excerpts I have [S1] [S2] cover a freshness audit and the scoring refresh cadence (nightly incremental, annual ACS/NRI/tract-vintage refresh), not statutory text, so they don't bear on this question. If you want this reflected in a scoring input, it would flow through the annual refresh vintages rather than the nightly re-score.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "5-9",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_REFRESH_PIPELINE.md@78c4d2d",
+    "lines": "26-39",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "5-9",
+    "score": 7.4
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_REFRESH_PIPELINE.md@78c4d2d",
+    "lines": "26-39",
+    "score": 7.1
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q24",
+  "answer": "I can't reliably state what the One Big Beautiful Bill Act changed here, so I'll flag that rather than guess. The Terminal excerpts I was given [S1][S2][S3] cover internal scoring/freshness mechanics and say nothing about LIHTC, so the Terminal documentation I have doesn't address this.\n\nWhat I can state with confidence is the pre-OBBBA rule: under IRC \u00a742(h)(4), a building gets 4% credit without competing for state credit authority only if it is \"substantially bond-financed\" \u2014 at least 50% of the building's aggregate basis financed by tax-exempt bonds that are part of a qualified residential rental project issue (a common exception lets a project satisfy the test if bond proceeds finance 50% of the *project's* basis where the building is part of that project). That 50% threshold, and definitions around what counts as bond-financed, is what the reconciliation bill was reported to be modifying.\n\nI have a vague recollection that the proposal would have lowered the required bond share (to roughly 25%) so more projects could reach 4% credit without a competitive 9% allocation, but I am not certain of the final enacted figure, effective date, or whether the Senate retained it \u2014 do not rely on my memory for that.\n\nVerify against: the text of \u00a742(h)(4) as amended, IRS guidance/notice on the new provisions, and Novogradac or Joint Committee on Taxation summaries of OBBBA's LIHTC sections.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "5-9",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_REFRESH_PIPELINE.md@78c4d2d",
+    "lines": "26-39",
+    "cited": true
+   },
+   {
+    "n": 3,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "33-37",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "5-9",
+    "score": 7.4
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_REFRESH_PIPELINE.md@78c4d2d",
+    "lines": "26-39",
+    "score": 7.1
+   },
+   {
+    "n": 3,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "33-37",
+    "score": 5.6
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q25",
+  "answer": "The automatic 4% credit (no competitive 9% allocation needed) comes from **bond financing**: under IRC \u00a742(h)(4), a building qualifies if at least 50% of its aggregate basis \u2014 including land \u2014 is financed with tax-exempt bonds subject to the state's private activity bond volume cap.\n\nSupporting points:\n- The 50% test is measured by aggregate basis, so land counts; bond proceeds must be traceable to the project.\n- The project still needs a minimum set-aside (20/50 or 40/60), income/rent restrictions, and a Form 8609 from the state agency. Many states charge a bond-credit fee or require a compliance review even though no credit allocation is competed.\n- The applicable rate is now a fixed 4% for these projects (and for acquisition, and for federally subsidized 9% projects), rather than the old floating rate near 3.1\u20133.2%. Check \u00a742(b) and the Consolidated Appropriations Act, 2021 amendments for current text.\n- Practical catch: volume cap. Tax-exempt private activity bond cap is scarce and allocated by the state or its designated issuer, so the \"automatic\" 4% still depends on winning cap.\n\nI should note: the Terminal documentation excerpts I was given cover repo/deploy mechanics only, not LIHTC rules, so nothing above is cited to them.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "AGENTS.md@78c4d2d",
+    "lines": "57-64",
+    "score": 11.7
+   },
+   {
+    "n": 2,
+    "src": "AGENTS.md@78c4d2d",
+    "lines": "6-17",
+    "score": 5.4
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q26",
+  "answer": "I can't give you a verified NSPIRE compliance date for HCV with confidence \u2014 HUD has revised these dates more than once via Federal Register notices, and I don't want to hand you a stale or invented one. Check HUD's NSPIRE page and the NSPIRE Federal Register notices for the current effective date.\n\nWhat I can say with confidence about the framework:\n\n- NSPIRE replaced UPCS as HUD's physical inspection standard; the final rule and standards are in the Federal Register (NSPIRE final rule, 2016, and subsequent implementation notices).\n- HCV inspections themselves still sit under 24 CFR 982.401 (Housing Quality Standards) and 982.406 for inspections, with NSPIRE standards being phased in for HCV units. PHAs must also meet the requirement that inspection standards be no more stringent than HQS \u2014 HUD has addressed how NSPIRE fits that constraint.\n- Public housing and multifamily rolled out on separate timelines from HCV, so dates you see quoted for one program don't transfer to the other.\n- During transition, many PHAs continued inspecting under HQS; some had HUD-approved postponements or used NSPIRE on an early-optional basis.\n\nPractical point: voucher rent reasonableness (24 CFR 982.507) is unaffected by NSPIRE timing \u2014 NSPIRE is about unit condition, not rent comparability. If you need the date for a compliance calendar, the authoritative sources are HUD's NSPIRE website and the Federal Register notices for HCV implementation. For the Terminal side, the excerpts I have don't cover NSPIRE inspection dates at all \u2014 only RFP/enforcement layers [S5] and data coverage [S2] \u2014 so actual inspection data per property must be read in Spain Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "154-168",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "171-189",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "160-171",
+    "score": 11.5
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "154-168",
+    "score": 8
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "86-91",
+    "score": 7.9
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 7.5
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "171-189",
+    "score": 6
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "25-29",
+    "score": 5.6
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q27",
+  "answer": "I'm not certain of the exact Federal Register publication date of the NSPIRE final rule, so I won't state one \u2014 check HUD's NSPIRE page or search the Federal Register directly. What it replaces is clear: NSPIRE consolidates the two prior inspection regimes \u2014 UPCS (Uniform Physical Condition Standards), which governed REAC inspections of HUD-assisted and multifamily properties, and HQS (Housing Quality Standards), which governed Housing Choice Voucher unit inspections \u2014 into a single physical-condition standard with standardized deficiency definitions and severity tiers (life-threatening, severe, moderate/low), scored as inspectable areas rather than the old UPCS scoring model. It also shifted sampling toward a larger share of units and buildings in a property.\n\nThe Terminal excerpts I was given ([S1], [S2]) cover the revenue-model documentation and a scoring-coverage note dated October 23, 2026; neither covers NSPIRE rulemaking, so I can't cite them for this. For compliance-as-a-service work the Terminal does track, note that NSPIRE readiness applies primarily to HUD-assisted assets, which matters for the Section 8 and LIHTC properties in your underwriting.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "160-171",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "153-153",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "160-171",
+    "score": 5.2
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "153-153",
+    "score": 5.1
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q28",
+  "answer": "I don't have a reliable date for that, and the Terminal documentation I was given doesn't cover NSPIRE rule timing \u2014 the excerpts only list HUD/PHA NSPIRE/REAC prep as a compliance-as-a-service revenue line [S1] and note the inspection tables are currently empty (0 rows), so no inspection dates or scores are on file [S2].\n\nWhat I can say from general knowledge, with the caveat that you should verify each item:\n\n- HUD's NSPIRE final rule was published in 2023 (May), with the standards replacing UPCS.\n- NSPIRE inspections for HUD multifamily/HUD-assisted stock began at the start of FY2024 (October 1, 2023); public housing authorities had a later compliance deadline (mid-2024).\n- HUD deliberately separated \"affirmative\" standards \u2014 features a unit or site must *have*, such as smoke/CO alarms, handrails, guardrails, and address signage \u2014 from defect-based deficiencies, and said affirmative items would be cited during an initial period without affecting the inspection score. Scoring of those items has been deferred and re-deferred by notice, so the start date has moved at least once.\n\nI don't want to quote a specific effective or scoring date I can't verify. Confirm via HUD's NSPIRE page (hud.gov/nspire), the implementing PIH notices for public housing, the parallel multifamily housing notice, and any Federal Register notice delaying affirmative-requirement scoring. Also note scores only move when the underlying inspection data is populated in the Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "160-171",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "129-136",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "160-171",
+    "score": 9.9
+   },
+   {
+    "n": 2,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "129-136",
+    "score": 9.1
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "50-56",
+    "score": 7.8
+   },
+   {
+    "n": 4,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "10-17",
+    "score": 7.1
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_REFRESH_PIPELINE.md@78c4d2d",
+    "lines": "1-6",
+    "score": 6.8
+   },
+   {
+    "n": 6,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "76-82",
+    "score": 6.1
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q29",
+  "answer": "A \"success-rate payment standard\" isn't a separate subsidy type \u2014 it's HUD shorthand for an exception payment standard above the normal 90\u2013110%-of-FMR band, justified by a PHA's leasing success rate (the share of vouchers issued that actually result in a signed lease) rather than by rental-market data alone.\n\nSupporting detail:\n\n- The baseline rule: a PHA sets its payment standard between 90% and 110% of the FMR (or Small Area FMR) for each unit size \u2014 24 CFR 982.503.\n- Exception standards can go up to 120% of the FMR. One recognized basis for requesting that higher standard is a low success rate \u2014 i.e., voucher holders can't find units they can afford at the basic standard, so raising the standard improves lease-up.\n- The subsidy itself still equals the payment standard minus 30% of adjusted income (family share capped at 40% of income at move-in for new admits).\n- I'm not confident of the exact current success-rate threshold or the specific HUD notice number governing the request process, so verify against 24 CFR 982.503(b) and HUD's PIH notices on payment standards and success rates; HUD User publishes the FMRs these are keyed to.\n\nOn the Terminal side: the documentation excerpt I was given [S1] only describes the repo's internal legal-mode configuration \u2014 it contains nothing on payment standards, so this answer is general housing-finance knowledge, not a Terminal citation.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "AGENTS.md@78c4d2d",
+    "lines": "29-37",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "AGENTS.md@78c4d2d",
+    "lines": "29-37",
+    "score": 5.9
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q30",
+  "answer": "The minimum public housing flat rent is 80% of the applicable Fair Market Rent for a unit of comparable size and type \u2014 that floor comes from the 1998 public housing reform law (42 U.S.C. 1437a(a)(2)) and is implemented at 24 CFR 960.253(b).\n\nSupporting detail: PHAs set a flat rent for each unit size (as an alternative to the income-based rent), and HUD requires it to be no lower than 80% of the FMR for that unit size in the PHA's market area. PHAs that were below the floor when the rule took effect were allowed to phase increases in over several years, so some in-place flat rents may still sit below 80% of the current FMR. HUD's operating fund and public housing notices, plus the PIH flat-rent guidance, are the authoritative references; HUD User tables supply the FMR used in the calculation.\n\nOne caveat: I have no live access to HUD data or the Terminal in this chat, and the Terminal documentation excerpts I was given cover Spain Terminal scoring and data-coverage inputs, not public housing rent rules \u2014 so verify the current figure and any phase-in provisions against 24 CFR 960.253 and the latest HUD PIH notice before relying on it.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "33-47",
+    "score": 7
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "15-32",
+    "score": 6.9
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "169-187",
+    "score": 6.2
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "92-96",
+    "score": 5.4
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "57-61",
+    "score": 5.3
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "Q31",
+  "answer": "There is no state-by-state per-capita rate \u2014 the 9% ceiling uses one uniform national per-capita dollar amount set annually by IRS revenue procedure, so each state's allocation is simply **population \u00d7 that rate, floored at the small-state minimum**. I do not have reliable 2026 figures and will not invent them; the indexed per-capita amount and minimum for recent years are roughly $2.90\u2013$3.00 per capita with a minimum near $3.4 million, but confirm the exact 2026 numbers in the IRS annual revenue procedure (the one setting 2026 inflation adjustments under IRC \u00a742(h)(3)(C)) and in HUD's LIHTC databases.\n\nMechanics worth knowing:\n\n- **Authority:** IRC \u00a742(h)(3)(C)\u2013(D); population comes from Census Bureau estimates, not the decennial count.\n- **Small-state minimum:** states below roughly 1.1\u20131.2 million people get the floor rather than the per-capita product \u2014 typically a dozen-plus states plus territories.\n- **Carryforward:** unused ceiling carries forward indefinitely; states also get returned/National Pool credits.\n- **Set-asides:** at least 10% of the ceiling must go to qualified nonprofit-sponsored projects, and states may exchange up to 8% of ceiling for additional tax-exempt bond authority.\n- **Basis boost:** up to 30% for QCT/DDA, which is separate from the volume ceiling.\n\nFor the actual 2026 per-state dollars, check the IRS revenue procedure and Novogradac's or NCSHA's annual state-by-state allocation tables.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 6.1
+   },
+   {
+    "n": 2,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "45-56",
+    "score": 5.9
+   },
+   {
+    "n": 3,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "233-243",
+    "score": 5.8
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "88-104",
+    "score": 5.7
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "92-96",
+    "score": 5.6
+   },
+   {
+    "n": 6,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "5-7",
+    "score": 5.3
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "T01",
+  "answer": "A score of 66 gets a **B-**. The engine's grade mapping assigns B- to scores of 65 up to (but not including) 70; 70\u201374.9 is B, and 75+ is B+ [S5].\n\nOne caveat worth knowing: the engine grades the unrounded score while the stored `risk_adjusted_score` is rounded to 0.1, so a property sitting within 0.05 of a band boundary (here 65) could display one grade off from a band derived from the stored value [S1]. At 66 you're comfortably inside B-, so no boundary issue. Also note the grade itself isn't persisted by the recompute batch \u2014 it's derived at display time \u2014 so if you need the authoritative letter for a specific property, read it in the Spain Terminal rather than computing it from a stored score [S1].",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "33-37",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "5-16",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "33-37",
+    "score": 8.5
+   },
+   {
+    "n": 2,
+    "src": "AGENTS.md@78c4d2d",
+    "lines": "6-17",
+    "score": 8.2
+   },
+   {
+    "n": 3,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "44-54",
+    "score": 7
+   },
+   {
+    "n": 4,
+    "src": "AGENTS.md@78c4d2d",
+    "lines": "1-5",
+    "score": 6.9
+   },
+   {
+    "n": 5,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "5-16",
+    "score": 6.8
+   },
+   {
+    "n": 6,
+    "src": "docs/FLEET.md@78c4d2d",
+    "lines": "1-4",
+    "score": 6.4
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "T02",
+  "answer": "The scorable multifamily universe is clean-record (`dq_status` null) multifamily properties with 5 or more units \u2014 634,930 properties in the current snapshot \u2014 but the exact filter behind that count is unresolved and a literal units\u22655 query returns far fewer rows.\n\n- **Definition as documented:** measured live October 21, 2026 against `public.properties_base`, clean records with 5+ units came to 587,802; the universe has since grown to 634,930 with the FL NAL ingest [S1].\n- **Why the number is uncertain:** as of the October 27, 2026 measurement, the 634,930 figure is a narrower filter than \"clean + multifamily\" (816,886), and a naive `units>=5` on `asset_class='multifamily'` gave only 256,927 \u2014 so the documented filter uses a different units definition and \"should be reconciled\" [S2].\n- **Open ruling:** verification flagged two candidate universes \u2014 a 258,239 cohort versus roughly 635k including null-unit multifamily rows; the larger reading \"would require a queue change and is a production scoring change needing authorization\" [S5].\n- **Not the same as view membership:** the Multifamily terminal views deliberately retain rows whose unit count is unknown (1,206,371 rows), so being visible in the Terminal does not mean being in the scorable set [S4].\n- **Caveat:** \"scored\" means the model ran, not that the inputs were real [S1]. For a specific property, check its units and `dq_status` in the Spain Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "25-27",
+    "cited": true
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "207-220",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "51-53",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "score": 12.4
+   },
+   {
+    "n": 2,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "25-27",
+    "score": 10.4
+   },
+   {
+    "n": 3,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "233-243",
+    "score": 9.9
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "207-220",
+    "score": 9.7
+   },
+   {
+    "n": 5,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "51-53",
+    "score": 9.6
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 7.5
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "T03",
+  "answer": "No \u2014 being \"scored\" in the Terminal means the model ran on that record, not that the underlying inputs were real. The documentation states this flatly: every property in the scorable universe has a v43 score, expected IRR and run lineage, \"so 'scored' means the model ran, not that the inputs were real\" [S1].\n\nHow to read a score accordingly:\n\n- **Input completeness, not score presence, is the signal.** The documentation's stated fix is to compute sigma per record from the inputs actually present, so a fully defaulted record shows a wide uncertainty band and a well-evidenced one a narrow band \u2014 and to show input completeness and which inputs were defaulted on every score [S2]. Mean uncertainty sigma across the current universe is 2.56 as of the October 23, 2026 measurement [S3].\n- **Coverage is uneven at the join level.** Tract coverage is 84.6%, APN 48.1%, housing-authority link 7.2% [S5] \u2014 so many records are scored without the joins that would make the inputs property-specific.\n- **Some panels are empty spine-wide.** Distress filings, foreclosure events and insurance claims have no real feed; no property is flagged distressed [S4].\n\nTwo cautions on the published figures themselves: the universe counts were not reproducible \u2014 the Oct 28 addendum reconciles \"634,930 of 634,930\" to 258,239 of 258,239, and finds the 587,648 baseline pairs unreproducible [S6]. So treat score *presence* as model execution and score *quality* as an input-completeness question. For a specific property, read its input-completeness and sigma values in Spain Terminal; I can't see them here.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "66-69",
+    "cited": true
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "cited": true
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "57-65",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "86-91",
+    "cited": true
+   },
+   {
+    "n": 6,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "43-50",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "score": 8.4
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "66-69",
+    "score": 7.1
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 7
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "57-65",
+    "score": 6.7
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "86-91",
+    "score": 6.6
+   },
+   {
+    "n": 6,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "43-50",
+    "score": 5.6
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "T04",
+  "answer": "The latest scoring engine in the excerpts I have is v50.0 (engine \"o15\"), but the documentation does not cleanly confirm it is the authorized live version \u2014 so treat v50.0 as \"latest re-rank landed, not yet fully cleared.\"\n\nWhat the excerpts actually say:\n\n- The v50.0 re-ranking was **measured Oct 22, 03:00 UTC, with 295,801 properties rescored**, dated 2026-10-23, and its launch-gate status is **AMBER**; separately, \"Scoring inputs vs harvested data\" is **RED** [S1].\n- The v50.0 engine (o15) reads **37 property fields**, and the re-rank \"just landed\" \u2014 88% of pairs moved at least 1 point, top band A+ collapsed from 456 to 8 properties [S2].\n- Any input change is a further production scoring change requiring Brett's approval, a before/after report, and an authorization record in `docs/scoring_authorizations.json`; a new version shows as **RED** in the scoring-state job until authorized, by design [S2].\n- Note a schema wrinkle: the *current* score fields (`risk_adjusted_score`, `expected_irr_pct`, `uncertainty_sigma`) are written by `v43.recompute_batch`, with v45 as the baseline prior [S5]. So model lineage labels and engine versions don't map one-to-one.\n\nFor a definitive \"live version\" answer, check the scoring-state job and `docs/scoring_authorizations.json` in the Terminal rather than relying on these excerpts.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "89-95",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "5-9",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "10-26",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "89-95",
+    "score": 8.6
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "5-9",
+    "score": 8.5
+   },
+   {
+    "n": 3,
+    "src": "ai-gateway-site/retrieval/GATEWAY_FACTS.md",
+    "lines": "1-3",
+    "score": 8.3
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "score": 8.2
+   },
+   {
+    "n": 5,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "10-26",
+    "score": 7.3
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "86-91",
+    "score": 6.9
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "T05",
+  "answer": "**41.90** \u2014 the mean score of the current universe in the final v50.0 measurement (October 23, 2026, 06:28 UTC).\n\nSupporting detail from that measurement [S1][S2]:\n\n- Mean score 41.90, maximum 93.2, minimum 22.7, 99th percentile 68.9.\n- Mean expected IRR 11.55%, mean uncertainty sigma 2.56.\n- Universe: 634,930 properties (clean `dq_status`, 5+ units), 100% on v50.0.\n- On the 587,648 matched pairs against the v49.0 baseline, the mean was 42.22 on v50.0 versus 44.87 on v49.0 \u2014 a 2.65-point decline. So 41.90 is the current-universe average; 42.22 is the baseline-matched average.\n\nOne caution: the server-side table read later (2026-10-27 14:23 UTC) shows a mean of 42.16 on a universe of only 258,239 rows, after roughly 376,691 rows apparently lost their v50.0 scores in what looks like a data regression [S6]. That figure describes the shrunken table, not the October 23 universe, so 41.90 is the number to cite for the rescore itself. Any individual property's current score and expected IRR must be read live in the Spain Terminal.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "102-118",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "cited": true
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_BAND_RECALIBRATION.md@78c4d2d",
+    "lines": "3-13",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "102-118",
+    "score": 13.9
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 13.7
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "97-101",
+    "score": 10
+   },
+   {
+    "n": 4,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "1-9",
+    "score": 9.7
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "153-153",
+    "score": 9.6
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_BAND_RECALIBRATION.md@78c4d2d",
+    "lines": "3-13",
+    "score": 8.2
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "T06",
+  "answer": "Roughly 99% \u2014 only about 0.7\u20130.8% of properties carry an observed rent; the rest have revenue modeled from FMR and area income [S2][S5].\n\n- **Observed rent:** 4,722 of 634,930 properties (0.7%) in the current data, and \"rent is real on 0.8% of properties\" in the scoring coverage doc; for the other ~99%, the revenue line is modeled from Fair Market Rent (99.3%) plus area income [S2][S5].\n- **Why it matters:** rent drives NOI, IRR and the score, so the modeled-only majority means ranking leans on location and size rather than deal economics [S2].\n- **Caveat on the gap:** per the inputs note, the shortfall is \"mostly join failures, not missing data\" \u2014 32.8M rent observations and 11.5M rent intervals exist in the DB but aren't reaching the property records [S5].\n\nThe excerpts don't state a snapshot date for these figures beyond the Sep 29, 2026 gap-report entries, so treat them as of that nightly snapshot. For a single property, read the rent-evidence status in the Spain Terminal rather than inferring it.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "5-9",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "33-37",
+    "score": 7.3
+   },
+   {
+    "n": 2,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "score": 7.2
+   },
+   {
+    "n": 3,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "207-220",
+    "score": 6.7
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "16-18",
+    "score": 6.3
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "5-9",
+    "score": 6.2
+   },
+   {
+    "n": 6,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "18-31",
+    "score": 6
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "T07",
+  "answer": "No \u2014 parcels_general rescoring is not running; it is explicitly on hold. Per the launch-readiness standing-holds table, item \"parcels_general rescoring (#321)\" has status **HOLD**, owner scoring_holds / Brett, dated 2026-10-27, with the note \"ON HOLD per FLEET.md rule 5; no automation touches it\" [S2]. That rule is restated as non-negotiable in the fleet rules: \"parcels_general rescoring stays ON HOLD; no automation touches it\" [S3].\n\nThe other item in that table, PHA register staleness (#378), is GREEN and closed [S2]. For contrast, the nightly freshness audit lists jobs that are currently failing (timeouts, deadlocks, two permission errors since fixed, and one calling a dropped function) [S4][S5] \u2014 parcels_general rescoring appears in neither the failing list nor as an active job, consistent with the hold.\n\nSo: nothing should be moving on that rescoring until Brett lifts the hold. If you want to confirm the hold hasn't been released, check issue #321 and the current FLEET.md in the terminal repo.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 2,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "37-43",
+    "cited": true
+   },
+   {
+    "n": 3,
+    "src": "docs/FLEET.md@78c4d2d",
+    "lines": "8-15",
+    "cited": true
+   },
+   {
+    "n": 4,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "56-69",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "70-75",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "92-96",
+    "score": 10.6
+   },
+   {
+    "n": 2,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "37-43",
+    "score": 9.6
+   },
+   {
+    "n": 3,
+    "src": "docs/FLEET.md@78c4d2d",
+    "lines": "8-15",
+    "score": 7.8
+   },
+   {
+    "n": 4,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "56-69",
+    "score": 6.4
+   },
+   {
+    "n": 5,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "70-75",
+    "score": 5.9
+   },
+   {
+    "n": 6,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "1-9",
+    "score": 5.5
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "T08",
+  "answer": "**Roughly 1.19 million rows \u2014 1,189,952 in the 2026-10-30 nightly snapshot \u2014 and 230,170 of them, or 19.3%, carry a non-null dq_status flag** [S2].\n\nThe flag mix is overwhelmingly duplicate-driven, not junk. The 2026-10-27 measurement breaks the flagged set down as: 216,714 `duplicate`, 12,413 `duplicate_addr_units_50p`, 138 `junk`, 104 `quarantined`, 67 `quarantined_non_property_content`, and 12 `forbidden_source_quarantine` [S1]. So duplicates and near-duplicates account for essentially the entire 19% (about 229,000 rows), while true junk is negligible \u2014 138 rows, well under 0.02%. The clean set (dq_status null) was 959,782 on 2026-10-30 [S2].\n\nTwo caveats worth carrying forward:\n\n- These counts move nightly, so treat both the total and the flagged share as dated to 2026-10-30 and re-read them from the Terminal rather than quoting a frozen figure.\n- The headline row count is the spine table, not the scorable set. Applying clean + multifamily + 5+ units narrows it sharply, and the documentation itself notes the scorable-universe filter is unreconciled \u2014 a naive units>=5 cut on multifamily returned only 256,927 [S1]. If your question is \"how many properties are actually scoreable,\" the 1.19M figure will overstate it substantially.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "25-27",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "anomaly-data:series.jsonl (latest line, 2026-10-30) in spain-terminal-shell",
+    "lines": "1-1",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "25-27",
+    "score": 15
+   },
+   {
+    "n": 2,
+    "src": "anomaly-data:series.jsonl (latest line, 2026-10-30) in spain-terminal-shell",
+    "lines": "1-1",
+    "score": 9.4
+   },
+   {
+    "n": 3,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "5-9",
+    "score": 8.9
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "57-65",
+    "score": 6.5
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "18-31",
+    "score": 6.1
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "16-18",
+    "score": 6
+   }
+  ],
+  "err": null
+ },
+ {
+  "id": "T09",
+  "answer": "The default model costs roughly $0.0003 per question \u2014 about three hundredths of a cent \u2014 and the gateway's default is DeepSeek V4.1 Flash via OpenRouter [S1].\n\nSupporting detail from the gateway facts (dated 2026-10-31) [S1]:\n\n- **Default model:** DeepSeek V4.1 Flash (`deepseek/deepseek-v4.1-flash-1017`) through OpenRouter; paid at roughly $0.0003 per question [S1].\n- **Tripwire:** a daily threshold of 2,000 paid calls (about $0.60) triggers a downgrade to the free Qwen3.8-27B model on Groq [S1].\n- **Fallback chain:** if the default errors or returns nothing, the gateway falls back to Qwen3.8-27B, then to Flint v1.0 (free, OpenRouter) [S1].\n- **Model picker options:** Flint v1.0 and Qwen3.8-27B (fast summary) [S1].\n- Answers can include Spain Terminal documentation excerpts retrieved per question, shown as numbered sources [S1].\n\nOne caveat: these figures are as of the dated snapshot in that documentation, so pricing or model routing may have changed since \u2014 worth confirming in the Terminal if cost matters for budgeting.",
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null,
+  "sources": [
+   {
+    "n": 1,
+    "src": "ai-gateway-site/retrieval/GATEWAY_FACTS.md",
+    "lines": "1-3",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "ai-gateway-site/retrieval/GATEWAY_FACTS.md",
+    "lines": "1-3",
+    "score": 11.5
+   }
+  ],
+  "err": null
+ }
+]
