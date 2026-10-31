@@ -1,0 +1,557 @@
+{
+ "T06": {
+  "answer": "66.0% of properties in the spine have no rent signal source recorded, per the latest nightly anomaly snapshot taken 2026-10-30T07:52:36Z [S2]. That matches the null rate for `rent_signal_source` on `properties_base` (66.0%) [S2].\n\nThe remainder splits into rr_pipeline 27.0%, rr_pipeline_minted_addr_promoted 6.3%, rent_listing 0.7%, and rr_pipeline_minted_addr rounding to 0.0% [S2]. In other words, only about 0.7% of properties carry an observed listing rent, so for roughly 99% of the spine the revenue line is modeled rather than observed [S2][S6]. Note the `rent_signal_refreshed_at` timestamp is also null at 66.0%, consistent with the same population [S2]; the freshness SLA on that column is a 7-day weekly-tolerance provisional target [S5]. These are snapshot figures and will drift night to night \u2014 check the current values in the Terminal.",
+  "sources": [
+   {
+    "n": 2,
+    "src": "anomaly-data:series.jsonl (latest line, 2026-10-30) in spain-terminal-shell",
+    "lines": "1-1",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "docs/FRESHNESS_SLA.md@78c4d2d",
+    "lines": "1-12",
+    "cited": true
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "8-18",
+    "score": 12.6
+   },
+   {
+    "n": 2,
+    "src": "anomaly-data:series.jsonl (latest line, 2026-10-30) in spain-terminal-shell",
+    "lines": "1-1",
+    "score": 12.5
+   },
+   {
+    "n": 3,
+    "src": "docs/FRESHNESS_SLA.md@78c4d2d",
+    "lines": "13-17",
+    "score": 8.1
+   },
+   {
+    "n": 4,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "33-37",
+    "score": 7.3
+   },
+   {
+    "n": 5,
+    "src": "docs/FRESHNESS_SLA.md@78c4d2d",
+    "lines": "1-12",
+    "score": 6.6
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "5-14",
+    "score": 6.5
+   }
+  ],
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null
+ },
+ "T04": {
+  "answer": "The current scoring model is **v50.0 (engine o15)**; in the 2026-10-23 snapshot it covers the full scorable multifamily universe of **634,930 properties (100%)** [S1][S2][S5].\n\nSupporting detail:\n- v50.0 reads **37 property fields** and the v50.0 re-rank had just landed, moving 88% of pairs by at least 1 point [S1].\n- The 06:28 UTC coverage rebuild on 2026-10-23 shows 634,930 properties on v50.0 with 0 failed runs [S5].\n- The launch gate dated 2026-10-23 lists the v50.0 re-ranking as **AMBER** and \u201cScoring inputs vs harvested data\u201d as **RED** [S6].",
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "5-9",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "27-56",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "117-143",
+    "cited": true
+   },
+   {
+    "n": 6,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "89-95",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "5-9",
+    "score": 7.7
+   },
+   {
+    "n": 2,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "27-56",
+    "score": 7.6
+   },
+   {
+    "n": 3,
+    "src": "ai-gateway-site/retrieval/GATEWAY_FACTS.md",
+    "lines": "1-3",
+    "score": 7.4
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "score": 6.8
+   },
+   {
+    "n": 5,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "117-143",
+    "score": 6.2
+   },
+   {
+    "n": 6,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "89-95",
+    "score": 6.2
+   }
+  ],
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null
+ },
+ "T01": {
+  "answer": "A score of 66 receives a **B-** in the Terminal.\n\nPer the engine logic, grades are assigned in Postgres inside the scoring function, not the front end: score \u2265 90 is A+, \u2265 85 A, \u2265 80 A-, \u2265 75 B+, \u2265 70 B, \u2265 65 B-, \u2265 60 C+, \u2265 52 C, \u2265 40 D, else F [S4]. Since 66 falls at or above 65 but below 70, it lands on B-.\n\nTwo caveats worth knowing: the engine grades the *unrounded* score while the stored `risk_adjusted_score` is rounded to 0.1, so a property sitting within 0.05 of the 65 boundary could display one grade off from its stored value [S1]. Also, the grades you see are derived at display time rather than persisted \u2014 `v43.recompute_batch` writes only score, IRR, and sigma [S1]. The bands themselves are reconstructed in the documentation by matching published grade counts to score percentiles, so they reproduce published output within data-quality drift rather than being read from the operational mapping [S2]. The authoritative check for any specific property is its `risk_adjusted_score` in the Spain Terminal.",
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "33-37",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "10-26",
+    "cited": true
+   },
+   {
+    "n": 4,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "5-16",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "33-37",
+    "score": 8.1
+   },
+   {
+    "n": 2,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "10-26",
+    "score": 7
+   },
+   {
+    "n": 3,
+    "src": "AGENTS.md@78c4d2d",
+    "lines": "6-17",
+    "score": 6.9
+   },
+   {
+    "n": 4,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "5-16",
+    "score": 6.4
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "97-101",
+    "score": 6
+   },
+   {
+    "n": 6,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "44-54",
+    "score": 5.7
+   }
+  ],
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null
+ },
+ "T02": {
+  "answer": "Nominally: clean records (`dq_status` null) in the multifamily asset class with 5 or more units \u2014 about **634,930 properties** as of the October 21\u201327, 2026 snapshot, up from 587,802 after the FL NAL ingest [S1][S2]. But the exact membership is unsettled, and the Terminal's own verification gate for it is RED [S3].\n\nSupporting detail:\n\n- **The rule behind it.** Brett's Sep 29, 2026 rule restricts the Multifamily terminal to 5+ unit properties: known 1\u20134 unit rows (1,569,936) left the Multifamily views, while 5+ unit rows (538,343) and rows with an *unknown* unit count (1,206,371) stay [S4]. That leaves 1,736,528 properties / 32.36M units live in the views \u2014 a much larger set than the scored universe.\n- **Why the count is fuzzy.** A naive `units >= 5` filter on `asset_class='multifamily'` returns only 256,927, so the coverage doc's filter uses a different units definition and \"should be reconciled\" [S2]. Clean + multifamily is 816,886 [S2].\n- **Open options.** The Oct 28 addendum lists three unresolved readings: a ~258,239 cohort, the ~635k cohort, or legacy-scored rows needing re-measurement [S3].\n- **\"Scored\" \u2260 real inputs.** Every property in the universe has a v43 score, expected IRR and run lineage, but roughly 1.17M ran without a unit count, so size-dependent components are defaulted [S1][S5].\n\nFor the authoritative membership, query `public.properties_base` directly; HUD/Census data plays no role here.",
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "25-27",
+    "cited": true
+   },
+   {
+    "n": 3,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "51-53",
+    "cited": true
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "207-220",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "233-243",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "score": 12.1
+   },
+   {
+    "n": 2,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "25-27",
+    "score": 11.7
+   },
+   {
+    "n": 3,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "51-53",
+    "score": 9.9
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "207-220",
+    "score": 9.3
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "233-243",
+    "score": 8.7
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 7.5
+   }
+  ],
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null
+ },
+ "T03": {
+  "answer": "No \u2014 in the Terminal a \"scored\" property only means the model ran, not that the inputs behind the score were real or complete [S1].\n\nMeasured live on October 21, 2026 over the scorable multifamily universe (clean `dq_status`, 5+ units) \u2014 587,802 properties at that time \u2014 every record had a v43 score, expected IRR and run lineage, even where inputs were absent [S1]. The Terminal's own documentation flags this as the core coverage weakness and proposes fixes: compute uncertainty (sigma) per record from the inputs actually present so fully defaulted records show wide bands, and display input completeness plus which inputs were defaulted on every score [S4].\n\nPractically, treat a score as a model output whose reliability varies by record. Check the property's input completeness and defaulted-input flags alongside the score in Spain Terminal; the actual values must be read there. Note the snapshot figures are dated \u2014 the universe has since grown to 634,930 after the FL NAL ingest, and after the v50.0 rescore (October 23, 2026, 06:28 UTC) the mean score is 41.90 with mean expected IRR 11.55%, but that doesn't change the \"ran \u2260 real inputs\" distinction [S1][S2].",
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "117-143",
+    "cited": true
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "66-69",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "1-4",
+    "score": 7.9
+   },
+   {
+    "n": 2,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "117-143",
+    "score": 7.4
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 6.7
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "66-69",
+    "score": 6.5
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "32-40",
+    "score": 5.9
+   },
+   {
+    "n": 6,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "57-65",
+    "score": 5.8
+   }
+  ],
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null
+ },
+ "T05": {
+  "answer": "The mean property score is 41.90 after the v50.0 rescore, measured October 23, 2026 at 06:28 UTC [S1][S2].\n\nSupporting detail from that measurement:\n- Universe: 634,930 multifamily properties with no data-quality flag and 5+ units [S2][S3].\n- Maximum 93.2, minimum 22.7, 99th percentile 68.9 [S1].\n- Mean expected IRR 11.55% and mean uncertainty sigma 2.56 [S1][S2].\n- Matched-pair mean against v49.0 was 42.22 versus 44.87, a shift of -2.65 points, with correlation 0.811 [S3].\n\nBy regime, mean deltas were Market -2.56, LIHTC -4.35, and Section 8 -1.63 [S1][S3]. Note that these figures are snapshot values from the documented measurement; individual property scores must be read in the Terminal.",
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "117-143",
+    "cited": true
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "102-118",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "119-135",
+    "score": 14
+   },
+   {
+    "n": 2,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "117-143",
+    "score": 13.9
+   },
+   {
+    "n": 3,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "102-118",
+    "score": 13.7
+   },
+   {
+    "n": 4,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "97-101",
+    "score": 10.6
+   },
+   {
+    "n": 5,
+    "src": "docs/v50-coverage-measurement-2026-10-23.md@78c4d2d",
+    "lines": "1-9",
+    "score": 9.5
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "153-153",
+    "score": 9.3
+   }
+  ],
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null
+ },
+ "T07": {
+  "answer": "No \u2014 parcels_general rescoring is on hold, not running. Per the launch-readiness standing holds, issue #321 (parcels_general rescoring) is status HOLD with owner scoring_holds / Brett, dated 2026-10-27, citing FLEET.md rule 5 with the note \"no automation touches it\" [S1]. The fleet rules state the same: \"parcels_general rescoring stays ON HOLD; no automation touches it\" [S3], and it appears in the open fleet issues list as \"#321 AG-28 parcels_general rescore \u2014 ON HOLD (Brett)\" [S4].\n\nThe nightly scoring jobs don't reach it either: `v43.refresh_score_local()` reads only `public.properties_base`, and `v43.recompute_batch` (the scoring writer) also updates only `properties_base` \u2014 neither references `parcels_general`, \"so the nightly cron cannot rescore it\" [S2].\n\nOne caveat from that same doc: `parcels_general.v43_scored_at` carries values from Oct 21 to Oct 26 on roughly 378k rows, which the docs say were never rescored \u2014 something other than those two jobs wrote them, and finding the writer is an open follow-up. A watermark guard (nothing newer than 2026-10-26) covers further movement [S2]. Also note that a future rescore needs separate approval and an entry in `docs/scoring_authorizations.json`, and stays on hold regardless [S5]. These excerpts are from the 78c4d2d snapshot; confirm current hold status in the Terminal.",
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "37-43",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "38-42",
+    "cited": true
+   },
+   {
+    "n": 3,
+    "src": "docs/FLEET.md@78c4d2d",
+    "lines": "8-15",
+    "cited": true
+   },
+   {
+    "n": 4,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "195-202",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "25-29",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/LAUNCH_READINESS.md@78c4d2d",
+    "lines": "37-43",
+    "score": 14.4
+   },
+   {
+    "n": 2,
+    "src": "docs/V50_GRADE_MAPPING_VERIFICATION.md@78c4d2d",
+    "lines": "38-42",
+    "score": 13.1
+   },
+   {
+    "n": 3,
+    "src": "docs/FLEET.md@78c4d2d",
+    "lines": "8-15",
+    "score": 12.5
+   },
+   {
+    "n": 4,
+    "src": "docs/MASTER_TERMINAL_TRACKER.md@78c4d2d",
+    "lines": "195-202",
+    "score": 11.9
+   },
+   {
+    "n": 5,
+    "src": "docs/SCORING_INPUTS_OPTIONS.md@78c4d2d",
+    "lines": "25-29",
+    "score": 10
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "92-96",
+    "score": 9.8
+   }
+  ],
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null
+ },
+ "T08": {
+  "answer": "The Terminal's latest nightly snapshot puts `properties_base` at **1,189,952 rows, with 230,170 (19.3%) flagged** by `dq_status` [S2] \u2014 dated 2026-10-30T07:52 UTC, so treat as a stale figure if you're reading later.\n\nOn the duplicate/junk breakdown, the most recent composition measurement (2026-10-27) reports [S1]:\n\n- duplicate: 216,714\n- duplicate_addr_units_50p: 12,413\n- junk: 138\n- quarantined: 104; quarantined_non_property_content: 67; forbidden_source_quarantine: 12\n- clean (null `dq_status`): 959,384\n\nSo duplicates dominate the flag set \u2014 roughly 18.2% of the whole spine \u2014 and true junk is negligible.\n\nTwo caveats. First, the documents disagree on table size: `DB_GAP_REPORT.md` cites a 4.07\u20134.09M \"spine,\" while the anomaly docs say 1.19M and explicitly note the scorable universe is a narrower filter (clean, multifamily, 5+ units) and needs reconciliation [S1][S5]. Second, \"flagged\" is not the same as \"unscorable\" \u2014 the 816,886 clean-multifamily figure is the relevant denominator for scoring questions [S1]. For anything property-specific, read the live values in the Terminal rather than these excerpts.",
+  "sources": [
+   {
+    "n": 1,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "25-27",
+    "cited": true
+   },
+   {
+    "n": 2,
+    "src": "anomaly-data:series.jsonl (latest line, 2026-10-30) in spain-terminal-shell",
+    "lines": "1-1",
+    "cited": true
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "41-44",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "docs/ANOMALY_DRIFT.md@78c4d2d",
+    "lines": "25-27",
+    "score": 19.2
+   },
+   {
+    "n": 2,
+    "src": "anomaly-data:series.jsonl (latest line, 2026-10-30) in spain-terminal-shell",
+    "lines": "1-1",
+    "score": 12.8
+   },
+   {
+    "n": 3,
+    "src": "docs/TERMINAL_FRESHNESS_AUDIT.md@78c4d2d",
+    "lines": "5-9",
+    "score": 10.2
+   },
+   {
+    "n": 4,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "18-31",
+    "score": 10.2
+   },
+   {
+    "n": 5,
+    "src": "DB_GAP_REPORT.md@78c4d2d",
+    "lines": "41-44",
+    "score": 9.5
+   },
+   {
+    "n": 6,
+    "src": "docs/SCORING_DATA_COVERAGE.md@78c4d2d",
+    "lines": "86-91",
+    "score": 9.5
+   }
+  ],
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null
+ },
+ "T09": {
+  "answer": "About $0.0003 per question (roughly three hundredths of a cent) on the default model, DeepSeek V4.1 Flash, accessed via OpenRouter \u2014 so it is not free [S1]. That figure is as of 2026-10-31 [S1].\n\nSupporting detail from the same source [S1]:\n- Default: DeepSeek V4.1 Flash (`deepseek/deepseek-v4.1-flash-1017`) through OpenRouter.\n- Tripwire: after 2,000 paid calls in a day (about $0.60), the gateway downgrades to the free Qwen3.8-27B model on Groq.\n- Error fallback order: Qwen3.8-27B, then Flint v1.0 (free, OpenRouter).\n- Model picker also offers Flint v1.0 and Qwen3.8-27B (fast summary).\n\nI can\u2019t confirm current pricing beyond that dated snapshot; check the Terminal for the latest.",
+  "sources": [
+   {
+    "n": 1,
+    "src": "ai-gateway-site/retrieval/GATEWAY_FACTS.md",
+    "lines": "1-3",
+    "cited": true
+   }
+  ],
+  "retrieved": [
+   {
+    "n": 1,
+    "src": "ai-gateway-site/retrieval/GATEWAY_FACTS.md",
+    "lines": "1-3",
+    "score": 11.9
+   }
+  ],
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "fallback": null
+ }
+}
