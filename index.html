@@ -1144,12 +1144,19 @@ function extractSources(text) {
 }
 
 function generateRelated(query) {
-  const base = query.replace(/[?.!]+$/, "").split(" ").slice(0, 6).join(" ");
+  // Extract key topics (nouns/keywords) from the query for more contextual follow-ups
+  const clean = query.replace(/[?.!]+$/, "").trim();
+  const words = clean.split(/\s+/);
+  // Filter out common stop words to get the key topics
+  const stopWords = new Set(["what","how","is","are","the","a","an","in","on","with","my","our","i","you","we","they","this","that","these","those","it","its","of","for","to","and","or","but","not","can","could","should","would","do","does","did","have","has","had","will","was","were","be","been","being","get","got","make","made","need","needs","want","wants"]);
+  const topics = words.filter(w => !stopWords.has(w.toLowerCase()) && w.length > 3).slice(0, 4);
+  const topicStr = topics.join(" ") || clean.split(" ").slice(0, 4).join(" ");
+  
   return [
-    `What are the latest trends in ${base}?`,
-    `How does ${base} compare to last year?`,
-    `What are the key factors affecting ${base}?`,
-    `What are best practices for ${base}?`
+    `Can you go deeper on ${topicStr}?`,
+    `What are the current status and gaps for ${topicStr}?`,
+    `What should I do next about ${topicStr}?`,
+    `What are the risks or blockers with ${topicStr}?`
   ];
 }
 
