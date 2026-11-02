@@ -1320,7 +1320,8 @@ async function performSearch(query) {
     if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
     if (!res.ok) throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
     const _msg = data?.choices?.[0]?.message ?? {};
-    const answer = _msg.content || _msg.reasoning || "(no response from model — please try again)";
+    // Never render raw reasoning/chain-of-thought — only the actual answer
+    const answer = _msg.content || "(no response from model — please try again)";
     // Strip the model's own follow-ups section from the rendered answer
     const fuMatch = answer.match(/\n?##\s*Suggested Follow-ups?[\s\S]*$/i);
     const answerClean = fuMatch ? answer.slice(0, fuMatch.index).trim() : answer;
