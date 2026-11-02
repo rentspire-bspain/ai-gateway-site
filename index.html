@@ -1201,6 +1201,7 @@ function renderAnswer(container, text, sources, related) {
   } catch (e) {
     content.textContent = text;
   }
+  ansSec.appendChild(content);
 
   // Answer actions
   const actions = document.createElement("div");
