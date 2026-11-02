@@ -1337,7 +1337,9 @@ async function performSearch(query) {
     
     // Render answer with sources and related
     const sources = extractSources(answerClean);
-    const related = generateRelated(query, answerClean);
+    // Extract follow-ups from the ORIGINAL answer — the model's suggestions
+    // live in the section that answerClean strips out
+    const related = generateRelated(query, answer);
     renderAnswer(content, answerClean, sources, related);
     
     // Save to thread
