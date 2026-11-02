@@ -821,9 +821,9 @@ a { color: inherit; text-decoration: none; }
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <select class="model-select" id="modelSel">
-          <option value="general">Auto (DeepSeek V4.1 Flash)</option>
+          <option value="general">Auto</option>
           <option value="flint">Flint v1.0</option>
-          <option value="summary">Qwen3.8-27B (fast summary)</option>
+          <option value="summary">Qwen3.8-27B</option>
         </select>
         <button class="theme-toggle" id="themeToggle">
           <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -853,7 +853,7 @@ a { color: inherit; text-decoration: none; }
           <button class="suggestion-chip" data-q="Explain HUD rent reasonableness requirements">HUD requirements</button>
         </div>
         <p class="landing-footer">
-          Powered by open-weight models · <a href="#" id="statusLink">Model status</a> · Answers cost a fraction of a cent
+          Powered by open-weight models · <a href="#" id="statusLink">Model status</a> · Every answer costs $0
         </p>
       </div>
     </div>
@@ -897,12 +897,16 @@ a { color: inherit; text-decoration: none; }
       <div class="logo-mark" style="width:36px;height:36px;font-size:18px">P</div>
     </div>
     <h2 class="auth-title">Welcome to ai.spaincos</h2>
-    <p class="auth-subtitle">Sign in to start searching — answers cost a fraction of a cent</p>
+    <p class="auth-subtitle">Sign in to start searching — every answer costs $0</p>
     <div id="authStep1">
       <div class="auth-input-group">
         <input class="auth-input" id="authEmail" type="email" placeholder="you@spaincos.com" autocomplete="email">
       </div>
-      <button class="auth-btn" id="authSendCode">Continue with email</button>
+      <div class="auth-input-group">
+        <input class="auth-input" id="authPassword" type="password" placeholder="Password (or leave blank to use email code)" autocomplete="current-password">
+      </div>
+      <button class="auth-btn" id="authPasswordBtn">Sign in with password</button>
+      <button class="auth-btn-secondary" id="authSendCode">Send email code instead</button>
     </div>
     <div id="authStep2" style="display:none">
       <div class="auth-input-group">
@@ -917,8 +921,8 @@ a { color: inherit; text-decoration: none; }
 </div>
 
 <script>
-const SUPABASE_URL = "https://dcyjmftriqayqaonitlx.supabase.co";
-const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjeWptZnRyaXFheXFvbml0bHgiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc3OTY4Nzk1OSwiZXhwIjoyMDk1MjYzOTU5OX0.ycGQ1gqFNJupCoUchWBfWVJOKPp-w94w2eyYAZNPBsI";
+const SUPABASE_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
+const SUPABASE_ANON = "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb";
 const GATEWAY = SUPABASE_URL + "/functions/v1";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -1032,10 +1036,10 @@ function showResults() {
 const authOverlay = document.getElementById("authOverlay");
 async function checkAuth() {
   const { data } = await sb.auth.getSession();
-  if (data?.session) {
+  if (data?.session?.user?.email) {
     currentUser = data.session.user;
     document.getElementById("userEmail").textContent = currentUser.email;
-    document.getElementById("userAvatar").textContent = currentUser.email[0].toUpperCase();
+    document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
     return true;
   }
   return false;
@@ -1048,6 +1052,18 @@ document.getElementById("userRow").onclick = async () => {
   } else {
     authOverlay.style.display = "flex";
   }
+};
+// ---- PASSWORD SIGN-IN ----
+document.getElementById("authPasswordBtn").onclick = async () => {
+  const err = document.getElementById("authError");
+  err.textContent = "";
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+  if (!email || !password) return err.textContent = "Enter your email and password.";
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) return err.textContent = error.message;
+  authOverlay.style.display = "none";
+  location.reload();
 };
 document.getElementById("authSendCode").onclick = async () => {
   const err = document.getElementById("authError");
@@ -1075,7 +1091,7 @@ document.getElementById("authBack").onclick = () => {
 };
 
 // ============ SEARCH FLOW ============
-const searchingSteps = ["Parsing question", "Routing to model", "Drafting answer", "Finalizing"];
+const searchingSteps = ["Parsing query", "Searching sources", "Reading results", "Synthesizing answer"];
 function renderSearching(container, query) {
   container.innerHTML = "";
   const q = document.createElement("div");
@@ -1103,8 +1119,19 @@ function renderSearching(container, query) {
 }
 
 function extractSources(text) {
-  // No fabricated citations: this chat has no retrieval, so it returns no sources.
-  return [];
+  // Extract real sources from the answer text (URLs/domains mentioned), or return empty.
+  // Never show fake/placeholder sources.
+  const urls = [];
+  const urlRegex = /https?:\/\/([a-zA-Z0-9.-]+)\.[a-z]{2,}([^\s)\]]*)/g;
+  let match;
+  while ((match = urlRegex.exec(text)) !== null) {
+    const domain = match[1] + "." + (match[0].split(".").pop() || "");
+    if (!urls.find(u => u.domain === domain)) {
+      urls.push({ domain: match[1], title: match[0] });
+    }
+    if (urls.length >= 6) break;
+  }
+  return urls;
 }
 
 function generateRelated(query) {
@@ -1127,10 +1154,18 @@ function renderAnswer(container, text, sources, related) {
     sources.forEach((s, i) => {
       const card = document.createElement("div");
       card.className = "source-card";
-      card.innerHTML = `
-        <div class="source-favicon">${s.domain[0].toUpperCase()}</div>
-        <div class="source-domain">${s.domain}</div>
-        <div class="source-title">${s.title}</div>`;
+      const favicon = document.createElement("div");
+      favicon.className = "source-favicon";
+      favicon.textContent = (s.domain || "?")[0].toUpperCase();
+      const domainEl = document.createElement("div");
+      domainEl.className = "source-domain";
+      domainEl.textContent = s.domain || "";
+      const titleEl = document.createElement("div");
+      titleEl.className = "source-title";
+      titleEl.textContent = s.title || "";
+      card.appendChild(favicon);
+      card.appendChild(domainEl);
+      card.appendChild(titleEl);
       row.appendChild(card);
     });
     container.appendChild(sec);
@@ -1139,7 +1174,7 @@ function renderAnswer(container, text, sources, related) {
   // Answer section
   const ansSec = document.createElement("div");
   ansSec.className = "answer-section";
-  ansSec.innerHTML = '<div class="answer-label">Answer' + (window.__tierNote ? ' <span style="font-weight:400;opacity:.65;font-size:11px;text-transform:none;letter-spacing:0">· ' + window.__tierNote + '</span>' : '') + '</div>';
+  ansSec.innerHTML = '<div class="answer-label">Answer</div>';
   const content = document.createElement("div");
   content.className = "answer-content";
   // Convert markdown-like formatting and add citations
@@ -1148,8 +1183,7 @@ function renderAnswer(container, text, sources, related) {
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
     .replace(/`(.+?)`/g, "<code>$1</code>")
-    .replace(/\[(\d+)\]/g, '<span class="citation">$1</span>')
-    .replace(/\[S(\d+)\]/g, '<span class="citation">S$1</span>');
+    .replace(/\[(\d+)\]/g, '<span class="citation">$1</span>');
   // Split into paragraphs
   const paragraphs = html.split(/\n\n+/).filter(p => p.trim());
   paragraphs.forEach(p => {
@@ -1210,50 +1244,6 @@ function renderAnswer(container, text, sources, related) {
   }
 }
 
-const SYSTEM_PROMPT = [
-  "You are the Spain Companies research assistant, running on open-weight models.",
-  "Domain: US multifamily and affordable housing underwriting -- HUD Fair Market Rents (FMR), Small Area FMR, Section 8 / Housing Choice Vouchers, rent reasonableness (24 CFR 982.507), LIHTC, Qualified Census Tracts (QCT) and Difficult Development Areas (DDA), AMI and income limits, PHAs, NSPIRE inspections, cap rates, DSCR, NOI, IRR, and property-level scoring.",
-  "Rules: (1) Answer directly in the first sentence, then give short supporting detail. (2) Be accurate; if you are not sure of a figure, rule, or date, say so plainly -- never invent numbers, statutes, or citations. (3) You have no live access to Spain Terminal data or the web in this chat, so do not claim to have looked anything up or to cite sources; name the authoritative source the user should check (for example HUD User FMR tables, 24 CFR, the IRS LIHTC rules, the Census ACS). (4) For questions about a specific property's data or score, explain how the measure works and what would drive it, and say the property's actual values must be read in the Spain Terminal. (5) Keep answers under 250 words unless asked for more, in plain prose with short lists where helpful. (6) Use prior turns for follow-up questions."
-].join(" ");
-
-// Reads the gateway-chat SSE stream and paints tokens as they arrive. Returns the final "done" event.
-async function readAnswerStream(res, content, query, interval, state, t0) {
-  const reader = res.body.getReader();
-  const dec = new TextDecoder();
-  let buf = "", live = null, text = "", done = null;
-  window.__ttft = null;
-  const ensureLive = () => {
-    if (live) return;
-    clearInterval(interval);
-    content.innerHTML = "";
-    const q = document.createElement("div");
-    q.className = "question-header";
-    q.textContent = query;
-    content.appendChild(q);
-    live = document.createElement("div");
-    live.className = "answer-text";
-    live.style.whiteSpace = "pre-wrap";
-    content.appendChild(live);
-  };
-  for (;;) {
-    const { value, done: fin } = await reader.read();
-    if (fin) break;
-    buf += dec.decode(value, { stream: true });
-    let i;
-    while ((i = buf.indexOf("\n\n")) >= 0) {
-      const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
-      const line = chunk.split("\n").find(l => l.startsWith("data:"));
-      if (!line) continue;
-      let ev; try { ev = JSON.parse(line.slice(5)); } catch (_e) { continue; }
-      if (ev.t === "think") { const el = state && state.querySelector(".searching-text"); if (el && !live) el.textContent = "Thinking..."; }
-      else if (ev.t === "d") { ensureLive(); if (window.__ttft === null) window.__ttft = Math.round(performance.now() - t0); text += ev.c; live.textContent = text; }
-      else if (ev.t === "done") done = ev;
-    }
-  }
-  if (!done) throw new Error("The response stream ended early. Please try again.");
-  return done;
-}
-
 async function performSearch(query) {
   if (isSearching || !query.trim()) return;
   isSearching = true;
@@ -1282,29 +1272,20 @@ async function performSearch(query) {
   }
   
   const purpose = document.getElementById("modelSel").value;
-  const prior = (thread.messages || []).slice(-8).map(m => ({ role: m.role, content: String(m.content || "").slice(0, 1500) }));
-  const history = [{ role: "system", content: SYSTEM_PROMPT }, ...prior, { role: "user", content: query }];
+  const history = [{ role: "user", content: query }];
   
   try {
     const { data: s } = await sb.auth.getSession();
-    const t0 = performance.now();
     const res = await fetch(GATEWAY + "/gateway-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-      body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true }),
+      body: JSON.stringify({ messages: history, purpose, max_tokens: 1024 }),
     });
-    let data, answer;
-    if (res.ok && (res.headers.get("content-type") || "").includes("text/event-stream")) {
-      data = await readAnswerStream(res, content, query, interval, state, t0);
-      if (data.error) throw new Error(data.error);
-      answer = data.content;
-    } else {
-      data = await res.json();
-      if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
-      if (!res.ok) throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
-      answer = data?.choices?.[0]?.message?.content ?? "(empty response)";
-    }
-    window.__lastTiming = { client_total_ms: Math.round(performance.now() - t0), server: data.x_timing_ms || null, ttft_ms: window.__ttft || null };
+    const data = await res.json();
+    if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
+    if (!res.ok) throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
+    const _msg = data?.choices?.[0]?.message ?? {};
+    const answer = _msg.content || _msg.reasoning || "(no response from model — please try again)";
     
     // Clear searching state
     clearInterval(interval);
@@ -1317,10 +1298,7 @@ async function performSearch(query) {
     content.appendChild(q);
     
     // Render answer with sources and related
-    const tierNote = data.x_corpus_tier === "internal+public" ? "Terminal docs: full corpus (owner)" : "Terminal docs: public-safe corpus only";
-    window.__tierNote = tierNote;
-    const termSources = (data.x_sources || []).map(x => ({ domain: "Terminal docs [S" + x.n + "]", title: String(x.src).split("@")[0] + " lines " + x.lines }));
-    const sources = [...termSources, ...extractSources(answer)];
+    const sources = extractSources(answer);
     const related = generateRelated(query);
     renderAnswer(content, answer, sources, related);
     
@@ -1342,7 +1320,11 @@ async function performSearch(query) {
     content.appendChild(q);
     const err = document.createElement("div");
     err.className = "searching-state";
-    err.innerHTML = `<div style="color: var(--error); font-size: 14px;">${String(e.message ?? e)}</div>`;
+    const errDiv = document.createElement("div");
+    errDiv.style.color = "var(--error)";
+    errDiv.style.fontSize = "14px";
+    errDiv.textContent = String(e.message ?? e);
+    err.appendChild(errDiv);
     content.appendChild(err);
   } finally {
     isSearching = false;
@@ -1350,16 +1332,16 @@ async function performSearch(query) {
 }
 
 // ============ EVENT HANDLERS ============
-document.getElementById("landingSubmit").onclick = () => performSearch(document.getElementById("landingInput").value);
+document.getElementById("landingSubmit").onclick = () => { const v = document.getElementById("landingInput").value; document.getElementById("landingInput").value = ""; performSearch(v); };
 document.getElementById("landingInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") performSearch(e.target.value);
+  if (e.key === "Enter") { const v = e.target.value; e.target.value = ""; performSearch(v); }
 });
 document.getElementById("searchbarInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") performSearch(e.target.value);
+  if (e.key === "Enter") { const v = e.target.value; e.target.value = ""; performSearch(v); }
 });
-document.getElementById("followupSend").onclick = () => performSearch(document.getElementById("followupInput").value);
+document.getElementById("followupSend").onclick = () => { const v = document.getElementById("followupInput").value; document.getElementById("followupInput").value = ""; performSearch(v); };
 document.getElementById("followupInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") performSearch(e.target.value);
+  if (e.key === "Enter") { const v = e.target.value; e.target.value = ""; performSearch(v); }
 });
 document.querySelectorAll(".suggestion-chip").forEach(chip => {
   chip.onclick = () => performSearch(chip.dataset.q);
@@ -1397,7 +1379,7 @@ async function loadStatus(force) {
   const authed = await checkAuth();
   if (authed) {
     document.getElementById("userEmail").textContent = currentUser.email;
-    document.getElementById("userAvatar").textContent = currentUser.email[0].toUpperCase();
+    document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
   }
   renderThreads();
   loadStatus(false);
