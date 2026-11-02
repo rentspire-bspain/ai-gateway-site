@@ -813,7 +813,7 @@ a { color: inherit; text-decoration: none; }
         <div class="user-avatar" id="userAvatar">?</div>
         <div class="user-info">
           <div class="user-email" id="userEmail">Sign in</div>
-          <div class="user-plan" id="userPlan">$0 · Open weights</div>
+          <div class="user-plan" id="userPlan">Open-weight models</div>
         </div>
       </div>
     </div>
@@ -845,7 +845,7 @@ a { color: inherit; text-decoration: none; }
     <div class="landing" id="landing">
       <div class="landing-inner">
         <h1 class="landing-title">Where knowledge <em>begins</em></h1>
-        <p class="landing-subtitle">Ask anything. Powered by open-weight models at $0 cost.</p>
+        <p class="landing-subtitle">Ask anything. Powered by open-weight models.</p>
         <div class="search-container">
           <div class="search-box">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -862,7 +862,7 @@ a { color: inherit; text-decoration: none; }
           <button class="suggestion-chip" data-q="Explain HUD rent reasonableness requirements">HUD requirements</button>
         </div>
         <p class="landing-footer">
-          Powered by open-weight models · <a href="#" id="statusLink">Model status</a> · Every answer costs $0
+          Powered by open-weight models · <a href="#" id="statusLink">Model status</a>
         </p>
       </div>
     </div>
@@ -906,7 +906,7 @@ a { color: inherit; text-decoration: none; }
       <div class="logo-mark" style="width:36px;height:36px;font-size:18px">P</div>
     </div>
     <h2 class="auth-title">Welcome to ai.spaincos</h2>
-    <p class="auth-subtitle">Sign in to start searching — every answer costs $0</p>
+    <p class="auth-subtitle">Sign in to start searching</p>
     <div id="authStep1">
       <div class="auth-input-group">
         <input class="auth-input" id="authEmail" type="email" placeholder="you@spaincos.com" autocomplete="email">
@@ -1128,30 +1128,58 @@ function renderSearching(container, query) {
 }
 
 function extractSources(text) {
-  // Extract real sources from the answer text (URLs/domains mentioned), or return empty.
+  // Extract real sources from the answer text (URLs), deduped by URL, parsed with URL().
   // Never show fake/placeholder sources.
   const urls = [];
-  const urlRegex = /https?:\/\/([a-zA-Z0-9.-]+)\.[a-z]{2,}([^\s)\]]*)/g;
+  const seen = new Set();
+  const urlRegex = /https?:\/\/[^\s)\]}"'<>]+/g;
   let match;
   while ((match = urlRegex.exec(text)) !== null) {
-    const domain = match[1] + "." + (match[0].split(".").pop() || "");
-    if (!urls.find(u => u.domain === domain)) {
-      urls.push({ domain: match[1], title: match[0] });
+    const raw = match[0].replace(/[.,;:!?)]+$/, "");
+    let host = "";
+    try { host = new URL(raw).hostname.replace(/^www\./, ""); } catch (e) { continue; }
+    if (host.includes("pollinations.ai")) continue; // generated images are not sources
+    if (!seen.has(raw)) {
+      seen.add(raw);
+      urls.push({ domain: host, title: raw, url: raw });
     }
     if (urls.length >= 6) break;
   }
   return urls;
 }
 
-function generateRelated(query) {
+function extractSuggestedFollowups(text) {
+  // Pull follow-ups the model generated in its "## Suggested Follow-ups" section
+  const m = (text || "").match(/##\s*Suggested Follow-ups?\s*\n([\s\S]*)$/i);
+  if (!m) return null;
+  const items = m[1].split(/\n+/)
+    .map(l => l.replace(/^[\s>*-]*/, "").replace(/^\d+[.)]\s*/, "").trim())
+    .filter(l => l.length > 8 && l.length < 140);
+  return items.length ? items.slice(0, 4) : null;
+}
+
+function generateRelated(query, answer) {
+  // Prefer the model's own suggested follow-ups from the answer
+  const suggested = extractSuggestedFollowups(answer);
+  if (suggested) return suggested;
+
   // Extract key topics (nouns/keywords) from the query for more contextual follow-ups
   const clean = query.replace(/[?.!]+$/, "").trim();
   const words = clean.split(/\s+/);
   // Filter out common stop words to get the key topics
-  const stopWords = new Set(["what","how","is","are","the","a","an","in","on","with","my","our","i","you","we","they","this","that","these","those","it","its","of","for","to","and","or","but","not","can","could","should","would","do","does","did","have","has","had","will","was","were","be","been","being","get","got","make","made","need","needs","want","wants"]);
+  const stopWords = new Set(["what","how","is","are","the","a","an","in","on","with","my","our","i","you","we","they","this","that","these","those","it","its","of","for","to","and","or","but","not","can","could","should","would","do","does","did","have","has","had","will","was","were","be","been","being","get","got","make","made","need","needs","want","wants","who","when","where","why","which"]);
   const topics = words.filter(w => !stopWords.has(w.toLowerCase()) && w.length > 3).slice(0, 4);
-  const topicStr = topics.join(" ") || clean.split(" ").slice(0, 4).join(" ");
-  
+
+  if (!topics.length) {
+    // Simple/short factual questions — curiosity follow-ups, not canned project jargon
+    return [
+      `Can you explain that more simply?`,
+      `What is the most important thing to know about ${clean}?`,
+      `Why does ${clean} matter?`,
+      `What are common misconceptions about ${clean}?`
+    ];
+  }
+  const topicStr = topics.join(" ");
   return [
     `Can you go deeper on ${topicStr}?`,
     `What are the current status and gaps for ${topicStr}?`,
@@ -1168,8 +1196,11 @@ function renderAnswer(container, text, sources, related) {
     sec.innerHTML = '<div class="sources-row"></div>';
     const row = sec.querySelector(".sources-row");
     sources.forEach((s, i) => {
-      const card = document.createElement("div");
+      const card = document.createElement("a");
       card.className = "source-card";
+      card.href = s.url || s.title || "#";
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
       const favicon = document.createElement("div");
       favicon.className = "source-favicon";
       favicon.textContent = (s.domain || "?")[0].toUpperCase();
@@ -1272,20 +1303,27 @@ async function performSearch(query) {
   }
   
   const purpose = document.getElementById("modelSel").value;
-  const history = [{ role: "user", content: query }];
+  // Send the full conversation history so follow-ups keep context
+  const history = [
+    ...thread.messages.map(m => ({ role: m.role, content: m.content })),
+    { role: "user", content: query },
+  ];
   
   try {
     const { data: s } = await sb.auth.getSession();
     const res = await fetch(GATEWAY + "/gateway-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-      body: JSON.stringify({ messages: history, purpose, max_tokens: 1024 }),
+      body: JSON.stringify({ messages: history, purpose, max_tokens: 2048 }),
     });
     const data = await res.json();
     if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
     if (!res.ok) throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
     const _msg = data?.choices?.[0]?.message ?? {};
     const answer = _msg.content || _msg.reasoning || "(no response from model — please try again)";
+    // Strip the model's own follow-ups section from the rendered answer
+    const fuMatch = answer.match(/\n?##\s*Suggested Follow-ups?[\s\S]*$/i);
+    const answerClean = fuMatch ? answer.slice(0, fuMatch.index).trim() : answer;
     
     // Clear searching state
     clearInterval(interval);
@@ -1298,13 +1336,13 @@ async function performSearch(query) {
     content.appendChild(q);
     
     // Render answer with sources and related
-    const sources = extractSources(answer);
-    const related = generateRelated(query);
-    renderAnswer(content, answer, sources, related);
+    const sources = extractSources(answerClean);
+    const related = generateRelated(query, answerClean);
+    renderAnswer(content, answerClean, sources, related);
     
     // Save to thread
     thread.messages.push({ role: "user", content: query });
-    thread.messages.push({ role: "assistant", content: answer, sources, related });
+    thread.messages.push({ role: "assistant", content: answerClean, sources, related });
     saveThreads();
     renderThreads();
     
