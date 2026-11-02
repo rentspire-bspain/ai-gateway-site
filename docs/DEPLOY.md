@@ -19,3 +19,9 @@ a human reauthorization. Personal access tokens do not expire on that cycle (unl
 and need no refresh. Note: the connector was not the only gap - nothing auto-deploys, since the project has no Git
 integration, so merges to master never publish without a manual API/CLI deploy.
 Follow-up: consider a GitHub Action deploying on push using a VERCEL_TOKEN repo secret.
+
+## Update: Git-linked auto-deploy
+The live Vercel project is `ai-gateway` (prj_mkgPk4qdRGWbKS9S9W6h73knAaJy). On 2026-11-02 it was linked to this repo
+(POST /v9/projects/{id}/link {type:github, repo:rentspire-bspain/ai-gateway-site}); production branch = master.
+Every push to master now auto-deploys to ai.spaincos.com through Vercel's Git integration - no token, no OAuth connector.
+A GitHub Action with a VERCEL_TOKEN secret was not needed (and the vault token value cannot be read out to set as a secret).
