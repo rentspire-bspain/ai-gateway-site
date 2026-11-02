@@ -25,3 +25,7 @@ The live Vercel project is `ai-gateway` (prj_mkgPk4qdRGWbKS9S9W6h73knAaJy). On 2
 (POST /v9/projects/{id}/link {type:github, repo:rentspire-bspain/ai-gateway-site}); production branch = master.
 Every push to master now auto-deploys to ai.spaincos.com through Vercel's Git integration - no token, no OAuth connector.
 A GitHub Action with a VERCEL_TOKEN secret was not needed (and the vault token value cannot be read out to set as a secret).
+
+## Verification and /api/geocode
+- `.github/workflows/verify-live.yml` runs on push to master and on demand; it md5-compares https://ai.spaincos.com with index.html and fails red if they differ.
+- `/api/geocode` returning 401 is BY DESIGN: api/geocode.js requires the X-Worker-Token header (or ?token=) matching env GEOCODE_WORKER_TOKEN and returns 401 `unauthorized` otherwise. Code is unchanged by the move to Git deploys. Direct *.vercel.app deployment URLs additionally sit behind Vercel Authentication (302).

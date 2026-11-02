@@ -1,0 +1,22 @@
+name: verify-live
+# Fails red if ai.spaincos.com does not serve the repo's index.html (silent non-deploy guard). No secrets needed.
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare live site to repo (retry up to ~10 min for Vercel build)
+        run: |
+          want=$(md5sum index.html | cut -d' ' -f1)
+          for i in $(seq 1 20); do
+            got=$(curl -fsS -H 'Cache-Control: no-cache' "https://ai.spaincos.com/?cb=$(date +%s)" | md5sum | cut -d' ' -f1 || true)
+            echo "attempt $i: repo=$want live=$got"
+            [ "$got" = "$want" ] && { echo "live matches repo"; exit 0; }
+            sleep 30
+          done
+          echo "::error::ai.spaincos.com does not match repo index.html - deploy did not reach production"
+          exit 1
