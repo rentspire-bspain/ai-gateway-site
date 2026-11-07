@@ -41,10 +41,16 @@ Deno.serve(async (req) => {
     // (default 2000, about $0.60 at $0.0003/call) paid models are downgraded to free Qwen and the response
     // carries x_budget_exceeded. Meter errors fail open (availability over a few cents).
     const DAILY_CAP = Number(Deno.env.get("DAILY_PAID_CALL_CAP")) || 2000;
+    // MONTHLY_SPEND_CAP: true dollar budget for the calendar month, summed from the
+    // ops.llm_requests ledger (exact per-call cost from OpenRouter usage.cost; streaming
+    // calls logged at a conservative token-budget estimate). Over the cap, paid models
+    // downgrade to free Qwen for the rest of the month. Fails open on query error.
+    const MONTHLY_SPEND_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP")) || 20;
     const dayKey = new Date().toISOString().slice(0, 10);
     let budgetExceeded = false;
     const paid = !custom && !isFree(chosen);
     let paidToday: number | null = null;
+    let monthSpend: number | null = null;
     let meterDiag = "";
     if (paid && sbUrl) {
       try {
@@ -59,17 +65,59 @@ Deno.serve(async (req) => {
           paidToday = 0;
         } else if (l.ok) { const arr = await l.json(); paidToday = Array.isArray(arr) ? arr.length : null; }
       } catch (e) { meterDiag += ` err:${String(e).slice(0, 80)}`; }
+      try {
+        const mr = await fetch(`${sbUrl}/rest/v1/rpc/ops_month_spend`, { method: "POST",
+          headers: { ...sbHeaders, "Content-Type": "application/json" }, body: "{}", signal: AbortSignal.timeout(5000) });
+        if (mr.ok) { const t = await mr.text(); const n = Number(t); if (Number.isFinite(n)) monthSpend = n; meterDiag += ` month:${mr.status}:${monthSpend === null ? "?" : monthSpend.toFixed(4)}`; }
+      } catch (_e) { meterDiag += ` montherr`; }
       if (paidToday !== null && paidToday >= DAILY_CAP) { budgetExceeded = true; chosen = DEFAULTS.summary; }
+      else if (monthSpend !== null && monthSpend >= MONTHLY_SPEND_CAP) { budgetExceeded = true; chosen = DEFAULTS.summary; meterDiag += ` monthly_cap_hit`; }
     }
+    // Ledger every paid call with its cost (single writer for cap accounting: caller='call-model').
+    // Non-streaming: exact cost from OpenRouter usage.cost. Streaming: conservative estimate
+    // (max token budget x output price) logged at stream start in the streaming path below.
+    const logPaid = (cost: number | null, mt: string | null, okFlag: boolean, d: any) => {
+      if (!sbUrl) return;
+      const job = fetch(`${sbUrl}/rest/v1/rpc/ops_log_llm_request`, { method: "POST",
+        headers: { ...sbHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({ p: { caller: "call-model", product: "ai.spaincos.com", alias: purpose ?? null,
+          resolved_model: (d?.model ?? mt ?? null), served_by: okFlag ? "hosted" : "error",
+          prompt_tokens: d?.usage?.prompt_tokens ?? null, completion_tokens: d?.usage?.completion_tokens ?? null,
+          latency_ms: null, status: okFlag ? "ok" : "error", request_id: d?.id ?? null, cost_usd: cost } }),
+        signal: AbortSignal.timeout(5000) }).catch(() => {});
+      (globalThis as any).EdgeRuntime?.waitUntil?.(job);
+    };
+    // Conservative per-stream cost estimate: full output token budget at the worst-case
+    // paid output price ($0.60/Mtok for deepseek-v4.1-flash). Overestimates; the cap errs safe.
+    const EST_OUT_PRICE = 0.60;
+    const estStreamCost = (mt: number) => (mt / 1e6) * EST_OUT_PRICE;
     const callOne = async (m: string, mt: number) => {
       const g = isGroqId(m);
       const url = backend || Deno.env.get("MODEL_BACKEND_URL") || (g ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions");
       const key = Deno.env.get("MODEL_BACKEND_KEY") || (g ? Deno.env.get("GROQ_API_KEY") : Deno.env.get("OPENROUTER_API_KEY")) || "";
       const msgs = messages ? messages : [{ role: "user", content: prompt || "" }];
+      const mkBody = (tokens: number) => JSON.stringify({ model: m, messages: msgs, max_tokens: tokens, ...reasoningFor(m) });
       const r = await fetch(url, { method: "POST", headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: m, messages: msgs, max_tokens: mt, ...reasoningFor(m) }), signal: AbortSignal.timeout(55_000) });
+        body: mkBody(mt), signal: AbortSignal.timeout(55_000) });
       let d: any; try { d = await r.json(); } catch (_e) { d = { error: "bad upstream response" }; }
-      const content = d?.choices?.[0]?.message?.content;
+      let content = d?.choices?.[0]?.message?.content;
+      // EMPTY-COMPLETION RETRY (the Flint/DeepSeek class): reasoning-first models can
+      // burn the entire token budget on hidden reasoning and return content:null with
+      // finish_reason "length" — the user gets an empty answer. Retry once with 4x
+      // budget so the reasoning fits and real content follows. Only for OpenRouter
+      // models (Groq models are not reasoning-first in this deployment).
+      if (r.ok && !d?.error && d?.choices?.[0]?.finish_reason === "length" &&
+          (content === null || String(content ?? "").trim() === "") && !g) {
+        try {
+          const rr = await fetch(url, { method: "POST", headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
+            body: mkBody(Math.min(mt * 4, 8192)), signal: AbortSignal.timeout(55_000) });
+          let d2: any; try { d2 = await rr.json(); } catch (_e2) { d2 = null; }
+          const c2 = d2?.choices?.[0]?.message?.content;
+          if (d2 && !d2.error && typeof c2 === "string" && c2.length > 0) {
+            d = d2; d.x_retry_reason = "empty_completion_budget_retry"; content = c2;
+          }
+        } catch (_e3) { /* keep original */ }
+      }
       return { ok: r.ok && !d?.error && typeof content === "string" && content.length > 0, d };
     };
     // max_tokens: Groq free tier enforces OTPM 1000 (cap 1024); OpenRouter reasoning models get 2048.
@@ -91,6 +139,8 @@ Deno.serve(async (req) => {
             const job = fetch(`${sbUrl}/storage/v1/object/gateway-meter/${obj}`, { method: "POST", headers: { ...sbHeaders, "Content-Type": "application/json" },
               body: JSON.stringify({ model: chosen, purpose: purpose ?? null, ok: true, stream: true }), signal: AbortSignal.timeout(5000) }).catch(() => {});
             (globalThis as any).EdgeRuntime?.waitUntil?.(job);
+            // Streaming cost is unknown at stream start: ledger the conservative token-budget estimate.
+            logPaid(estStreamCost(capFor(chosen)), chosen, true, { model: chosen });
           }
           return new Response(sr.body, { headers: { ...cors, "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "x-model": chosen, "x-budget-exceeded": budgetExceeded ? "1" : "0" } });
         }
@@ -111,6 +161,8 @@ Deno.serve(async (req) => {
         }
         meterDiag += ` put:${pr.status}`;
       } catch (e) { meterDiag += ` puterr:${String(e).slice(0, 60)}`; }
+      // Ledger the exact billed cost (skip if the fallback chain served a free model instead).
+      if (data?.model && !isFree(String(data.model))) logPaid(data?.usage?.cost ?? null, chosen, ok, data);
     }
     // Fallback chain (only when the caller did not pin a model/backend): Qwen on Groq (free, works), then Flint.
     if (!ok && !model && !custom) {
@@ -122,7 +174,7 @@ Deno.serve(async (req) => {
         } catch (_e) { /* try next */ }
       }
     }
-    if (paid && data && typeof data === "object") data.x_meter = { paid_today: paidToday, cap: DAILY_CAP, diag: meterDiag };
+    if (paid && data && typeof data === "object") data.x_meter = { paid_today: paidToday, cap: DAILY_CAP, month_spend_usd: monthSpend, monthly_cap_usd: MONTHLY_SPEND_CAP, diag: meterDiag };
     if (budgetExceeded && data && typeof data === "object") data.x_budget_exceeded = { cap: DAILY_CAP, paid_calls_today: paidToday };
     return new Response(JSON.stringify(data), { headers: { ...cors, "Content-Type": "application/json" } });
   } catch (e) {
