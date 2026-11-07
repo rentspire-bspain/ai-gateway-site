@@ -705,6 +705,16 @@ a { color: inherit; text-decoration: none; }
   margin: 0 auto;
   pointer-events: auto;
 }
+
+/* ============ ADJUSTABLE ANSWER WIDTH (default / wide / full) ============ */
+[data-width="wide"] .landing-inner { max-width: 960px; }
+[data-width="wide"] .results-inner { max-width: 1100px; }
+[data-width="wide"] .followup-inner { max-width: 1100px; }
+[data-width="full"] .landing-inner { max-width: 100%; }
+[data-width="full"] .results-inner { max-width: 100%; }
+[data-width="full"] .followup-inner { max-width: 100%; }
+.width-toggle { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 12.5px; }
+.width-toggle:hover { color: var(--text); }
 .followup-box {
   display: flex;
   align-items: center;
@@ -839,6 +849,10 @@ a { color: inherit; text-decoration: none; }
           <option value="flint">Flint v1.0</option>
           <option value="summary">Qwen3.8-27B</option>
         </select>
+        <button class="width-toggle" id="widthToggle" title="Adjust answer width">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          <span id="widthLabel">Default</span>
+        </button>
         <button class="theme-toggle" id="themeToggle">
           <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           <span id="themeLabel">Dark</span>
@@ -963,6 +977,22 @@ function setTheme(theme) {
 }
 setTheme(localStorage.getItem("ai_theme") || "dark");
 themeToggle.onclick = () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+
+// Adjustable answer width: default → wide → full → default (persisted)
+const WIDTH_MODES = [
+  { key: "", label: "Default" },
+  { key: "wide", label: "Wide" },
+  { key: "full", label: "Full" }
+];
+let widthIdx = Math.max(0, WIDTH_MODES.findIndex(m => m.key === (localStorage.getItem("answerWidth") || "")));
+const applyWidth = () => {
+  const m = WIDTH_MODES[widthIdx % WIDTH_MODES.length];
+  document.documentElement.setAttribute("data-width", m.key);
+  document.getElementById("widthLabel").textContent = m.label;
+  localStorage.setItem("answerWidth", m.key);
+};
+document.getElementById("widthToggle").onclick = () => { widthIdx = (widthIdx + 1) % WIDTH_MODES.length; applyWidth(); };
+applyWidth();
 
 // ============ SIDEBAR ============
 const sidebar = document.getElementById("sidebar");
