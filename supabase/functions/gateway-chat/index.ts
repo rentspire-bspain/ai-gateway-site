@@ -143,7 +143,7 @@ Question: "${userQuery}"`;
     // Wikipedia + DuckDuckGo Instant Answers. Gives the writing agent real,
     // current facts and real source URLs to cite. If PERPLEXITY_API_KEY is set
     // as a function secret, the Perplexity Search API is used instead (best quality).
-    const timeSensitive = /who won|latest|news|current|today|this (year|month|week)|score|standing|price of|weather|released|announced|20(2[4-9]|3\d)/i.test(userQuery);
+    const timeSensitive = /who won|latest|most recent|news|current|today|this (year|month|week)|score|standing|price of|weather|released|announced|report|data release|inflation|cpi|jobs report|20(2[4-9]|3\d)/i.test(userQuery);
     // PERSONAL-ADVICE questions ("What should I focus on this week?") are member
     // questions, NOT news queries — "this week" must not dump unrelated headlines.
     const personalAdvice = /should i|what should|focus on|prioriti|my (week|day|plan|goals?)|advice|recommend|help me (plan|decide|think)/i.test(userQuery);
@@ -414,7 +414,7 @@ Question: "${userQuery}"`;
     // Only inject Brett's ecosystem context when the question is actually
     // about his system. General questions get a clean expert prompt so
     // answers don't leak internal data or off-topic follow-ups.
-    const systemKeywords = /comptrove|rentspire|spaincos|spain companies|shmt|spain-runner|spain runner|the gateway|ai\.spaincos|property_facts|rent observ|my (data|system|terminal|connections|ux|site|app|portfolio|properties|rents|products|companies|infrastructure|jobs|runner|pipelines)|the (terminal|data universe|runner)|this ux|bulk job|harvest|our (data|systems?|platform)/i;
+    const systemKeywords = /comptrove|rentspire|spaincos|spain companies|spain terminal|shmt|spain-runner|spain runner|the gateway|ai\.spaincos|property_facts|rent observ|my (data|system|terminal|connections|ux|site|app|portfolio|propert(y|ies)|rents|products|companies|infrastructure|jobs|runner|pipelines)|the (terminal|data universe|runner)|this ux|bulk job|what .{0,30}(infrastructure|jobs?|pipelines?) do i have|harvest|our (data|systems?|platform)/i;
     const ADMIN_EMAIL = "bspain@spaincos.com";
     const isAdmin = userEmail === ADMIN_EMAIL;
     // 2026-11-07 FIX: isAdmin no longer force-injects the ecosystem prompt on
