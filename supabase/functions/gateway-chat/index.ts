@@ -161,22 +161,30 @@ Question: "${userQuery}"`;
       try {
         const findings: Array<{ title: string; url: string; extract: string }> = [];
         const perplexityKey = Deno.env.get("PERPLEXITY_API_KEY");
+        let perplexityUsed = false;
         if (perplexityKey) {
-          // Preferred: Perplexity Search API
-          const pRes = await fetch("https://api.perplexity.ai/search", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${perplexityKey}` },
-            body: JSON.stringify({ model: "sonar", query: userQuery.slice(0, 400) }),
-            signal: AbortSignal.timeout(15_000)
-          });
-          if (pRes.ok) {
-            const p = await pRes.json();
-            const pText = p?.choices?.[0]?.message?.content || "";
-            const pCitations: string[] = Array.isArray(p?.citations) ? p.citations : [];
-            if (pText) findings.push({ title: "Perplexity Search (live web)", url: pCitations[0] || "https://www.perplexity.ai", extract: String(pText).slice(0, 1200) });
-            pCitations.slice(0, 4).forEach((u: string) => findings.push({ title: "Web source", url: u, extract: "" }));
-          }
-        } else {
+          // Preferred: Perplexity Search API (chat/completions is the documented shape;
+          // the old /search + {query} call failed silently and killed retrieval).
+          try {
+            const pRes = await fetch("https://api.perplexity.ai/chat/completions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": `Bearer ${perplexityKey}` },
+              body: JSON.stringify({ model: "sonar", messages: [{ role: "user", content: String(researchQuery).slice(0, 400) }] }),
+              signal: AbortSignal.timeout(20_000)
+            });
+            if (pRes.ok) {
+              const p = await pRes.json();
+              const pText = p?.choices?.[0]?.message?.content || "";
+              const pCitations: string[] = Array.isArray(p?.citations) ? p.citations : [];
+              if (pText) {
+                findings.push({ title: "Perplexity Search (live web)", url: pCitations[0] || "https://www.perplexity.ai", extract: String(pText).slice(0, 1500) });
+                pCitations.slice(0, 8).forEach((u: string) => findings.push({ title: "Web source", url: u, extract: "" }));
+                perplexityUsed = true;
+              }
+            }
+          } catch (e) { /* fall through to the free sources below */ }
+        }
+        if (!perplexityUsed) {
           // Free tier — pick the right source for the question type
           const addNewsFindings = async (arr: Array<{ title: string; url: string; extract: string }>, q: string) => {
             // Two sources for redundancy and better citations:
