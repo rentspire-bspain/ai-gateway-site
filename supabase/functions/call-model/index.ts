@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: "unauthorized gateway token" }), { status: 401, headers: { ...cors, "Content-Type": "application/json" } });
       }
     }
-    const { prompt, model, backend, messages, purpose, max_tokens, stream, reasoning_effort } = await req.json();
+    const { prompt, model, backend, messages, purpose, max_tokens, stream, reasoning_effort , tools, tool_choice, parallel_tool_calls } = await req.json();
     // THE FREE HOSTED MODELS (no hardware, no cost):
     //   - OpenRouter's free Flint (recursive/flint-v1.0:free) — the coding/agent model
     //   - OpenRouter's Free Models Router — the auto-routing free tier
@@ -96,6 +96,9 @@ Deno.serve(async (req) => {
       const url = backend || Deno.env.get("MODEL_BACKEND_URL") || (g ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions");
       const key = Deno.env.get("MODEL_BACKEND_KEY") || (g ? Deno.env.get("GROQ_API_KEY") : Deno.env.get("OPENROUTER_API_KEY")) || "";
       const msgs = messages ? messages : [{ role: "user", content: prompt || "" }];
+      const toolsBody = (Array.isArray(tools) && tools.length)
+        ? { tools, tool_choice: tool_choice ?? "auto", ...(typeof parallel_tool_calls === "boolean" ? { parallel_tool_calls } : {}) }
+        : {};
       const mkBody = (tokens: number) => JSON.stringify({ model: m, messages: msgs, max_tokens: tokens, ...reasoningFor(m) });
       const r = await fetch(url, { method: "POST", headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
         body: mkBody(mt), signal: AbortSignal.timeout(55_000) });
@@ -118,7 +121,9 @@ Deno.serve(async (req) => {
           }
         } catch (_e3) { /* keep original */ }
       }
-      return { ok: r.ok && !d?.error && typeof content === "string" && content.length > 0, d };
+      const _msg = d?.choices?.[0]?.message;
+      const _hasToolCalls = Array.isArray(_msg?.tool_calls) && _msg.tool_calls.length > 0;
+      return { ok: r.ok && !d?.error && ((typeof content === "string" && content.length > 0) || _hasToolCalls), d };
     };
     // max_tokens: Groq free tier enforces OTPM 1000 (cap 1024); OpenRouter reasoning models get 2048.
     const effort = ["minimal", "low", "medium", "high"].includes(String(reasoning_effort)) ? String(reasoning_effort) : (Deno.env.get("REASONING_EFFORT") || "");
@@ -174,6 +179,7 @@ Deno.serve(async (req) => {
         } catch (_e) { /* try next */ }
       }
     }
+    if (Array.isArray(tools) && tools.length && data && typeof data === "object" && !data.error) data.x_tools_passthrough = true;
     if (paid && data && typeof data === "object") data.x_meter = { paid_today: paidToday, cap: DAILY_CAP, month_spend_usd: monthSpend, monthly_cap_usd: MONTHLY_SPEND_CAP, diag: meterDiag };
     if (budgetExceeded && data && typeof data === "object") data.x_budget_exceeded = { cap: DAILY_CAP, paid_calls_today: paidToday };
     return new Response(JSON.stringify(data), { headers: { ...cors, "Content-Type": "application/json" } });
