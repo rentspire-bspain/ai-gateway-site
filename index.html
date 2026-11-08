@@ -176,6 +176,32 @@ a { color: inherit; text-decoration: none; }
 }
 .thread-item:hover { background: var(--bg-elevated); color: var(--text); }
 .thread-item.active { background: var(--accent-light); color: var(--text); }
+.thread-search {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 12.5px;
+  padding: 7px 10px;
+  margin-bottom: 8px;
+  outline: none;
+}
+.thread-search:focus { border-color: var(--accent); }
+.thread-search::placeholder { color: var(--text-faint); }
+.attach-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: transparent; border: none; color: var(--text-muted); cursor: pointer; border-radius: 8px;
+}
+.attach-btn:hover { color: var(--text); background: var(--bg-elevated); }
+.attach-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent-light); color: var(--text);
+  border: 1px solid var(--border); border-radius: 999px;
+  font-size: 12px; padding: 3px 10px; margin: 6px 0 0;
+}
+.attach-chip button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 0; line-height: 1; }
 .thread-item svg { flex-shrink: 0; opacity: 0.6; }
 .sidebar-footer {
   border-top: 1px solid var(--border);
@@ -822,6 +848,7 @@ a { color: inherit; text-decoration: none; }
       New Thread
     </button>
     <div class="threads-list" id="threadsList">
+      <input class="thread-search" id="threadSearch" placeholder="Search threads..." autocomplete="off">
       <div class="threads-label">Recent</div>
       <div id="threadItems"></div>
     </div>
@@ -875,10 +902,14 @@ a { color: inherit; text-decoration: none; }
           <div class="search-box">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             <input class="search-input" id="landingInput" placeholder="Ask anything..." autocomplete="off">
+            <button class="attach-btn" id="landingAttach" title="Attach a text file (txt, md, csv, json)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </button>
             <button class="search-submit" id="landingSubmit">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
             </button>
           </div>
+          <div id="landingAttachChip"></div>
         </div>
         <div class="search-suggestions" id="suggestions">
           <button class="suggestion-chip" data-q="What are the current multifamily rent trends in Austin, TX?">Austin rent trends</button>
@@ -915,10 +946,14 @@ a { color: inherit; text-decoration: none; }
         <div class="followup-box">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
           <input id="followupInput" placeholder="Ask a follow-up..." autocomplete="off">
+          <button class="attach-btn" id="followupAttach" title="Attach a text file (txt, md, csv, json)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </button>
           <button class="followup-send" id="followupSend">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
           </button>
         </div>
+        <div id="followupAttachChip"></div>
       </div>
     </div>
   </main>
@@ -1010,6 +1045,59 @@ document.getElementById("deepResearchToggle").onclick = () => {
   document.getElementById("deepResearchLabel").textContent = deepResearchOn ? "Deep" : "Research";
 };
 
+// ============ THREAD SEARCH (v62) ============
+document.getElementById("threadSearch").addEventListener("input", () => renderThreads());
+
+// ============ FILE ATTACHMENTS (v62) ============
+// Text files (txt, md, csv, json) attach to the next question; the content is
+// spliced into the message (capped at 3,000 chars — the gateway's per-message
+// cap is 4,000) so the model reads the actual file alongside the question.
+let pendingAttachment = null;
+const fileInput = document.createElement("input");
+fileInput.type = "file";
+fileInput.accept = ".txt,.md,.csv,.json,.log,.ts,.js,.py,.sql,.yml,.yaml,.html,.css,text/*";
+fileInput.style.display = "none";
+document.body.appendChild(fileInput);
+function renderAttachChips() {
+  for (const id of ["landingAttachChip", "followupAttachChip"]) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    el.innerHTML = "";
+    if (!pendingAttachment) continue;
+    const chip = document.createElement("div");
+    chip.className = "attach-chip";
+    const name = document.createElement("span");
+    name.textContent = pendingAttachment.name + " (" + pendingAttachment.content.length + " chars)";
+    const x = document.createElement("button");
+    x.textContent = "×";
+    x.title = "Remove attachment";
+    x.onclick = () => { pendingAttachment = null; renderAttachChips(); };
+    chip.appendChild(name); chip.appendChild(x);
+    el.appendChild(chip);
+  }
+}
+fileInput.onchange = async () => {
+  const f = fileInput.files && fileInput.files[0];
+  fileInput.value = "";
+  if (!f) return;
+  if (f.size > 200_000) { alert("File too large (200KB max for text attachments)"); return; }
+  try {
+    const text = await f.text();
+    if (!text.trim()) { alert("That file has no readable text"); return; }
+    pendingAttachment = { name: f.name, content: text.slice(0, 3000) };
+    renderAttachChips();
+  } catch (e) { alert("Could not read that file"); }
+};
+document.getElementById("landingAttach").onclick = () => fileInput.click();
+document.getElementById("followupAttach").onclick = () => fileInput.click();
+function consumeAttachment(query) {
+  if (!pendingAttachment) return query;
+  const att = pendingAttachment;
+  pendingAttachment = null;
+  renderAttachChips();
+  return query + "\n\n[Attached file: " + att.name + "]\n\"\"\"\n" + att.content + "\n\"\"\"";
+}
+
 // ============ SIDEBAR ============
 const sidebar = document.getElementById("sidebar");
 const expandSidebar = document.getElementById("expandSidebar");
@@ -1090,7 +1178,14 @@ function saveThreads() {
 function renderThreads() {
   const container = document.getElementById("threadItems");
   container.innerHTML = "";
-  threads.forEach(t => {
+  // v62: live search over titles AND message content (client-side — all
+  // synced threads are local; the server list merges in on login)
+  const q = (document.getElementById("threadSearch")?.value || "").trim().toLowerCase();
+  const visible = !q ? threads : threads.filter(t =>
+    t.title.toLowerCase().includes(q) ||
+    (t.messages || []).some(m => String(m.content || "").toLowerCase().includes(q))
+  );
+  visible.forEach(t => {
     const div = document.createElement("div");
     div.className = "thread-item" + (t.id === currentThreadId ? " active" : "");
     div.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
@@ -1426,10 +1521,13 @@ async function performSearch(query) {
   }
   
   const purpose = document.getElementById("modelSel").value;
+  // v62: the attachment (if any) is spliced into the outgoing MESSAGE only —
+  // thread titles and rendered question headers stay clean
+  const fullQuery = consumeAttachment(query);
   // Send the full conversation history so follow-ups keep context
   const history = [
     ...thread.messages.map(m => ({ role: m.role, content: m.content })),
-    { role: "user", content: query },
+    { role: "user", content: fullQuery },
   ];
   
   try {
@@ -1448,7 +1546,7 @@ async function performSearch(query) {
       const sources = extractSources(answerClean);
       const related = generateRelated(query, answer);
       renderAnswer(content, answerClean, sources, related);
-      thread.messages.push({ role: "user", content: query });
+      thread.messages.push({ role: "user", content: fullQuery });
       thread.messages.push({ role: "assistant", content: answerClean, sources, related });
       saveThreads();
       renderThreads();
