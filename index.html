@@ -1048,14 +1048,16 @@ document.getElementById("deepResearchToggle").onclick = () => {
 // ============ THREAD SEARCH (v62) ============
 document.getElementById("threadSearch").addEventListener("input", () => renderThreads());
 
-// ============ FILE ATTACHMENTS (v62) ============
-// Text files (txt, md, csv, json) attach to the next question; the content is
-// spliced into the message (capped at 3,000 chars — the gateway's per-message
-// cap is 4,000) so the model reads the actual file alongside the question.
-let pendingAttachment = null;
+// ============ FILE ATTACHMENTS (v62/v63) ============
+// Three kinds: plain text (content spliced into the message), PDF (text
+// extracted client-side with pdf.js, then spliced), and images (sent as a
+// base64 data URI on the request's `attachment` field — the gateway's
+// Perplexity vision lane analyzes them; the image itself never enters the
+// thread history or the writing agents).
+let pendingAttachment = null; // {kind:"text"|"pdf", name, content} | {kind:"image", name, dataUrl}
 const fileInput = document.createElement("input");
 fileInput.type = "file";
-fileInput.accept = ".txt,.md,.csv,.json,.log,.ts,.js,.py,.sql,.yml,.yaml,.html,.css,text/*";
+fileInput.accept = ".txt,.md,.csv,.json,.log,.ts,.js,.py,.sql,.yml,.yaml,.html,.css,text/*,.pdf,image/png,image/jpeg,image/webp,image/gif";
 fileInput.style.display = "none";
 document.body.appendChild(fileInput);
 function renderAttachChips() {
@@ -1067,7 +1069,9 @@ function renderAttachChips() {
     const chip = document.createElement("div");
     chip.className = "attach-chip";
     const name = document.createElement("span");
-    name.textContent = pendingAttachment.name + " (" + pendingAttachment.content.length + " chars)";
+    name.textContent = pendingAttachment.kind === "image"
+      ? "🖼 " + pendingAttachment.name + " (image)"
+      : pendingAttachment.name + " (" + pendingAttachment.content.length + " chars)";
     const x = document.createElement("button");
     x.textContent = "×";
     x.title = "Remove attachment";
@@ -1076,26 +1080,75 @@ function renderAttachChips() {
     el.appendChild(chip);
   }
 }
+function fileToDataUrl(f) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+}
+// Normalize images before they hit the request: downscale anything over 1568px,
+// and UPSCALE anything under 256px on its short side (the vision API rejects
+// tiny images), re-encoding through canvas so the payload is always standard.
+async function prepareImage(f) {
+  const dataUrl = await fileToDataUrl(f);
+  const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = dataUrl; });
+  const MAX = 1568, MIN = 256;
+  let w = img.width, h = img.height;
+  const big = Math.max(w, h);
+  if (big > MAX) { const s = MAX / big; w = Math.round(w * s); h = Math.round(h * s); }
+  if (Math.min(w, h) < MIN) { const s = MIN / Math.min(w, h); w = Math.round(w * s); h = Math.round(h * s); }
+  if (w === img.width && h === img.height && dataUrl.length <= 2_800_000) return dataUrl;
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, w); c.height = Math.max(1, h);
+  c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL(f.type === "image/png" ? "image/png" : "image/jpeg", 0.85);
+}
+// pdf.js loads lazily from CDN, only when a PDF is actually attached.
+let pdfjsLibP = null;
+function getPdfjs() {
+  if (!pdfjsLibP) pdfjsLibP = import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs").then(m => {
+    m.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+    return m;
+  });
+  return pdfjsLibP;
+}
+async function extractPdfText(f) {
+  const pdfjs = await getPdfjs();
+  const doc = await pdfjs.getDocument({ data: await f.arrayBuffer() }).promise;
+  let text = "";
+  const pages = Math.min(doc.numPages, 6); // first 6 pages, capped at 3,000 chars
+  for (let p = 1; p <= pages && text.length < 3000; p++) {
+    const page = await doc.getPage(p);
+    const tc = await page.getTextContent();
+    text += tc.items.map(it => it.str).join(" ").replace(/\s+/g, " ").trim() + "\n\n";
+  }
+  return text.slice(0, 3000);
+}
 fileInput.onchange = async () => {
   const f = fileInput.files && fileInput.files[0];
   fileInput.value = "";
   if (!f) return;
-  if (f.size > 200_000) { alert("File too large (200KB max for text attachments)"); return; }
   try {
-    const text = await f.text();
-    if (!text.trim()) { alert("That file has no readable text"); return; }
-    pendingAttachment = { name: f.name, content: text.slice(0, 3000) };
+    if (/^image\/(png|jpeg|webp|gif)$/.test(f.type)) {
+      if (f.size > 10_000_000) { alert("Image too large (10MB max)"); return; }
+      pendingAttachment = { kind: "image", name: f.name, dataUrl: await prepareImage(f) };
+    } else if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) {
+      const text = await extractPdfText(f);
+      if (!text.trim()) { alert("That PDF has no extractable text (likely a scan) — images of pages aren't supported yet"); return; }
+      pendingAttachment = { kind: "pdf", name: f.name, content: text };
+    } else {
+      if (f.size > 200_000) { alert("File too large (200KB max for text attachments)"); return; }
+      const text = await f.text();
+      if (!text.trim()) { alert("That file has no readable text"); return; }
+      pendingAttachment = { kind: "text", name: f.name, content: text.slice(0, 3000) };
+    }
     renderAttachChips();
   } catch (e) { alert("Could not read that file"); }
 };
 document.getElementById("landingAttach").onclick = () => fileInput.click();
 document.getElementById("followupAttach").onclick = () => fileInput.click();
-function consumeAttachment(query) {
-  if (!pendingAttachment) return query;
+function takeAttachment() {
   const att = pendingAttachment;
   pendingAttachment = null;
   renderAttachChips();
-  return query + "\n\n[Attached file: " + att.name + "]\n\"\"\"\n" + att.content + "\n\"\"\"";
+  return att;
 }
 
 // ============ SIDEBAR ============
@@ -1521,9 +1574,20 @@ async function performSearch(query) {
   }
   
   const purpose = document.getElementById("modelSel").value;
-  // v62: the attachment (if any) is spliced into the outgoing MESSAGE only —
-  // thread titles and rendered question headers stay clean
-  const fullQuery = consumeAttachment(query);
+  // v63: text/PDF attachments splice into the outgoing message; image
+  // attachments ride the request's `attachment` field to the gateway's
+  // vision lane (never into the thread text or the message cap).
+  const att = takeAttachment();
+  let fullQuery = query;
+  let attachmentBody = null;
+  if (att) {
+    if (att.kind === "image") {
+      fullQuery = query + "\n\n[Attached image: " + att.name + "]";
+      attachmentBody = { type: "image", data_url: att.dataUrl, name: att.name };
+    } else {
+      fullQuery = query + "\n\n[Attached file: " + att.name + "]\n\"\"\"\n" + att.content + "\n\"\"\"";
+    }
+  }
   // Send the full conversation history so follow-ups keep context
   const history = [
     ...thread.messages.map(m => ({ role: m.role, content: m.content })),
@@ -1577,7 +1641,7 @@ async function performSearch(query) {
       const submit = await fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(attachmentBody ? { attachment: attachmentBody } : {}) }),
       });
       const sub = await submit.json();
       if (!submit.ok || !sub?.deep_research_id) throw new Error(sub?.error ?? "Deep research submit failed");
@@ -1600,7 +1664,7 @@ async function performSearch(query) {
       const res = await fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...(attachmentBody ? { attachment: attachmentBody } : {}) }),
       });
       if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
       if (!res.ok) {
