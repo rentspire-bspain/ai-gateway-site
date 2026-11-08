@@ -715,6 +715,8 @@ a { color: inherit; text-decoration: none; }
 [data-width="full"] .followup-inner { max-width: 100%; }
 .width-toggle { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 12.5px; }
 .width-toggle:hover { color: var(--text); }
+.width-toggle.active { color: var(--accent); }
+.width-toggle.active svg { stroke: var(--accent); }
 .followup-box {
   display: flex;
   align-items: center;
@@ -849,6 +851,10 @@ a { color: inherit; text-decoration: none; }
           <option value="flint">Flint v1.0</option>
           <option value="summary">Qwen3.8-27B</option>
         </select>
+        <button class="width-toggle" id="deepResearchToggle" title="Deep Research: minutes-long expert-grade reports (high effort, many sources)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
+          <span id="deepResearchLabel">Research</span>
+        </button>
         <button class="width-toggle" id="widthToggle" title="Adjust answer width">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
           <span id="widthLabel">Default</span>
@@ -994,6 +1000,16 @@ const applyWidth = () => {
 document.getElementById("widthToggle").onclick = () => { widthIdx = (widthIdx + 1) % WIDTH_MODES.length; applyWidth(); };
 applyWidth();
 
+// Deep Research toggle (v61): when active, questions submit a background
+// Agent API run at high effort (minutes-long, expert-grade) and the UI polls
+// until the report is ready. The monthly spend cap applies server-side.
+let deepResearchOn = false;
+document.getElementById("deepResearchToggle").onclick = () => {
+  deepResearchOn = !deepResearchOn;
+  document.getElementById("deepResearchToggle").classList.toggle("active", deepResearchOn);
+  document.getElementById("deepResearchLabel").textContent = deepResearchOn ? "Deep" : "Research";
+};
+
 // ============ SIDEBAR ============
 const sidebar = document.getElementById("sidebar");
 const expandSidebar = document.getElementById("expandSidebar");
@@ -1007,7 +1023,70 @@ expandSidebar.onclick = () => {
 };
 
 // ============ THREAD MANAGEMENT ============
-function saveThreads() { localStorage.setItem("ai_threads", JSON.stringify(threads)); }
+// ============ SERVER-SIDE THREAD SYNC (v61) ============
+// Threads are persisted to the account's own database (threads +
+// thread_messages tables, RLS: user-owned) with localStorage as the offline
+// cache. On login the server list is merged in (server rows win for shared
+// ids; local-only threads are pushed up); every save mirrors the current
+// thread to the server so conversations survive browser changes and devices.
+let threadsSynced = false;
+async function pushThreadToServer(t) {
+  if (!t || !currentUser) return;
+  try {
+    await sb.from("threads").upsert({ id: t.id, title: t.title, user_id: currentUser.id });
+  } catch (e) { /* offline-tolerant: localStorage still has it */ }
+}
+async function pushThreadMessages(t) {
+  if (!t || !currentUser) return;
+  try {
+    await sb.from("thread_messages").delete().eq("thread_id", t.id);
+    const rows = t.messages.map(m => ({ thread_id: t.id, role: m.role, content: m.content, sources: m.sources || null, related: m.related || null }));
+    if (rows.length) await sb.from("thread_messages").insert(rows);
+    await sb.from("threads").update({ updated_at: new Date().toISOString() }).eq("id", t.id);
+  } catch (e) { /* offline-tolerant */ }
+}
+async function syncThreadsFromServer() {
+  if (!currentUser || threadsSynced) return;
+  threadsSynced = true;
+  try {
+    const { data: remote, error } = await sb.from("threads").select("id,title,updated_at").order("updated_at", { ascending: false }).limit(50);
+    if (error) return;
+    const remoteIds = new Set((remote || []).map(r => r.id));
+    // load remote messages for threads we don't have locally cached
+    const byId = new Map(threads.map(t => [t.id, t]));
+    for (const rt of (remote || [])) {
+      const local = byId.get(rt.id);
+      if (local && local.messages.length) continue; // local cache is richer
+      const { data: msgs } = await sb.from("thread_messages").select("role,content,sources,related").eq("thread_id", rt.id).order("created_at", { ascending: true });
+      byId.set(rt.id, { id: rt.id, title: rt.title, messages: (msgs || []).map(m => ({ role: m.role, content: m.content, sources: m.sources, related: m.related })) });
+    }
+    threads = [...byId.values()];
+    // push local-only threads up to the server (one-time migration).
+    // Threads created before v61 have numeric (non-uuid) ids — re-key them
+    // with fresh UUIDs so the server accepts them, updating local references.
+    for (const t of threads) {
+      if (!remoteIds.has(t.id) && t.messages.length) {
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(t.id))) {
+          const oldId = t.id;
+          t.id = crypto.randomUUID();
+          if (currentThreadId === oldId) currentThreadId = t.id;
+        }
+        await pushThreadToServer(t);
+        await pushThreadMessages(t);
+      }
+    }
+    saveThreads();
+    renderThreads();
+  } catch (e) { /* offline-tolerant */ }
+}
+function saveThreads() {
+  localStorage.setItem("ai_threads", JSON.stringify(threads));
+  // v61: mirror the current thread to the server (best-effort, non-blocking)
+  const cur = threads.find(t => t.id === currentThreadId);
+  if (cur && currentUser) {
+    pushThreadToServer(cur).then(() => pushThreadMessages(cur)).catch(() => {});
+  }
+}
 function renderThreads() {
   const container = document.getElementById("threadItems");
   container.innerHTML = "";
@@ -1028,7 +1107,8 @@ function newThread() {
   renderThreads();
 }
 function createThread(title) {
-  const thread = { id: Date.now().toString(), title, messages: [] };
+  // v61: UUID ids so threads sync to the server-side threads table
+  const thread = { id: (crypto.randomUUID ? crypto.randomUUID() : "t" + Date.now() + "-" + Math.random().toString(36).slice(2)), title, messages: [] };
   threads.unshift(thread);
   if (threads.length > 50) threads = threads.slice(0, 50);
   currentThreadId = thread.id;
@@ -1036,13 +1116,20 @@ function createThread(title) {
   renderThreads();
   return thread;
 }
-function loadThread(id) {
+async function loadThread(id) {
   const thread = threads.find(t => t.id === id);
   if (!thread) return;
   currentThreadId = id;
   showResults();
   renderThreads();
   document.getElementById("breadcrumb").textContent = thread.title;
+  // v61: if the local cache has no messages, pull them from the server
+  if (!thread.messages.length && currentUser) {
+    try {
+      const { data: msgs } = await sb.from("thread_messages").select("role,content,sources,related").eq("thread_id", id).order("created_at", { ascending: true });
+      thread.messages = (msgs || []).map(m => ({ role: m.role, content: m.content, sources: m.sources, related: m.related }));
+    } catch (e) { /* render whatever we have */ }
+  }
   const content = document.getElementById("resultsContent");
   content.innerHTML = "";
   thread.messages.forEach(m => {
@@ -1084,6 +1171,7 @@ async function checkAuth() {
     currentUser = data.session.user;
     document.getElementById("userEmail").textContent = currentUser.email;
     document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
+    syncThreadsFromServer(); // v61: merge server threads once per login
     return true;
   }
   return false;
@@ -1346,47 +1434,113 @@ async function performSearch(query) {
   
   try {
     const { data: s } = await sb.auth.getSession();
-    const res = await fetch(GATEWAY + "/gateway-chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-      body: JSON.stringify({ messages: history, purpose, max_tokens: 2048 }),
-    });
-    const data = await res.json();
-    if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
-    if (!res.ok) throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
-    const _msg = data?.choices?.[0]?.message ?? {};
-    // Never render raw reasoning/chain-of-thought — only the actual answer
-    const answer = _msg.content || "(no response from model — please try again)";
-    // Strip the model's own follow-ups section from the rendered answer
-    const fuMatch = answer.match(/\n?##\s*Suggested Follow-ups?[\s\S]*$/i);
-    const answerClean = fuMatch ? answer.slice(0, fuMatch.index).trim() : answer;
-    
-    // Clear searching state
-    clearInterval(interval);
-    content.innerHTML = "";
-    
-    // Render question
-    const q = document.createElement("div");
-    q.className = "question-header";
-    q.textContent = query;
-    content.appendChild(q);
-    
-    // Render answer with sources and related
-    const sources = extractSources(answerClean);
-    // Extract follow-ups from the ORIGINAL answer — the model's suggestions
-    // live in the section that answerClean strips out
-    const related = generateRelated(query, answer);
-    renderAnswer(content, answerClean, sources, related);
-    
-    // Save to thread
-    thread.messages.push({ role: "user", content: query });
-    thread.messages.push({ role: "assistant", content: answerClean, sources, related });
-    saveThreads();
-    renderThreads();
-    
-    // Scroll to top of results
-    document.getElementById("resultsScroll").scrollTop = 0;
-    
+
+    // Final render (shared by streaming, deep research, and fallback paths)
+    const renderFinal = (answer) => {
+      const fuMatch = answer.match(/\n?##\s*Suggested Follow-ups?[\s\S]*$/i);
+      const answerClean = fuMatch ? answer.slice(0, fuMatch.index).trim() : answer;
+      clearInterval(interval);
+      content.innerHTML = "";
+      const q = document.createElement("div");
+      q.className = "question-header";
+      q.textContent = query;
+      content.appendChild(q);
+      const sources = extractSources(answerClean);
+      const related = generateRelated(query, answer);
+      renderAnswer(content, answerClean, sources, related);
+      thread.messages.push({ role: "user", content: query });
+      thread.messages.push({ role: "assistant", content: answerClean, sources, related });
+      saveThreads();
+      renderThreads();
+      document.getElementById("resultsScroll").scrollTop = 0;
+    };
+    // Live partial render during streaming (throttled)
+    let lastRender = 0;
+    const renderLive = (full) => {
+      const now = Date.now();
+      if (now - lastRender < 120) return;
+      lastRender = now;
+      const fuMatch = full.match(/\n?##\s*Suggested Follow-ups?[\s\S]*$/i);
+      const partial = (fuMatch ? full.slice(0, fuMatch.index).trim() : full).trim();
+      if (!partial) return;
+      clearInterval(interval);
+      content.innerHTML = "";
+      const q = document.createElement("div");
+      q.className = "question-header";
+      q.textContent = query;
+      content.appendChild(q);
+      renderAnswer(content, partial, extractSources(partial), []);
+    };
+
+    if (deepResearchOn) {
+      // DEEP RESEARCH MODE: submit a background Agent API run (high effort,
+      // minutes-long), then poll until the report is ready. The searching
+      // indicator stays live the whole time.
+      const submit = await fetch(GATEWAY + "/gateway-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true }),
+      });
+      const sub = await submit.json();
+      if (!submit.ok || !sub?.deep_research_id) throw new Error(sub?.error ?? "Deep research submit failed");
+      const started = Date.now();
+      while (true) {
+        await new Promise(r => setTimeout(r, 5000));
+        const pr = await fetch(GATEWAY + "/gateway-chat?deep_research_id=" + encodeURIComponent(sub.deep_research_id), {
+          headers: { "Authorization": "Bearer " + s.session.access_token },
+        });
+        const p = await pr.json();
+        if (p.status === "completed" && p.answer) { renderFinal(p.answer); break; }
+        if (p.error) throw new Error(p.error);
+        if (Date.now() - started > 15 * 60 * 1000) throw new Error("Deep research timed out after 15 minutes");
+      }
+
+    } else {
+      // STREAMING: the server pipes the model's SSE with linked citations
+      // (v58+); render tokens live. Falls back to the non-streaming path
+      // whenever the response is not an SSE stream.
+      const res = await fetch(GATEWAY + "/gateway-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true }),
+      });
+      if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
+      if (!res.ok) {
+        let data = {};
+        try { data = await res.json(); } catch {}
+        throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
+      }
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("text/event-stream") && res.body) {
+        const reader = res.body.getReader();
+        const dec = new TextDecoder();
+        let buf = "", full = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          const lines = buf.split("\n");
+          buf = lines.pop() || ""; // keep the trailing partial line for the next chunk
+          for (const line of lines) {
+            if (!line.startsWith("data:")) continue;
+            const payload = line.slice(5).trim();
+            if (payload === "[DONE]") continue;
+            try {
+              const evt = JSON.parse(payload);
+              const delta = evt?.choices?.[0]?.delta?.content;
+              if (delta) full += delta;
+            } catch {}
+          }
+          renderLive(full);
+        }
+        renderFinal(full || "(no response from model — please try again)");
+      } else {
+        const data = await res.json();
+        const _msg = data?.choices?.[0]?.message ?? {};
+        renderFinal(_msg.content || "(no response from model — please try again)");
+      }
+    }
+
   } catch (e) {
     clearInterval(interval);
     content.innerHTML = "";
