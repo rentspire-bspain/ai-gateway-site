@@ -6,13 +6,15 @@
 #docsRoot *{box-sizing:border-box}
 #docsRoot button{font-family:inherit;color:inherit;cursor:pointer}
 .dx-header{padding:16px 24px 12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:12px}
-.dx-top{display:flex;align-items:center;gap:12px}
+.dx-header{max-width:100%;overflow-x:hidden}
+.dx-top{display:flex;align-items:center;gap:12px;max-width:100%;min-width:0;overflow:hidden}
+.dx-top>*{max-width:100%}
 .dx-title{font-size:21px;font-weight:600;margin:0;flex:0 0 auto;display:flex;align-items:center;gap:10px}
 .dx-title .dx-book{color:var(--accent)}
-.dx-search{flex:1;max-width:520px;display:flex;align-items:center;gap:8px;background:var(--bg-input,var(--bg-surface));border:1px solid var(--border-light,var(--border));border-radius:var(--radius);padding:0 12px;height:38px;color:var(--text-muted)}
+.dx-search{flex:1 1 0;min-width:0;max-width:520px;display:flex;align-items:center;gap:8px;background:var(--bg-input,var(--bg-surface));border:1px solid var(--border-light,var(--border));border-radius:var(--radius);padding:0 12px;height:38px;color:var(--text-muted)}
 .dx-search:focus-within{border-color:var(--accent)}
 .dx-search input{flex:1;background:none;border:0;outline:0;color:var(--text);font:inherit;font-size:14px;min-width:0}
-.dx-close{width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid transparent;border-radius:var(--radius-sm,var(--radius));color:var(--text-muted);font-size:20px;line-height:1}
+.dx-close{flex:0 0 36px;width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid transparent;border-radius:var(--radius-sm,var(--radius));color:var(--text-muted);font-size:20px;line-height:1}
 .dx-close:hover{background:var(--bg-elevated);color:var(--text)}
 .dx-tabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .dx-tab{background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:7px 16px;font-size:13.5px;color:var(--text-muted)}
@@ -21,18 +23,18 @@
 .dx-tab .n{font-size:11px;opacity:.7;margin-left:5px}
 .dx-body{flex:1;display:flex;min-height:0}
 .dx-list{width:330px;flex:0 0 330px;border-right:1px solid var(--border);overflow-y:auto;padding:10px 10px 40px}
-.dx-list .dx-count{font-size:12px;color:var(--text-faint,var(--text-muted));padding:6px 8px 10px}
+.dx-list .dx-count{font-size:12px;color:var(--text-muted);padding:6px 8px 10px}
 .dx-item{display:block;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:var(--radius-sm,var(--radius));padding:9px 12px;font-size:13.5px;line-height:1.4;color:var(--text);word-break:break-word}
 .dx-item:hover{background:var(--bg-elevated)}
 .dx-item.active{background:var(--bg-surface);border-color:var(--accent);color:var(--accent-hover,var(--accent));font-weight:500}
-.dx-item .u{display:block;font-size:11px;color:var(--text-faint,var(--text-muted));margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dx-item .u{display:block;font-size:11px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dx-empty{padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13.5px}
 .dx-reader{flex:1;overflow-y:auto;min-width:0}
 .dx-reader-inner{max-width:860px;margin:0 auto;padding:28px 36px 80px}
 .dx-reader .dx-back{display:none;margin-bottom:14px}
 .dx-page-head{border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:22px}
 .dx-page-head h1{margin:0 0 6px;font-size:26px;line-height:1.25;font-weight:650}
-.dx-page-head .dx-src{font-size:12.5px;color:var(--text-faint,var(--text-muted))}
+.dx-page-head .dx-src{font-size:12.5px;color:var(--text-muted)}
 .dx-page-head .dx-src a{color:var(--accent);text-decoration:none}
 .dx-page-head .dx-src a:hover{text-decoration:underline}
 /* markdown rendering */
@@ -68,7 +70,11 @@
 .dx-mobile-only{display:none}
 @media (max-width:760px){
   .dx-header{padding:12px 14px}
-  .dx-title{font-size:17px}
+  .dx-title{font-size:17px;flex:0 1 auto;min-width:0;white-space:nowrap}
+  .dx-title .dx-book{display:none}
+  .dx-top{gap:8px}
+  .dx-tab{min-height:40px}
+  .dx-close{flex:0 0 40px;width:40px;height:40px}
   .dx-tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}
   .dx-list{width:100%;flex:1 1 auto;border-right:0}
   .dx-reader{display:none}

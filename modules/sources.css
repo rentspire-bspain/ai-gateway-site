@@ -1,0 +1,132 @@
+/* sources.css — Sources picker pill + dropdown (Wave 2, B4/B6/B7).
+   The pill rides the composer pill row (.composer-pills) next to the
+   deepResearchToggle pill; the menu is fixed-positioned off the pill. */
+
+/* ---------- pill ---------- */
+/* inherits the .width-toggle pill look from the composer pill row */
+.composer-pills .sources-pill { max-width: 100%; min-width: 0; flex: 0 1 auto; }
+.sources-pill .sources-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sources-pill .sources-caret { color: var(--text-faint); flex-shrink: 0; transition: transform 0.15s ease; }
+.sources-pill[aria-expanded="true"] { color: var(--text); border-color: var(--border-light); }
+.sources-pill[aria-expanded="true"] .sources-caret { transform: rotate(180deg); color: var(--text); }
+
+/* ---------- scrim + menu ---------- */
+.sources-scrim { position: fixed; inset: 0; z-index: 319; background: transparent; }
+.sources-menu {
+  position: fixed;
+  z-index: 320;
+  background: var(--bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  padding: 6px;
+  width: 280px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  font-family: var(--font-sans);
+  color: var(--text);
+}
+.sources-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 6px 10px 4px;
+}
+
+/* checkbox rows (Web / Academic / Finance / Files) */
+.sources-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  min-height: 40px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  color: var(--text);
+}
+.sources-item:hover,
+.sources-item:focus-visible { background: var(--bg-elevated); outline: none; }
+.sources-item-main { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
+.sources-item em { font-style: normal; font-size: 11.5px; color: var(--text-faint); }
+.sources-box {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border-light);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.sources-box svg { opacity: 0; }
+.sources-item[aria-checked="true"] .sources-box { background: var(--accent-btn); border-color: var(--accent-btn); }
+.sources-item[aria-checked="true"] .sources-box svg { opacity: 1; }
+
+.sources-sep { height: 1px; background: var(--border); margin: 4px 2px; }
+
+/* time-range submenu (shown when Academic or Finance is on) */
+.sources-range-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 6px 10px 4px;
+}
+.sources-range-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  min-height: 40px;
+  padding: 8px 10px 8px 38px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-muted);
+  position: relative;
+}
+.sources-range-item:hover,
+.sources-range-item:focus-visible { background: var(--bg-elevated); outline: none; color: var(--text); }
+.sources-range-item.selected { color: var(--accent); font-weight: 500; }
+.sources-range-item.selected::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* hint when every source is off */
+.sources-hint { font-size: 11.5px; color: var(--text-faint); padding: 8px 10px 4px; line-height: 1.45; }
+
+/* ---------- mobile ---------- */
+/* collapse into the composer's existing pill row; 40px touch targets */
+@media (max-width: 768px) {
+  .composer-pills .sources-pill { min-height: 40px; flex: 0 1 auto; }
+}
+/* narrow phones: the menu becomes a bottom sheet, 44px touch targets */
+@media (max-width: 480px) {
+  .sources-scrim { background: rgba(0, 0, 0, 0.35); }
+  .sources-menu {
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    top: auto !important;
+    bottom: 12px !important;
+  }
+  .sources-item,
+  .sources-range-item { min-height: 44px; }
+}

@@ -1,0 +1,13 @@
+.ec-card{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid var(--border-light);background:var(--bg-elevated);border-radius:var(--radius-sm);padding:10px 14px;margin:0 0 10px;font-family:var(--font-sans);color:var(--text)}
+.ec-main{display:flex;flex-direction:column;min-width:0}
+.ec-top{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted)}
+.ec-sym{font-weight:700;color:var(--text);font-size:14px}
+.ec-live{font-size:10px;font-weight:700;letter-spacing:.06em;padding:1px 6px;border-radius:999px;background:var(--accent-light);color:var(--citation-text)}
+.ec-price{font-size:22px;font-weight:600;line-height:1.2}
+.ec-chg{font-size:13px;font-weight:600}
+.ec-up{color:#3FB950}.ec-down{color:var(--error)}
+.ec-spark{margin-left:auto;width:96px;height:32px;flex:none}
+.ec-spark polyline{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linejoin:round;stroke-linecap:round}
+.ec-sub{font-size:13px;color:var(--text-muted)}
+.ec-icon{font-size:28px;line-height:1}
+@media(max-width:600px){.ec-spark{width:72px}}

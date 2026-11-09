@@ -362,6 +362,7 @@
   function open(vendor) {
     if (vendor && VENDORS.some(function (v) { return v.key === vendor; })) state.vendor = vendor;
     ensureRoot();
+    if (!state.root.classList.contains("open")) state.prevFocus = document.activeElement;
     state.root.classList.add("open");
     document.addEventListener("keydown", onEsc, true);
     renderTabs();
@@ -369,6 +370,10 @@
     setTimeout(function () {
       var inp = state.root.querySelector(".dx-search input");
       if (inp && window.innerWidth > 760) inp.focus();
+      else {
+        var t = state.root.querySelector(".dx-close");
+        if (t) t.focus();
+      }
     }, 0);
   }
 
@@ -376,6 +381,8 @@
     if (!state.root) return;
     state.root.classList.remove("open", "showing-page");
     document.removeEventListener("keydown", onEsc, true);
+    var pf = state.prevFocus; state.prevFocus = null;
+    if (pf && pf.focus && document.body.contains(pf)) { try { pf.focus(); } catch (e) {} }
   }
 
   window.DocsUI = { open: open, close: close };
