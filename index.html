@@ -369,6 +369,31 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   transition: background 0.15s ease;
 }
 .user-row:hover { background: var(--bg-elevated); }
+.user-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* v74: account menu (popover above the user row; compact bottom sheet on phones) */
+.account-scrim { position: fixed; inset: 0; z-index: 319; background: transparent; }
+.account-menu {
+  position: fixed; z-index: 320; background: var(--bg); border: 1px solid var(--border-light);
+  border-radius: var(--radius); box-shadow: 0 12px 40px rgba(0,0,0,0.25); padding: 6px;
+  max-height: calc(100dvh - 24px); overflow-y: auto; font-family: var(--font-sans); color: var(--text);
+}
+.account-head { display: flex; align-items: center; gap: 10px; padding: 8px 8px 10px; min-width: 0; }
+.account-id { min-width: 0; flex: 1; }
+.account-email { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-sep { height: 1px; background: var(--border); margin: 4px 2px; }
+.account-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  padding: 9px 10px; min-height: 40px; border-radius: var(--radius-sm); font-size: 13.5px; color: var(--text);
+}
+.account-item svg { color: var(--text-muted); flex-shrink: 0; }
+.account-item span { flex: 1; min-width: 0; }
+.account-item em { font-style: normal; font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
+.account-item:hover, .account-item:focus-visible { background: var(--bg-elevated); outline: none; }
+.account-item.danger, .account-item.danger svg { color: var(--error); }
+@media (max-width: 480px) {
+  .account-scrim { background: rgba(0,0,0,0.35); }
+  .account-item { min-height: 44px; }
+}
 .user-avatar {
   width: 28px;
   height: 28px;
@@ -728,9 +753,9 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .answer-content {
   overflow-wrap: anywhere;
   min-width: 0;
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 16px;
-  line-height: 1.75;
+  line-height: 1.7;
   color: var(--text);
 }
 .answer-content p { margin-bottom: 14px; }
@@ -739,13 +764,22 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .answer-content strong { font-weight: 600; }
 .answer-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 6px 0; }
 .answer-content pre { overflow-x: auto; max-width: 100%; }
-.answer-content table { display: block; overflow-x: auto; max-width: 100%; }
+.answer-content table { display: table; width: 100%; max-width: none; }
+.answer-content .table-wrap { overflow-x: auto; max-width: 100%; margin: 0 0 14px; -webkit-overflow-scrolling: touch; }
+.answer-content .table-wrap > table { margin: 0; }
 .answer-content code {
-  font-family: "SF Mono", "Fira Code", monospace;
-  font-size: 14px;
+  font-family: ui-monospace, "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+  font-size: 0.875em;
+  line-height: 1.2;
   background: var(--citation-bg);
-  padding: 2px 6px;
+  padding: 0.08em 0.25em;
+  margin: 0;
   border-radius: 4px;
+  vertical-align: baseline;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 .answer-content pre {
   background: var(--bg-elevated);
@@ -758,9 +792,9 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   font-size: 13px;
   line-height: 1.5;
 }
-.answer-content pre code { background: none; padding: 0; }
+.answer-content pre code { background: none; padding: 0; font-size: inherit; line-height: inherit; white-space: pre; overflow-wrap: normal; }
 .answer-content table { border-collapse: collapse; width: 100%; margin: 0 0 14px 0; font-size: 14px; }
-.answer-content th, .answer-content td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+.answer-content th, .answer-content td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; overflow-wrap: break-word; }
 .answer-content th { background: var(--bg-elevated); font-weight: 600; }
 .answer-content h1, .answer-content h2, .answer-content h3, .answer-content h4 { margin: 18px 0 10px 0; font-weight: 600; }
 .answer-content h1 { font-size: 20px; } .answer-content h2 { font-size: 18px; } .answer-content h3 { font-size: 16px; } .answer-content h4 { font-size: 15px; }
@@ -792,13 +826,17 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 /* Answer actions */
 .answer-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+  gap: 4px;
+  margin-top: 4px;
   flex-wrap: wrap;
 }
+/* spacing between conversation turns (a question after an answer) */
+.answer-section + .related-section + .question-header,
+.answer-section + .question-header { margin-top: 28px; }
 .action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -824,6 +862,9 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .related-item {
   display: flex;
   align-items: center;
+  text-align: left;
+  max-width: 100%;
+  line-height: 1.4;
   gap: 8px;
   padding: 7px 14px;
   background: var(--bg-surface);
@@ -1022,6 +1063,28 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .status-dot.warn { background: #F59E0B; }
 .status-dot.err { background: var(--error); }
 
+/* Error / empty-answer card */
+.answer-error {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px; margin: 4px 0 16px;
+  background: color-mix(in srgb, var(--error) 7%, var(--bg-surface));
+  border: 1px solid color-mix(in srgb, var(--error) 28%, transparent);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+}
+.answer-error-icon { color: var(--error); flex-shrink: 0; margin-top: 1px; }
+.answer-error-body { min-width: 0; flex: 1; }
+.answer-error-title { font-size: 14.5px; font-weight: 600; color: var(--text); line-height: 1.4; }
+.answer-error-detail { font-size: 13.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.5; overflow-wrap: anywhere; }
+.answer-error-retry {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+  padding: 7px 14px; min-height: 36px; border-radius: 999px; cursor: pointer;
+  background: var(--accent); color: #fff; border: none; font-size: 13px; font-weight: 600;
+  transition: background 0.15s ease;
+}
+.answer-error-retry:hover { background: var(--accent-hover); }
+.answer-error-retry:disabled { opacity: 0.6; cursor: default; }
+
 /* Responsive */
 @media (max-width: 768px) {
   .landing { padding: 24px 16px; }
@@ -1034,6 +1097,9 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   .main-header .width-toggle, .main-header .theme-toggle, .main-header .icon-btn { min-width: 40px; min-height: 40px; justify-content: center; padding: 6px; }
   .results-scroll { padding: 16px 16px calc(var(--followup-h, 120px) + 16px); }
   .searchbar-wrapper { padding: 12px 16px 0; }
+  /* v74: the pinned follow-up composer at the bottom makes the top mini search bar
+     redundant on phones — hide it instead of stacking two inputs on screen */
+  .searchbar-wrapper { display: none !important; }
   .followup-wrapper { padding: 12px 16px 16px; }
   .search-box { gap: 8px; padding: 12px 14px; }
   .followup-box { gap: 8px; padding: 8px 12px; }
@@ -1491,8 +1557,15 @@ function attachDrag(handle, opts) {
   if (window.ResizeObserver) {
     const ro = new ResizeObserver(place);
     [main, resultsInner, landingInner].forEach(el => el && ro.observe(el));
-    const ro2 = new ResizeObserver(() => layoutRoot.style.setProperty("--followup-h", Math.ceil(followupWrapper.offsetHeight || 120) + "px"));
-    ro2.observe(followupWrapper);
+    // v74: measure the FULL composer stack (input bar + attach chip + pills +
+    // model/Research row + wrapper padding) — border-box so padding changes count too
+    const syncFollowupH = () => layoutRoot.style.setProperty("--followup-h", Math.ceil(followupWrapper.offsetHeight || 120) + "px");
+    const ro2 = new ResizeObserver(syncFollowupH);
+    ro2.observe(followupWrapper, { box: "border-box" });
+    const fi = followupWrapper.querySelector(".followup-inner");
+    if (fi) ro2.observe(fi, { box: "border-box" });
+    window.addEventListener("resize", syncFollowupH);
+    window.addEventListener("load", syncFollowupH);
   }
   window.addEventListener("resize", place);
   window.addEventListener("load", place);
@@ -2067,6 +2140,7 @@ function speakAnswer(text) {
     // "?" — shortcut help
     if (e.key === "?" && !inInput) { e.preventDefault(); help.classList.add("open"); }
   });
+  window.openShortcutsHelp = () => help.classList.add("open"); // v74: used by the account menu
 })();
 function takeAttachment() {
   const att = pendingAttachment;
@@ -2239,17 +2313,7 @@ async function loadThread(id) {
     } catch (e) { /* render whatever we have */ }
   }
   const content = document.getElementById("resultsContent");
-  content.innerHTML = "";
-  thread.messages.forEach(m => {
-    if (m.role === "user") {
-      const q = document.createElement("div");
-      q.className = "question-header";
-      q.textContent = m.content;
-      content.appendChild(q);
-    } else {
-      renderAnswer(content, m.content, m.sources || [], m.related || []);
-    }
-  });
+  renderPriorTurns(content, thread, true);
 }
 document.getElementById("newThreadBtn").onclick = newThread;
 document.getElementById("newThreadIcon").onclick = newThread;
@@ -2275,11 +2339,14 @@ function positionComposerPills() {
   target.appendChild(document.getElementById("deepResearchToggle"));
 }
 function showResults() {
-  positionComposerPills();
   document.getElementById("landing").style.display = "none";
   document.getElementById("searchbarWrapper").style.display = "block";
   document.getElementById("resultsScroll").style.display = "block";
   document.getElementById("followupWrapper").style.display = "block";
+  // v74: relocate the Model / Research pills AFTER the landing is hidden — before,
+  // the first turn saw the landing as still visible and left the pills there, so
+  // the follow-up composer had no model row (and --followup-h under-measured it)
+  positionComposerPills();
 }
 
 // ============ AUTH ============
@@ -2308,15 +2375,98 @@ async function checkAuth() {
   }
   return false;
 }
-document.getElementById("userRow").onclick = async () => {
-  if (currentUser) {
-    await sb.auth.signOut();
-    currentUser = null;
-    location.reload();
-  } else {
-    authOverlay.style.display = "flex";
+// v74: the bottom-left user row opens an ACCOUNT MENU (it used to sign out on a
+// single click, which dumped the session on a misclick). Sign out is now the last,
+// explicit item in the menu.
+const accountMenu = (function () {
+  let menu = null, scrim = null;
+  const ICON = {
+    kbd: '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
+    imp: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/>',
+    sun: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
+    moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+    out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>'
+  };
+  const svg = (k) => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[k] + '</svg>';
+  function close() {
+    if (menu) menu.remove();
+    if (scrim) scrim.remove();
+    menu = scrim = null;
+    document.getElementById("userRow").setAttribute("aria-expanded", "false");
   }
-};
+  function place() {
+    if (!menu) return;
+    const row = document.getElementById("userRow").getBoundingClientRect();
+    const narrow = window.innerWidth <= 480;
+    if (narrow) { // compact bottom sheet
+      menu.style.left = "12px"; menu.style.right = "12px"; menu.style.width = "auto";
+      menu.style.bottom = "12px"; menu.style.top = "auto";
+      return;
+    }
+    const w = Math.min(280, window.innerWidth - 16);
+    menu.style.width = w + "px"; menu.style.right = "auto";
+    menu.style.left = Math.max(8, Math.min(row.left, window.innerWidth - w - 8)) + "px";
+    menu.style.top = "auto";
+    menu.style.bottom = Math.max(8, window.innerHeight - row.top + 6) + "px"; // opens ABOVE the row
+  }
+  function open() {
+    if (menu) return close();
+    const email = (currentUser && currentUser.email) || "";
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    scrim = document.createElement("div");
+    scrim.className = "account-scrim";
+    scrim.onclick = close;
+    menu = document.createElement("div");
+    menu.className = "account-menu";
+    menu.setAttribute("role", "menu");
+    menu.innerHTML =
+      '<div class="account-head"><div class="user-avatar"></div><div class="account-id"><div class="account-email"></div><div class="user-plan">Open-weight models</div></div></div>' +
+      '<div class="account-sep"></div>' +
+      '<button class="account-item" role="menuitem" data-act="kbd">' + svg("kbd") + '<span>Keyboard shortcuts</span></button>' +
+      '<button class="account-item" role="menuitem" data-act="imp">' + svg("imp") + '<span>Import Perplexity history</span></button>' +
+      '<button class="account-item" role="menuitem" data-act="theme">' + svg(dark ? "sun" : "moon") + '<span>Theme: ' + (dark ? "Dark" : "Light") + '</span><em>Switch to ' + (dark ? "light" : "dark") + '</em></button>' +
+      '<div class="account-sep"></div>' +
+      '<button class="account-item danger" role="menuitem" data-act="out">' + svg("out") + '<span>Sign out</span></button>';
+    menu.querySelector(".account-email").textContent = email;
+    menu.querySelector(".user-avatar").textContent = (email[0] || "?").toUpperCase();
+    menu.addEventListener("click", async (e) => {
+      const b = e.target.closest("[data-act]");
+      if (!b) return;
+      const act = b.dataset.act;
+      if (act === "theme") { themeToggle.click(); close(); return; }
+      close();
+      if (act === "kbd") { if (window.openShortcutsHelp) window.openShortcutsHelp(); }
+      else if (act === "imp") { document.getElementById("importHistoryBtn").click(); }
+      else if (act === "out") { await sb.auth.signOut(); currentUser = null; location.reload(); }
+    });
+    document.body.appendChild(scrim);
+    document.body.appendChild(menu);
+    place();
+    document.getElementById("userRow").setAttribute("aria-expanded", "true");
+    const first = menu.querySelector(".account-item");
+    if (first) first.focus();
+  }
+  document.addEventListener("keydown", (e) => {
+    if (!menu) return;
+    if (e.key === "Escape") { e.preventDefault(); close(); document.getElementById("userRow").focus(); return; }
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const items = [...menu.querySelectorAll(".account-item")];
+      const i = items.indexOf(document.activeElement);
+      items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus();
+    }
+  }, true);
+  window.addEventListener("resize", place);
+  return { open, close };
+})();
+(function () {
+  const row = document.getElementById("userRow");
+  row.setAttribute("role", "button"); row.tabIndex = 0;
+  row.setAttribute("aria-haspopup", "menu"); row.setAttribute("aria-expanded", "false");
+  const go = () => { if (currentUser) accountMenu.open(); else authOverlay.style.display = "flex"; };
+  row.onclick = go;
+  row.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
+})();
 // ---- PASSWORD SIGN-IN ----
 document.getElementById("authPasswordBtn").onclick = async () => {
   const err = document.getElementById("authError");
@@ -2326,7 +2476,7 @@ document.getElementById("authPasswordBtn").onclick = async () => {
   if (!email || !password) return err.textContent = "Enter your email and password.";
   if (!ALLOWED_EMAILS.includes(email.toLowerCase())) return err.textContent = "This site is private.";
   const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) return err.textContent = error.message;
+  if (error) { err.textContent = error.message; err.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   authOverlay.style.display = "none";
   location.reload();
 };
@@ -2357,7 +2507,16 @@ document.getElementById("authSendCode").onclick = async () => {
   if (!email) return err.textContent = "Enter your email";
   if (!ALLOWED_EMAILS.includes(email.toLowerCase())) return err.textContent = "This site is private.";
   const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-  if (error) return err.textContent = error.message;
+  if (error) {
+    // v74: friendly rate-limit message instead of Supabase's raw 429 text
+    const msg = String(error.message || "");
+    if (error.status === 429 || /rate limit|after \d+ seconds|too many/i.test(msg) || /over_email_send_rate_limit|over_request_rate_limit/i.test(String(error.code || ""))) {
+      const sec = (msg.match(/(\d+)\s*seconds?/i) || [])[1];
+      err.textContent = sec ? "Too many code requests — wait " + sec + " seconds and try once." : "Too many code requests — wait a minute and try once.";
+    } else err.textContent = msg;
+    err.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    return;
+  }
   document.getElementById("authStep1").style.display = "none";
   document.getElementById("authStep2").style.display = "block";
 };
@@ -2383,18 +2542,25 @@ const searchingSteps = ["Parsing query", "Searching sources", "Reading results",
 function cleanQuestionText(content) {
   return String(content || "").split("\n\n[Attached")[0];
 }
-function renderPriorTurns(content, thread) {
+// v74: follow-up suggestions belong below the LATEST answer only (Perplexity
+// shows them once, at the end of the thread) — never between turns, never above
+// a question. showRelatedForLast=false is used while a new question is in flight.
+function renderPriorTurns(content, thread, showRelatedForLast) {
   content.innerHTML = "";
-  for (const m of (thread.messages || [])) {
+  const msgs = thread.messages || [];
+  let lastAssistant = -1;
+  msgs.forEach((m, i) => { if (m.role !== "user") lastAssistant = i; });
+  msgs.forEach((m, i) => {
     if (m.role === "user") {
       const q = document.createElement("div");
       q.className = "question-header";
       q.textContent = cleanQuestionText(m.content);
       content.appendChild(q);
     } else {
-      renderAnswer(content, String(m.content || ""), m.sources || [], m.related || [], m.images || []);
+      const rel = (showRelatedForLast && i === lastAssistant) ? cleanRelated(m.related) : [];
+      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || []);
     }
-  }
+  });
 }
 function renderSearching(container, query) {
   // v65/v66: no fake timed checklist — the status shows the real current step.
@@ -2455,47 +2621,64 @@ function extractSources(text) {
   return urls;
 }
 
+// v74: one pattern strips the model's "Suggested Follow-ups" section from the
+// visible answer AND feeds the related pills (heading may be ##–####, bold, colon).
+const FOLLOWUP_SECTION_RE = /\n?[ \t]*#{2,4}[ \t]*\**[ \t]*Suggested[ \t]+Follow[- ]?ups?\b[^\n]*(?:\n[\s\S]*)?$/i;
+function splitFollowups(answer) {
+  const text = String(answer || "");
+  const m = text.match(FOLLOWUP_SECTION_RE);
+  if (!m) return { body: text.trim(), section: "" };
+  return { body: text.slice(0, m.index).trim(), section: text.slice(m.index) };
+}
+// Light cleanup only (the model's wording is used as-is): strip markdown
+// decoration, capitalise the first letter, cut at a WORD boundary if very long.
+function tidyFollowup(raw) {
+  let t = String(raw || "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/[*_`]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (t.length > 110) {
+    const cut = t.slice(0, 110);
+    const sp = cut.lastIndexOf(" ");
+    t = (sp > 40 ? cut.slice(0, sp) : cut).replace(/[\s,;:\-–—]+$/, "") + "…";
+  }
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
 function extractSuggestedFollowups(text) {
-  // Pull follow-ups the model generated in its "## Suggested Follow-ups" section
-  const m = (text || "").match(/##\s*Suggested Follow-ups?\s*\n([\s\S]*)$/i);
-  if (!m) return null;
-  const items = m[1].split(/\n+/)
-    .map(l => l.replace(/^[\s>*-]*/, "").replace(/^\d+[.)]\s*/, "").trim())
-    .filter(l => l.length > 8 && l.length < 140);
+  const { section } = splitFollowups(text);
+  if (!section) return null;
+  const items = section.replace(/^\s+/, "").split(/\n+/).slice(1)
+    .map(l => l.replace(/^[\s>*•-]*/, "").replace(/^\d+[.)]\s*/, "").trim())
+    .map(tidyFollowup)
+    .filter(l => l.length > 8 && l.length < 200);
   return items.length ? items.slice(0, 4) : null;
+}
+// Threads saved before v74 stored template pills that echoed the raw prompt
+// ("Can you go deeper on CONTEXT SHOULDN'T…"). Drop them when re-rendering.
+const LEGACY_RELATED_RE = /^(Can you go deeper on|What are the current status and gaps for|What should I do next about|What are the risks or blockers with|Why does .+ matter\?$|What is the most important thing to know about)/i;
+function cleanRelated(list) {
+  return (Array.isArray(list) ? list : []).filter(r => typeof r === "string" && r.trim() && !LEGACY_RELATED_RE.test(r.trim()));
 }
 
 function generateRelated(query, answer) {
-  // Prefer the model's own suggested follow-ups from the answer
+  // (a) the model's own suggested follow-ups win, used as written
   const suggested = extractSuggestedFollowups(answer);
   if (suggested) return suggested;
-
-  // Extract key topics (nouns/keywords) from the query for more contextual follow-ups
-  const clean = query.replace(/[?.!]+$/, "").trim();
-  const words = clean.split(/\s+/);
-  // Filter out common stop words to get the key topics
-  const stopWords = new Set(["what","how","is","are","the","a","an","in","on","with","my","our","i","you","we","they","this","that","these","those","it","its","of","for","to","and","or","but","not","can","could","should","would","do","does","did","have","has","had","will","was","were","be","been","being","get","got","make","made","need","needs","want","wants","who","when","where","why","which"]);
-  const topics = words.filter(w => !stopWords.has(w.toLowerCase()) && w.length > 3).slice(0, 4);
-
-  if (!topics.length) {
-    // Simple/short factual questions — curiosity follow-ups, not canned project jargon
-    return [
-      `Can you explain that more simply?`,
-      `What is the most important thing to know about ${clean}?`,
-      `Why does ${clean} matter?`,
-      `What are common misconceptions about ${clean}?`
-    ];
-  }
-  const topicStr = topics.join(" ");
+  // (b) fallback: clean, human questions that never echo the raw prompt (an
+  // ALL-CAPS or rambling prompt fragment pasted into a template reads as garbage)
   return [
-    `Can you go deeper on ${topicStr}?`,
-    `What are the current status and gaps for ${topicStr}?`,
-    `What should I do next about ${topicStr}?`,
-    `What are the risks or blockers with ${topicStr}?`
+    "Can you summarize this in a few key points?",
+    "What are the main risks or trade-offs here?",
+    "What should I do next?",
+    "Can you walk me through the exact steps?"
   ];
 }
 
 function renderAnswer(container, text, sources, related, images) {
+  // v74: an empty answer has no tabs / actions / suggestions — the caller shows
+  // an error card instead (tabs and actions are tied to answer presence).
+  if (!String(text || "").trim()) return;
   // Sources section
   if (sources && sources.length) {
     const sec = document.createElement("div");
@@ -2550,6 +2733,13 @@ function renderAnswer(container, text, sources, related, images) {
   } catch (e) {
     content.textContent = text;
   }
+  // v74: tables fill the answer column; the wrapper owns horizontal scroll
+  content.querySelectorAll("table").forEach(tbl => {
+    const w = document.createElement("div");
+    w.className = "table-wrap";
+    tbl.parentNode.insertBefore(w, tbl);
+    w.appendChild(tbl);
+  });
   ansSec.appendChild(content);
 
   // v66 carbon-copy: the answer tab row (Answer / Links / Images / Share) like
@@ -2623,14 +2813,10 @@ function renderAnswer(container, text, sources, related, images) {
     imagesPanel.style.display = "";
     [...tabs.querySelectorAll(".answer-tab")].forEach(b => b.classList.toggle("active", b === imagesTab));
   });
-  const shareTab = tabBtn("Share", async () => {
-    try { await navigator.clipboard.writeText(location.href); shareTab.textContent = "Copied"; setTimeout(() => shareTab.textContent = "Share", 1500); } catch {}
-  });
   answerTab.classList.add("active");
   tabs.appendChild(answerTab);
   tabs.appendChild(linksTab);
   tabs.appendChild(imagesTab);
-  tabs.appendChild(shareTab);
   linksPanel.style.display = "none";
   imagesPanel.style.display = "none";
   ansSec.appendChild(tabs);
@@ -2651,15 +2837,26 @@ function renderAnswer(container, text, sources, related, images) {
     </button>`;
   const copyBtn = actions.querySelector('[data-action="copy"]');
   copyBtn.onclick = () => {
-    navigator.clipboard.writeText(text);
+    try { navigator.clipboard.writeText(text); } catch {}
     copyBtn.classList.add("active");
     setTimeout(() => copyBtn.classList.remove("active"), 1500);
+  };
+  // v74: Share lives only here (the duplicate "Share" tab was removed) and now works
+  const shareBtn = actions.querySelector('[data-action="share"]');
+  shareBtn.onclick = async () => {
+    try {
+      if (navigator.share && window.matchMedia("(pointer: coarse)").matches) { await navigator.share({ title: document.title, url: location.href }); return; }
+      await navigator.clipboard.writeText(location.href);
+      shareBtn.classList.add("active");
+      setTimeout(() => shareBtn.classList.remove("active"), 1500);
+    } catch {}
   };
   ansSec.appendChild(actions);
   container.appendChild(ansSec);
 
   // Related questions
-  if (related && related.length) {
+  related = cleanRelated(related);
+  if (related.length) {
     const relSec = document.createElement("div");
     relSec.className = "related-section";
     relSec.innerHTML = '<div class="related-label">Related</div><div class="related-list"></div>';
@@ -2667,15 +2864,41 @@ function renderAnswer(container, text, sources, related, images) {
     related.forEach(r => {
       const item = document.createElement("div");
       item.className = "related-item";
+      item.setAttribute("role", "button");
+      item.tabIndex = 0;
       item.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>';
       const span = document.createElement("span");
       span.textContent = r;
       item.appendChild(span);
       item.onclick = () => performSearch(r);
+      item.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); performSearch(r); } };
       list.appendChild(item);
     });
     container.appendChild(relSec);
   }
+}
+
+// v74: styled failure state (empty model response or request error) with a
+// Retry button that re-sends the exact same query through performSearch.
+function renderAnswerError(container, title, detail, query) {
+  const card = document.createElement("div");
+  card.className = "answer-error";
+  card.setAttribute("role", "alert");
+  card.innerHTML = '<svg class="answer-error-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>' +
+    '<div class="answer-error-body"><div class="answer-error-title"></div><div class="answer-error-detail"></div></div>';
+  card.querySelector(".answer-error-title").textContent = title;
+  const det = card.querySelector(".answer-error-detail");
+  if (detail) det.textContent = detail; else det.remove();
+  if (query && query.trim()) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "answer-error-retry";
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Retry';
+    btn.onclick = () => { if (isSearching) return; btn.disabled = true; performSearch(query); };
+    card.querySelector(".answer-error-body").appendChild(btn);
+  }
+  container.appendChild(card);
+  return card;
 }
 
 async function performSearch(query) {
@@ -2709,7 +2932,7 @@ async function performSearch(query) {
   }
 
   const content = document.getElementById("resultsContent");
-  renderPriorTurns(content, thread);
+  renderPriorTurns(content, thread, false);
   const { state, interval, started } = renderSearching(content, query);
   document.getElementById("breadcrumb").textContent = query;
 
@@ -2750,6 +2973,7 @@ async function performSearch(query) {
     { role: "user", content: fullQuery },
   ];
   
+  let liveAnswerEl = null; // partial streamed answer (kept visible if the stream fails midway)
   try {
     const { data: s } = await sb.auth.getSession();
 
@@ -2759,11 +2983,17 @@ async function performSearch(query) {
     // v67: imageResults (gateway image_search) render in the Images tab.
     let imageResults = [];
     const renderFinal = (answer) => {
-      const fuMatch = answer.match(/\n?##\s*Suggested Follow-ups?[\s\S]*$/i);
-      const answerClean = fuMatch ? answer.slice(0, fuMatch.index).trim() : answer;
+      const answerClean = splitFollowups(answer).body;
       clearInterval(interval);
       if (state && state.isConnected) state.remove();
       if (liveAnswerEl) { liveAnswerEl.remove(); liveAnswerEl = null; }
+      if (!answerClean) {
+        // v74: empty response -> error card + Retry; the failed turn is NOT saved
+        // to the thread, so a retry doesn't duplicate the question in history.
+        renderAnswerError(content, "The model returned an empty response", "No answer was generated for this question. This is usually temporary — try again.", query);
+        document.getElementById("resultsScroll").scrollTop = document.getElementById("resultsScroll").scrollHeight;
+        return;
+      }
       // v66: "Finished Ns" timestamp like perplexity.ai
       const stamp = document.createElement("div");
       stamp.className = "search-timer";
@@ -2777,18 +3007,19 @@ async function performSearch(query) {
       thread.messages.push({ role: "assistant", content: answerClean, sources, related, ...(imageResults.length ? { images: imageResults } : {}) });
       saveThreads();
       renderThreads();
-      document.getElementById("resultsScroll").scrollTop = 0;
+      // v74: stay where the reader is — jump to the bottom ONLY if they were
+      // already near the latest answer; never yank them to the top of the thread.
+      const sc = document.getElementById("resultsScroll");
+      if (sc.scrollHeight - sc.scrollTop - sc.clientHeight < 220) sc.scrollTop = sc.scrollHeight;
     };
     // Live partial render during streaming (throttled). v65: renders into a
     // single replaceable answer element so prior turns stay visible.
-    let liveAnswerEl = null;
     let lastRender = 0;
     const renderLive = (full) => {
       const now = Date.now();
       if (now - lastRender < 120) return;
       lastRender = now;
-      const fuMatch = full.match(/\n?##\s*Suggested Follow-ups?[\s\S]*$/i);
-      const partial = (fuMatch ? full.slice(0, fuMatch.index).trim() : full).trim();
+      const partial = splitFollowups(full).body;
       if (!partial) return;
       clearInterval(interval);
       if (state && state.isConnected) state.remove();
@@ -2864,12 +3095,12 @@ async function performSearch(query) {
           }
           renderLive(full);
         }
-        renderFinal(full || "(no response from model — please try again)");
+        renderFinal(full);
       } else {
         const data = await res.json();
         if (Array.isArray(data?.images)) imageResults = data.images;
         const _msg = data?.choices?.[0]?.message ?? {};
-        renderFinal(_msg.content || "(no response from model — please try again)");
+        renderFinal(_msg.content || "");
       }
     }
 
@@ -2877,14 +3108,7 @@ async function performSearch(query) {
     // v65: keep prior turns visible — only the loading state becomes the error
     clearInterval(interval);
     if (state && state.isConnected) state.remove();
-    const err = document.createElement("div");
-    err.className = "searching-state";
-    const errDiv = document.createElement("div");
-    errDiv.style.color = "var(--error)";
-    errDiv.style.fontSize = "14px";
-    errDiv.textContent = String(e.message ?? e);
-    err.appendChild(errDiv);
-    content.appendChild(err);
+    renderAnswerError(content, "Something went wrong", String(e && e.message ? e.message : e), query);
   } finally {
     isSearching = false;
   }
