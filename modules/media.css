@@ -24,3 +24,17 @@
 .mg-vcard img { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; }
 .mg-vph { aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; font-size: 28px; }
 .mg-vcap { padding: 6px 10px; font-size: 12px; color: var(--text-faint, var(--text)); }
+.mg-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+.mg-segbtn { background: transparent; color: var(--text); border: none; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 36px; }
+.mg-segbtn.on { background: var(--accent-btn); color: #fff; }
+.mg-vnote { font-size: 12.5px; margin-top: 8px; color: var(--text-faint, var(--text)); }
+.mg-vnote.off { color: #d19a66; }
+.mg-card video { display: block; width: 100%; background: #000; }
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.mg-overlay{padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.mg-dialog{max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overscroll-behavior:contain}
+.mg-head h3,.mg-status,.mg-vcap{overflow-wrap:anywhere}
+.mg-head h3{min-width:0}
+.mg-card img,.mg-vcard img{max-width:100%}
+@media (max-width:768px){.mg-prompt{font-size:16px}}

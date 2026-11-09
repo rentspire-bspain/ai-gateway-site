@@ -173,7 +173,7 @@
   }
 
   /* ---------- viewer ---------- */
-  var current = null;
+  var current = null, currentArt = null;
   function copyText(t) {
     try { if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t); } catch (e) {}
     try { var ta = el('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); } catch (e) {}
@@ -225,6 +225,7 @@
       }
     });
     document.body.appendChild(ov);
+    currentArt = a;
     current = { ov: ov, prev: prevFocus, overflow: document.body.style.overflow };
     document.body.style.overflow = 'hidden';
     (ov.querySelector('[data-action="copy"],[data-action="close"]') || ov).focus();
@@ -232,7 +233,7 @@
   }
   function close() {
     if (!current) return;
-    var c = current; current = null;
+    var c = current; current = null; currentArt = null;
     c.ov.remove(); document.body.style.overflow = c.overflow;
     try { if (c.prev && c.prev.focus) c.prev.focus(); } catch (e) {}
   }
@@ -257,8 +258,24 @@
     return row;
   }
 
+  function saveStore(arts) {
+    try {
+      var st = JSON.parse(localStorage.getItem('ai_artifacts') || '[]'), dead = JSON.parse(localStorage.getItem('ai_artifacts_deleted') || '[]'), ch = false;
+      if (!Array.isArray(st)) st = [];
+      arts.forEach(function (a) {
+        if (dead.indexOf(a.id) >= 0 || st.some(function (x) { return x.id === a.id; })) return;
+        st.push({ id: a.id, kind: a.kind, lang: a.lang, title: a.title, content: a.content, created: Date.now(), query: lastQuery(a) }); ch = true;
+      });
+      if (ch) localStorage.setItem('ai_artifacts', JSON.stringify(st.slice(-200)));
+    } catch (e) {}
+  }
+  function lastQuery() { var q = document.querySelector('.question-header, .question-title, #queryText'); return q ? (q.textContent || '').trim().slice(0, 120) : ''; }
+  function runHooks(ac, text) { (window.ArtifactsHooks || []).forEach(function (h) { try { h(ac, text); } catch (e) {} }); }
+
   function placeCards(answerContent, text) {
     var arts = extractFromAnswer(text);
+    runHooks(answerContent, text);
+    saveStore(arts);
     var host = answerContent.closest('.answer-section') || answerContent.parentNode;
     var key = arts.map(function (a) { return a.id; }).join(',');
     var old = host.querySelector(':scope > .artifact-row');
@@ -334,6 +351,6 @@
     _loaded: true, extractFromAnswer: extractFromAnswer, renderInline: renderInline, attach: attach, scan: scan,
     highlight: highlight, renderChart: renderChart
   };
-  window.ArtifactsUI = { open: open, close: close };
+  window.ArtifactsUI = { open: open, close: close, current: function () { return currentArt; } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attach); else attach();
 })();

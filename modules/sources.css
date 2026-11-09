@@ -130,3 +130,8 @@
   .sources-item,
   .sources-range-item { min-height: 44px; }
 }
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.sources-menu{max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overscroll-behavior:contain;box-sizing:border-box}
+.sources-item-main,.sources-hint{overflow-wrap:anywhere}
+@media (max-width:480px){.sources-menu{bottom:calc(12px + env(safe-area-inset-bottom)) !important;max-height:calc(100dvh - 24px - env(safe-area-inset-bottom))}}

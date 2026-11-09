@@ -35,3 +35,27 @@
 .sk-slash-item .sk-d{color:var(--text-muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .sk-slash-sep{height:1px;background:var(--border);margin:4px 2px;}
 @media(max-width:600px){.sk-row{grid-template-columns:1fr}}
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.sk-overlay{padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.sk-panel{max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));min-width:0}
+.sk-body{min-height:0;overscroll-behavior:contain;scroll-padding-bottom:96px}
+.sk-head h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sk-card,.sk-card-top{min-width:0}
+.sk-name{min-width:0;flex:1}
+.sk-desc,.sk-sub{overflow-wrap:anywhere}
+.sk-row{grid-template-columns:90px minmax(0,1fr)}
+.sk-form input,.sk-form textarea{width:100%;box-sizing:border-box;min-width:0}
+.sk-slash{max-width:calc(100vw - 16px);max-height:min(320px,50dvh);box-sizing:border-box;overscroll-behavior:contain}
+.sk-slash-item{min-width:0}
+.sk-slash-item .sk-d{flex:1}
+@media(max-width:600px){
+  .sk-row{grid-template-columns:minmax(0,1fr)}
+  .sk-overlay{padding:0}
+  .sk-panel{width:100%;height:100dvh;max-height:100dvh;border-radius:0;border-left:0;border-right:0}
+  .sk-head{padding-top:max(16px,env(safe-area-inset-top))}
+  .sk-body{padding-bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px))}
+  .sk-form input,.sk-form textarea{font-size:16px}
+  .sk-btn{min-height:40px}
+  .sk-slash-item{min-height:44px}
+}

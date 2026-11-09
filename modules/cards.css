@@ -11,3 +11,24 @@
 .ec-sub{font-size:13px;color:var(--text-muted)}
 .ec-icon{font-size:28px;line-height:1}
 @media(max-width:600px){.ec-spark{width:72px}}
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.ec-card{max-width:100%;min-width:0;box-sizing:border-box}
+.ec-top,.ec-sub{flex-wrap:wrap;overflow-wrap:anywhere}
+.ec-price{overflow-wrap:anywhere}
+.ec-spark{max-width:40%}
+@media(max-width:400px){.ec-card{gap:10px;padding:10px 12px}.ec-price{font-size:20px}.ec-spark{width:56px}}
+.ec-col{flex-direction:column;align-items:stretch;gap:8px}
+.ec-game{display:flex;align-items:center;gap:14px;font-size:14px;padding:4px 0;border-top:1px solid var(--border)}
+.ec-game:first-of-type{border-top:0}
+.ec-team{display:flex;gap:8px;min-width:64px;color:var(--text-muted)}
+.ec-tn{font-weight:600}.ec-ts{font-variant-numeric:tabular-nums;font-weight:700;color:var(--text)}
+.ec-win .ec-tn{color:var(--text)}
+.ec-gs{margin-left:auto;font-size:12px;color:var(--text-muted);text-align:right}
+.ec-gs-live{color:var(--error);font-weight:700}
+.ec-place{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid var(--border)}
+.ec-pn{font-weight:600;font-size:14px}
+.ec-place .ec-main{flex:1}
+.ec-links{display:flex;flex-wrap:wrap;gap:8px}
+.ec-link{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--border-light);color:var(--citation-text);text-decoration:none;background:var(--citation-bg)}
+.ec-link:hover{border-color:var(--accent);color:var(--accent-hover)}

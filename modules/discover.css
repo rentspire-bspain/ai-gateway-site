@@ -23,3 +23,11 @@
 .dv-err{color:var(--error);font-size:13px;text-align:center;padding:16px}
 @media(max-width:640px){.dv-head{padding:12px 14px}.dv-body{padding:14px}}
 @media(max-width:768px){.dv-btn,.dv-x{min-height:40px;min-width:40px}.dv-x{font-size:24px}}
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.dv-head{padding-top:max(14px,env(safe-area-inset-top));padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+.dv-body{padding-bottom:max(24px,calc(env(safe-area-inset-bottom) + 16px));padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right));overscroll-behavior:contain}
+.dv-wrap>*,.dv-card{min-width:0}
+.dv-title,.dv-title a,.dv-meta,.dv-sub{overflow-wrap:anywhere}
+.dv-row .dv-btn{flex:0 0 auto}
+@media(max-width:640px){.dv-head{padding-top:max(12px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.dv-body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}}

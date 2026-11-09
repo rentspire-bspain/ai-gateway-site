@@ -45,3 +45,20 @@
 @keyframes tkspin{to{transform:rotate(360deg)}}
 @media(max-width:640px){.tk-head{flex-wrap:wrap;padding:12px 14px}.tk-tabs{order:3;flex:1 0 100%}.tk-tab{flex:1;justify-content:center}.tk-body{padding:14px}.tk-select{width:100%}}
 @media(max-width:768px){.tk-tab,.tk-btn,.tk-x,.tk-input,.tk-select{min-height:40px}.tk-x{min-width:40px}.tk-switch{position:relative}.tk-switch::before{content:"";position:absolute;inset:-12px -4px}}
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.tk-head{padding-top:max(14px,env(safe-area-inset-top));padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+.tk-body{padding-bottom:max(24px,calc(env(safe-area-inset-bottom) + 16px));padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right));overscroll-behavior:contain;scroll-padding-bottom:96px}
+.tk-ev>*{min-width:0}
+.tk-ev>.tk-dot{min-width:8px}
+.tk-card,.tk-form{min-width:0}
+.tk-name,.tk-q,.tk-meta,.tk-digest,.tk-evbody{overflow-wrap:anywhere}
+.tk-tabs{overflow-x:auto;scrollbar-width:none}
+.tk-tabs::-webkit-scrollbar{display:none}
+.tk-tab{flex:0 0 auto;white-space:nowrap}
+@media(max-width:640px){.tk-head{padding-top:max(12px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.tk-body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.tk-tab{flex:1 0 auto}}
+@media(max-width:768px){.tk-input,.tk-select,.tk-textarea{font-size:16px}}
+.tk-step,.tk-run{border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--bg-elevated)}
+.tk-run .tk-digest{background:var(--bg-surface);margin-top:0;max-height:260px;overflow:auto}
+.tk-tab{white-space:nowrap}
+@media(max-width:640px){.tk-tab{padding:7px 8px;font-size:13px}.tk-tabs{overflow-x:auto}}

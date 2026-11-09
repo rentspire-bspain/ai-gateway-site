@@ -24,3 +24,13 @@
 .sa-status.ok{color:var(--text)}
 @media(max-width:480px){.sa-compare{grid-template-columns:1fr}.sa-panel{padding:16px}}
 @media(max-width:768px){.sa-btn,.sa-input,.sa-sel,.sa-x{min-height:40px}}
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.sa-overlay{padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.sa-panel{max-height:100%;overscroll-behavior:contain;box-sizing:border-box;min-width:0}
+.sa-title{min-width:0;overflow-wrap:anywhere}
+.sa-sizes{max-width:100%;overflow-x:auto;scrollbar-width:thin}
+.sa-note,.sa-box h4{overflow-wrap:anywhere}
+.sa-row .sa-btn{flex:0 0 auto}
+@media(max-width:768px){.sa-input,.sa-sel{font-size:16px}}
+@media(max-width:480px){.sa-overlay{align-items:flex-end;padding:0}.sa-panel{max-width:100%;border-radius:var(--radius) var(--radius) 0 0;max-height:92dvh;padding-bottom:max(16px,calc(env(safe-area-inset-bottom) + 8px))}}

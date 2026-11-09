@@ -1,0 +1,4 @@
+/* depends on modules/skills.css (sk-* classes) and skills-actions.css (sa-error) */
+.pl-meta{color:var(--text-muted);font-size:12px;}
+.pl-badge{white-space:nowrap;color:var(--accent);font-weight:600;}
+.pl-card .sk-actions{margin-top:2px;}

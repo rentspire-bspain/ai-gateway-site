@@ -122,14 +122,19 @@
     { cmd: "research", icon: "🔬", name: "/research", desc: "Turn Deep Research on", run: function () {
         var t = el("deepResearchToggle"); if (t && !t.classList.contains("active")) t.click(); } },
     { cmd: "new", icon: "✨", name: "/new", desc: "Start a new thread", run: function () {
-        if (typeof window.newThread === "function") window.newThread(); else if (typeof newThread === "function") newThread(); } }
+        if (typeof window.newThread === "function") window.newThread(); else if (typeof newThread === "function") newThread(); } },
+    { cmd: "email", icon: "✉️", name: "/email", desc: "Draft or send email (preview + approval)", run: function () { if (window.SkillsActions) window.SkillsActions.open("send_email"); } },
+    { cmd: "draft", icon: "📝", name: "/draft", desc: "Create a Gmail draft (preview + approval)", run: function () { if (window.SkillsActions) window.SkillsActions.open("draft_email"); } },
+    { cmd: "event", icon: "📅", name: "/event", desc: "Create calendar event (preview + approval)", run: function () { if (window.SkillsActions) window.SkillsActions.open("create_event"); } }
   ];
 
   function buildItems(q) {
     q = q.toLowerCase();
     var out = [];
     COMMANDS.forEach(function (c) { if (!q || c.cmd.indexOf(q) === 0) out.push({ type: "cmd", c: c, icon: c.icon, name: c.name, desc: c.desc }); });
-    load().forEach(function (s) {
+    var extra = [];
+    try { extra = (typeof window.SkillsPluginSource === "function" ? window.SkillsPluginSource() : []) || []; } catch (e) {}
+    load().concat(extra).forEach(function (s) {
       if (!q || (s.name || "").toLowerCase().indexOf(q) !== -1) out.push({ type: "skill", s: s, icon: s.icon || (s.name || "?")[0], name: s.name, desc: s.prompt.replace(/\s+/g, " ").slice(0, 60) });
     });
     return out;

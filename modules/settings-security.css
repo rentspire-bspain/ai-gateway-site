@@ -1,0 +1,50 @@
+/* ============ Settings extensions: Devices (E8) + Credentials (E12) ============
+   Companion styles for modules/settings-security.js. Reuses .stg-* classes
+   from settings.css; only row/action-specific styles live here. */
+
+/* ---- shared row scaffolding (devices + credentials) ---- */
+.sec-device-list, .sec-cred-list { display: flex; flex-direction: column; gap: 2px; margin: 10px 0 4px; }
+.sec-device-row, .sec-cred-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.sec-device-row:last-child, .sec-cred-row:last-child { border-bottom: none; }
+.sec-device-text { flex: 1; min-width: 0; }
+.sec-device-name { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sec-device-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* ---- devices: sign-out actions ---- */
+.sec-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 6px; }
+.sec-actions .stg-btn.danger.solid { background: var(--error); border-color: var(--error); color: #fff; }
+
+/* ---- credentials: masked value + form ---- */
+.sec-cred-mask {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.sec-cred-form {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 460px;
+}
+.sec-field { display: flex; flex-direction: column; gap: 6px; }
+.sec-field .stg-label { font-size: 13px; }
+.sec-cred-form .stg-confirm { margin-top: 0; }
+
+/* icon-button delete arming state (devices rows reuse the plain danger style) */
+.stg-icon-btn.solid { background: var(--error); color: #fff; }
+
+@media (max-width: 768px) {
+  .sec-device-row, .sec-cred-row { flex-wrap: wrap; }
+  .sec-cred-form { max-width: none; }
+}

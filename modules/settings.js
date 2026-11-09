@@ -761,6 +761,40 @@
     usage: paneUsage, data: paneData, about: paneAbout
   };
 
+  // ---------- pane registration (other settings*.js modules) ----------
+  // window.SettingsUI.registerPane({ id, label, icon, render, after, visible })
+  //   icon: string of SVG path markup (16px stroke style) — optional
+  //   render: () => HTMLElement — returns the pane root (class .stg-pane recommended)
+  //   after: insert after this pane id (default: "data", i.e. before About)
+  //   visible: () => boolean — tab hidden when false (evaluated on each open)
+  function iconFor(p) { return p.customSvg ? svgRaw(p.customSvg) : svg(p.icon); }
+  function svgRaw(body) {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + body + "</svg>";
+  }
+  function paneVisible(p) {
+    try { return typeof p.visible !== "function" || !!p.visible(); }
+    catch (e) { return true; }
+  }
+  function registerPane(opts) {
+    if (!opts || !opts.id || typeof opts.render !== "function") return false;
+    if (PANES.some(function (p) { return p.id === opts.id; }) || RENDERERS[opts.id]) return false;
+    var pane = {
+      id: String(opts.id),
+      label: String(opts.label || opts.id),
+      icon: "info",
+      customSvg: typeof opts.icon === "string" ? opts.icon : null,
+      render: opts.render,
+      visible: typeof opts.visible === "function" ? opts.visible : null
+    };
+    RENDERERS[pane.id] = function () { return pane.render(); };
+    var afterId = opts.after || "data";
+    var idx = PANES.findIndex(function (p) { return p.id === afterId; });
+    if (idx < 0) idx = PANES.length - 2; // fall back to just before About
+    PANES.splice(idx + 1, 0, pane);
+    if (overlay) { var keep = activePane; close(); open(PANES.some(function (p) { return p.id === keep; }) ? keep : pane.id); } // rebuild, keep the user where they were
+    return true;
+  }
+
   // ---------- overlay shell ----------
   var overlay = null, panel = null, navEl = null, contentEl = null, lastFocus = null;
 
@@ -822,7 +856,8 @@
     navEl.setAttribute("role", "tablist");
     navEl.setAttribute("aria-label", "Settings sections");
     PANES.forEach(function (p) {
-      var b = el("button", "stg-nav-btn", svg(p.icon) + "<span>" + esc(p.label) + "</span>");
+      if (!paneVisible(p)) return;
+      var b = el("button", "stg-nav-btn", iconFor(p) + "<span>" + esc(p.label) + "</span>");
       b.type = "button";
       b.id = "stg-tab-" + p.id;
       b.dataset.pane = p.id;
@@ -877,5 +912,5 @@
     list: connectorList,
     enabled: function () { return connectorList().filter(function (c) { return c.enabled; }).map(function (c) { return c.name; }); }
   };
-  window.SettingsUI = { open: open, close: close };
+  window.SettingsUI = { open: open, close: close, registerPane: registerPane };
 })();

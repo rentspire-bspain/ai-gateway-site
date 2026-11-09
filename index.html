@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ai.spaincos.com — Where knowledge begins</title>
 <link rel="icon" type="image/webp" href="favicon.webp">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#14646B">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ai.spaincos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="modules/composerx.css">
 <link rel="stylesheet" href="modules/settings.css">
 <link rel="stylesheet" href="modules/library.css">
 <link rel="stylesheet" href="modules/skills.css">
@@ -19,11 +27,51 @@
 <link rel="stylesheet" href="modules/sources.css">
 <link rel="stylesheet" href="modules/media.css">
 <link rel="stylesheet" href="modules/export.css">
+<link rel="stylesheet" href="modules/settings-security.css">
+<link rel="stylesheet" href="modules/settings-org.css">
+<link rel="stylesheet" href="modules/skills-actions.css">
+<link rel="stylesheet" href="modules/plugins.css">
+<link rel="stylesheet" href="modules/hubs.css">
+<link rel="stylesheet" href="modules/repo-pr.css">
+<link rel="stylesheet" href="modules/voice-convo.css">
 <link rel="preconnect" href="https://frontend-cdn.perplexity.ai" crossorigin>
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
 @font-face { font-family: "pplxSans"; src: url("https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: "pplxSerif"; src: url("https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Serif-Beta-R6-VF.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+/* ===== v83: council, steps, math, incognito, offline, drop overlay ===== */
+.width-toggle#councilToggle.active,.width-toggle#incognitoToggle.active{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
+.answer-meta{display:flex;flex-direction:column;gap:8px;margin:4px 0 10px}
+.council-badge{display:inline-flex;align-items:center;gap:5px;align-self:flex-start;font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-light);border:1px solid var(--border-light);border-radius:999px;padding:2px 10px}
+details.steps-list,details.council-drafts{border:1px solid var(--border-light);border-radius:var(--radius-sm);background:var(--bg-elevated);font-size:13.5px}
+details.steps-list>summary,details.council-drafts>summary{cursor:pointer;padding:8px 12px;color:var(--text-muted);font-weight:500;list-style:none;display:flex;align-items:center;gap:6px}
+details.steps-list>summary::-webkit-details-marker,details.council-drafts>summary::-webkit-details-marker{display:none}
+details.steps-list>summary::before,details.council-drafts>summary::before{content:"▸";font-size:11px;transition:transform .15s}
+details[open].steps-list>summary::before,details[open].council-drafts>summary::before{transform:rotate(90deg)}
+.steps-body{padding:2px 12px 10px;display:flex;flex-direction:column;gap:10px}
+.steps-group-h{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px}
+.steps-item{padding:2px 0;color:var(--text);overflow-wrap:anywhere}
+.steps-item.err{color:var(--error,#c0392b)}
+.steps-sub{color:var(--text-muted);font-size:12.5px;padding-left:12px;overflow-wrap:anywhere}
+.council-drafts{margin-top:10px}
+.council-drafts .steps-body{padding-top:0}
+.tex{font-family:inherit}
+.tex[data-d="1"]{display:block;text-align:center;margin:.6em 0;overflow-x:auto;overflow-y:hidden;max-width:100%}
+.tex .katex{font-size:1.05em}
+.incognito-bar{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:90;display:none;align-items:center;gap:10px;max-width:calc(100vw - 24px);padding:5px 8px 5px 12px;border-radius:999px;background:#1f2121;color:#f3f3ee;font-size:12.5px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.incognito-bar.show{display:flex}
+.incognito-bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.incognito-bar button{background:#3a3d3d;color:#f3f3ee;border:0;border-radius:999px;padding:3px 10px;font:inherit;cursor:pointer}
+body.incognito .question-header::after{content:"";}
+.offline-bar{position:fixed;left:0;right:0;top:0;z-index:960;display:none;justify-content:center;padding:6px 12px;background:#8a5a00;color:#fff;font-size:13px;text-align:center}
+.offline-bar.show{display:flex}
+.drop-overlay{position:fixed;inset:0;z-index:970;display:none;align-items:center;justify-content:center;background:rgba(20,100,107,.18);backdrop-filter:blur(2px);pointer-events:none}
+.drop-overlay.show{display:flex}
+.drop-overlay div{border:2px dashed var(--accent);border-radius:16px;background:var(--bg-elevated);color:var(--text);padding:28px 36px;font-size:16px;font-weight:500;max-width:calc(100vw - 40px);text-align:center}
+#installAppBtn{display:none}
+#installAppBtn.show{display:flex}
+@media(max-width:768px){.incognito-bar{top:52px}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
@@ -1268,6 +1316,8 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
       <button class="side-nav-btn" id="navSkills" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Skills</span></button>
       <button class="side-nav-btn" id="navDocs" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Docs</span></button>
       <button class="side-nav-btn" id="navTasks" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Tasks</span></button>
+      <button class="side-nav-btn" id="navHubs" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M3 20V10l9-7 9 7v10"/></svg><span>Hubs</span></button>
+      <button class="side-nav-btn" id="navPlugins" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg><span>Plugins</span></button>
       <button class="side-nav-btn" id="navDiscover" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2.1 6.3-6.3 2.1 2.1-6.3z"/></svg><span>Discover</span></button>
     </div>
     <div class="threads-list" id="threadsList">
@@ -1286,6 +1336,10 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
       <button class="import-history-btn" id="importHistoryBtn" title="Import your Perplexity history as searchable context">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
         Import Perplexity history
+      </button>
+      <button class="import-history-btn" id="installAppBtn" title="Install ai.spaincos as an app">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Install app
       </button>
       <div class="user-row" id="userRow">
         <div class="user-avatar" id="userAvatar">?</div>
@@ -1327,6 +1381,14 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
         <button class="width-toggle" id="deepResearchToggle" title="Deep Research: minutes-long expert-grade reports (high effort, many sources)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
           <span id="deepResearchLabel">Research</span>
+        </button>
+        <button class="width-toggle" id="councilToggle" title="Model council: several models draft independently, then one writer synthesizes (about 3x model cost)" aria-pressed="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.3c3 0 6 1.5 6 5.7"/></svg>
+          <span id="councilLabel">Council</span>
+        </button>
+        <button class="width-toggle" id="incognitoToggle" title="Incognito: this thread is not saved to your account and expires within 24 hours" aria-pressed="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18M5 11l1.5-6h11L19 11"/><circle cx="8" cy="16.5" r="2.5"/><circle cx="16" cy="16.5" r="2.5"/><path d="M10.5 16h3"/></svg>
+          <span id="incognitoLabel">Incognito</span>
         </button>
         <button class="width-toggle" id="widthToggle" title="Toggle answer width: fit / full (or drag the column edge)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
@@ -1459,6 +1521,13 @@ function safeLSArray(key) {
   }
 }
 let threads = safeLSArray("ai_threads");
+// v83 (B8): incognito threads live in their own key with a 24h expiry; purged at boot
+(function () {
+  const now = Date.now();
+  const live = safeLSArray("ai_incognito_threads").filter(t => t && t.expiresAt && t.expiresAt > now);
+  try { localStorage.setItem("ai_incognito_threads", JSON.stringify(live)); } catch (e) {}
+  threads = threads.filter(t => t && !t.incognito).concat(live);
+})();
 let currentThreadId = null;
 let isSearching = false;
 let currentUser = null;
@@ -1716,6 +1785,41 @@ document.getElementById("deepResearchToggle").onclick = () => {
   document.getElementById("deepResearchLabel").textContent = deepResearchOn ? "Deep" : "Research";
 };
 
+// ===== v83: Council (H3) + Incognito (B8) toggles =====
+let councilOn = false;
+document.getElementById("councilToggle").onclick = () => {
+  councilOn = !councilOn;
+  const b = document.getElementById("councilToggle");
+  b.classList.toggle("active", councilOn);
+  b.setAttribute("aria-pressed", String(councilOn));
+};
+let incognitoOn = false;
+const INCOG_KEY = "ai_incognito_threads";
+const INCOG_TTL = 24 * 3600 * 1000;
+function setIncognito(on) {
+  if (on === incognitoOn) return;
+  incognitoOn = on;
+  const b = document.getElementById("incognitoToggle");
+  b.classList.toggle("active", on);
+  b.setAttribute("aria-pressed", String(on));
+  document.body.classList.toggle("incognito", on);
+  document.getElementById("incognitoBar").classList.toggle("show", on);
+  // switching modes always starts a fresh thread so the two kinds never mix
+  currentThreadId = null;
+  showLanding();
+  renderThreads();
+}
+(function () {
+  const bar = document.createElement("div");
+  bar.className = "incognito-bar"; bar.id = "incognitoBar"; bar.setAttribute("role", "status");
+  bar.innerHTML = '<span>Incognito · not saved · expires in 24h</span>';
+  const end = document.createElement("button"); end.type = "button"; end.textContent = "Exit";
+  end.onclick = () => setIncognito(false);
+  bar.appendChild(end);
+  document.body.appendChild(bar);
+  document.getElementById("incognitoToggle").onclick = () => setIncognito(!incognitoOn);
+})();
+
 // ============ THREAD SEARCH (v62) ============
 document.getElementById("threadSearch").addEventListener("input", () => renderThreads());
 
@@ -1917,14 +2021,12 @@ async function extractPdfText(f) {
   }
   return text.slice(0, 3000);
 }
-fileInput.onchange = async () => {
-  const f = fileInput.files && fileInput.files[0];
-  fileInput.value = "";
+async function handleAttachFile(f) {
   if (!f) return;
   try {
     if (/^image\/(png|jpeg|webp|gif)$/.test(f.type)) {
       if (f.size > 10_000_000) { alert("Image too large (10MB max)"); return; }
-      pendingAttachment = { kind: "image", name: f.name, dataUrl: await prepareImage(f) };
+      pendingAttachment = { kind: "image", name: f.name || "pasted-image.png", dataUrl: await prepareImage(f) };
     } else if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) {
       const text = await extractPdfText(f);
       if (!text.trim()) { alert("That PDF has no extractable text (likely a scan) — images of pages aren't supported yet"); return; }
@@ -1937,7 +2039,44 @@ fileInput.onchange = async () => {
     }
     renderAttachChips();
   } catch (e) { alert("Could not read that file"); }
+}
+fileInput.onchange = async () => {
+  const f = fileInput.files && fileInput.files[0];
+  fileInput.value = "";
+  await handleAttachFile(f);
 };
+// v83 (C6): drag-and-drop anywhere + paste an image into any composer
+(function () {
+  const ov = document.createElement("div");
+  ov.className = "drop-overlay"; ov.id = "dropOverlay";
+  ov.innerHTML = "<div>Drop a file to attach it to your question</div>";
+  document.body.appendChild(ov);
+  let depth = 0;
+  const hasFiles = (e) => e.dataTransfer && [...(e.dataTransfer.types || [])].indexOf("Files") !== -1;
+  const inModal = (e) => !!(e.target && e.target.closest && e.target.closest(".import-modal-backdrop, #importDrop, .auth-overlay, [data-no-global-drop]"));
+  window.addEventListener("dragenter", (e) => { if (!hasFiles(e) || inModal(e)) return; depth++; ov.classList.add("show"); });
+  window.addEventListener("dragover", (e) => { if (!hasFiles(e) || inModal(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = "copy"; });
+  window.addEventListener("dragleave", (e) => { if (!hasFiles(e)) return; depth = Math.max(0, depth - 1); if (!depth) ov.classList.remove("show"); });
+  window.addEventListener("drop", (e) => {
+    if (!hasFiles(e)) return;
+    depth = 0; ov.classList.remove("show");
+    if (inModal(e)) return;
+    e.preventDefault();
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleAttachFile(f);
+  });
+  ["landingInput", "searchbarInput", "followupInput"].forEach((id) => {
+    const el = document.getElementById(id); if (!el) return;
+    el.addEventListener("paste", (e) => {
+      const items = [...((e.clipboardData && e.clipboardData.items) || [])];
+      const it = items.find(x => x.kind === "file" && /^image\//.test(x.type));
+      const f = it ? it.getAsFile() : null;
+      if (!f) return; // plain text paste proceeds normally
+      e.preventDefault();
+      handleAttachFile(f);
+    });
+  });
+})();
 document.getElementById("landingAttach").onclick = () => fileInput.click();
 document.getElementById("followupAttach").onclick = () => fileInput.click();
 
@@ -2317,6 +2456,7 @@ async function syncThreadsFromServer() {
     // Threads created before v61 have numeric (non-uuid) ids — re-key them
     // with fresh UUIDs so the server accepts them, updating local references.
     for (const t of threads) {
+      if (t.incognito) continue;
       if (!remoteIds.has(t.id) && t.messages.length) {
         if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(t.id))) {
           const oldId = t.id;
@@ -2332,14 +2472,16 @@ async function syncThreadsFromServer() {
   } catch (e) { /* offline-tolerant */ }
 }
 function saveThreads() {
-  localStorage.setItem("ai_threads", JSON.stringify(threads));
-  // v61: mirror the current thread to the server (best-effort, non-blocking)
+  localStorage.setItem("ai_threads", JSON.stringify(threads.filter(t => !t.incognito)));
+  try { localStorage.setItem("ai_incognito_threads", JSON.stringify(threads.filter(t => t.incognito && t.expiresAt > Date.now()))); } catch (e) {}
+  // v61: mirror the current thread to the server (best-effort, non-blocking) — never for incognito
   const cur = threads.find(t => t.id === currentThreadId);
-  if (cur && currentUser) {
+  if (cur && currentUser && !cur.incognito) {
     pushThreadToServer(cur).then(() => pushThreadMessages(cur)).catch(() => {});
   }
 }
 function renderThreads() {
+  var arch = []; try { arch = JSON.parse(localStorage.ai_archived || "[]"); } catch (e) {}
   const container = document.getElementById("threadItems");
   container.innerHTML = "";
   // v62: live search over titles AND message content (client-side — all
@@ -2347,10 +2489,11 @@ function renderThreads() {
   const q = (document.getElementById("threadSearch")?.value || "").trim().toLowerCase();
   // v64: space filter (clicking a space shows only its threads) + search
   const spaceVisible = activeSpaceId ? threads.filter(t => t.spaceId === activeSpaceId) : threads;
-  const visible = !q ? spaceVisible : spaceVisible.filter(t =>
+  let visible = !q ? spaceVisible : spaceVisible.filter(t =>
     t.title.toLowerCase().includes(q) ||
     (t.messages || []).some(m => String(m.content || "").toLowerCase().includes(q))
   );
+  visible = visible.filter(t => !arch.includes(t.id));
   const label = document.getElementById("recentLabel");
   if (label) label.textContent = activeSpaceId ? (spaces.find(s => s.id === activeSpaceId)?.name || "Space") : "Recent";
   visible.forEach(t => {
@@ -2404,6 +2547,7 @@ function newThread() {
 function createThread(title) {
   // v61: UUID ids so threads sync to the server-side threads table
   const thread = { id: (crypto.randomUUID ? crypto.randomUUID() : "t" + Date.now() + "-" + Math.random().toString(36).slice(2)), title, messages: [], createdAt: Date.now(), updatedAt: Date.now() };
+  if (incognitoOn) { thread.incognito = true; thread.expiresAt = Date.now() + INCOG_TTL; }
   threads.unshift(thread);
   if (threads.length > 50) threads = threads.slice(0, 50);
   currentThreadId = thread.id;
@@ -2415,6 +2559,13 @@ async function loadThread(id) {
   const thread = threads.find(t => t.id === id);
   if (!thread) return;
   currentThreadId = id;
+  if (!!thread.incognito !== incognitoOn) { // opening a thread of the other kind switches the mode indicator
+    incognitoOn = !!thread.incognito;
+    document.getElementById("incognitoToggle").classList.toggle("active", incognitoOn);
+    document.getElementById("incognitoToggle").setAttribute("aria-pressed", String(incognitoOn));
+    document.body.classList.toggle("incognito", incognitoOn);
+    document.getElementById("incognitoBar").classList.toggle("show", incognitoOn);
+  }
   showResults();
   renderThreads();
   document.getElementById("breadcrumb").textContent = thread.title;
@@ -2450,6 +2601,8 @@ function positionComposerPills() {
   if (!target) return;
   target.appendChild(document.getElementById("modelSel"));
   target.appendChild(document.getElementById("deepResearchToggle"));
+  target.appendChild(document.getElementById("councilToggle"));
+  target.appendChild(document.getElementById("incognitoToggle"));
 }
 function showResults() {
   document.getElementById("landing").style.display = "none";
@@ -2676,7 +2829,7 @@ function renderPriorTurns(content, thread, showRelatedForLast) {
       content.appendChild(q);
     } else {
       const rel = (showRelatedForLast && i === lastAssistant) ? cleanRelated(m.related) : [];
-      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || []);
+      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council) ? { steps: m.steps || [], council: m.council || null } : null);
     }
   });
 }
@@ -2915,10 +3068,132 @@ function buildCitations(content, sources) {
   return master.slice(0, 30);
 }
 
-function renderAnswer(container, text, sources, related, images) {
+// ===== v83 (A11): LaTeX — protect math from marked, render with KaTeX (lazy, SRI-pinned) =====
+const KATEX_JS = { src: "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js", sri: "sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" };
+const KATEX_CSS = { href: "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css", sri: "sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" };
+let katexState = null; // null | Promise
+function loadKatex() {
+  if (window.katex) return Promise.resolve(true);
+  if (katexState) return katexState;
+  katexState = new Promise((res) => {
+    try {
+      const l = document.createElement("link");
+      l.rel = "stylesheet"; l.href = KATEX_CSS.href; l.integrity = KATEX_CSS.sri; l.crossOrigin = "anonymous";
+      document.head.appendChild(l);
+      const sc = document.createElement("script");
+      sc.src = KATEX_JS.src; sc.integrity = KATEX_JS.sri; sc.crossOrigin = "anonymous";
+      sc.onload = () => res(!!window.katex);
+      sc.onerror = () => { katexState = null; res(false); };
+      document.head.appendChild(sc);
+    } catch (e) { katexState = null; res(false); }
+  });
+  return katexState;
+}
+function protectMath(text) {
+  const items = [];
+  const stash = (tex, display, raw) => { items.push({ tex, display, raw }); return "XMATHX" + (items.length - 1) + "XENDX"; };
+  const seg = (chunk) => chunk
+    .replace(/\$\$([\s\S]+?)\$\$/g, (m, t) => stash(t.trim(), true, m))
+    .replace(/\\\[([\s\S]+?)\\\]/g, (m, t) => stash(t.trim(), true, m))
+    .replace(/\\\(([\s\S]+?)\\\)/g, (m, t) => stash(t.trim(), false, m))
+    .replace(/(^|[^\\$\d\w])\$(?![\s$])([^$\n]*?[^\s$\\])\$(?!\d)/g, (m, pre, t) => pre + stash(t, false, "$" + t + "$"))
+    .replace(/(^|[^\\$\d\w])\$([^\s$\\])\$(?!\d)/g, (m, pre, t) => pre + stash(t, false, "$" + t + "$"));
+  // leave fenced and inline code untouched
+  const parts = String(text).split(/(```[\s\S]*?(?:```|$)|`[^`\n]*`)/g);
+  const out = parts.map((c, i) => (i % 2 ? c : seg(c))).join("");
+  return { text: out, items };
+}
+function restoreMath(html, items) {
+  if (!items.length) return html;
+  const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return html.replace(/XMATHX(\d+)XENDX/g, (m, n) => {
+    const it = items[+n]; if (!it) return m;
+    return '<span class="tex" data-d="' + (it.display ? 1 : 0) + '" data-tex="' + esc(it.tex) + '">' + esc(it.raw) + '</span>';
+  });
+}
+function renderMath(root) {
+  const nodes = [...root.querySelectorAll(".tex:not([data-done])")];
+  if (!nodes.length) return;
+  const go = () => nodes.forEach(n => {
+    try { window.katex.render(n.dataset.tex, n, { displayMode: n.dataset.d === "1", throwOnError: false, output: "htmlAndMathml" }); n.dataset.done = "1"; } catch (e) { /* keep raw TeX text */ }
+  });
+  if (window.katex) go(); else loadKatex().then(ok => { if (ok) go(); });
+}
+// ===== v83 (A8/H3): steps list + council badge =====
+function stepGroup(p) {
+  const k = String(p.kind || "");
+  if (k === "search") return "Searched";
+  if (k === "read") return "Read";
+  if (k) return "Reasoned";
+  const l = String(p.label || "");
+  if (/search|queried/i.test(l)) return "Searched";
+  if (/read|fetch|page|image|attached/i.test(l)) return "Read";
+  return "Reasoned";
+}
+function compactSteps(phases) {
+  return (Array.isArray(phases) ? phases : []).filter(p => p && p.label && !(p.kind === "draft" && !p.done)).map(p => ({
+    label: String(p.label).slice(0, 200), kind: p.kind || "", done: true,
+    items: (Array.isArray(p.items) ? p.items : []).slice(0, 8).map(i => ({ title: String(i.title || "").slice(0, 160), domain: i.domain || "" }))
+  }));
+}
+function councilFromPhases(phases, x) {
+  const ph = (Array.isArray(phases) ? phases : []).find(p => p && /^Consulted \d+ models?/i.test(String(p.label || "")));
+  if (!ph && !(x && x.synthesized)) return null;
+  const models = (x && Array.isArray(x.models) && x.models.length) ? x.models : ((ph && ph.items) || []).map(i => i.title);
+  return { models: models.slice(0, 8), chars: (x && x.chars) || [] };
+}
+function renderMeta(container, meta) {
+  const steps = meta && meta.steps || [];
+  if (!meta || (!steps.length && !meta.council)) return null;
+  const wrap = document.createElement("div");
+  wrap.className = "answer-meta";
+  if (meta.council) {
+    const b = document.createElement("span");
+    b.className = "council-badge";
+    b.textContent = "Council · " + (meta.council.models.length || "several") + " models";
+    b.title = "Several models drafted independently; one writer synthesized the final answer";
+    wrap.appendChild(b);
+  }
+  if (steps.length) {
+    const d = document.createElement("details"); d.className = "steps-list";
+    const sm = document.createElement("summary"); sm.textContent = "Steps · " + steps.length; d.appendChild(sm);
+    const body = document.createElement("div"); body.className = "steps-body";
+    ["Searched", "Read", "Reasoned"].forEach(g => {
+      const list = steps.filter(p => stepGroup(p) === g); if (!list.length) return;
+      const grp = document.createElement("div");
+      const h = document.createElement("div"); h.className = "steps-group-h"; h.textContent = g; grp.appendChild(h);
+      list.forEach(p => {
+        const it = document.createElement("div"); const bad = isDegradedPhase(p);
+        it.className = "steps-item" + (bad ? " err" : ""); it.textContent = (bad ? "⚠ " : "✓ ") + p.label; grp.appendChild(it);
+        (p.items || []).slice(0, 6).forEach(x => { if (!x.title) return; const sub = document.createElement("div"); sub.className = "steps-sub"; sub.textContent = (x.domain ? x.domain + " — " : "") + x.title; grp.appendChild(sub); });
+      });
+      body.appendChild(grp);
+    });
+    d.appendChild(body); wrap.appendChild(d);
+  }
+  container.appendChild(wrap);
+  return wrap;
+}
+function renderCouncilDrafts(parent, council) {
+  if (!council) return;
+  const d = document.createElement("details"); d.className = "council-drafts";
+  const sm = document.createElement("summary"); sm.textContent = "Drafts · " + council.models.length; d.appendChild(sm);
+  const body = document.createElement("div"); body.className = "steps-body";
+  council.models.forEach((m, i) => {
+    const it = document.createElement("div"); it.className = "steps-item";
+    it.textContent = "Draft " + (i + 1) + " — " + m + (council.chars && council.chars[i] ? " (" + council.chars[i] + " chars)" : "");
+    body.appendChild(it);
+  });
+  const note = document.createElement("div"); note.className = "steps-sub";
+  note.textContent = "The gateway returns which models drafted, not their text; the answer above is the synthesis.";
+  body.appendChild(note);
+  d.appendChild(body); parent.appendChild(d);
+}
+function renderAnswer(container, text, sources, related, images, meta) {
   // v74: an empty answer has no tabs / actions / suggestions — the caller shows
   // an error card instead (tabs and actions are tied to answer presence).
   if (!String(text || "").trim()) return;
+  renderMeta(container, meta);
   // Sources section
   if (sources && sources.length) {
     const sec = document.createElement("div");
@@ -2971,8 +3246,9 @@ function renderAnswer(container, text, sources, related, images) {
   content.className = "answer-content";
   // Render with marked (proper markdown: tables, headings, code blocks, lists)
   try {
-    const rawHtml = marked.parse(text, { breaks: true, gfm: true });
-    const safeHtml = DOMPurify.sanitize(rawHtml);
+    const pm = protectMath(text);
+    const rawHtml = marked.parse(pm.text, { breaks: true, gfm: true });
+    const safeHtml = restoreMath(DOMPurify.sanitize(rawHtml), pm.items);
     content.innerHTML = safeHtml;
   } catch (e) {
     content.textContent = text;
@@ -2986,6 +3262,8 @@ function renderAnswer(container, text, sources, related, images) {
   });
   const master = buildCitations(content, sources);
   ansSec.appendChild(content);
+  renderMath(content);
+  if (meta && meta.council) renderCouncilDrafts(ansSec, meta.council);
 
   // v66 carbon-copy: the answer tab row (Answer / Links / Images / Share) like
   // perplexity.ai's thread view.
@@ -3156,11 +3434,40 @@ function renderAnswerError(container, title, detail, query) {
   return card;
 }
 
+// v83 (G8): retry transient network failures / gateway 502-504 on the chat POST, with a visible note
+async function fetchRetry(url, opts, note) {
+  const delays = [1200, 2500];
+  for (let i = 0; ; i++) {
+    try {
+      const r = await fetch(url, opts);
+      if ([502, 503, 504].includes(r.status) && i < delays.length) { reconnecting(i); await new Promise(z => setTimeout(z, delays[i])); continue; }
+      return r;
+    } catch (e) {
+      if (i >= delays.length || (e && e.name === "AbortError")) throw e;
+      reconnecting(i); await new Promise(z => setTimeout(z, delays[i]));
+    }
+  }
+  function reconnecting(n) {
+    const t = document.querySelector(".searching-state .searching-text");
+    if (t) t.firstChild.textContent = "Reconnecting… (attempt " + (n + 2) + " of " + (delays.length + 1) + ")";
+  }
+}
 async function performSearch(query) {
   if (isSearching || !query.trim()) return;
   try { window.EntityCards && window.EntityCards.questionHint && window.EntityCards.questionHint(query); } catch (e) {}
   isSearching = true;
   stopSpeaking();
+  // v83 (G8): offline — show a retryable error card instead of starting a request that cannot succeed
+  if (navigator.onLine === false) {
+    showResults();
+    const ct0 = document.getElementById("resultsContent");
+    const th0 = threads.find(t => t.id === currentThreadId);
+    if (th0) renderPriorTurns(ct0, th0, false); else ct0.innerHTML = "";
+    const q0 = document.createElement("div"); q0.className = "question-header"; q0.textContent = query; ct0.appendChild(q0);
+    renderAnswerError(ct0, "You're offline", "No network connection. Your question hasn't been sent — reconnect and retry.", query);
+    isSearching = false;
+    return;
+  }
   
   // Check auth
   const authed = await checkAuth();
@@ -3224,10 +3531,18 @@ async function performSearch(query) {
     }
   }
   // Send the full conversation history so follow-ups keep context
+  // v83 (C10): @-mentions add a context block to the OUTGOING last user message only (not saved in the thread)
+  const mx = (window.ComposerX && window.ComposerX.take) ? window.ComposerX.take() : { mentions: [], context: "" };
   const history = [
     ...thread.messages.map(m => ({ role: m.role, content: m.content })),
-    { role: "user", content: fullQuery },
+    { role: "user", content: (mx.context || "") + fullQuery },
   ];
+  const v83Body = {
+    ...(councilOn ? { model_council: true } : {}),
+    ...(incognitoOn || thread.incognito ? { incognito: true } : {}),
+    ...(mx.mentions.length ? { mentions: mx.mentions.map(({ type, id, label }) => ({ type, id, label })) } : {}),
+  };
+  const persona = () => (incognitoOn || thread.incognito) ? { ...getPersonalization(), memory: [] } : getPersonalization();
   
   let liveAnswerEl = null; // partial streamed answer (kept visible if the stream fails midway)
   try {
@@ -3239,6 +3554,8 @@ async function performSearch(query) {
     // v67: imageResults (gateway image_search) render in the Images tab.
     let imageResults = [];
     let degradedPhases = [];
+    let lastPhases = [];  // v83: final phase list -> Steps / Council
+    let councilX = null;  // v83: x_council from the non-streaming response
     let revisedText = ""; // v80 (I7 pass-2): full replacement text from a `revision` SSE event
     const renderFinal = (answer, revised) => {
       const answerClean = splitFollowups(answer).body;
@@ -3263,11 +3580,13 @@ async function performSearch(query) {
       renderDegradedNote(content, degradedPhases, query);
       const sources = extractSources(answerClean);
       const related = generateRelated(query, answer);
-      renderAnswer(content, answerClean, sources, related, imageResults);
+      const councilInfo = councilOn ? councilFromPhases(lastPhases, councilX) : null;
+      const stepsC = compactSteps(lastPhases);
+      renderAnswer(content, answerClean, sources, related, imageResults, { steps: stepsC, council: councilInfo });
       speakAnswer(answerClean);
       thread.messages.push({ role: "user", content: fullQuery });
       thread.updatedAt = Date.now();
-      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(revised ? { revised: true } : {}), ...(imageResults.length ? { images: imageResults } : {}) });
+      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(revised ? { revised: true } : {}), ...(imageResults.length ? { images: imageResults } : {}), ...(stepsC.length ? { steps: stepsC } : {}), ...(councilInfo ? { council: councilInfo } : {}) });
       saveThreads();
       renderThreads();
       // v74: stay where the reader is — jump to the bottom ONLY if they were
@@ -3308,7 +3627,7 @@ async function performSearch(query) {
       const submit = await fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, personalization: getPersonalization(), ...getSourcesFilter(), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(incognitoOn || thread.incognito ? { incognito: true } : {}), personalization: persona(), ...getSourcesFilter(), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       const sub = await submit.json();
       if (!submit.ok || !sub?.deep_research_id) throw new Error(sub?.error ?? "Deep research submit failed");
@@ -3328,15 +3647,16 @@ async function performSearch(query) {
       // STREAMING: the server pipes the model's SSE with linked citations
       // (v58+); render tokens live. Falls back to the non-streaming path
       // whenever the response is not an SSE stream.
-      const res = await fetch(GATEWAY + "/gateway-chat", {
+      const res = await fetchRetry(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, personalization: getPersonalization(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
       if (!res.ok) {
         let data = {};
         try { data = await res.json(); } catch {}
+        if ([502, 503, 504].includes(res.status)) throw new Error("The gateway is temporarily unavailable (HTTP " + res.status + "). Your question wasn't lost — retry in a moment.");
         throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
       }
       const ct = res.headers.get("content-type") || "";
@@ -3356,7 +3676,7 @@ async function performSearch(query) {
             if (payload === "[DONE]") continue;
             try {
               const evt = JSON.parse(payload);
-              if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); degradedPhases = evt.phases.filter(isDegradedPhase); }
+              if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); degradedPhases = evt.phases.filter(isDegradedPhase); lastPhases = evt.phases; }
               if (Array.isArray(evt?.images)) { imageResults = evt.images; }
               if (Array.isArray(evt?.phases)) continue;
               if (typeof evt?.revision === "string" && evt.revision.trim()) {
@@ -3379,6 +3699,8 @@ async function performSearch(query) {
       } else {
         const data = await res.json();
         if (Array.isArray(data?.images)) imageResults = data.images;
+        if (Array.isArray(data?.x_phases)) { lastPhases = data.x_phases; degradedPhases = lastPhases.filter(isDegradedPhase); }
+        if (data?.x_council) councilX = data.x_council;
         const _msg = data?.choices?.[0]?.message ?? {};
         if (typeof data?.revision === "string" && data.revision.trim()) _msg.content = data.revision;
         renderFinal(_msg.content || "", data?.revised === true || (typeof data?.revision === "string" && !!data.revision.trim()));
@@ -3492,6 +3814,24 @@ async function loadStatus(force) {
   });
 })();
 
+// ===== v83 (G6/G8): offline banner, service worker, install prompt =====
+(function () {
+  const bar = document.createElement("div");
+  bar.className = "offline-bar"; bar.id = "offlineBar"; bar.setAttribute("role", "status");
+  bar.textContent = "You're offline — saved threads are still readable; new questions need a connection.";
+  document.body.appendChild(bar);
+  const sync = () => bar.classList.toggle("show", navigator.onLine === false);
+  window.addEventListener("offline", sync); window.addEventListener("online", sync); sync();
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+    window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+  }
+  let deferred = null;
+  const btn = document.getElementById("installAppBtn");
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferred = e; if (btn) btn.classList.add("show"); });
+  window.addEventListener("appinstalled", () => { deferred = null; if (btn) btn.classList.remove("show"); });
+  if (btn) btn.onclick = async () => { if (!deferred) return; deferred.prompt(); try { await deferred.userChoice; } catch (e) {} deferred = null; btn.classList.remove("show"); };
+})();
+
 // ============ INIT ============
 (async function init() {
   const authed = await checkAuth();
@@ -3532,7 +3872,18 @@ async function loadStatus(force) {
 <script src="modules/discover.js"></script>
 <script src="modules/apikeys.js"></script>
 <script src="modules/projects.js"></script>
+<script src="modules/safe-url.js"></script>
 <script src="modules/siteassets.js"></script>
+<script src="modules/composerx.js"></script>
+<script src="modules/skills-actions.js"></script>
+<script src="modules/plugins.js"></script>
+<script src="modules/settings-security.js"></script>
+<script src="modules/settings-org.js"></script>
+<script src="modules/voice-convo.js"></script>
+<script src="modules/artifacts-files.js"></script>
+<script src="modules/artifacts-gallery.js"></script>
+<script src="modules/hubs.js"></script>
+<script src="modules/repo-pr.js"></script>
 <script src="modules/sources.js"></script>
 <script src="modules/media.js"></script>
 <script src="modules/export.js"></script>
@@ -3543,6 +3894,8 @@ document.getElementById("navDocs").onclick = function () { window.DocsUI && wind
 document.getElementById("navTasks").onclick = function () { window.TasksUI && window.TasksUI.open(); };
 document.getElementById("navProjects").onclick = function () { window.ProjectsUI && window.ProjectsUI.open(); };
 document.getElementById("navDiscover").onclick = function () { window.DiscoverUI && window.DiscoverUI.open(); };
+document.getElementById("navHubs").onclick = function () { window.LiveHubs && window.LiveHubs.open("finance"); };
+document.getElementById("navPlugins").onclick = function () { window.PluginsUI && window.PluginsUI.open(); };
 </script>
 </body>
 </html>

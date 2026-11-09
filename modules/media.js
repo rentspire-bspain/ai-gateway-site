@@ -8,6 +8,14 @@
   var FN = ((typeof GATEWAY !== "undefined" && GATEWAY) || "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1") + "/media-gen";
   var overlay = null, results = [], busy = false;
 
+  // Self-load companion assets (so index.html only needs ONE <script src="modules/media.js">).
+  (function loadCompanions() {
+    var cs = document.currentScript, base = cs && cs.src ? cs.src.replace(/[^/]*$/, "") : "modules/";
+    function css(n) { if (document.querySelector('link[data-mg="' + n + '"]')) return; var l = document.createElement("link"); l.rel = "stylesheet"; l.href = base + n; l.setAttribute("data-mg", n); document.head.appendChild(l); }
+    css("media.css"); css("media-labs.css");
+    if (!window.MediaLabs && !document.querySelector('script[data-mg="labs"]')) { var s = document.createElement("script"); s.src = base + "media-labs.js"; s.defer = true; s.setAttribute("data-mg", "labs"); document.head.appendChild(s); }
+  })();
+
   function client() { return (typeof sb !== "undefined") ? sb : window.sb; }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
 
@@ -25,10 +33,54 @@
     });
   }
 
+  function token() {
+    return client().auth.getSession().then(function (r) {
+      var tok = r && r.data && r.data.session && r.data.session.access_token;
+      if (!tok) throw new Error("Please sign in first.");
+      return tok;
+    });
+  }
+  function api(body) {
+    return token().then(function (tok) {
+      return fetch(FN, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok }, body: JSON.stringify(body) });
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (j) {
+        if (!res.ok || (j.error && j.available !== false)) throw new Error(j.error || ("Request failed (" + res.status + ")"));
+        return j;
+      });
+    });
+  }
+  function fetchBlob(body) {
+    return token().then(function (tok) {
+      return fetch(FN, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok }, body: JSON.stringify(body) });
+    }).then(function (res) { if (!res.ok) throw new Error("Download failed (" + res.status + ")"); return res.blob(); });
+  }
+
   function download(url, i) {
     var a = document.createElement("a");
     a.href = url; a.download = "image-" + (i + 1) + ".png"; a.rel = "noopener";
     document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  // Shrink generated PNGs (~300KB+) to a JPEG <=768px so thread storage (localStorage) stays small.
+  function shrink(url) {
+    return new Promise(function (resolve) {
+      try {
+        var im = new Image();
+        im.onload = function () {
+          try {
+            var sc = Math.min(1, 768 / Math.max(im.width, im.height)), c = document.createElement("canvas");
+            c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
+            c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+            var out = c.toDataURL("image/jpeg", 0.82);
+            resolve(out && out.length < url.length ? out : url);
+          } catch (e) { resolve(url); }
+        };
+        im.onerror = function () { resolve(url); };
+        setTimeout(function () { resolve(url); }, 4000);
+        im.src = url;
+      } catch (e) { resolve(url); }
+    });
   }
 
   function insert(prompt, url) {
@@ -48,25 +100,30 @@
     document.removeEventListener("keydown", onEsc, true);
   }
 
-  function open(initial) {
+  function open(initial, mode) {
     close();
+    mode = mode === "video" ? "video" : "image";
     results = [];
     overlay = el("div", "mg-overlay");
     overlay.addEventListener("mousedown", function (e) { if (e.target === overlay) close(); });
     var dlg = el("div", "mg-dialog");
     dlg.setAttribute("role", "dialog"); dlg.setAttribute("aria-modal", "true"); dlg.setAttribute("aria-label", "Generate image");
     var head = el("div", "mg-head");
-    head.appendChild(el("h3", "", "Generate image"));
+    var seg = el("div", "mg-seg");
+    var bImg = el("button", "mg-segbtn", "Image"), bVid = el("button", "mg-segbtn", "Video");
+    bImg.type = bVid.type = "button"; seg.appendChild(bImg); seg.appendChild(bVid);
+    head.appendChild(seg);
     var x = el("button", "mg-x", "×"); x.type = "button"; x.setAttribute("aria-label", "Close"); x.onclick = close;
     head.appendChild(x);
-    var ta = el("textarea", "mg-prompt"); ta.rows = 3; ta.maxLength = 1000; ta.placeholder = "Describe the image you want…";
+    var ta = el("textarea", "mg-prompt"); ta.rows = 3; ta.maxLength = 1000; ta.placeholder = "Describe what you want to create…";
     if (typeof initial === "string") ta.value = initial;
     var row = el("div", "mg-row");
     var go = el("button", "mg-go", "Generate"); go.type = "button";
     var status = el("div", "mg-status"); status.setAttribute("aria-live", "polite");
     row.appendChild(go); row.appendChild(status);
     var grid = el("div", "mg-grid");
-    dlg.appendChild(head); dlg.appendChild(ta); dlg.appendChild(row); dlg.appendChild(grid);
+    var vnote = el("div", "mg-vnote"); vnote.style.display = "none";
+    dlg.appendChild(head); dlg.appendChild(ta); dlg.appendChild(vnote); dlg.appendChild(row); dlg.appendChild(grid);
     overlay.appendChild(dlg);
     document.body.appendChild(overlay);
     document.addEventListener("keydown", onEsc, true);
@@ -80,13 +137,78 @@
         var acts = el("div", "mg-acts");
         var d = el("button", "mg-btn", "Download"); d.type = "button"; d.onclick = function () { download(url, i); };
         var ins = el("button", "mg-btn", "Insert into thread"); ins.type = "button";
-        ins.onclick = function () { if (insert(prompt, url)) { close(); } else { status.textContent = "Could not insert into thread."; status.className = "mg-status err"; } };
+        ins.onclick = function () {
+          ins.disabled = true;
+          shrink(url).then(function (small) {
+            if (insert(prompt, small)) close(); else { ins.disabled = false; status.textContent = "Could not insert into thread."; status.className = "mg-status err"; }
+          });
+        };
         acts.appendChild(d); acts.appendChild(ins); card.appendChild(acts); grid.appendChild(card);
       });
     }
+    var vcfg = null;
+    function setMode(m) {
+      mode = m;
+      bImg.classList.toggle("on", m === "image"); bVid.classList.toggle("on", m === "video");
+      dlg.setAttribute("aria-label", m === "video" ? "Generate video" : "Generate image");
+      go.textContent = "Generate"; grid.innerHTML = ""; status.textContent = ""; status.className = "mg-status";
+      vnote.style.display = m === "video" ? "" : "none";
+      if (m === "video") {
+        vnote.textContent = "Checking video availability…"; go.disabled = true;
+        (vcfg ? Promise.resolve(vcfg) : api({ action: "video_config" })).then(function (c) {
+          vcfg = c;
+          if (!c.available) {
+            vnote.className = "mg-vnote off";
+            vnote.textContent = "Video generation is not enabled yet. It needs an OpenRouter API key (OPENROUTER_API_KEY) set on this project's media-gen function; it will turn on automatically once that key is added.";
+            go.disabled = true;
+          } else {
+            vnote.className = "mg-vnote";
+            vnote.textContent = c.duration + "s clip, " + c.resolution + ", ≈ $" + c.est_cost_usd.toFixed(2) + " per video. Takes 1–3 minutes.";
+            go.disabled = busy;
+          }
+        }).catch(function (e) { vnote.className = "mg-vnote off"; vnote.textContent = String(e && e.message || e); go.disabled = true; });
+      } else { go.disabled = busy; }
+    }
+    bImg.onclick = function () { if (!busy) setMode("image"); };
+    bVid.onclick = function () { if (!busy) setMode("video"); };
+
+    function runVideo(p) {
+      busy = true; go.disabled = true; go.textContent = "Generating…";
+      status.className = "mg-status"; status.textContent = "Submitting video job…";
+      grid.innerHTML = ""; grid.appendChild(el("div", "mg-skel"));
+      var t0 = Date.now(), id = null;
+      function done() { busy = false; go.textContent = "Generate"; go.disabled = !(vcfg && vcfg.available); }
+      function fail(e) { grid.innerHTML = ""; status.className = "mg-status err"; status.textContent = String(e && e.message || e); done(); }
+      function poll() {
+        if (!overlay) { busy = false; return; }
+        if (Date.now() - t0 > 6 * 60 * 1000) return fail(new Error("Video timed out after 6 minutes."));
+        api({ action: "video_status", job_id: id }).then(function (s) {
+          if (s.status === "completed") {
+            status.textContent = "Downloading video…";
+            return fetchBlob({ action: "video_content", job_id: id }).then(function (blob) {
+              var u = URL.createObjectURL(blob); grid.innerHTML = "";
+              var card = el("div", "mg-card"), v = el("video"); v.src = u; v.controls = true; v.playsInline = true; v.style.width = "100%";
+              var acts = el("div", "mg-acts"), d = el("button", "mg-btn", "Download"); d.type = "button";
+              d.onclick = function () { var a = document.createElement("a"); a.href = u; a.download = "video.mp4"; document.body.appendChild(a); a.click(); a.remove(); };
+              acts.appendChild(d); card.appendChild(v); card.appendChild(acts); grid.appendChild(card);
+              status.textContent = ""; done();
+            });
+          }
+          if (/^(failed|cancelled|expired)$/.test(s.status)) throw new Error("Video " + s.status + (s.error ? ": " + s.error : ""));
+          status.textContent = "Rendering (" + s.status + ", " + Math.round((Date.now() - t0) / 1000) + "s)…";
+          setTimeout(poll, 8000);
+        }).catch(fail);
+      }
+      api({ action: "video_submit", prompt: p }).then(function (r) {
+        if (r.available === false) throw new Error(r.error);
+        id = r.job_id; status.textContent = "Rendering…"; setTimeout(poll, 5000);
+      }).catch(fail);
+    }
+
     function run() {
       var p = ta.value.trim();
       if (!p || busy) return;
+      if (mode === "video") { if (vcfg && vcfg.available) runVideo(p); return; }
       busy = true; go.disabled = true; go.textContent = "Generating…";
       status.className = "mg-status"; status.textContent = "Creating your image — this can take 10–30 seconds.";
       grid.innerHTML = ""; grid.appendChild(el("div", "mg-skel"));
@@ -99,6 +221,7 @@
       }).then(function () { busy = false; go.disabled = false; go.textContent = "Generate"; });
     }
     go.onclick = run;
+    setMode(mode);
     ta.addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); run(); } });
   }
 
@@ -110,6 +233,9 @@
       var b = el("button", "width-toggle mg-pill", "🖼 Image"); b.type = "button"; b.title = "Generate an image (/image)";
       b.onclick = function (e) { e.stopPropagation(); open(); };
       host.appendChild(b);
+      var v = el("button", "width-toggle mg-pill mg-pill-video", "🎬 Video"); v.type = "button"; v.title = "Generate a short video";
+      v.onclick = function (e) { e.stopPropagation(); open("", "video"); };
+      host.appendChild(v);
     });
   }
   // '/image <prompt>' typed in a composer and submitted with Enter opens the dialog instead of searching
@@ -183,6 +309,6 @@
   var mo = new MutationObserver(function () { mountPills(); scan(document); });
   function start() { attach(); mo.observe(document.body, { childList: true, subtree: true }); }
 
-  window.MediaGen = { generate: generate, open: open, close: close, videoIds: videoIds, attach: attach };
+  window.MediaGen = { api: api, shrink: shrink, generate: generate, open: open, close: close, videoIds: videoIds, attach: attach };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();

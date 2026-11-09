@@ -32,7 +32,7 @@
     }
     return out;
   }
-  var PROXY = "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/quotes?symbols=";
+  var PROXY = "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/live-data?action=quotes&symbols=";
   function getQuotes(syms) {
     var need = syms.filter(function (s) { var h = cache["q:" + s]; return !(h && Date.now() - h.t < TTL); });
     if (need.length) {
@@ -107,12 +107,123 @@
     c.appendChild(m); return c;
   }
 
+
+  // ---------- Wave 3: sports / places / shopping / travel ----------
+  var LIVE = "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/live-data";
+  var TEAMS = {
+    nba: "hawks celtics nets hornets bulls cavaliers cavs mavericks mavs nuggets pistons warriors rockets pacers clippers lakers grizzlies heat bucks timberwolves wolves pelicans knicks thunder magic 76ers sixers suns blazers kings spurs raptors jazz wizards",
+    nfl: "cardinals falcons ravens bills panthers bears bengals browns cowboys broncos lions packers texans colts jaguars jags chiefs raiders chargers rams dolphins vikings patriots saints giants jets eagles steelers 49ers niners seahawks buccaneers bucs titans commanders",
+    mlb: "diamondbacks braves orioles red sox cubs white sox reds guardians rockies tigers astros royals angels dodgers marlins brewers twins mets yankees athletics phillies pirates padres mariners cardinals rays rangers blue jays nationals",
+    nhl: "bruins sabres flames hurricanes blackhawks avalanche blue jackets stars red wings oilers panthers kings wild canadiens predators devils islanders rangers senators flyers penguins sharks kraken blues lightning maple leafs canucks golden knights capitals jets utah"
+  };
+  var LEAGUE_KW = [[/\bwnba\b/i, "wnba"], [/\bnba\b|basketball/i, "nba"], [/college football|\bncaaf\b/i, "ncaaf"], [/\bnfl\b|\bfootball\b/i, "nfl"], [/\bmlb\b|baseball/i, "mlb"],
+    [/\bnhl\b|hockey/i, "nhl"], [/premier league|\bepl\b/i, "epl"], [/\bmls\b/i, "mls"], [/champions league|\bucl\b/i, "ucl"], [/la ?liga/i, "laliga"]];
+  var LEAGUE_NAME = { nba: "NBA", wnba: "WNBA", nfl: "NFL", mlb: "MLB", nhl: "NHL", ncaaf: "College Football", ncaam: "College Basketball", epl: "Premier League", mls: "MLS", ucl: "Champions League", laliga: "La Liga" };
+  function sportsIntent(q) {
+    if (!q) return null;
+    var lg = null, team = null, i;
+    for (i = 0; i < LEAGUE_KW.length; i++) if (LEAGUE_KW[i][0].test(q)) { lg = LEAGUE_KW[i][1]; break; }
+    var ql = q.toLowerCase();
+    Object.keys(TEAMS).forEach(function (k) {
+      TEAMS[k].split(" ").concat(k === "nba" ? ["trail blazers"] : []).forEach(function (t) {
+        if (!team && t.length > 3 && new RegExp("\\b" + t + "\\b").test(ql)) { team = t; if (!lg) lg = k; }
+      });
+    });
+    if (!lg || !(/\b(scores?|games?|playing|plays|tonight|today|schedule|standings|vs\.?|versus|result|results|won|win|live)\b/i.test(q) || team)) return null;
+    return { league: lg, team: team };
+  }
+  function getGames(lg) {
+    return cached("s:" + lg, function () {
+      return tfetch(LIVE + "?action=sports&league=" + lg).then(function (t) { var g = (JSON.parse(t) || {}).games; if (!g || !g.length) throw new Error("ng"); return g; });
+    });
+  }
+  function gameRow(g) {
+    var r = el("div", "ec-game"), live = g.state === "in";
+    function side(x, cls) { var d = el("div", "ec-team " + cls + (x.winner ? " ec-win" : "")); d.appendChild(el("span", "ec-tn", x.abbr || x.name)); if (g.state !== "pre") d.appendChild(el("span", "ec-ts", String(x.score))); return d; }
+    r.appendChild(side(g.away, "ec-away")); r.appendChild(side(g.home, "ec-home"));
+    r.appendChild(el("span", "ec-gs" + (live ? " ec-gs-live" : ""), g.detail || (g.completed ? "Final" : "")));
+    return r;
+  }
+  function sportsCard(d) {
+    var c = el("div", "ec-card ec-sports ec-col"), top = el("div", "ec-top");
+    top.appendChild(el("span", "ec-sym", LEAGUE_NAME[d.league] || d.league.toUpperCase())); top.appendChild(liveChip()); c.appendChild(top);
+    d.games.forEach(function (g) { c.appendChild(gameRow(g)); });
+    return c;
+  }
+  function getSports(it) {
+    return getGames(it.league).then(function (all) {
+      var g = all;
+      if (it.team) { var m = all.filter(function (x) { return (x.home.name + " " + x.away.name).toLowerCase().indexOf(it.team) >= 0; }); if (m.length) g = m; else throw new Error("nt"); }
+      else g = all.slice().sort(function (a, b) { return (b.state === "in") - (a.state === "in"); });
+      return sportsCard({ league: it.league, games: g.slice(0, 3) });
+    });
+  }
+
+  var PLACE_RE = /\b(restaurants?|cafes?|coffee( shops?)?|bars?|pubs?|pizza|sushi|tacos?|bakery|hotels?|hostels?|gas stations?|pharmac(y|ies)|gyms?|museums?|parks?|beaches|libraries|supermarkets?|grocery|where (is|can)|directions? to|map of)\b/i;
+  function placesIntent(q) {
+    if (!q || !PLACE_RE.test(q) || /weather|temperature|forecast|flights?/i.test(q)) return null;
+    if (!/\b(in|near|around|at|by|of|to)\s+[A-Za-z]/i.test(q) && !/^\s*(where|map)/i.test(q)) return null;
+    var s = q.replace(/[?!.]+$/, "").replace(/\b(what|which|where|are|is|the|best|top|good|great|find|me|can|i|you|recommend|some|any|get|to|go|eat|a|an|please|show)\b/gi, " ").replace(/\s+/g, " ").trim();
+    return s.length > 2 ? { q: s.slice(0, 100) } : null;
+  }
+  function getPlaces(it) {
+    return cached("p:" + it.q.toLowerCase(), function () {
+      return tfetch(LIVE + "?action=places&q=" + encodeURIComponent(it.q)).then(function (t) { var p = (JSON.parse(t) || {}).places; if (!p || !p.length) throw new Error("np"); return p; });
+    }).then(function (p) {
+      var c = el("div", "ec-card ec-places ec-col"), top = el("div", "ec-top");
+      top.appendChild(el("span", "ec-sym", "Places")); top.appendChild(liveChip()); c.appendChild(top);
+      p.slice(0, 4).forEach(function (x) {
+        var r = el("div", "ec-place"), m = el("div", "ec-main");
+        m.appendChild(el("div", "ec-pn", x.name)); if (x.address) m.appendChild(el("div", "ec-sub", x.address));
+        r.appendChild(m); r.appendChild(link("Map", x.maps_url)); r.appendChild(link("OSM", x.osm_url)); c.appendChild(r);
+      });
+      return c;
+    });
+  }
+
+  function link(label, href) { var a = el("a", "ec-link", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; return a; }
+  function linkCard(title, sub, links) {
+    var c = el("div", "ec-card ec-col"), top = el("div", "ec-top");
+    top.appendChild(el("span", "ec-sym", title)); c.appendChild(top);
+    if (sub) c.appendChild(el("div", "ec-sub", sub));
+    var row = el("div", "ec-links"); links.forEach(function (l) { row.appendChild(link(l[0], l[1])); }); c.appendChild(row); return c;
+  }
+  function shoppingIntent(q) {
+    if (!q || !/\b(buy|purchase|cheapest|deals?|where to (buy|get)|shop(ping)? for|price of|how much (is|does|are)|best .{2,40} under \$?\d+|on sale)\b/i.test(q)) return null;
+    var s = q.replace(/[?!.]+$/, "").replace(/\b(where|to|buy|get|the|a|an|cheapest|best|price of|how much (is|does|are)|do|does|i|can|find|me|for|deals?|on|sale|shop(ping)?)\b/gi, " ").replace(/\s+/g, " ").trim();
+    return s.length > 2 ? { q: s.slice(0, 80) } : null;
+  }
+  function shoppingCard(it) {
+    var e = encodeURIComponent(it.q);
+    return linkCard("Shop: " + it.q, "Compare prices across stores", [["Google Shopping", "https://www.google.com/search?tbm=shop&q=" + e], ["Amazon", "https://www.amazon.com/s?k=" + e],
+      ["eBay", "https://www.ebay.com/sch/i.html?_nkw=" + e], ["Walmart", "https://www.walmart.com/search?q=" + e]]);
+  }
+  function travelIntent(q) {
+    if (!q || !/\b(flights?|flying|hotels?|trip|travel|vacation|holiday|visit|itinerary|getaway)\b/i.test(q)) return null;
+    var m = /\b(?:to|in|visit|visiting|for)\s+([A-Z][A-Za-z.'-]*(?:\s+[A-Z][A-Za-z.'-]*){0,2})/.exec(q);
+    return m ? { city: m[1].trim() } : null;
+  }
+  function travelCard(it) {
+    return getWeather(it.city).then(function (w) {
+      var e = encodeURIComponent(it.city), wc = WC[w.code] || ["", "\uD83C\uDF21\uFE0F"];
+      var c = linkCard("Trip: " + w.name, "Right now: " + Math.round(w.temp) + "\u00B0F, " + wc[0].toLowerCase() + ", wind " + Math.round(w.wind) + " mph",
+        [["Flights", "https://www.google.com/travel/flights?q=" + encodeURIComponent("Flights to " + it.city)], ["Hotels", "https://www.google.com/travel/hotels/" + e],
+         ["Kayak", "https://www.kayak.com/explore/" + e], ["Things to do", "https://www.tripadvisor.com/Search?q=" + e]]);
+      c.querySelector(".ec-top").appendChild(liveChip()); return c;
+    });
+  }
+
   function process(content, question) {
     if (!content || content.getAttribute("data-ec")) return;
     content.setAttribute("data-ec", "1");
     var text = content.textContent || "", jobs = [];
-    var city = cityFromHint(question != null ? question : hint);
+    var q = question != null ? question : hint, travel = travelIntent(q), sp = sportsIntent(q), pl = placesIntent(q), sh = shoppingIntent(q);
+    var city = travel ? null : cityFromHint(q);
     if (city) jobs.push(getWeather(city).then(weatherCard));
+    if (travel) jobs.push(travelCard(travel));
+    if (sp) jobs.push(getSports(sp));
+    if (pl && !travel) jobs.push(getPlaces(pl));
+    if (sh && !travel) jobs.push(Promise.resolve(shoppingCard(sh)));
     getQuotes(detectTickers(text)).forEach(function (p) { jobs.push(p.then(quoteCard)); });
     jobs = jobs.slice(0, MAX);
     if (!jobs.length) return;
@@ -135,6 +246,6 @@
     obs.observe(document.body, { childList: true, subtree: true });
     scan();
   }
-  window.EntityCards = { attach: attach, questionHint: function (q) { hint = String(q || ""); }, process: process, _detect: detectTickers, _city: cityFromHint };
+  window.EntityCards = { attach: attach, questionHint: function (q) { hint = String(q || ""); }, process: process, _detect: detectTickers, _intents: function (q) { return { sports: sportsIntent(q), places: placesIntent(q), shopping: shoppingIntent(q), travel: travelIntent(q), city: cityFromHint(q) }; }, _getWeather: getWeather, _tfetch: tfetch, LIVE: LIVE, _city: cityFromHint };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", attach); else attach();
 })();

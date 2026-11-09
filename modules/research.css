@@ -44,3 +44,19 @@
   .dr-ui-head{padding:12px 16px;gap:8px}
   .dr-ui-body{padding:16px}
 }
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.dr-ui-head{padding-top:max(14px,env(safe-area-inset-top));padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+.dr-ui-body{padding-bottom:max(24px,calc(env(safe-area-inset-bottom) + 16px));padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right));overscroll-behavior:contain}
+.dr-row>*{min-width:0}
+.dr-row>.dr-btn{min-width:auto}
+.dr-card{min-width:0}
+.dr-meta,.dr-note,.dr-err,.dr-empty{overflow-wrap:anywhere}
+.dr-steps{row-gap:10px}
+@media (max-width:768px){
+  .dr-ui-head{padding-top:max(12px,env(safe-area-inset-top));padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+  .dr-ui-body{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+  .dr-btn,.dr-x{min-height:40px}.dr-x{min-width:40px}
+  .dr-row{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){.dr-step.active .dr-dot{animation:none}}

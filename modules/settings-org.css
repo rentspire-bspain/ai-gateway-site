@@ -1,0 +1,24 @@
+/* ============ Settings extension: Team (G3) ============
+   Companion styles for modules/settings-org.js. */
+
+.org-member-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.org-member-row:last-child { border-bottom: none; }
+.org-member-row .stg-select { min-width: 118px; }
+
+.org-invite-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 10px 0 4px;
+}
+.org-invite-form .stg-input { flex: 1; min-width: 200px; }
+
+@media (max-width: 768px) {
+  .org-member-row { flex-wrap: wrap; }
+}

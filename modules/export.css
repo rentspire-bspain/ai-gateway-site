@@ -23,3 +23,19 @@
 .sv-src{margin-top:10px;font-size:13px;color:var(--text-muted)}.sv-src a{color:var(--citation-text);display:block;margin:2px 0;word-break:break-all}
 .sv-cta{display:inline-block;margin-top:28px;color:var(--accent);text-decoration:none;font-size:14px}
 .sv-err{color:var(--error);margin-top:40px}
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.ex-menu,.ex-comment{max-width:calc(100vw - 16px);max-height:calc(100dvh - 24px);overflow-y:auto;box-sizing:border-box}
+.ex-comment{width:min(260px,calc(100vw - 16px))}
+.ex-comment textarea{width:100%;box-sizing:border-box;font-size:16px}
+.ex-item{min-height:36px}
+.ex-note{word-break:normal;overflow-wrap:anywhere}
+.sv-root{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.sv-wrap{padding-top:max(32px,calc(env(safe-area-inset-top) + 16px));padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right));padding-bottom:max(80px,calc(env(safe-area-inset-bottom) + 60px))}
+.sv-title,.sv-q,.sv-a,.sv-a a{overflow-wrap:anywhere}
+.sv-a img,.sv-a video,.sv-a iframe{max-width:100%;height:auto}
+.sv-a table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse}
+.sv-a th,.sv-a td{border:1px solid var(--border);padding:6px 10px;text-align:left;vertical-align:top}
+.sv-a pre{max-width:100%}
+@media (max-width:480px){.sv-title{font-size:19px}.sv-q{font-size:15px;padding:10px 12px}}
+@media (hover:none){.ex-item{min-height:44px}}

@@ -1,0 +1,28 @@
+.ml-overlay { position: fixed; inset: 0; z-index: 390; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; padding: 12px; }
+.ml-dialog { background: var(--bg-elevated); color: var(--text); border: 1px solid var(--border-light); border-radius: 14px; width: min(760px, 100%); height: min(680px, calc(100dvh - 24px)); display: flex; flex-direction: column; padding: 16px; box-sizing: border-box; overflow: hidden; }
+.ml-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ml-head h3 { margin: 0; font-size: 16px; }
+.ml-x { background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; min-width: 40px; min-height: 40px; }
+.ml-prompt { width: 100%; box-sizing: border-box; resize: vertical; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font: inherit; font-size: 14px; }
+.ml-prompt:focus { outline: none; border-color: var(--accent); }
+.ml-brow { display: flex; align-items: center; gap: 10px; margin: 8px 0 4px; flex-wrap: wrap; }
+.ml-sel { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px; min-height: 40px; font-size: 13px; }
+.ml-go { background: var(--accent-btn); color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 40px; }
+.ml-go:disabled { opacity: .6; cursor: progress; }
+.ml-status { font-size: 12.5px; flex: 1 1 180px; color: var(--text-faint, var(--text)); }
+.ml-status.err { color: #e5655b; }
+.ml-ctx { font-size: 12px; color: var(--text-faint, var(--text)); margin-bottom: 8px; }
+.ml-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+.ml-tab { background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-faint, var(--text)); padding: 9px 14px; font-size: 13px; cursor: pointer; min-height: 40px; white-space: nowrap; }
+.ml-tab.on { color: var(--text); border-bottom-color: var(--text); }
+.ml-body { flex: 1; overflow-y: auto; padding-top: 10px; }
+.ml-note { font-size: 12.5px; color: var(--text-faint, var(--text)); margin: 4px 0 10px; }
+.ml-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.ml-grow { flex: 1 1 160px; min-width: 0; }
+.ml-t { font-size: 13.5px; font-weight: 600; overflow-wrap: anywhere; }
+.ml-s { font-size: 12px; color: var(--text-faint, var(--text)); overflow-wrap: anywhere; }
+.ml-chk { font-size: 12px; display: inline-flex; align-items: center; gap: 4px; }
+.ml-btn { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 12.5px; cursor: pointer; min-height: 36px; }
+.ml-btn:hover { border-color: var(--accent); }
+.ml-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 10px; margin-top: 8px; }
+.ml-grid img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); display: block; }

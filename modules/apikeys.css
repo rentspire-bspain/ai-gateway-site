@@ -35,3 +35,14 @@
 .ak-warn{color:var(--text-muted);font-size:12px;margin-top:10px}
 @media(max-width:640px){.ak-head{padding:12px 14px}.ak-body{padding:14px}}
 @media(max-width:768px){.ak-btn,.ak-x,.ak-input{min-height:40px}.ak-x{min-width:40px}}
+
+/* ---- responsive-pass 2026-11-09 ---- */
+.ak-head{padding-top:max(14px,env(safe-area-inset-top));padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+.ak-body{padding-bottom:max(24px,calc(env(safe-area-inset-bottom) + 16px));padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right));overscroll-behavior:contain;scroll-padding-bottom:96px}
+.ak-wrap>*,.ak-card,.ak-form{min-width:0}
+.ak-title{white-space:nowrap}
+.ak-name,.ak-meta,.ak-intro,.ak-usage,.ak-err,.ak-warn,.ak-prefix code{overflow-wrap:anywhere}
+.ak-prefix code{display:inline-block;max-width:100%}
+.ak-keyraw{max-width:100%;overflow-x:auto}
+@media(max-width:640px){.ak-head{padding-top:max(12px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.ak-body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.ak-row .ak-btn{flex:1 1 auto}}
+@media(max-width:768px){.ak-input{font-size:16px}}
