@@ -13,7 +13,10 @@
 (function () {
   "use strict";
 
-  var VERSION = "v74";
+  var VERSION = (function () { // v84: read the deployed version from <meta name="app-version"> (bumped per deploy)
+    try { var m = document.querySelector('meta[name="app-version"]'); if (m && m.content) return m.content; } catch (e) {}
+    return "dev";
+  })();
 
   // ---------- tiny helpers ----------
   function $(sel, el) { return (el || document).querySelector(sel); }

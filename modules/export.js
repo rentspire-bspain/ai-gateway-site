@@ -62,6 +62,15 @@
       if ((m = /^(#{1,6})\s+(.*)$/.exec(l))) { close(); out.push("<h" + m[1].length + ">" + inline(m[2]) + "</h" + m[1].length + ">"); }
       else if ((m = /^\s*[-*]\s+(.*)$/.exec(l))) { if (list !== "ul") { close(); out.push("<ul>"); list = "ul"; } out.push("<li>" + inline(m[1]) + "</li>"); }
       else if ((m = /^\s*\d+\.\s+(.*)$/.exec(l))) { if (list !== "ol") { close(); out.push("<ol>"); list = "ol"; } out.push("<li>" + inline(m[1]) + "</li>"); }
+      else if (l.indexOf("|") !== -1 && i + 1 < lines.length && /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(lines[i + 1])) {
+        // v84: GFM table
+        close();
+        var cells = function (ln) { return ln.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(function (x) { return x.trim(); }); };
+        var hd = cells(l), t = "<table><thead><tr>" + hd.map(function (x) { return "<th>" + inline(x) + "</th>"; }).join("") + "</tr></thead><tbody>";
+        i += 2;
+        while (i < lines.length && lines[i].indexOf("|") !== -1 && lines[i].trim()) { t += "<tr>" + cells(lines[i]).map(function (x) { return "<td>" + inline(x) + "</td>"; }).join("") + "</tr>"; i++; }
+        out.push(t + "</tbody></table>"); continue;
+      }
       else if (!l.trim()) close();
       else { close(); out.push("<p>" + inline(l) + "</p>"); }
       i++;
@@ -122,7 +131,10 @@
     document.body.appendChild(m);
     var r = anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : { left: 0, bottom: 0 };
     var top = r.bottom + 4, left = r.left;
-    var h = m.offsetHeight || 0; if (h && top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 4);
+    var h = m.offsetHeight || 0;
+    var limit = window.innerHeight - 8, fw = document.getElementById("followupWrapper"); // v84: never sit on top of the pinned composer
+    if (fw && fw.offsetParent !== null) { var ft = fw.getBoundingClientRect().top; if (ft > 60) limit = Math.min(limit, ft - 8); }
+    if (h && top + h > limit) top = Math.max(8, Math.min(r.top - h - 4, limit - h));
     m.style.top = top + "px"; m.style.left = Math.max(8, Math.min(left, window.innerWidth - (m.offsetWidth || 180) - 8)) + "px";
     openMenu = m;
     var first = m.querySelector(".ex-item"); if (first && first.focus) first.focus();
@@ -298,7 +310,7 @@
     viewer = document.createElement("div"); viewer.className = "sv-root"; viewer.innerHTML = '<div class="sv-wrap"><div class="sv-badge">Loading shared thread...</div></div>';
     document.body.appendChild(viewer);
     return call({ action: "get", id: id }, false).then(function (j) { viewer.innerHTML = render(j); return true; })
-      .catch(function (er) { viewer.innerHTML = '<div class="sv-wrap"><div class="sv-err">' + escH(er.message || "This link is unavailable or was revoked.") + "</div></div>"; return false; });
+      .catch(function (er) { viewer.innerHTML = '<div class="sv-wrap"><div class="sv-badge">Shared thread</div><h1 class="sv-title">Link not found</h1><div class="sv-err">' + escH("This share link is invalid, unavailable or was revoked.") + '</div><a class="sv-cta" href="' + APP + '">Back to ai.spaincos.com</a></div>'; return false; });
   }
   window.ShareView = { maybeOpen: maybeOpen, _render: render };
 

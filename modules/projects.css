@@ -70,3 +70,8 @@
   .pj-body{padding-bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px))}
   .pj-label input,.pj-label textarea{font-size:16px}
 }
+
+/* v84: title never truncates to "Pr…" at 360-390px; count/button wrap instead */
+.pj-head h2{flex:1 0 auto;min-width:max-content;overflow:visible;text-overflow:clip}
+.pj-head{flex-wrap:wrap}
+.pj-btn.primary{background:var(--accent-btn)!important;border-color:var(--accent-btn)!important;color:#fff!important}

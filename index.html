@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#14646B">
+<meta name="app-version" content="v84">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ai.spaincos">
@@ -1529,6 +1530,7 @@ let threads = safeLSArray("ai_threads");
   threads = threads.filter(t => t && !t.incognito).concat(live);
 })();
 let currentThreadId = null;
+function setCurrentThread(id) { currentThreadId = id || null; try { if (id) sessionStorage.setItem("ai_current_thread", id); else sessionStorage.removeItem("ai_current_thread"); } catch (e) {} }
 let isSearching = false;
 let currentUser = null;
 // v76: one-time thread timestamp backfill (Library date groups / Usage counts)
@@ -1805,7 +1807,7 @@ function setIncognito(on) {
   document.body.classList.toggle("incognito", on);
   document.getElementById("incognitoBar").classList.toggle("show", on);
   // switching modes always starts a fresh thread so the two kinds never mix
-  currentThreadId = null;
+  setCurrentThread(null);
   showLanding();
   renderThreads();
 }
@@ -2451,6 +2453,9 @@ async function syncThreadsFromServer() {
       const { data: msgs } = await sb.from("thread_messages").select("role,content,sources,related").eq("thread_id", rt.id).order("created_at", { ascending: true });
       byId.set(rt.id, { id: rt.id, title: rt.title, spaceId: rt.space_id || null, messages: (msgs || []).map(m => ({ role: m.role, content: m.content, sources: m.sources, related: m.related })) });
     }
+    // v84: threads created/loaded while the awaits above were in flight must survive the merge —
+    // dropping them left currentThreadId pointing at nothing, so the next follow-up started a NEW thread.
+    for (const lt of threads) if (!byId.has(lt.id)) byId.set(lt.id, lt);
     threads = [...byId.values()];
     // push local-only threads up to the server (one-time migration).
     // Threads created before v61 have numeric (non-uuid) ids — re-key them
@@ -2461,7 +2466,7 @@ async function syncThreadsFromServer() {
         if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(t.id))) {
           const oldId = t.id;
           t.id = crypto.randomUUID();
-          if (currentThreadId === oldId) currentThreadId = t.id;
+          if (currentThreadId === oldId) setCurrentThread(t.id);
         }
         await pushThreadToServer(t);
         await pushThreadMessages(t);
@@ -2530,7 +2535,7 @@ function renderThreads() {
     actions.appendChild(mkBtn("Delete", '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>', () => {
       if (!confirm("Delete this thread?")) return;
       threads = threads.filter(x => x.id !== t.id);
-      if (currentThreadId === t.id) { currentThreadId = null; showLanding(); }
+      if (currentThreadId === t.id) { setCurrentThread(null); showLanding(); }
       if (currentUser) sb.from("threads").delete().eq("id", t.id).then(() => {}, () => {});
       saveThreads(); renderSpaces(); renderThreads();
     }));
@@ -2540,7 +2545,7 @@ function renderThreads() {
   });
 }
 function newThread() {
-  currentThreadId = null;
+  setCurrentThread(null);
   showLanding();
   renderThreads();
 }
@@ -2550,7 +2555,7 @@ function createThread(title) {
   if (incognitoOn) { thread.incognito = true; thread.expiresAt = Date.now() + INCOG_TTL; }
   threads.unshift(thread);
   if (threads.length > 50) threads = threads.slice(0, 50);
-  currentThreadId = thread.id;
+  setCurrentThread(thread.id);
   saveThreads();
   renderThreads();
   return thread;
@@ -2558,7 +2563,7 @@ function createThread(title) {
 async function loadThread(id) {
   const thread = threads.find(t => t.id === id);
   if (!thread) return;
-  currentThreadId = id;
+  setCurrentThread(id);
   if (!!thread.incognito !== incognitoOn) { // opening a thread of the other kind switches the mode indicator
     incognitoOn = !!thread.incognito;
     document.getElementById("incognitoToggle").classList.toggle("active", incognitoOn);
@@ -3751,8 +3756,15 @@ async function loadStatus(force) {
   const dot = document.getElementById("statusDot");
   const text = document.getElementById("statusText");
   try {
-    const res = await fetch(GATEWAY + "/gateway-status" + (force ? "?force=1" : ""));
+    // v84: send the session token so the status endpoint can authorize the probe, and never show a
+    // scary banner for an auth/probe-plumbing failure (chat works independently of the probe).
+    let hdr = {};
+    try { const { data: sd } = await sb.auth.getSession(); if (sd?.session?.access_token) hdr = { Authorization: "Bearer " + sd.session.access_token }; } catch (e) {}
+    const res = await fetch(GATEWAY + "/gateway-status" + (force ? "?force=1" : ""), { headers: hdr });
     const data = await res.json();
+    if (!Array.isArray(data.results)) throw new Error("status unavailable");
+    const probeAuthFail = data.results.length && data.results.every(r => r.status !== "pass" && /unauthori[sz]ed|gateway token|\b40[13]\b/i.test(String(r.error || "")));
+    if (probeAuthFail && !force) { banner.style.display = "none"; console.warn("gateway-status probe unauthorized (server-side probe token) — banner suppressed"); return; }
     const allPass = data.results.every(r => r.status === "pass");
     const anyPass = data.results.some(r => r.status === "pass");
     dot.className = "status-dot" + (allPass ? "" : anyPass ? " warn" : " err");
@@ -3835,14 +3847,19 @@ async function loadStatus(force) {
 // ============ INIT ============
 (async function init() {
   const authed = await checkAuth();
-  if (authed) {
+  if (authed && currentUser) {
     document.getElementById("userEmail").textContent = currentUser.email;
     document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
   }
   renderThreads();
   renderSpaces();
   positionComposerPills();
-  loadStatus(false);
+  // v84: restore the active thread after a reload so a follow-up continues it instead of starting a new one
+  try {
+    const sid = sessionStorage.getItem("ai_current_thread");
+    if (sid && !/[?&]share=/.test(location.search) && threads.some(t => t.id === sid && (t.messages || []).length)) await loadThread(sid);
+  } catch (e) {}
+  if (!/[?&]share=/.test(location.search)) loadStatus(false);
   // v68: small screens start with the sidebar collapsed (Perplexity mobile behavior)
   let lastW = null;
   const autoCollapse = () => {

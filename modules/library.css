@@ -81,3 +81,7 @@
   .lib-bulk{padding-bottom:max(8px,env(safe-area-inset-bottom))}
 }
 @media (hover:none){.lib-menu button{min-height:44px}}
+
+/* v84: primary buttons — #libRoot button{color:inherit} was winning on specificity (low-contrast label) */
+.lib-btn.primary{background:var(--accent-btn)!important;border-color:var(--accent-btn)!important;color:#fff!important}
+.lib-btn.primary:hover{background:var(--accent-btn-hover)!important}

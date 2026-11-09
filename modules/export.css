@@ -39,3 +39,6 @@
 .sv-a pre{max-width:100%}
 @media (max-width:480px){.sv-title{font-size:19px}.sv-q{font-size:15px;padding:10px 12px}}
 @media (hover:none){.ex-item{min-height:44px}}
+
+/* v84: white-on-teal contrast token */
+.ex-comment button.primary{background:var(--accent-btn)!important;border-color:var(--accent-btn)!important;color:#fff!important}

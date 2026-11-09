@@ -438,3 +438,11 @@
   .stg-select{min-width:0;flex:1 1 150px}
   .stg-input.narrow{width:100%}
 }
+
+/* v84: tab strip scroll cue (shadows appear only when more tabs are off-screen) + primary contrast */
+@media (max-width:768px){
+  .stg-nav{background:linear-gradient(to right,var(--bg-surface,var(--bg)) 30%,transparent) left center/28px 100% no-repeat local,linear-gradient(to left,var(--bg-surface,var(--bg)) 30%,transparent) right center/28px 100% no-repeat local,linear-gradient(to right,rgba(0,0,0,.18),transparent) left center/12px 100% no-repeat scroll,linear-gradient(to left,rgba(0,0,0,.18),transparent) right center/12px 100% no-repeat scroll}
+  .stg-nav-btn{flex:0 0 auto;white-space:nowrap}
+}
+.stg-btn{background:var(--accent-btn)!important;color:#fff!important}
+.stg-btn:hover{background:var(--accent-btn-hover)!important}

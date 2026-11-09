@@ -59,3 +59,6 @@
   .sk-btn{min-height:40px}
   .sk-slash-item{min-height:44px}
 }
+
+/* v84: white-on-teal contrast token */
+.sk-btn.primary{background:var(--accent-btn)!important;border-color:var(--accent-btn)!important;color:#fff!important}

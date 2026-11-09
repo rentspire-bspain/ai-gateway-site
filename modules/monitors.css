@@ -62,3 +62,6 @@
 .tk-run .tk-digest{background:var(--bg-surface);margin-top:0;max-height:260px;overflow:auto}
 .tk-tab{white-space:nowrap}
 @media(max-width:640px){.tk-tab{padding:7px 8px;font-size:13px}.tk-tabs{overflow-x:auto}}
+
+/* v84: white-on-teal contrast token */
+.tk-btn.primary{background:var(--accent-btn)!important;border-color:var(--accent-btn)!important;color:#fff!important}

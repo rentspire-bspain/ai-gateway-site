@@ -46,3 +46,6 @@
 .ak-keyraw{max-width:100%;overflow-x:auto}
 @media(max-width:640px){.ak-head{padding-top:max(12px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.ak-body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.ak-row .ak-btn{flex:1 1 auto}}
 @media(max-width:768px){.ak-input{font-size:16px}}
+
+/* v84: white-on-teal contrast token */
+.ak-btn.primary{background:var(--accent-btn)!important;border-color:var(--accent-btn)!important;color:#fff!important}

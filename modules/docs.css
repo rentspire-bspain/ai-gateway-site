@@ -107,3 +107,14 @@
   .dx-search input{font-size:16px}
   .dx-md th,.dx-md td{min-width:72px}
 }
+
+/* v84: header wraps so the search field gets its own full-width row on phones; tab strip shows a scroll cue */
+@media (max-width:760px){
+  .dx-top{flex-wrap:wrap;overflow:visible}
+  .dx-title{order:0;flex:1 1 auto}
+  .dx-close{order:1}
+  .dx-search{order:2;flex:1 1 100%;max-width:100%;min-width:0}
+  .dx-tabs{background:linear-gradient(to right,var(--bg) 30%,transparent) left center/24px 100% no-repeat local,linear-gradient(to left,var(--bg) 30%,transparent) right center/24px 100% no-repeat local,linear-gradient(to right,rgba(0,0,0,.18),transparent) left center/10px 100% no-repeat scroll,linear-gradient(to left,rgba(0,0,0,.18),transparent) right center/10px 100% no-repeat scroll}
+  .dx-tab{flex:0 0 auto;white-space:nowrap}
+}
+.dx-retry{background:var(--accent-btn)!important;border-color:var(--accent-btn)!important;color:#fff!important}
