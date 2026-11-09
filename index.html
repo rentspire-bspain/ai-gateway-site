@@ -89,6 +89,11 @@ a { color: inherit; text-decoration: none; }
   transition: width 0.2s ease, margin-left 0.2s ease;
 }
 .sidebar.collapsed { width: 0; margin-left: calc(var(--sidebar-width) * -1); overflow: hidden; }
+@media (max-width: 768px) {
+  .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 120; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+  .sidebar.collapsed { width: var(--sidebar-width); margin-left: calc(var(--sidebar-width) * -1); }
+  .main { width: 100%; }
+}
 .sidebar-header {
   display: flex;
   align-items: center;
@@ -259,6 +264,8 @@ a { color: inherit; text-decoration: none; }
 }
 .attach-chip button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 0; line-height: 1; }
 .thread-item svg { flex-shrink: 0; opacity: 0.6; }
+.thread-item span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.thread-item { overflow: hidden; }
 .sidebar-footer {
   border-top: 1px solid var(--border);
   padding: 12px;
@@ -509,6 +516,11 @@ a { color: inherit; text-decoration: none; }
   font-weight: 500;
   color: var(--text);
   line-height: 1.35;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -617,6 +629,9 @@ a { color: inherit; text-decoration: none; }
 .answer-content ul, .answer-content ol { margin: 0 0 14px 20px; }
 .answer-content li { margin-bottom: 6px; }
 .answer-content strong { font-weight: 600; }
+.answer-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 6px 0; }
+.answer-content pre { overflow-x: auto; max-width: 100%; }
+.answer-content table { display: block; overflow-x: auto; max-width: 100%; }
 .answer-content code {
   font-family: "SF Mono", "Fira Code", monospace;
   font-size: 14px;
@@ -1784,7 +1799,18 @@ function renderAnswer(container, text, sources, related, images) {
       domainEl.textContent = s.domain || "";
       const titleEl = document.createElement("div");
       titleEl.className = "source-title";
-      titleEl.textContent = s.title || "";
+      // v68: never show a raw URL as the card title (Perplexity shows a readable
+      // title) — derive one from the path, or fall back to the domain
+      let t = String(s.title || "");
+      if (/^https?:\/\//i.test(t) || /^www\./i.test(t)) {
+        try {
+          const u = new URL(t.startsWith("www.") ? "https://" + t : t);
+          const seg = u.pathname.split("/").filter(Boolean).pop() || "";
+          t = seg.replace(/\.(html?|php|aspx?)$/i, "").replace(/[-_]+/g, " ").trim() || u.hostname.replace(/^www\./, "");
+        } catch { t = s.domain || ""; }
+      }
+      titleEl.textContent = t;
+      titleEl.title = s.title || "";
       card.appendChild(favicon);
       card.appendChild(domainEl);
       card.appendChild(titleEl);
@@ -2187,6 +2213,17 @@ async function loadStatus(force) {
   renderSpaces();
   positionComposerPills();
   loadStatus(false);
+  // v68: small screens start with the sidebar collapsed (Perplexity mobile behavior)
+  const autoCollapse = () => {
+    const small = window.innerWidth <= 768;
+    const btn = document.getElementById("expandSidebar");
+    if (small && !sidebar.classList.contains("collapsed")) {
+      sidebar.classList.add("collapsed");
+      if (btn) btn.style.display = "flex";
+    }
+  };
+  autoCollapse();
+  window.addEventListener("resize", autoCollapse);
 })();
 </script>
 </body>
