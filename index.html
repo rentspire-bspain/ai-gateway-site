@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-mMX5j8NyUyfC/lXS4jsaJrKMCuVA0aiuAJwUMSSolH4=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-FI/G8GwC3+LCLaQbv4DplOUP3436GUVJENayGvlNTu4=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -3540,7 +3540,7 @@ async function performSearch(query) {
     "deepseek-flash": "deepseek/deepseek-v4.1-flash",
     "gpt-oss": "openai/gpt-oss-120b",
     llama4: "meta-llama/llama-4-maverick",
-    venice: "venice/uncensored",
+    venice: "cognitivecomputations/dolphin-mistral-24b-venice-edition",
     dolphin: "cognitivecomputations/dolphin-mistral-24b-venice-edition"
   };
   const modelOverride = MODEL_OVERRIDES[purpose] || null;
