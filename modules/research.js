@@ -241,7 +241,7 @@
       '<div class="dr-step" data-step="done"><span class="dr-dot"></span>Report</div>' +
       "</div>" +
       '<div class="dr-elapsed" data-el="elapsed">0:00</div>' +
-      '<div class="dr-note">Deep Research runs for several minutes at high effort. Press Esc to hide this — the research continues in the background and you can reopen it from Research jobs.</div>';
+      '<div class="dr-note">Deep Research usually takes 2-6 minutes. Press Esc to hide this — the research continues in the background and you can reopen it from Research jobs.</div>';
     content.appendChild(q);
     content.appendChild(panel);
     var started = Date.now();

@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="modules/apikeys.css">
 <link rel="stylesheet" href="modules/projects.css">
 <link rel="stylesheet" href="modules/sources.css">
+<link rel="stylesheet" href="modules/media.css">
+<link rel="stylesheet" href="modules/export.css">
 <link rel="preconnect" href="https://frontend-cdn.perplexity.ai" crossorigin>
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
@@ -2456,6 +2458,7 @@ const authOverlay = document.getElementById("authOverlay");
 // use ai.spaincos.com. Anyone else is signed out and blocked at sign-in.
 const ALLOWED_EMAILS = ["bspain@spaincos.com", "eval-bot@spaincos.com"];
 async function checkAuth() {
+  if (/[?&]share=/.test(location.search)) return true; // v79: public read-only share links bypass the login gate (ShareView owns the screen)
   const { data } = await sb.auth.getSession();
   if (data?.session?.user?.email) {
     if (!ALLOWED_EMAILS.includes(data.session.user.email.toLowerCase())) {
@@ -3458,6 +3461,8 @@ async function loadStatus(force) {
 <script src="modules/apikeys.js"></script>
 <script src="modules/projects.js"></script>
 <script src="modules/sources.js"></script>
+<script src="modules/media.js"></script>
+<script src="modules/export.js"></script>
 <script>
 document.getElementById("navLibrary").onclick = function () { window.LibraryUI && window.LibraryUI.open(); };
 document.getElementById("navSkills").onclick = function () { window.SkillsUI && window.SkillsUI.open(); };
