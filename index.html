@@ -549,15 +549,37 @@ a { color: inherit; text-decoration: none; }
 .searching-step.done::before { content: "✓"; color: var(--accent); }
 .searching-step.live { color: var(--text); font-weight: 500; }
 .searching-phases { display: flex; flex-direction: column; gap: 7px; margin: 4px 0; }
+/* v66: answer tab row (Perplexity thread view) */
+.answer-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 4px 0 14px; }
+.answer-tab {
+  background: none; border: none; color: var(--text-muted); font-size: 13px; font-weight: 500;
+  padding: 8px 12px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.answer-tab:hover { color: var(--text); }
+.answer-tab.active { color: var(--text); border-bottom-color: var(--text); }
+.tab-panel { margin-bottom: 14px; }
+.links-list { display: flex; flex-direction: column; gap: 8px; }
+.links-list a { color: var(--accent); font-size: 13px; text-decoration: none; word-break: break-all; }
+.links-list a:hover { text-decoration: underline; }
+.tab-empty { color: var(--text-faint); font-size: 13px; padding: 8px 0; }
+.search-timer { font-size: 12px; color: var(--text-faint); margin-left: 10px; }
 
-/* Question */
+/* Question — v66 carbon-copy: Perplexity renders the user's question as a
+   rounded pill (measured live on perplexity.ai): pplxSans 16px, translucent
+   surface, radius 16px, padding 12px 16px, max-width 600px. */
 .question-header {
-  font-family: var(--font-serif);
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  margin-bottom: 20px;
-  line-height: 1.3;
+  font-family: var(--font-sans, "pplxSans", ui-sans-serif, system-ui, sans-serif);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: normal;
+  margin: 0 0 16px auto;
+  line-height: 1.5;
+  max-width: 600px;
+  width: fit-content;
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+  border-radius: 16px;
+  padding: 12px 16px;
+  color: var(--text);
 }
 
 /* Answer */
@@ -1593,9 +1615,10 @@ function renderPriorTurns(content, thread) {
   }
 }
 function renderSearching(container, query) {
-  // v65: no fake timed checklist — the status shows the real current step.
+  // v65/v66: no fake timed checklist — the status shows the real current step.
   // The gateway narrates actual phases ("Searched the web — 6 sources") in the
-  // SSE stream; renderPhases() displays them as they arrive.
+  // SSE stream; renderPhases() displays them as they arrive. A live "Working Ns"
+  // timer matches Perplexity's elapsed-time display.
   const q = document.createElement("div");
   q.className = "question-header";
   q.textContent = query;
@@ -1604,9 +1627,14 @@ function renderSearching(container, query) {
   state.className = "searching-state";
   state.innerHTML = `
     <div class="searching-spinner"></div>
-    <div class="searching-text">Analyzing your question…</div>`;
+    <div class="searching-text">Analyzing your question…<span class="search-timer">Working 0s</span></div>`;
   container.appendChild(state);
-  return { state, interval: null };
+  const started = Date.now();
+  const timer = setInterval(() => {
+    const t = state.querySelector(".search-timer");
+    if (t) t.textContent = "Working " + Math.round((Date.now() - started) / 1000) + "s";
+  }, 1000);
+  return { state, interval: timer, started };
 }
 function renderPhases(state, phases) {
   if (!state || !state.isConnected || !Array.isArray(phases)) return;
@@ -1731,6 +1759,75 @@ function renderAnswer(container, text, sources, related) {
   }
   ansSec.appendChild(content);
 
+  // v66 carbon-copy: the answer tab row (Answer / Links / Images / Share) like
+  // perplexity.ai's thread view.
+  const tabs = document.createElement("div");
+  tabs.className = "answer-tabs";
+  const tabBtn = (label, onClick) => {
+    const b = document.createElement("button");
+    b.className = "answer-tab";
+    b.textContent = label;
+    b.onclick = onClick;
+    return b;
+  };
+  const linksPanel = document.createElement("div");
+  linksPanel.className = "tab-panel";
+  const linksFound = [...content.querySelectorAll("a[href]")].map(a => ({ href: a.href, text: a.textContent.trim() }));
+  const seen = new Set();
+  const uniqueLinks = linksFound.filter(l => l.href.startsWith("http") && !seen.has(l.href) && seen.add(l.href)).slice(0, 20);
+  if (uniqueLinks.length) {
+    const ul = document.createElement("div");
+    ul.className = "links-list";
+    uniqueLinks.forEach(l => {
+      const a = document.createElement("a");
+      a.href = l.href; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.textContent = l.text || l.href;
+      ul.appendChild(a);
+    });
+    linksPanel.appendChild(ul);
+  } else {
+    linksPanel.innerHTML = '<div class="tab-empty">No links in this answer.</div>';
+  }
+  const imagesPanel = document.createElement("div");
+  imagesPanel.className = "tab-panel";
+  const imgs = [...content.querySelectorAll("img")];
+  if (imgs.length) {
+    imagesPanel.appendChild(content.cloneNode(true));
+  } else {
+    imagesPanel.innerHTML = '<div class="tab-empty">No images in this answer.</div>';
+  }
+  const answerTab = tabBtn("Answer", () => {
+    content.style.display = "";
+    linksPanel.style.display = "none";
+    imagesPanel.style.display = "none";
+    [...tabs.querySelectorAll(".answer-tab")].forEach(b => b.classList.toggle("active", b === answerTab));
+  });
+  const linksTab = tabBtn("Links", () => {
+    content.style.display = "none";
+    linksPanel.style.display = "";
+    imagesPanel.style.display = "none";
+    [...tabs.querySelectorAll(".answer-tab")].forEach(b => b.classList.toggle("active", b === linksTab));
+  });
+  const imagesTab = tabBtn("Images", () => {
+    content.style.display = "none";
+    linksPanel.style.display = "none";
+    imagesPanel.style.display = "";
+    [...tabs.querySelectorAll(".answer-tab")].forEach(b => b.classList.toggle("active", b === imagesTab));
+  });
+  const shareTab = tabBtn("Share", async () => {
+    try { await navigator.clipboard.writeText(location.href); shareTab.textContent = "Copied"; setTimeout(() => shareTab.textContent = "Share", 1500); } catch {}
+  });
+  answerTab.classList.add("active");
+  tabs.appendChild(answerTab);
+  tabs.appendChild(linksTab);
+  tabs.appendChild(imagesTab);
+  tabs.appendChild(shareTab);
+  linksPanel.style.display = "none";
+  imagesPanel.style.display = "none";
+  ansSec.appendChild(tabs);
+  ansSec.appendChild(linksPanel);
+  ansSec.appendChild(imagesPanel);
+
   // Answer actions
   const actions = document.createElement("div");
   actions.className = "answer-actions";
@@ -1793,14 +1890,17 @@ async function performSearch(query) {
     // v64: a new thread started while a space is active joins that space
     if (activeSpaceId) thread.spaceId = activeSpaceId;
   } else {
-    thread.title = query.slice(0, 60);
+    // v66 (audit item 15): the thread title comes from the FIRST question and
+    // stays stable for the whole conversation — Perplexity threads do not
+    // rename themselves on every follow-up.
+    if (!thread.title) thread.title = query.slice(0, 60);
     saveThreads();
     renderThreads();
   }
 
   const content = document.getElementById("resultsContent");
   renderPriorTurns(content, thread);
-  const { state, interval } = renderSearching(content, query);
+  const { state, interval, started } = renderSearching(content, query);
   document.getElementById("breadcrumb").textContent = query;
 
   // v64: the thread's space carries custom instructions that ride the request
@@ -1840,6 +1940,11 @@ async function performSearch(query) {
       clearInterval(interval);
       if (state && state.isConnected) state.remove();
       if (liveAnswerEl) { liveAnswerEl.remove(); liveAnswerEl = null; }
+      // v66: "Finished Ns" timestamp like perplexity.ai
+      const stamp = document.createElement("div");
+      stamp.className = "search-timer";
+      stamp.textContent = "Finished " + Math.max(1, Math.round((Date.now() - started) / 1000)) + "s";
+      content.appendChild(stamp);
       const sources = extractSources(answerClean);
       const related = generateRelated(query, answer);
       renderAnswer(content, answerClean, sources, related);
