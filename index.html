@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ai.spaincos.com — Where knowledge begins</title>
 <link rel="icon" type="image/webp" href="favicon.webp">
+<link rel="stylesheet" href="modules/settings.css">
+<link rel="stylesheet" href="modules/library.css">
+<link rel="stylesheet" href="modules/skills.css">
+<link rel="stylesheet" href="modules/docs.css">
 <link rel="preconnect" href="https://frontend-cdn.perplexity.ai" crossorigin>
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
@@ -700,6 +704,34 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .answer-tab:hover { color: var(--text); }
 .answer-tab.active { color: var(--text); border-bottom-color: var(--text); }
 .tab-panel { margin-bottom: 14px; }
+
+/* v75 citation chips + links tab */
+.cite-chip { display:inline-flex; align-items:center; gap:4px; vertical-align:baseline; margin:0 2px; padding:1px 7px 1px 4px; max-width:150px; border:1px solid var(--border); border-radius:999px; background:var(--bg-elevated); color:var(--text-muted)!important; font-size:11.5px; line-height:18px; text-decoration:none!important; position:relative; white-space:nowrap; cursor:pointer; }
+.cite-chip:hover, .cite-chip:focus-visible { border-color:var(--accent); color:var(--text)!important; outline:none; }
+.cite-chip img { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+.cite-chip .cn { font-weight:600; color:var(--accent); }
+.cite-chip .cd { overflow:hidden; text-overflow:ellipsis; min-width:0; }
+.cite-card { position:fixed; z-index:9999; width:280px; max-width:calc(100vw - 16px); padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--bg-elevated); color:var(--text); box-shadow:0 8px 24px rgba(0,0,0,.25); font-size:12.5px; line-height:1.4; pointer-events:none; }
+.cite-card .cc-dom { display:flex; align-items:center; gap:6px; color:var(--text-muted); font-size:11.5px; margin-bottom:4px; }
+.cite-card .cc-dom img { width:14px; height:14px; border-radius:3px; }
+.cite-card .cc-title { font-weight:600; margin-bottom:4px; overflow-wrap:anywhere; }
+.cite-card .cc-snip { color:var(--text-muted); overflow-wrap:anywhere; }
+.links-head { font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:10px; }
+.links-list.numbered { gap:0; }
+.link-row { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--border); text-decoration:none!important; color:var(--text)!important; min-width:0; }
+.link-row:last-child { border-bottom:none; }
+.link-row:hover .lr-title { text-decoration:underline; }
+.link-row .lr-num { flex:0 0 22px; height:22px; border-radius:999px; background:var(--bg-elevated); border:1px solid var(--border); color:var(--accent); font-size:11.5px; font-weight:600; display:flex; align-items:center; justify-content:center; }
+.link-row .lr-body { min-width:0; flex:1; }
+.link-row .lr-dom { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); }
+.link-row .lr-dom img { width:14px; height:14px; border-radius:3px; }
+.link-row .lr-title { font-size:14px; font-weight:500; color:var(--accent); overflow-wrap:anywhere; }
+.link-row .lr-snip { font-size:12.5px; color:var(--text-muted); margin-top:2px; overflow-wrap:anywhere; }
+.source-card .src-num { font-size:10.5px; font-weight:600; color:var(--accent); margin-right:4px; }
+.side-nav { display:flex; flex-direction:column; gap:2px; padding:0 10px 6px; }
+.side-nav-btn { display:flex; align-items:center; gap:10px; width:100%; padding:7px 10px; border:none; border-radius:8px; background:transparent; color:var(--text-muted); font:inherit; font-size:13.5px; cursor:pointer; text-align:left; }
+.side-nav-btn:hover, .side-nav-btn:focus-visible { background:var(--bg-elevated); color:var(--text); outline:none; }
+@media (max-width: 768px) { .side-nav-btn { min-height:44px; } }
 .links-list { display: flex; flex-direction: column; gap: 8px; }
 .links-list a { color: var(--accent); font-size: 13px; text-decoration: none; word-break: break-all; }
 .links-list a:hover { text-decoration: underline; }
@@ -1199,6 +1231,11 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
       New Thread
     </button>
+    <div class="side-nav">
+      <button class="side-nav-btn" id="navLibrary" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Library</span></button>
+      <button class="side-nav-btn" id="navSkills" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Skills</span></button>
+      <button class="side-nav-btn" id="navDocs" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Docs</span></button>
+    </div>
     <div class="threads-list" id="threadsList">
       <input class="thread-search" id="threadSearch" placeholder="Search threads..." autocomplete="off">
       <div class="spaces-head">
@@ -2290,7 +2327,7 @@ function newThread() {
 }
 function createThread(title) {
   // v61: UUID ids so threads sync to the server-side threads table
-  const thread = { id: (crypto.randomUUID ? crypto.randomUUID() : "t" + Date.now() + "-" + Math.random().toString(36).slice(2)), title, messages: [] };
+  const thread = { id: (crypto.randomUUID ? crypto.randomUUID() : "t" + Date.now() + "-" + Math.random().toString(36).slice(2)), title, messages: [], createdAt: Date.now(), updatedAt: Date.now() };
   threads.unshift(thread);
   if (threads.length > 50) threads = threads.slice(0, 50);
   currentThreadId = thread.id;
@@ -2422,6 +2459,7 @@ const accountMenu = (function () {
     menu.innerHTML =
       '<div class="account-head"><div class="user-avatar"></div><div class="account-id"><div class="account-email"></div><div class="user-plan">Open-weight models</div></div></div>' +
       '<div class="account-sep"></div>' +
+      '<button class="account-item" role="menuitem" data-act="settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></button>' +
       '<button class="account-item" role="menuitem" data-act="kbd">' + svg("kbd") + '<span>Keyboard shortcuts</span></button>' +
       '<button class="account-item" role="menuitem" data-act="imp">' + svg("imp") + '<span>Import Perplexity history</span></button>' +
       '<button class="account-item" role="menuitem" data-act="theme">' + svg(dark ? "sun" : "moon") + '<span>Theme: ' + (dark ? "Dark" : "Light") + '</span><em>Switch to ' + (dark ? "light" : "dark") + '</em></button>' +
@@ -2435,7 +2473,8 @@ const accountMenu = (function () {
       const act = b.dataset.act;
       if (act === "theme") { themeToggle.click(); close(); return; }
       close();
-      if (act === "kbd") { if (window.openShortcutsHelp) window.openShortcutsHelp(); }
+      if (act === "settings") { window.SettingsUI && window.SettingsUI.open(); }
+      else if (act === "kbd") { if (window.openShortcutsHelp) window.openShortcutsHelp(); }
       else if (act === "imp") { document.getElementById("importHistoryBtn").click(); }
       else if (act === "out") { await sb.auth.signOut(); currentUser = null; location.reload(); }
     });
@@ -2675,6 +2714,93 @@ function generateRelated(query, answer) {
   ];
 }
 
+
+// v75: Perplexity-style citation chips. Builds one master source list
+// (gateway sources first, then any other http links in the answer, in order of
+// first appearance) so chips, source cards and the Links tab share numbering.
+function citeFavicon(domain) {
+  const im = document.createElement("img");
+  im.alt = ""; im.loading = "lazy";
+  im.src = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(domain) + "&sz=32";
+  im.onerror = function () { this.onerror = null; this.src = "https://icons.duckduckgo.com/ip3/" + domain + ".ico"; };
+  return im;
+}
+function citeTitleFor(url, domain, text) {
+  const t = String(text || "").trim();
+  if (t && !/^\[?\d+\]?$/.test(t) && !/^https?:\/\//i.test(t)) return t;
+  try {
+    const u = new URL(url);
+    const seg = decodeURIComponent(u.pathname.split("/").filter(Boolean).pop() || "").replace(/\.(html?|php|aspx?)$/i, "").replace(/[-_+]+/g, " ").trim();
+    if (seg && !/^\d+$/.test(seg)) return seg.charAt(0).toUpperCase() + seg.slice(1);
+  } catch (e) {}
+  return domain;
+}
+let _citeCard = null;
+function showCiteCard(chip, m) {
+  hideCiteCard();
+  const c = document.createElement("div");
+  c.className = "cite-card";
+  const d = document.createElement("div"); d.className = "cc-dom";
+  d.appendChild(citeFavicon(m.domain)); d.appendChild(document.createTextNode(m.domain));
+  const t = document.createElement("div"); t.className = "cc-title"; t.textContent = m.title;
+  c.appendChild(d); c.appendChild(t);
+  if (m.snippet) { const sn = document.createElement("div"); sn.className = "cc-snip"; sn.textContent = m.snippet; c.appendChild(sn); }
+  document.body.appendChild(c);
+  const r = chip.getBoundingClientRect(), cw = c.offsetWidth, ch = c.offsetHeight;
+  let left = Math.max(8, Math.min(r.left, window.innerWidth - cw - 8));
+  let top = r.bottom + 6;
+  if (top + ch > window.innerHeight - 8) top = Math.max(8, r.top - ch - 6);
+  c.style.left = left + "px"; c.style.top = top + "px";
+  _citeCard = c;
+}
+function hideCiteCard() { if (_citeCard) { _citeCard.remove(); _citeCard = null; } }
+function buildCitations(content, sources) {
+  const master = [], idx = new Map();
+  const add = (url, title, snippet) => {
+    let host = "";
+    try { host = new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return -1; }
+    if (!/^https?:/i.test(url)) return -1;
+    if (idx.has(url)) {
+      const m = master[idx.get(url)];
+      if (snippet && !m.snippet) m.snippet = snippet;
+      return idx.get(url);
+    }
+    master.push({ url, domain: host, title: citeTitleFor(url, host, title), snippet: snippet || "" });
+    idx.set(url, master.length - 1);
+    return master.length - 1;
+  };
+  (sources || []).forEach(s => { if (s && s.url) add(s.url, s.title, s.snippet || s.description || ""); });
+  const anchors = [...content.querySelectorAll("a[href]")];
+  anchors.forEach(a => { if (/^https?:/i.test(a.href)) add(a.href, a.textContent, ""); });
+  // convert numeric-citation anchors into chips
+  anchors.forEach(a => {
+    if (!/^\[?\d+\]?$/.test(a.textContent.trim())) return;
+    const i = idx.get(a.href);
+    if (i === undefined) return;
+    const m = master[i];
+    // strip bracket text nodes wrapping the link: "[" <a>1</a> "]"
+    const prev = a.previousSibling, next = a.nextSibling;
+    if (prev && prev.nodeType === 3 && /\[\s*$/.test(prev.nodeValue) && next && next.nodeType === 3 && /^\s*\]/.test(next.nodeValue)) {
+      prev.nodeValue = prev.nodeValue.replace(/\[\s*$/, "");
+      next.nodeValue = next.nodeValue.replace(/^\s*\]/, "");
+    }
+    const chip = document.createElement("a");
+    chip.className = "cite-chip";
+    chip.href = m.url; chip.target = "_blank"; chip.rel = "noopener noreferrer";
+    chip.setAttribute("aria-label", "Source " + (i + 1) + ": " + m.domain);
+    chip.appendChild(citeFavicon(m.domain));
+    const n = document.createElement("span"); n.className = "cn"; n.textContent = String(i + 1);
+    const dd = document.createElement("span"); dd.className = "cd"; dd.textContent = m.domain;
+    chip.appendChild(n); chip.appendChild(dd);
+    chip.addEventListener("mouseenter", () => showCiteCard(chip, m));
+    chip.addEventListener("focus", () => showCiteCard(chip, m));
+    chip.addEventListener("mouseleave", hideCiteCard);
+    chip.addEventListener("blur", hideCiteCard);
+    a.replaceWith(chip);
+  });
+  return master.slice(0, 30);
+}
+
 function renderAnswer(container, text, sources, related, images) {
   // v74: an empty answer has no tabs / actions / suggestions — the caller shows
   // an error card instead (tabs and actions are tied to answer presence).
@@ -2696,7 +2822,11 @@ function renderAnswer(container, text, sources, related, images) {
       favicon.textContent = (s.domain || "?")[0].toUpperCase();
       const domainEl = document.createElement("div");
       domainEl.className = "source-domain";
-      domainEl.textContent = s.domain || "";
+      domainEl.textContent = (s.domain || "");
+      const numEl = document.createElement("span");
+      numEl.className = "src-num";
+      numEl.textContent = String(i + 1);
+      domainEl.insertBefore(numEl, domainEl.firstChild);
       const titleEl = document.createElement("div");
       titleEl.className = "source-title";
       // v68: never show a raw URL as the card title (Perplexity shows a readable
@@ -2740,6 +2870,7 @@ function renderAnswer(container, text, sources, related, images) {
     tbl.parentNode.insertBefore(w, tbl);
     w.appendChild(tbl);
   });
+  const master = buildCitations(content, sources);
   ansSec.appendChild(content);
 
   // v66 carbon-copy: the answer tab row (Answer / Links / Images / Share) like
@@ -2755,16 +2886,26 @@ function renderAnswer(container, text, sources, related, images) {
   };
   const linksPanel = document.createElement("div");
   linksPanel.className = "tab-panel";
-  const linksFound = [...content.querySelectorAll("a[href]")].map(a => ({ href: a.href, text: a.textContent.trim() }));
-  const seen = new Set();
-  const uniqueLinks = linksFound.filter(l => l.href.startsWith("http") && !seen.has(l.href) && seen.add(l.href)).slice(0, 20);
-  if (uniqueLinks.length) {
+  if (master.length) {
+    const head = document.createElement("div");
+    head.className = "links-head";
+    head.textContent = master.length + (master.length === 1 ? " source" : " sources");
+    linksPanel.appendChild(head);
     const ul = document.createElement("div");
-    ul.className = "links-list";
-    uniqueLinks.forEach(l => {
+    ul.className = "links-list numbered";
+    master.forEach((m, i) => {
       const a = document.createElement("a");
-      a.href = l.href; a.target = "_blank"; a.rel = "noopener noreferrer";
-      a.textContent = l.text || l.href;
+      a.className = "link-row";
+      a.href = m.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+      const num = document.createElement("div"); num.className = "lr-num"; num.textContent = String(i + 1);
+      const body = document.createElement("div"); body.className = "lr-body";
+      const dom = document.createElement("div"); dom.className = "lr-dom";
+      dom.appendChild(citeFavicon(m.domain));
+      dom.appendChild(document.createTextNode(m.domain));
+      const ti = document.createElement("div"); ti.className = "lr-title"; ti.textContent = m.title;
+      body.appendChild(dom); body.appendChild(ti);
+      if (m.snippet) { const sn = document.createElement("div"); sn.className = "lr-snip"; sn.textContent = m.snippet; body.appendChild(sn); }
+      a.appendChild(num); a.appendChild(body);
       ul.appendChild(a);
     });
     linksPanel.appendChild(ul);
@@ -2801,7 +2942,7 @@ function renderAnswer(container, text, sources, related, images) {
     imagesPanel.style.display = "none";
     [...tabs.querySelectorAll(".answer-tab")].forEach(b => b.classList.toggle("active", b === answerTab));
   });
-  const linksTab = tabBtn("Links", () => {
+  const linksTab = tabBtn("Links" + (master.length ? " · " + master.length : ""), () => {
     content.style.display = "none";
     linksPanel.style.display = "";
     imagesPanel.style.display = "none";
@@ -3004,7 +3145,8 @@ async function performSearch(query) {
       renderAnswer(content, answerClean, sources, related, imageResults);
       speakAnswer(answerClean);
       thread.messages.push({ role: "user", content: fullQuery });
-      thread.messages.push({ role: "assistant", content: answerClean, sources, related, ...(imageResults.length ? { images: imageResults } : {}) });
+      thread.updatedAt = Date.now();
+      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(imageResults.length ? { images: imageResults } : {}) });
       saveThreads();
       renderThreads();
       // v74: stay where the reader is — jump to the bottom ONLY if they were
@@ -3230,6 +3372,16 @@ async function loadStatus(force) {
   autoCollapse();
   window.addEventListener("resize", autoCollapse);
 })();
+</script>
+<div id="moduleRoot"></div>
+<script src="modules/settings.js"></script>
+<script src="modules/library.js"></script>
+<script src="modules/skills.js"></script>
+<script src="modules/docs.js"></script>
+<script>
+document.getElementById("navLibrary").onclick = function () { window.LibraryUI && window.LibraryUI.open(); };
+document.getElementById("navSkills").onclick = function () { window.SkillsUI && window.SkillsUI.open(); };
+document.getElementById("navDocs").onclick = function () { window.DocsUI && window.DocsUI.open(); };
 </script>
 </body>
 </html>

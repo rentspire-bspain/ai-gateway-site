@@ -1,0 +1,80 @@
+/* DocsUI — full-screen documentation library overlay (Claude / OpenAI / Perplexity).
+   Uses app CSS vars: --bg, --bg-surface, --bg-elevated, --border, --text, --text-muted,
+   --accent, --radius, --font-sans. */
+#docsRoot{position:fixed;inset:0;z-index:920;background:var(--bg);color:var(--text);font-family:var(--font-sans);display:none;flex-direction:column;overflow:hidden}
+#docsRoot.open{display:flex}
+#docsRoot *{box-sizing:border-box}
+#docsRoot button{font-family:inherit;color:inherit;cursor:pointer}
+.dx-header{padding:16px 24px 12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:12px}
+.dx-top{display:flex;align-items:center;gap:12px}
+.dx-title{font-size:21px;font-weight:600;margin:0;flex:0 0 auto;display:flex;align-items:center;gap:10px}
+.dx-title .dx-book{color:var(--accent)}
+.dx-search{flex:1;max-width:520px;display:flex;align-items:center;gap:8px;background:var(--bg-input,var(--bg-surface));border:1px solid var(--border-light,var(--border));border-radius:var(--radius);padding:0 12px;height:38px;color:var(--text-muted)}
+.dx-search:focus-within{border-color:var(--accent)}
+.dx-search input{flex:1;background:none;border:0;outline:0;color:var(--text);font:inherit;font-size:14px;min-width:0}
+.dx-close{width:36px;height:36px;display:grid;place-items:center;background:none;border:1px solid transparent;border-radius:var(--radius-sm,var(--radius));color:var(--text-muted);font-size:20px;line-height:1}
+.dx-close:hover{background:var(--bg-elevated);color:var(--text)}
+.dx-tabs{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dx-tab{background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:7px 16px;font-size:13.5px;color:var(--text-muted)}
+.dx-tab:hover{color:var(--text);background:var(--bg-elevated)}
+.dx-tab.active{background:var(--accent-light,var(--accent));border-color:var(--accent);color:var(--accent-hover,var(--accent));font-weight:600}
+.dx-tab .n{font-size:11px;opacity:.7;margin-left:5px}
+.dx-body{flex:1;display:flex;min-height:0}
+.dx-list{width:330px;flex:0 0 330px;border-right:1px solid var(--border);overflow-y:auto;padding:10px 10px 40px}
+.dx-list .dx-count{font-size:12px;color:var(--text-faint,var(--text-muted));padding:6px 8px 10px}
+.dx-item{display:block;width:100%;text-align:left;background:none;border:1px solid transparent;border-radius:var(--radius-sm,var(--radius));padding:9px 12px;font-size:13.5px;line-height:1.4;color:var(--text);word-break:break-word}
+.dx-item:hover{background:var(--bg-elevated)}
+.dx-item.active{background:var(--bg-surface);border-color:var(--accent);color:var(--accent-hover,var(--accent));font-weight:500}
+.dx-item .u{display:block;font-size:11px;color:var(--text-faint,var(--text-muted));margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dx-empty{padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13.5px}
+.dx-reader{flex:1;overflow-y:auto;min-width:0}
+.dx-reader-inner{max-width:860px;margin:0 auto;padding:28px 36px 80px}
+.dx-reader .dx-back{display:none;margin-bottom:14px}
+.dx-page-head{border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:22px}
+.dx-page-head h1{margin:0 0 6px;font-size:26px;line-height:1.25;font-weight:650}
+.dx-page-head .dx-src{font-size:12.5px;color:var(--text-faint,var(--text-muted))}
+.dx-page-head .dx-src a{color:var(--accent);text-decoration:none}
+.dx-page-head .dx-src a:hover{text-decoration:underline}
+/* markdown rendering */
+.dx-md{font-size:14.5px;line-height:1.65;word-wrap:break-word}
+.dx-md h1,.dx-md h2,.dx-md h3,.dx-md h4{line-height:1.3;margin:26px 0 10px;font-weight:650}
+.dx-md h1{font-size:22px}.dx-md h2{font-size:19px}.dx-md h3{font-size:16.5px}.dx-md h4{font-size:14.5px}
+.dx-md h1:first-child,.dx-md h2:first-child{margin-top:0}
+.dx-md p{margin:0 0 14px}
+.dx-md a{color:var(--accent);text-decoration:none}
+.dx-md a:hover{text-decoration:underline}
+.dx-md ul,.dx-md ol{margin:0 0 14px;padding-left:24px}
+.dx-md li{margin:4px 0}
+.dx-md blockquote{margin:0 0 14px;padding:10px 16px;border-left:3px solid var(--accent);background:var(--bg-surface);border-radius:0 var(--radius-sm,var(--radius)) var(--radius-sm,var(--radius)) 0;color:var(--text-muted)}
+.dx-md blockquote p:last-child{margin-bottom:0}
+.dx-md code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;background:var(--bg-surface);border:1px solid var(--border-light,var(--border));border-radius:4px;padding:1px 5px}
+.dx-md pre{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;overflow-x:auto;margin:0 0 16px}
+.dx-md pre code{background:none;border:0;padding:0;font-size:13px;line-height:1.55;display:block;white-space:pre}
+.dx-md table{border-collapse:collapse;width:100%;margin:0 0 16px;font-size:13px;display:block;overflow-x:auto}
+.dx-md th,.dx-md td{border:1px solid var(--border);padding:7px 11px;text-align:left;vertical-align:top}
+.dx-md th{background:var(--bg-surface);font-weight:600}
+.dx-md hr{border:0;border-top:1px solid var(--border);margin:22px 0}
+.dx-md img{max-width:100%}
+/* states */
+.dx-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;height:100%;color:var(--text-muted);font-size:14px}
+.dx-spinner{width:26px;height:26px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--accent);animation:dxspin .8s linear infinite}
+@keyframes dxspin{to{transform:rotate(360deg)}}
+.dx-error{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;height:100%;color:var(--text-muted);text-align:center;padding:24px}
+.dx-error h3{color:var(--text);margin:0;font-size:17px}
+.dx-error p{margin:0;font-size:13.5px;max-width:420px}
+.dx-retry{background:var(--accent);border:1px solid var(--accent);color:#fff;border-radius:var(--radius-sm,var(--radius));padding:8px 16px;font-size:13.5px}
+.dx-retry:hover{background:var(--accent-hover,var(--accent))}
+/* responsive: list collapses on mobile */
+.dx-mobile-only{display:none}
+@media (max-width:760px){
+  .dx-header{padding:12px 14px}
+  .dx-title{font-size:17px}
+  .dx-tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}
+  .dx-list{width:100%;flex:1 1 auto;border-right:0}
+  .dx-reader{display:none}
+  #docsRoot.showing-page .dx-list{display:none}
+  #docsRoot.showing-page .dx-reader{display:block}
+  .dx-reader-inner{padding:16px 16px 60px}
+  .dx-mobile-only{display:inline-flex}
+  .dx-page-head h1{font-size:21px}
+}
