@@ -363,6 +363,7 @@ a { color: inherit; text-decoration: none; }
 }
 .search-box {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   background: var(--bg-input);
@@ -472,11 +473,11 @@ a { color: inherit; text-decoration: none; }
 }
 .source-card {
   flex-shrink: 0;
-  width: 180px;
+  width: 148px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px;
+  border-radius: 10px;
+  padding: 8px;
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
@@ -562,6 +563,16 @@ a { color: inherit; text-decoration: none; }
 .links-list a { color: var(--accent); font-size: 13px; text-decoration: none; word-break: break-all; }
 .links-list a:hover { text-decoration: underline; }
 .tab-empty { color: var(--text-faint); font-size: 13px; padding: 8px 0; }
+.images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.images-grid a { display: block; }
+.images-grid img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+.images-grid .img-title { font-size: 11px; color: var(--text-faint); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.composer-pills { display: flex; align-items: center; gap: 6px; padding: 8px 4px 2px; flex-wrap: wrap; flex-basis: 100%; }
+.composer-pills .model-select, .composer-pills .width-toggle { border: 1px solid var(--border); border-radius: 999px; font-size: 12.5px; padding: 5px 12px; background: var(--bg-surface); height: auto; }
+.thread-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s ease; }
+.thread-item:hover .thread-actions { opacity: 1; }
+.thread-actions button { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 3px; border-radius: 5px; display: flex; }
+.thread-actions button:hover { color: var(--text); background: var(--bg-elevated); }
 .search-timer { font-size: 12px; color: var(--text-faint); margin-left: 10px; }
 
 /* Question — v66 carbon-copy: Perplexity renders the user's question as a
@@ -685,17 +696,17 @@ a { color: inherit; text-decoration: none; }
   color: var(--text-muted);
   margin-bottom: 12px;
 }
-.related-list { display: flex; flex-direction: column; gap: 8px; }
+.related-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .related-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 8px;
+  padding: 7px 14px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 999px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text);
   transition: border-color 0.15s ease, background 0.15s ease;
@@ -825,6 +836,7 @@ a { color: inherit; text-decoration: none; }
 .width-toggle.active svg { stroke: var(--accent); }
 .followup-box {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   background: var(--bg-input);
@@ -997,6 +1009,7 @@ a { color: inherit; text-decoration: none; }
             </button>
           </div>
           <div id="landingAttachChip"></div>
+          <div class="composer-pills" id="landingPills"></div>
         </div>
         <div class="search-suggestions" id="suggestions">
           <button class="suggestion-chip" data-q="What are the current multifamily rent trends in Austin, TX?">Austin rent trends</button>
@@ -1041,6 +1054,7 @@ a { color: inherit; text-decoration: none; }
           </button>
         </div>
         <div id="followupAttachChip"></div>
+        <div class="composer-pills" id="followupPills"></div>
       </div>
     </div>
   </main>
@@ -1103,7 +1117,7 @@ function setTheme(theme) {
     themeLabel.textContent = "Dark";
   }
 }
-setTheme(localStorage.getItem("ai_theme") || "dark");
+setTheme(localStorage.getItem("ai_theme") || "light"); // v67: Perplexity defaults light for new users
 themeToggle.onclick = () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
 
 // Adjustable answer width: default → wide → full → default (persisted)
@@ -1468,6 +1482,31 @@ function renderThreads() {
     move.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
     move.onclick = (e) => { e.stopPropagation(); openMoveMenu(t, move); };
     div.appendChild(move);
+    // v67: hover actions — rename, delete, share (Perplexity thread list parity)
+    const actions = document.createElement("div");
+    actions.className = "thread-actions";
+    const mkBtn = (title, svg, onClick) => {
+      const b = document.createElement("button");
+      b.title = title;
+      b.innerHTML = svg;
+      b.onclick = (e) => { e.stopPropagation(); onClick(); };
+      return b;
+    };
+    actions.appendChild(mkBtn("Rename", '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>', () => {
+      const name = prompt("Rename thread", t.title);
+      if (name && name.trim()) { t.title = name.trim().slice(0, 60); saveThreads(); pushThreadToServer(t); renderThreads(); }
+    }));
+    actions.appendChild(mkBtn("Share", '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4M12 2v13"/></svg>', () => {
+      navigator.clipboard.writeText(location.href).then(() => {}, () => {});
+    }));
+    actions.appendChild(mkBtn("Delete", '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>', () => {
+      if (!confirm("Delete this thread?")) return;
+      threads = threads.filter(x => x.id !== t.id);
+      if (currentThreadId === t.id) { currentThreadId = null; showLanding(); }
+      if (currentUser) sb.from("threads").delete().eq("id", t.id).then(() => {}, () => {});
+      saveThreads(); renderSpaces(); renderThreads();
+    }));
+    div.appendChild(actions);
     div.onclick = () => loadThread(t.id);
     container.appendChild(div);
   });
@@ -1520,6 +1559,7 @@ document.getElementById("newThreadIcon").onclick = newThread;
 // ============ VIEW SWITCHING ============
 function showLanding() {
   document.getElementById("landing").style.display = "flex";
+  positionComposerPills();
   document.getElementById("searchbarWrapper").style.display = "none";
   document.getElementById("resultsScroll").style.display = "none";
   document.getElementById("followupWrapper").style.display = "none";
@@ -1527,7 +1567,17 @@ function showLanding() {
   document.getElementById("landingInput").value = "";
   document.getElementById("landingInput").focus();
 }
+// v67: Perplexity keeps the mode pills (Model, Research) INSIDE the composer —
+// relocate the single controls into whichever composer is visible.
+function positionComposerPills() {
+  const landingVisible = document.getElementById("landing").style.display !== "none";
+  const target = landingVisible ? document.getElementById("landingPills") : document.getElementById("followupPills");
+  if (!target) return;
+  target.appendChild(document.getElementById("modelSel"));
+  target.appendChild(document.getElementById("deepResearchToggle"));
+}
 function showResults() {
+  positionComposerPills();
   document.getElementById("landing").style.display = "none";
   document.getElementById("searchbarWrapper").style.display = "block";
   document.getElementById("resultsScroll").style.display = "block";
@@ -1610,7 +1660,7 @@ function renderPriorTurns(content, thread) {
       q.textContent = cleanQuestionText(m.content);
       content.appendChild(q);
     } else {
-      renderAnswer(content, String(m.content || ""), m.sources || [], m.related || []);
+      renderAnswer(content, String(m.content || ""), m.sources || [], m.related || [], m.images || []);
     }
   }
 }
@@ -1713,7 +1763,7 @@ function generateRelated(query, answer) {
   ];
 }
 
-function renderAnswer(container, text, sources, related) {
+function renderAnswer(container, text, sources, related, images) {
   // Sources section
   if (sources && sources.length) {
     const sec = document.createElement("div");
@@ -1790,9 +1840,25 @@ function renderAnswer(container, text, sources, related) {
   }
   const imagesPanel = document.createElement("div");
   imagesPanel.className = "tab-panel";
-  const imgs = [...content.querySelectorAll("img")];
-  if (imgs.length) {
-    imagesPanel.appendChild(content.cloneNode(true));
+  const imgList = (Array.isArray(images) && images.length)
+    ? images
+    : [...content.querySelectorAll("img")].map(im => ({ image_url: im.src, origin_url: (im.parentElement && im.parentElement.tagName === "A") ? im.parentElement.href : "", title: im.alt || "" }));
+  if (imgList.length) {
+    const grid = document.createElement("div");
+    grid.className = "images-grid";
+    imgList.slice(0, 12).forEach(im => {
+      const a = document.createElement("a");
+      a.href = im.origin_url || im.image_url;
+      a.target = "_blank"; a.rel = "noopener noreferrer";
+      const el = document.createElement("img");
+      el.src = im.image_url; el.alt = im.title || ""; el.loading = "lazy";
+      const cap = document.createElement("div");
+      cap.className = "img-title";
+      cap.textContent = im.title || "";
+      a.appendChild(el); a.appendChild(cap);
+      grid.appendChild(a);
+    });
+    imagesPanel.appendChild(grid);
   } else {
     imagesPanel.innerHTML = '<div class="tab-empty">No images in this answer.</div>';
   }
@@ -1934,6 +2000,8 @@ async function performSearch(query) {
     // Final render (shared by streaming, deep research, and fallback paths).
     // v65: prior turns are already in the DOM — only the loading state is
     // replaced by the answer (the question header stays from renderSearching).
+    // v67: imageResults (gateway image_search) render in the Images tab.
+    let imageResults = [];
     const renderFinal = (answer) => {
       const fuMatch = answer.match(/\n?##\s*Suggested Follow-ups?[\s\S]*$/i);
       const answerClean = fuMatch ? answer.slice(0, fuMatch.index).trim() : answer;
@@ -1947,9 +2015,9 @@ async function performSearch(query) {
       content.appendChild(stamp);
       const sources = extractSources(answerClean);
       const related = generateRelated(query, answer);
-      renderAnswer(content, answerClean, sources, related);
+      renderAnswer(content, answerClean, sources, related, imageResults);
       thread.messages.push({ role: "user", content: fullQuery });
-      thread.messages.push({ role: "assistant", content: answerClean, sources, related });
+      thread.messages.push({ role: "assistant", content: answerClean, sources, related, ...(imageResults.length ? { images: imageResults } : {}) });
       saveThreads();
       renderThreads();
       document.getElementById("resultsScroll").scrollTop = 0;
@@ -1972,7 +2040,7 @@ async function performSearch(query) {
         content.appendChild(liveAnswerEl);
       }
       liveAnswerEl.innerHTML = "";
-      renderAnswer(liveAnswerEl, partial, extractSources(partial), []);
+      renderAnswer(liveAnswerEl, partial, extractSources(partial), [], []);
     };
 
     if (deepResearchOn) {
@@ -2030,7 +2098,9 @@ async function performSearch(query) {
             if (payload === "[DONE]") continue;
             try {
               const evt = JSON.parse(payload);
-              if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); continue; }
+              if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); }
+              if (Array.isArray(evt?.images)) { imageResults = evt.images; }
+              if (Array.isArray(evt?.phases)) continue;
               const delta = evt?.choices?.[0]?.delta?.content;
               if (delta) full += delta;
             } catch {}
@@ -2040,6 +2110,7 @@ async function performSearch(query) {
         renderFinal(full || "(no response from model — please try again)");
       } else {
         const data = await res.json();
+        if (Array.isArray(data?.images)) imageResults = data.images;
         const _msg = data?.choices?.[0]?.message ?? {};
         renderFinal(_msg.content || "(no response from model — please try again)");
       }
@@ -2114,6 +2185,7 @@ async function loadStatus(force) {
   }
   renderThreads();
   renderSpaces();
+  positionComposerPills();
   loadStatus(false);
 })();
 </script>
