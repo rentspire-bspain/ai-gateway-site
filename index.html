@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-mMX5j8NyUyfC/lXS4jsaJrKMCuVA0aiuAJwUMSSolH4=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ai.spaincos.com — Where knowledge begins</title>
@@ -74,9 +76,9 @@ body.incognito .question-header::after{content:"";}
 #installAppBtn.show{display:flex}
 @media(max-width:768px){.incognito-bar{top:52px}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js" integrity="sha384-XQqX/4yiUGu+oyr87jvWzRuqBUK/adrY0DunhL+tID9m/9dwSpV8h9Fk/Sg6ifVQ" crossorigin="anonymous"></script>
 <style>
 :root {
   /* Exact Perplexity dark theme (resolved values from perplexity.ai) */
@@ -2447,12 +2449,29 @@ async function syncThreadsFromServer() {
     const remoteIds = new Set((remote || []).map(r => r.id));
     // load remote messages for threads we don't have locally cached
     const byId = new Map(threads.map(t => [t.id, t]));
+    // v85: ONE batched query (paged at 1000 rows) for every thread without a local cache, grouped
+    // client-side — this used to be one thread_messages round-trip per thread (N+1, up to 50 serial calls).
+    const need = [];
     for (const rt of (remote || [])) {
       const local = byId.get(rt.id);
       if (local && local.messages.length) { local.spaceId = local.spaceId || rt.space_id || null; continue; } // local cache is richer
-      const { data: msgs } = await sb.from("thread_messages").select("role,content,sources,related").eq("thread_id", rt.id).order("created_at", { ascending: true });
-      byId.set(rt.id, { id: rt.id, title: rt.title, spaceId: rt.space_id || null, messages: (msgs || []).map(m => ({ role: m.role, content: m.content, sources: m.sources, related: m.related })) });
+      need.push(rt);
     }
+    const msgsByThread = new Map();
+    if (need.length) {
+      const ids = need.map(r => r.id), PAGE = 1000;
+      for (let from = 0; ; from += PAGE) {
+        const { data: rows, error: merr } = await sb.from("thread_messages").select("thread_id,role,content,sources,related")
+          .in("thread_id", ids).order("created_at", { ascending: true }).range(from, from + PAGE - 1);
+        if (merr) break;
+        for (const m of (rows || [])) {
+          if (!msgsByThread.has(m.thread_id)) msgsByThread.set(m.thread_id, []);
+          msgsByThread.get(m.thread_id).push({ role: m.role, content: m.content, sources: m.sources, related: m.related });
+        }
+        if (!rows || rows.length < PAGE) break;
+      }
+    }
+    for (const rt of need) byId.set(rt.id, { id: rt.id, title: rt.title, spaceId: rt.space_id || null, messages: msgsByThread.get(rt.id) || [] });
     // v84: threads created/loaded while the awaits above were in flight must survive the merge —
     // dropping them left currentThreadId pointing at nothing, so the next follow-up started a NEW thread.
     for (const lt of threads) if (!byId.has(lt.id)) byId.set(lt.id, lt);
@@ -2904,11 +2923,15 @@ function renderPhases(state, phases) {
     box.className = "searching-phases";
     state.appendChild(box);
   }
-  box.innerHTML = phases.map(p =>
-    '<div class="searching-step ' + (p.done ? "done" : "live") + (isDegradedPhase(p) ? " err" : "") + '">' +
-    (isDegradedPhase(p) ? "⚠" : p.done ? "✓" : '<span class="searching-spinner" style="width:10px;height:10px;margin:0"></span>') +
-    " " + p.label + "</div>"
-  ).join("");
+  box.textContent = "";
+  for (const p of phases) { // label comes from the server / the web: never innerHTML
+    const row = document.createElement("div");
+    row.className = "searching-step " + (p.done ? "done" : "live") + (isDegradedPhase(p) ? " err" : "");
+    if (isDegradedPhase(p) || p.done) row.appendChild(document.createTextNode(isDegradedPhase(p) ? "\u26a0" : "\u2713"));
+    else { const sp = document.createElement("span"); sp.className = "searching-spinner"; sp.style.cssText = "width:10px;height:10px;margin:0"; row.appendChild(sp); }
+    row.appendChild(document.createTextNode(" " + String(p.label == null ? "" : p.label)));
+    box.appendChild(row);
+  }
 }
 
 function extractSources(text) {
@@ -3058,7 +3081,7 @@ function buildCitations(content, sources) {
     }
     const chip = document.createElement("a");
     chip.className = "cite-chip";
-    chip.href = m.url; chip.target = "_blank"; chip.rel = "noopener noreferrer";
+    chip.href = SafeUrl.http(m.url) || "#"; chip.target = "_blank"; chip.rel = "noopener noreferrer";
     chip.setAttribute("aria-label", "Source " + (i + 1) + ": " + m.domain);
     chip.appendChild(citeFavicon(m.domain));
     const n = document.createElement("span"); n.className = "cn"; n.textContent = String(i + 1);
@@ -3208,7 +3231,7 @@ function renderAnswer(container, text, sources, related, images, meta) {
     sources.forEach((s, i) => {
       const card = document.createElement("a");
       card.className = "source-card";
-      card.href = s.url || s.title || "#";
+      card.href = SafeUrl.http(s.url) || "#";
       card.target = "_blank";
       card.rel = "noopener noreferrer";
       const favicon = document.createElement("div");
@@ -3293,7 +3316,7 @@ function renderAnswer(container, text, sources, related, images, meta) {
     master.forEach((m, i) => {
       const a = document.createElement("a");
       a.className = "link-row";
-      a.href = m.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.href = SafeUrl.http(m.url) || "#"; a.target = "_blank"; a.rel = "noopener noreferrer";
       const num = document.createElement("div"); num.className = "lr-num"; num.textContent = String(i + 1);
       const body = document.createElement("div"); body.className = "lr-body";
       const dom = document.createElement("div"); dom.className = "lr-dom";
@@ -3319,10 +3342,10 @@ function renderAnswer(container, text, sources, related, images, meta) {
     grid.className = "images-grid";
     imgList.slice(0, 12).forEach(im => {
       const a = document.createElement("a");
-      a.href = im.origin_url || im.image_url;
+      a.href = SafeUrl.http(im.origin_url) || SafeUrl.http(im.image_url) || "#";
       a.target = "_blank"; a.rel = "noopener noreferrer";
       const el = document.createElement("img");
-      el.src = im.image_url; el.alt = im.title || ""; el.loading = "lazy";
+      el.src = SafeUrl.http(im.image_url); el.alt = im.title || ""; el.loading = "lazy";
       const cap = document.createElement("div");
       cap.className = "img-title";
       cap.textContent = im.title || "";
