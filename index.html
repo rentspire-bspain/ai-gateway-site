@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ai.spaincos.com — Where knowledge begins</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2320808D'/><text x='16' y='22' text-anchor='middle' fill='white' font-family='Georgia' font-size='18' font-style='italic'>P</text></svg>">
+<link rel="icon" type="image/webp" href="favicon.webp">
 <link rel="preconnect" href="https://frontend-cdn.perplexity.ai" crossorigin>
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
@@ -1170,6 +1170,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <button class="auth-btn" id="authPasswordBtn">Sign in with password</button>
       <button class="auth-btn-secondary" id="authSendCode">Send email code instead</button>
+      <button class="auth-btn-secondary" id="authPasskeyBtn" style="margin-top:8px">Sign in with passkey</button>
     </div>
     <div id="authStep2" style="display:none">
       <div class="auth-input-group">
@@ -1993,9 +1994,21 @@ function showResults() {
 
 // ============ AUTH ============
 const authOverlay = document.getElementById("authOverlay");
+// v72: private-site lock — only the owner's account (plus the QA test account) may
+// use ai.spaincos.com. Anyone else is signed out and blocked at sign-in.
+const ALLOWED_EMAILS = ["bspain@spaincos.com", "eval-bot@spaincos.com"];
 async function checkAuth() {
   const { data } = await sb.auth.getSession();
   if (data?.session?.user?.email) {
+    if (!ALLOWED_EMAILS.includes(data.session.user.email.toLowerCase())) {
+      // not on the allowlist — sign them out and keep the site blocked
+      await sb.auth.signOut();
+      currentUser = null;
+      const sub = document.querySelector(".auth-subtitle");
+      if (sub) sub.textContent = "This site is private. Sign in with an authorized account.";
+      authOverlay.style.display = "flex";
+      return false;
+    }
     currentUser = data.session.user;
     document.getElementById("userEmail").textContent = currentUser.email;
     document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
@@ -2021,17 +2034,39 @@ document.getElementById("authPasswordBtn").onclick = async () => {
   const email = document.getElementById("authEmail").value.trim();
   const password = document.getElementById("authPassword").value;
   if (!email || !password) return err.textContent = "Enter your email and password.";
+  if (!ALLOWED_EMAILS.includes(email.toLowerCase())) return err.textContent = "This site is private.";
   const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) return err.textContent = error.message;
   authOverlay.style.display = "none";
   location.reload();
+};
+// ---- PASSKEY SIGN-IN (v72) ----
+document.getElementById("authPasskeyBtn").onclick = async () => {
+  const err = document.getElementById("authError");
+  err.textContent = "";
+  try {
+    if (typeof sb.auth.signInWithWebAuthn !== "function") {
+      return err.textContent = "Passkeys aren't supported in this browser yet — use password or email code.";
+    }
+    const { data, error: pkErr } = await sb.auth.signInWithWebAuthn();
+    if (pkErr) return err.textContent = pkErr.message;
+    if (data?.session?.user?.email && !ALLOWED_EMAILS.includes(data.session.user.email.toLowerCase())) {
+      await sb.auth.signOut();
+      return err.textContent = "This site is private.";
+    }
+    authOverlay.style.display = "none";
+    location.reload();
+  } catch (e) {
+    err.textContent = "Passkey sign-in failed: " + (e?.message || e);
+  }
 };
 document.getElementById("authSendCode").onclick = async () => {
   const err = document.getElementById("authError");
   err.textContent = "";
   const email = document.getElementById("authEmail").value.trim();
   if (!email) return err.textContent = "Enter your email";
-  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  if (!ALLOWED_EMAILS.includes(email.toLowerCase())) return err.textContent = "This site is private.";
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
   if (error) return err.textContent = error.message;
   document.getElementById("authStep1").style.display = "none";
   document.getElementById("authStep2").style.display = "block";
