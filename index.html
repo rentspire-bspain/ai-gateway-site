@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="modules/discover.css">
 <link rel="stylesheet" href="modules/apikeys.css">
 <link rel="stylesheet" href="modules/projects.css">
+<link rel="stylesheet" href="modules/siteassets.css">
 <link rel="stylesheet" href="modules/sources.css">
 <link rel="stylesheet" href="modules/media.css">
 <link rel="stylesheet" href="modules/export.css">
@@ -1130,6 +1131,12 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 }
 .answer-error-retry:hover { background: var(--accent-btn-hover); }
 .answer-error-retry:disabled { opacity: 0.6; cursor: default; }
+.searching-phases .searching-step.done::before { content: none; }
+.searching-step.err { color: var(--error); }
+.degraded-note { display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap; padding:10px 12px; margin:0 0 14px; border:1px solid var(--border-light); border-left:3px solid #F59E0B; border-radius:var(--radius-sm); background:var(--bg-elevated); font-size:13.5px; line-height:1.5; }
+.degraded-note .dn-text { flex:1 1 220px; min-width:0; overflow-wrap:anywhere; color:var(--text); }
+.degraded-note .dn-text span { color:var(--text-muted); }
+.degraded-note .answer-error-retry { margin-top:0; }
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -2692,6 +2699,34 @@ function renderSearching(container, query) {
   }, 1000);
   return { state, interval: timer, started };
 }
+// v79 (I10): phases that report a degraded/failed step get an error style and a
+// retry notice in the answer, with the gateway's reason shown verbatim.
+function isDegradedPhase(p) {
+  return !!(p && /unavailable|failed|couldn.?t|could not|timed out|time-?out|skipped|error|rate.?limit/i.test(String(p.label || "")));
+}
+function renderDegradedNote(container, phases, query) {
+  const bad = (phases || []).filter(isDegradedPhase);
+  if (!bad.length) return;
+  const note = document.createElement("div");
+  note.className = "degraded-note";
+  note.setAttribute("role", "status");
+  const txt = document.createElement("div");
+  txt.className = "dn-text";
+  txt.textContent = bad.map(p => String(p.label)).join(" · ");
+  const sub = document.createElement("span");
+  sub.textContent = " — this answer may be missing live sources or tools.";
+  txt.appendChild(sub);
+  note.appendChild(txt);
+  if (query && query.trim()) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "answer-error-retry";
+    btn.textContent = "Retry";
+    btn.onclick = () => { if (isSearching) return; btn.disabled = true; submitQuery(query); };
+    note.appendChild(btn);
+  }
+  container.appendChild(note);
+}
 function renderPhases(state, phases) {
   if (!state || !state.isConnected || !Array.isArray(phases)) return;
   let box = state.querySelector(".searching-phases");
@@ -2702,8 +2737,8 @@ function renderPhases(state, phases) {
     state.appendChild(box);
   }
   box.innerHTML = phases.map(p =>
-    '<div class="searching-step ' + (p.done ? "done" : "live") + '">' +
-    (p.done ? "✓" : '<span class="searching-spinner" style="width:10px;height:10px;margin:0"></span>') +
+    '<div class="searching-step ' + (p.done ? "done" : "live") + (isDegradedPhase(p) ? " err" : "") + '">' +
+    (isDegradedPhase(p) ? "⚠" : p.done ? "✓" : '<span class="searching-spinner" style="width:10px;height:10px;margin:0"></span>') +
     " " + p.label + "</div>"
   ).join("");
 }
@@ -3193,6 +3228,7 @@ async function performSearch(query) {
     // replaced by the answer (the question header stays from renderSearching).
     // v67: imageResults (gateway image_search) render in the Images tab.
     let imageResults = [];
+    let degradedPhases = [];
     const renderFinal = (answer) => {
       const answerClean = splitFollowups(answer).body;
       clearInterval(interval);
@@ -3210,6 +3246,7 @@ async function performSearch(query) {
       stamp.className = "search-timer";
       stamp.textContent = "Finished " + Math.max(1, Math.round((Date.now() - started) / 1000)) + "s";
       content.appendChild(stamp);
+      renderDegradedNote(content, degradedPhases, query);
       const sources = extractSources(answerClean);
       const related = generateRelated(query, answer);
       renderAnswer(content, answerClean, sources, related, imageResults);
@@ -3298,7 +3335,7 @@ async function performSearch(query) {
             if (payload === "[DONE]") continue;
             try {
               const evt = JSON.parse(payload);
-              if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); }
+              if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); degradedPhases = evt.phases.filter(isDegradedPhase); }
               if (Array.isArray(evt?.images)) { imageResults = evt.images; }
               if (Array.isArray(evt?.phases)) continue;
               const delta = evt?.choices?.[0]?.delta?.content;
@@ -3320,7 +3357,9 @@ async function performSearch(query) {
     // v65: keep prior turns visible — only the loading state becomes the error
     clearInterval(interval);
     if (state && state.isConnected) state.remove();
-    renderAnswerError(content, "Something went wrong", String(e && e.message ? e.message : e), query);
+    const emsg = String(e && e.message ? e.message : e);
+    const netFail = /failed to fetch|networkerror|load failed|network request failed/i.test(emsg);
+    renderAnswerError(content, netFail ? "Couldn't reach the gateway" : "Something went wrong", netFail ? "Network request failed (" + emsg + "). Check your connection and retry." : emsg, query);
   } finally {
     isSearching = false;
   }
@@ -3329,6 +3368,7 @@ async function performSearch(query) {
 // ============ EVENT HANDLERS ============
 // v77: user-submitted queries pass through the (optional) Research Mode hook first
 function submitQuery(query) {
+  if (window.SiteAssets && window.SiteAssets.intercept && window.SiteAssets.intercept(query)) return;
   if (window.ResearchMode && window.ResearchMode.intercept && window.ResearchMode.intercept(query)) return;
   performSearch(query);
 }
@@ -3460,6 +3500,7 @@ async function loadStatus(force) {
 <script src="modules/discover.js"></script>
 <script src="modules/apikeys.js"></script>
 <script src="modules/projects.js"></script>
+<script src="modules/siteassets.js"></script>
 <script src="modules/sources.js"></script>
 <script src="modules/media.js"></script>
 <script src="modules/export.js"></script>

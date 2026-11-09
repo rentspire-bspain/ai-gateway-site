@@ -1,0 +1,26 @@
+.sa-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;font-family:var(--font-sans)}
+.sa-panel{width:100%;max-width:560px;max-height:100%;overflow-y:auto;background:var(--bg-surface);color:var(--text);border:1px solid var(--border-light);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:14px;outline:none}
+.sa-head{display:flex;align-items:center;gap:12px}
+.sa-title{font-size:17px;font-weight:600;margin:0;flex:1}
+.sa-x{background:none;border:0;color:var(--text-muted);font-size:22px;cursor:pointer;padding:4px 10px;border-radius:var(--radius-sm)}
+.sa-x:hover{background:var(--bg-elevated);color:var(--text)}
+.sa-note{color:var(--text-muted);font-size:13px;line-height:1.5}
+.sa-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sa-input,.sa-sel{background:var(--bg-input);color:var(--text);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:9px 11px;font:inherit;font-size:14px;min-width:0;box-sizing:border-box}
+.sa-input{flex:1 1 200px}
+.sa-input:focus,.sa-sel:focus{outline:none;border-color:var(--accent)}
+.sa-btn{background:var(--bg-elevated);color:var(--text);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}
+.sa-btn:hover{border-color:var(--accent)}
+.sa-btn:disabled{opacity:.55;cursor:default}
+.sa-btn.primary{background:var(--accent-btn,var(--accent));border-color:transparent;color:#fff}
+.sa-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sa-box{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;background:var(--bg-elevated);min-width:0}
+.sa-box h4{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 10px;text-transform:uppercase;letter-spacing:.04em}
+.sa-sizes{display:flex;align-items:flex-end;gap:12px;min-height:64px}
+.sa-sizes img{display:block;background:repeating-conic-gradient(rgba(128,128,128,.18) 0 25%,transparent 0 50%) 0/10px 10px;border-radius:4px;object-fit:contain}
+.sa-meta{font-size:12px;color:var(--text-faint);margin-top:8px;overflow-wrap:anywhere}
+.sa-status{font-size:13px;color:var(--text-muted);overflow-wrap:anywhere}
+.sa-status.err{color:var(--error)}
+.sa-status.ok{color:var(--text)}
+@media(max-width:480px){.sa-compare{grid-template-columns:1fr}.sa-panel{padding:16px}}
+@media(max-width:768px){.sa-btn,.sa-input,.sa-sel,.sa-x{min-height:40px}}
