@@ -13,7 +13,20 @@
     down: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 14V3h4v11z"/><path d="M17 14l-4 8a3 3 0 0 1-3-3v-4H4a2 2 0 0 1-2-2l2-8a2 2 0 0 1 2-2h13"/></svg>'
   };
 
-  function g(name) { try { return (0, eval)("typeof " + name + "!=='undefined'?" + name + ":undefined"); } catch (e) { return undefined; } }
+  // CSP-safe global getter: no eval (blocked without unsafe-eval). Top-level bindings
+  // of the main script live in the shared global lexical environment, so a direct
+  // typeof check reaches them from this module.
+  function g(name) {
+    try {
+      switch (name) {
+        case "threads": return typeof threads !== "undefined" ? threads : undefined;
+        case "currentThreadId": return typeof currentThreadId !== "undefined" ? currentThreadId : undefined;
+        case "sb": return typeof sb !== "undefined" ? sb : undefined;
+        case "submitQuery": return typeof submitQuery !== "undefined" ? submitQuery : undefined;
+        default: return undefined;
+      }
+    } catch (e) { return undefined; }
+  }
   function lsGet(k) { try { var v = JSON.parse(localStorage.getItem(k) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
   function escH(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function slug(s) { var r = String(s || "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60).replace(/-+$/, ""); return r || "answer"; }
