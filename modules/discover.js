@@ -10,12 +10,14 @@
     return String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, "").replace(/ {2,}/g, " ").trim();
   }
   function esc(s) { var d = document.createElement("div"); d.textContent = clean(s); return d.innerHTML; }
-  // Markdown-safe text: drop [label](url) syntax (keep the label), strip bold/italic markers.
+  // Markdown-safe text: drop [label](url) syntax (keep the label), strip bold/italic
+  // markers (including unbalanced ones).
   function mdText(s) {
     return clean(s)
       .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
       .replace(/\*\*([^*]*)\*\*/g, "$1").replace(/__([^_]*)__/g, "$1")
-      .replace(/\*([^*]+)\*/g, "$1").trim();
+      .replace(/\*([^*]+)\*/g, "$1")
+      .replace(/\*\*/g, "").replace(/__/g, "").trim();
   }
   function domain(u) {
     try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; }
@@ -69,9 +71,16 @@
     if (/^(date|day|source|url|link|published|summary|headline|title)\s*[:\-–]/i.test(t)) return true;
     return t.replace(/[^A-Za-z]/g, "").length < 4;
   }
+  // Body-sentence openers ("It highlights…", "The shift suggests…", "…also
+  // declined…") never make good display titles either.
+  function isContinuation(t) {
+    if (/^(it|they|this|that|these|those|he|she|we|you)\b/i.test(t)) return true;
+    if (/^the\s+(shift|move|change|announcement|report|decision|figure|trend|development|drop|decline|rise|fall|increase|cut|hike|data|result|update|news)\b/i.test(t)) return true;
+    return /\b(also|meanwhile|additionally|furthermore|moreover)\b/i.test(t);
+  }
   function effectiveTitle(c) {
     var t = mdText(c.title);
-    if (isJunkTitle(t)) {
+    if (isJunkTitle(t) || isContinuation(t)) {
       var s = mdText(c.summary || "");
       var first = s.split(/(?<=[.!?])\s+/)[0] || s;
       t = first.split(/\s[—–]\s/)[0].slice(0, 120) || t;
