@@ -91,7 +91,7 @@
     var host; try { host = new URL(url).hostname; } catch (e) { throw new Error("Invalid URL"); }
     var direct = /\.(ico|png|jpe?g|gif|webp|svg|avif|bmp)$/i.test(new URL(url).pathname);
     var ask = "Fetch the " + kind + " from " + (direct ? url : host) + " and attach it.";
-    var ctl = new AbortController(), timer = setTimeout(function () { ctl.abort(); }, 60000);
+    var ctl = new AbortController(), timer = setTimeout(function () { ctl.abort(); }, 90000);
     var res, data = {};
     try {
       res = await fetch(endpoint, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok },
@@ -226,7 +226,7 @@
   }
 
   /* ---------- chat intent ---------- */
-  var INTENT = /\b(update|change|replace|set|swap|use|switch|make)\b[^.?!]{0,60}\b(favicon|fav icon|site icon|tab icon|logo)\b/i;
+  var INTENT = /\b(update|change|replace|set|swap|use|switch|make)\b(?:(?![.?!](?:\s|$)).){0,60}\b(favicon|fav icon|site icon|tab icon|logo)\b/i;
   function intercept(query) {
     var q = String(query || "");
     if (!INTENT.test(q)) return false;
