@@ -5,18 +5,16 @@
    localStorage and best-effort Supabase Storage. Nothing is applied without a click
    (prompt-injection safe: the model never swaps assets on its own).
 
-   GATEWAY CONTRACT (proposed; confirm with gateway_brain):
-     POST {GATEWAY}/gateway-asset   Authorization: Bearer <session token>
-     body    { action:"fetch", kind:"favicon"|"logo", url:"https://spaincos.com" }
-     200     { ok:true, kind, source_url, content_type:"image/png"|..., width?, height?,
-               bytes, sha256?, data_base64 }       (<=256KB, image/* only, https only)
-     4xx/5xx { ok:false, error:"reason" }
-   Override the endpoint with window.SITE_ASSET_ENDPOINT. If it 404s the panel falls back to
-   a public favicon service (favicon only) and says so.
+   GATEWAY CONTRACT (matches the deployed gateway-chat fetch_asset tool, I4):
+     POST {GATEWAY}/gateway-chat {messages:[{role:"user",content:"Fetch the favicon from <domain> and attach it."}],
+          purpose:"auto", stream:false}  -> JSON with x_assets:[{name,url,content_type,bytes,sha256,base64,storage}]
+     (streaming responses carry the same list as a `data: {assets:[...]}` SSE event.) Max inline size 512 KB.
+     Override the endpoint with window.SITE_ASSET_ENDPOINT. If it 404s the panel falls back to a public
+     favicon service (favicon only) and says so.
    Exposes window.SiteAssets = { intercept, open, close, applyStored, revert }. */
 (function () {
   "use strict";
-  var LS = window.localStorage, MAX = 256 * 1024, BUCKET = "site-assets";
+  var LS = window.localStorage, MAX = 512 * 1024, BUCKET = "site-assets";
   var KEYS = { favicon: "ai_site_favicon", logo: "ai_site_logo" };
   var DEFAULT_DOMAIN = "spaincos.com";
   var overlay = null, lastFocus = null, state = null;
@@ -81,22 +79,41 @@
     return false;
   }
   async function viaGateway(kind, url) {
+    // The deployed gateway has no standalone asset endpoint: fetch_asset is a gateway-chat tool.
+    // A request like "fetch the favicon from <domain>" makes the platform run it server-side and
+    // attach the file as `x_assets` (JSON) / an `assets` SSE event. We use the non-streaming form.
     var sb = g("sb"), GW = g("GATEWAY");
-    var endpoint = window.SITE_ASSET_ENDPOINT || (GW ? GW + "/gateway-asset" : "");
+    var endpoint = window.SITE_ASSET_ENDPOINT || (GW ? GW + "/gateway-chat" : "");
     if (!endpoint) throw new Error("Gateway endpoint not configured");
     var tok = "";
     try { var s = await sb.auth.getSession(); tok = s && s.data && s.data.session ? s.data.session.access_token : ""; } catch (e) {}
     if (!tok) throw new Error("Sign in to fetch assets");
-    var res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok }, body: JSON.stringify({ action: "fetch", kind: kind, url: url }) });
-    var data = {}; try { data = await res.json(); } catch (e) {}
+    var host; try { host = new URL(url).hostname; } catch (e) { throw new Error("Invalid URL"); }
+    var direct = /\.(ico|png|jpe?g|gif|webp|svg|avif|bmp)$/i.test(new URL(url).pathname);
+    var ask = "Fetch the " + kind + " from " + (direct ? url : host) + " and attach it.";
+    var ctl = new AbortController(), timer = setTimeout(function () { ctl.abort(); }, 60000);
+    var res, data = {};
+    try {
+      res = await fetch(endpoint, { method: "POST", signal: ctl.signal, headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok },
+        body: JSON.stringify({ messages: [{ role: "user", content: ask }], purpose: "auto", max_tokens: 400, stream: false }) });
+      try { data = await res.json(); } catch (e) {}
+    } catch (e) { throw new Error(e && e.name === "AbortError" ? "The gateway took too long (60s)" : (e && e.message) || "Network error"); }
+    finally { clearTimeout(timer); }
     if (res.status === 404) { var nf = new Error("The gateway asset tool isn't deployed yet"); nf.notDeployed = true; throw nf; }
-    if (!res.ok || !data || data.ok === false) throw new Error((data && (data.error && data.error.message || data.error)) || ("Gateway error " + res.status));
-    var type = String(data.content_type || "").toLowerCase();
-    if (!/^image\//.test(type)) throw new Error("The fetched file isn't an image (" + (type || "unknown type") + ")");
-    var b64 = String(data.data_base64 || "");
-    if (!b64 || b64.length * 0.75 > MAX) throw new Error("Image is empty or larger than 256 KB");
+    if (!res.ok) throw new Error((data && (data.error && data.error.message || data.error)) || ("Gateway error " + res.status));
+    var list = (data && (data.x_assets || data.assets)) || [];
+    var a = null;
+    for (var i = 0; i < list.length; i++) { if (list[i] && /^image\//i.test(String(list[i].content_type || ""))) { a = list[i]; break; } }
+    if (!a) {
+      var said = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      throw new Error(list.length ? "The gateway fetched a file, but it isn't an image (" + (list[0].content_type || "unknown type") + ")"
+        : "The gateway returned no asset" + (said ? " — " + String(said).replace(/\s+/g, " ").slice(0, 160) : ""));
+    }
+    var type = String(a.content_type).toLowerCase().split(";")[0].trim(), b64 = String(a.base64 || "");
+    if (!b64) throw new Error("Image is larger than the gateway's inline limit (512 KB) — it was stored but can't be previewed here");
+    if (b64.length * 0.75 > MAX) throw new Error("Image is larger than 512 KB");
     if (!sniffOk(b64, type)) throw new Error("File contents don't look like an image");
-    return { dataUrl: "data:" + type + ";base64," + b64, type: type, source: data.source_url || url, bytes: data.bytes || Math.round(b64.length * 0.75), via: "gateway" };
+    return { dataUrl: "data:" + type + ";base64," + b64, type: type, source: a.url || url, bytes: a.bytes || Math.round(b64.length * 0.75), sha256: a.sha256 || "", via: "gateway" + (a.storage && a.storage.ok ? " (stored in " + a.storage.bucket + ")" : "") };
   }
   async function viaPublicService(url) {
     var host; try { host = new URL(url).hostname; } catch (e) { throw new Error("Invalid URL"); }
@@ -182,7 +199,7 @@
         var a;
         try { a = await viaGateway(sel.value, url); }
         catch (e) {
-          if (e.notDeployed && sel.value === "favicon") { a = await viaPublicService(url); say("Gateway asset tool unavailable — used a public favicon service instead. Review the preview carefully.", ""); }
+          if (e.notDeployed && sel.value === "favicon") { try { a = await viaPublicService(url); } catch (e2) { throw new Error("The gateway asset tool isn't deployed and the public favicon service is unreachable (" + ((e2 && e2.message) || "network error") + ")"); } say("Gateway asset tool unavailable — used a public favicon service instead. Review the preview carefully.", ""); }
           else throw e;
         }
         state.asset = a; draw(); apply.disabled = false;

@@ -1133,6 +1133,9 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .answer-error-retry:disabled { opacity: 0.6; cursor: default; }
 .searching-phases .searching-step.done::before { content: none; }
 .searching-step.err { color: var(--error); }
+.revised-badge { display:inline-block; margin-left:8px; padding:0 7px; border:1px solid var(--border-light); border-radius:999px; font-size:11px; line-height:17px; color:var(--text-muted); background:var(--bg-elevated); animation: revFade .6s ease; }
+@keyframes revFade { from { opacity:0; } to { opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .revised-badge { animation:none; } }
 .degraded-note { display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap; padding:10px 12px; margin:0 0 14px; border:1px solid var(--border-light); border-left:3px solid #F59E0B; border-radius:var(--radius-sm); background:var(--bg-elevated); font-size:13.5px; line-height:1.5; }
 .degraded-note .dn-text { flex:1 1 220px; min-width:0; overflow-wrap:anywhere; color:var(--text); }
 .degraded-note .dn-text span { color:var(--text-muted); }
@@ -2704,6 +2707,13 @@ function renderSearching(container, query) {
 function isDegradedPhase(p) {
   return !!(p && /unavailable|failed|couldn.?t|could not|timed out|time-?out|skipped|error|rate.?limit/i.test(String(p.label || "")));
 }
+function revisedBadge() {
+  const b = document.createElement("span");
+  b.className = "revised-badge";
+  b.textContent = "Revised";
+  b.title = "This answer was checked and corrected after it was first drafted";
+  return b;
+}
 function renderDegradedNote(container, phases, query) {
   const bad = (phases || []).filter(isDegradedPhase);
   if (!bad.length) return;
@@ -3229,8 +3239,11 @@ async function performSearch(query) {
     // v67: imageResults (gateway image_search) render in the Images tab.
     let imageResults = [];
     let degradedPhases = [];
-    const renderFinal = (answer) => {
+    let revisedText = ""; // v80 (I7 pass-2): full replacement text from a `revision` SSE event
+    const renderFinal = (answer, revised) => {
       const answerClean = splitFollowups(answer).body;
+      const scBefore = document.getElementById("resultsScroll");
+      const prevTop = scBefore ? scBefore.scrollTop : 0;
       clearInterval(interval);
       if (state && state.isConnected) state.remove();
       if (liveAnswerEl) { liveAnswerEl.remove(); liveAnswerEl = null; }
@@ -3245,6 +3258,7 @@ async function performSearch(query) {
       const stamp = document.createElement("div");
       stamp.className = "search-timer";
       stamp.textContent = "Finished " + Math.max(1, Math.round((Date.now() - started) / 1000)) + "s";
+      if (revised) stamp.appendChild(revisedBadge());
       content.appendChild(stamp);
       renderDegradedNote(content, degradedPhases, query);
       const sources = extractSources(answerClean);
@@ -3253,13 +3267,14 @@ async function performSearch(query) {
       speakAnswer(answerClean);
       thread.messages.push({ role: "user", content: fullQuery });
       thread.updatedAt = Date.now();
-      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(imageResults.length ? { images: imageResults } : {}) });
+      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(revised ? { revised: true } : {}), ...(imageResults.length ? { images: imageResults } : {}) });
       saveThreads();
       renderThreads();
       // v74: stay where the reader is — jump to the bottom ONLY if they were
       // already near the latest answer; never yank them to the top of the thread.
       const sc = document.getElementById("resultsScroll");
-      if (sc.scrollHeight - sc.scrollTop - sc.clientHeight < 220) sc.scrollTop = sc.scrollHeight;
+      if (revised && sc.scrollHeight - prevTop - sc.clientHeight >= 220) sc.scrollTop = prevTop; // revision swap: keep the reader's place
+      else if (sc.scrollHeight - sc.scrollTop - sc.clientHeight < 220) sc.scrollTop = sc.scrollHeight;
     };
     // Live partial render during streaming (throttled). v65: renders into a
     // single replaceable answer element so prior turns stay visible.
@@ -3278,6 +3293,12 @@ async function performSearch(query) {
       }
       liveAnswerEl.innerHTML = "";
       renderAnswer(liveAnswerEl, partial, extractSources(partial), [], []);
+      if (revisedText) {
+        const rv = document.createElement("div");
+        rv.className = "search-timer";
+        rv.appendChild(revisedBadge());
+        liveAnswerEl.insertBefore(rv, liveAnswerEl.firstChild);
+      }
     };
 
     if (deepResearchOn) {
@@ -3338,18 +3359,29 @@ async function performSearch(query) {
               if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); degradedPhases = evt.phases.filter(isDegradedPhase); }
               if (Array.isArray(evt?.images)) { imageResults = evt.images; }
               if (Array.isArray(evt?.phases)) continue;
+              if (typeof evt?.revision === "string" && evt.revision.trim()) {
+                // swap the rendered answer for the revised text, keeping the reader's scroll position
+                revisedText = evt.revision;
+                const scr = document.getElementById("resultsScroll");
+                const keepTop = scr ? scr.scrollTop : 0;
+                lastRender = 0;
+                renderLive(revisedText);
+                if (scr) scr.scrollTop = keepTop;
+                continue;
+              }
               const delta = evt?.choices?.[0]?.delta?.content;
-              if (delta) full += delta;
+              if (delta && !revisedText) full += delta;
             } catch {}
           }
-          renderLive(full);
+          renderLive(revisedText || full);
         }
-        renderFinal(full);
+        renderFinal(revisedText || full, !!revisedText);
       } else {
         const data = await res.json();
         if (Array.isArray(data?.images)) imageResults = data.images;
         const _msg = data?.choices?.[0]?.message ?? {};
-        renderFinal(_msg.content || "");
+        if (typeof data?.revision === "string" && data.revision.trim()) _msg.content = data.revision;
+        renderFinal(_msg.content || "", data?.revised === true || (typeof data?.revision === "string" && !!data.revision.trim()));
       }
     }
 
