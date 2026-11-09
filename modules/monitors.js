@@ -5,7 +5,13 @@
   var root = null, tab = "monitors", monitors = [], events = [], timer = null;
   var state = { loading: true, setup: false, error: "", running: {}, editing: null, creating: false };
 
-  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
+  var MOJI = /[\u00C2\u00C3][\u0080-\u00BF\u20AC\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\u0160\u2039\u0152\u017D\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]*|\u00E2[\u0080-\u00BF\u20AC\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\u0160\u2039\u0152\u017D\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\u017E\u0178]*/g;
+  function clean(s) {
+    if (s == null) return "";
+    return String(s).replace(MOJI, "-").replace(/\uFFFD+/g, " ").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, "")
+      .replace(/ {2,}/g, " ").replace(/(\S) - (\S)/g, "$1 - $2");
+  }
+  function esc(s) { var d = document.createElement("div"); d.textContent = clean(s); return d.innerHTML; }
   function ivLabel(m) { for (var i = 0; i < INTERVALS.length; i++) if (INTERVALS[i][0] === +m) return INTERVALS[i][1]; return "Every " + m + " min"; }
   function ago(t) {
     if (!t) return "never";
@@ -26,7 +32,7 @@
     }).then(function (res) {
       if (res.status === 404) { var e = new Error("setup"); e.setup = true; throw e; }
       return res.json().catch(function () { return {}; }).then(function (j) {
-        if (!res.ok) throw new Error(j.error || j.message || "Request failed (" + res.status + ")");
+        if (!res.ok) throw new Error(clean(j.error || j.message) || "Request failed (" + res.status + ")");
         return j;
       });
     });
@@ -43,7 +49,7 @@
       state.setup = false; state.error = ""; state.loading = false;
     }).catch(function (e) {
       state.loading = false;
-      if (e.setup) state.setup = true; else state.error = e.message;
+      if (e.setup) state.setup = true; else state.error = clean(e.message);
     }).then(render);
   }
   function refreshEvents() {
@@ -118,7 +124,7 @@
     return { name: (o.name || "").trim(), query: (o.query || "").trim(), interval_min: parseInt(o.interval, 10) || 60 };
   }
   function find(id) { return monitors.filter(function (m) { return m.id === id; })[0]; }
-  function fail(e) { state.error = e.message === "setup" ? "Service unavailable." : e.message; render(); }
+  function fail(e) { state.error = e.message === "setup" ? "Service unavailable." : clean(e.message); render(); }
 
   function onClick(ev) {
     var t = ev.target.closest("[data-tab],[data-act],.tk-x"); if (!t) return;
@@ -157,8 +163,10 @@
   }
   function onKey(e) { if (e.key === "Escape" && root) close(); }
 
+  var lastFocus = null;
   function open() {
     if (root) return;
+    lastFocus = document.activeElement;
     ensureCss();
     root = document.createElement("div");
     root.className = "tk-root";
@@ -167,6 +175,8 @@
     root.addEventListener("click", onClick);
     document.addEventListener("keydown", onKey);
     state.loading = true; state.error = ""; render();
+    root.setAttribute("role", "dialog"); root.setAttribute("aria-modal", "true"); root.setAttribute("aria-label", "Tasks");
+    var xb = root.querySelector(".tk-x"); if (xb) xb.focus();
     refresh();
     timer = setInterval(refreshEvents, 60000);
   }
@@ -175,6 +185,8 @@
     clearInterval(timer); timer = null;
     document.removeEventListener("keydown", onKey);
     root.remove(); root = null;
+    if (lastFocus && lastFocus.focus && document.contains(lastFocus)) { try { lastFocus.focus(); } catch (e) {} }
+    lastFocus = null;
   }
   window.TasksUI = { open: open, close: close };
 })();

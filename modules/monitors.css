@@ -4,7 +4,7 @@
 .tk-tabs{display:flex;gap:4px;flex:1}
 .tk-tab{background:none;border:0;color:var(--text-muted);font:inherit;font-size:14px;padding:7px 14px;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;gap:6px}
 .tk-tab:hover{background:var(--bg-elevated);color:var(--text)}
-.tk-tab.active{background:var(--accent-light);color:var(--accent-hover)}
+.tk-tab.active{background:var(--accent-light);color:var(--text);font-weight:600;box-shadow:inset 0 -2px 0 var(--accent)}
 .tk-count{background:var(--error);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px}
 .tk-x{background:none;border:0;color:var(--text-muted);font-size:22px;cursor:pointer;padding:4px 10px;border-radius:var(--radius-sm)}
 .tk-x:hover{background:var(--bg-elevated);color:var(--text)}
@@ -44,3 +44,4 @@
 .tk-spin{display:inline-block;width:10px;height:10px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:tkspin .7s linear infinite;margin-right:6px;vertical-align:-1px}
 @keyframes tkspin{to{transform:rotate(360deg)}}
 @media(max-width:640px){.tk-head{flex-wrap:wrap;padding:12px 14px}.tk-tabs{order:3;flex:1 0 100%}.tk-tab{flex:1;justify-content:center}.tk-body{padding:14px}.tk-select{width:100%}}
+@media(max-width:768px){.tk-tab,.tk-btn,.tk-x,.tk-input,.tk-select{min-height:40px}.tk-x{min-width:40px}.tk-switch{position:relative}.tk-switch::before{content:"";position:absolute;inset:-12px -4px}}

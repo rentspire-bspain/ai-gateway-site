@@ -32,6 +32,8 @@
   --text-faint: #71757C;
   --accent: #3D9595;
   --accent-hover: #56ABAB;
+  --accent-btn: #2B7A7A;
+  --accent-btn-hover: #246C6C;
   --accent-light: rgba(61, 149, 149, 0.14);
   --citation-bg: rgba(219, 222, 227, 0.06);
   --citation-text: #6BB8B8;
@@ -58,6 +60,8 @@
   --text-faint: #8A9490;
   --accent: #14646B;
   --accent-hover: #0F4F55;
+  --accent-btn: #14646B;
+  --accent-btn-hover: #0F4F55;
   --accent-light: rgba(61, 149, 149, 0.1);
   --citation-bg: rgba(11, 40, 51, 0.05);
   --citation-text: #14646B;
@@ -157,7 +161,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: var(--accent);
+  background: var(--accent-btn);
   color: white;
   display: flex;
   align-items: center;
@@ -257,7 +261,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .space-modal textarea { min-height: 90px; resize: vertical; }
 .space-modal .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 .space-modal .btn {
-  background: var(--accent); border: none; color: white; font-size: 13px; font-weight: 600;
+  background: var(--accent-btn); border: none; color: white; font-size: 13px; font-weight: 600;
   padding: 8px 16px; border-radius: 8px; cursor: pointer;
 }
 .space-modal .btn.ghost { background: none; border: 1px solid var(--border); color: var(--text-muted); }
@@ -340,6 +344,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 20px;
 }
 .import-modal-backdrop.open { display: flex; }
+#shortcutsBackdrop { z-index: 980; }
 .import-modal {
   background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
   max-width: 560px; width: 100%; max-height: 85vh; max-height: min(85vh, calc(100dvh - 24px)); overflow-y: auto; padding: 24px;
@@ -360,7 +365,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .import-status .err { color: #dc2626; }
 .import-modal .close-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 .import-modal button.primary {
-  background: var(--accent); color: white; border: none; border-radius: var(--radius-sm);
+  background: var(--accent-btn); color: white; border: none; border-radius: var(--radius-sm);
   padding: 8px 16px; font-size: 13.5px; font-family: inherit; cursor: pointer;
 }
 .user-row {
@@ -402,7 +407,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-btn);
   color: white;
   display: flex;
   align-items: center;
@@ -520,7 +525,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-btn);
   color: white;
   display: flex;
   align-items: center;
@@ -528,7 +533,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   flex-shrink: 0;
   transition: background 0.15s ease, transform 0.15s ease;
 }
-.search-submit:hover { background: var(--accent-hover); transform: scale(1.05); }
+.search-submit:hover { background: var(--accent-btn-hover); transform: scale(1.05); }
 .search-submit:disabled { opacity: 0.5; cursor: wait; }
 .search-suggestions {
   display: flex;
@@ -973,13 +978,13 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   width: 100%;
   padding: 12px;
   border-radius: var(--radius-sm);
-  background: var(--accent);
+  background: var(--accent-btn);
   color: white;
   font-size: 14.5px;
   font-weight: 600;
   transition: background 0.15s ease;
 }
-.auth-btn:hover { background: var(--accent-hover); }
+.auth-btn:hover { background: var(--accent-btn-hover); }
 .auth-btn:disabled { opacity: 0.6; cursor: wait; }
 .auth-btn-secondary {
   width: 100%;
@@ -1047,7 +1052,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-btn);
   color: white;
   display: flex;
   align-items: center;
@@ -1055,7 +1060,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   flex-shrink: 0;
   transition: background 0.15s ease;
 }
-.followup-send:hover { background: var(--accent-hover); }
+.followup-send:hover { background: var(--accent-btn-hover); }
 .followup-send:disabled { opacity: 0.5; cursor: wait; }
 
 /* Model selector */
@@ -1082,7 +1087,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   border: 1px solid rgba(32,128,141,0.3);
   border-radius: var(--radius-sm);
   font-size: 12.5px;
-  color: var(--text-muted);
+  color: var(--text);
   margin-bottom: 16px;
 }
 .status-dot {
@@ -1111,10 +1116,10 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .answer-error-retry {
   display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
   padding: 7px 14px; min-height: 36px; border-radius: 999px; cursor: pointer;
-  background: var(--accent); color: #fff; border: none; font-size: 13px; font-weight: 600;
+  background: var(--accent-btn); color: #fff; border: none; font-size: 13px; font-weight: 600;
   transition: background 0.15s ease;
 }
-.answer-error-retry:hover { background: var(--accent-hover); }
+.answer-error-retry:hover { background: var(--accent-btn-hover); }
 .answer-error-retry:disabled { opacity: 0.6; cursor: default; }
 
 /* Responsive */
@@ -1164,7 +1169,14 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   .thread-item.active .thread-actions button, .thread-item.active .thread-move { min-width: 36px; min-height: 36px; align-items: center; justify-content: center; }
   .space-item .space-gear { opacity: 0.7; min-width: 36px; min-height: 36px; justify-content: center; }
 }
+@media (hover: none), (max-width: 480px) {
+  .model-select, #modelSel { min-height: 40px; }
+  .search-input { min-height: 40px; }
+}
 @media (max-width: 480px) {
+  .auth-input { font-size: 14px; padding: 12px 10px; }
+  .auth-input::placeholder { font-size: 13px; text-overflow: ellipsis; }
+  .answer-content td, .answer-content th { hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; min-width: 72px; }
   .source-card { width: 140px; }
   .landing-title { font-size: 26px; }
   .question-header { font-size: 15px; padding: 10px 14px; }
@@ -1390,7 +1402,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
         <input class="auth-input" id="authEmail" type="email" placeholder="you@spaincos.com" autocomplete="email">
       </div>
       <div class="auth-input-group">
-        <input class="auth-input" id="authPassword" type="password" placeholder="Password (or leave blank to use email code)" autocomplete="current-password">
+        <input class="auth-input" id="authPassword" type="password" placeholder="Password (or blank for email code)" autocomplete="current-password">
       </div>
       <button class="auth-btn" id="authPasswordBtn">Sign in with password</button>
       <button class="auth-btn-secondary" id="authSendCode">Send email code instead</button>
@@ -1415,7 +1427,17 @@ const GATEWAY = SUPABASE_URL + "/functions/v1";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ============ STATE ============
-let threads = JSON.parse(localStorage.getItem("ai_threads") || "[]");
+function safeLSArray(key) {
+  try {
+    const v = JSON.parse(localStorage.getItem(key) || "[]");
+    if (Array.isArray(v)) return v;
+    throw new Error("not an array");
+  } catch (e) {
+    try { localStorage.removeItem(key); } catch (e2) {}
+    return [];
+  }
+}
+let threads = safeLSArray("ai_threads");
 let currentThreadId = null;
 let isSearching = false;
 let currentUser = null;
@@ -1672,7 +1694,7 @@ document.getElementById("threadSearch").addEventListener("input", () => renderTh
 // Perplexity-Projects parity: threads group under a space; each space carries
 // custom instructions that ride every request from its threads. Spaces sync to
 // the account's `spaces` table (RLS user-owned); threads carry space_id.
-let spaces = JSON.parse(localStorage.getItem("ai_spaces") || "[]");
+let spaces = safeLSArray("ai_spaces");
 let activeSpaceId = null;
 function saveSpaces() {
   localStorage.setItem("ai_spaces", JSON.stringify(spaces));
