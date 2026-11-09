@@ -35,7 +35,9 @@
   --radius: 12px;
   --radius-sm: 8px;
   --radius-xs: 6px;
-  --sidebar-width: 240px;
+  --sidebar-width: 260px;
+  --answer-w: 720px;
+  --followup-h: 120px;
   --font-sans: "pplxSans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: "pplxSerif", Georgia, serif;
 }
@@ -58,7 +60,7 @@
   --error: #DC2626;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
+html, body { height: 100%; max-width: 100vw; overflow-x: hidden; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -76,35 +78,73 @@ a { color: inherit; text-decoration: none; }
 ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
 
 /* ============ APP SHELL ============ */
-.app { display: flex; height: 100vh; width: 100%; }
+.app { display: flex; height: 100vh; height: 100dvh; width: 100%; max-width: 100vw; overflow: hidden; }
 
 /* ============ SIDEBAR ============ */
 .sidebar {
-  width: var(--sidebar-width);
+  position: relative;
+  width: min(var(--sidebar-width), max(220px, calc(100vw - 420px)));
+  min-width: 0;
   background: var(--bg);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  transition: width 0.2s ease, margin-left 0.2s ease;
+  transition: width 0.2s ease, transform 0.2s ease, visibility 0s;
 }
-.sidebar.collapsed { width: 0; margin-left: calc(var(--sidebar-width) * -1); overflow: hidden; }
+.sidebar.resizing { transition: none; }
+/* Collapsed (desktop): zero width, no negative margin (the old margin-left hack pushed
+   the main column 260px off-screen and hid the expand button). */
+.sidebar.collapsed {
+  width: 0; min-width: 0; border-right-width: 0; overflow: hidden;
+  visibility: hidden; transition: width 0.2s ease, visibility 0s 0.2s;
+}
+.sidebar-scrim { display: none; }
 @media (max-width: 768px) {
-  .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 120; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
-  .sidebar.collapsed { width: var(--sidebar-width); margin-left: calc(var(--sidebar-width) * -1); }
+  /* mobile: overlay drawer, no resize handle */
+  .sidebar { position: fixed; inset: 0 auto 0 0; height: 100%; width: min(300px, 86vw); z-index: 90; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+  .sidebar.collapsed { width: min(300px, 86vw); border-right-width: 1px; transform: translateX(-105%); box-shadow: none; transition: transform 0.2s ease, visibility 0s 0.2s; }
+  .sidebar-scrim { position: fixed; inset: 0; z-index: 85; background: rgba(0,0,0,0.45); }
+  body.sidebar-open .sidebar-scrim { display: block; }
+  .sidebar-resizer, .answer-resizer, .modal-resizer { display: none !important; }
   .main { width: 100%; }
+}
+/* drag handles (sidebar / answer column / modals) */
+.sidebar-resizer {
+  position: absolute; top: 0; bottom: 0; right: -3px; width: 6px; z-index: 6;
+  cursor: col-resize; touch-action: none; background: transparent; transition: background 0.15s ease;
+  border-radius: 3px;
+}
+.answer-resizer, .modal-resizer {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 6px; z-index: 6; display: none;
+  cursor: col-resize; touch-action: none; background: transparent; transition: background 0.15s ease; border-radius: 3px;
+}
+.answer-resizer.show, .modal-resizer.show { display: block; }
+.modal-resizer { position: fixed; z-index: 310; }
+.sidebar-resizer:hover, .answer-resizer:hover, .modal-resizer:hover,
+.sidebar-resizer.dragging, .answer-resizer.dragging, .modal-resizer.dragging,
+.sidebar-resizer:focus-visible, .answer-resizer:focus-visible, .modal-resizer:focus-visible {
+  background: color-mix(in srgb, var(--accent) 55%, transparent); outline: none;
+}
+.sidebar.collapsed .sidebar-resizer { display: none; }
+body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-select: none !important; -webkit-user-select: none !important; }
+@media (pointer: coarse) {
+  .sidebar-resizer { right: -8px; width: 16px; }
+  .answer-resizer, .modal-resizer { width: 16px; }
 }
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 16px 12px;
+  padding: 16px 12px 12px 16px;
   gap: 8px;
+  min-width: 0;
 }
 .logo {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   font-weight: 700;
   font-size: 15px;
   letter-spacing: -0.01em;
@@ -123,7 +163,9 @@ a { color: inherit; text-decoration: none; }
   font-size: 16px;
   font-weight: 600;
 }
-.sidebar-actions { display: flex; gap: 4px; }
+.logo span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.logo-mark { flex-shrink: 0; }
+.sidebar-actions { display: flex; gap: 4px; flex-shrink: 0; }
 .icon-btn {
   width: 32px;
   height: 32px;
@@ -153,7 +195,9 @@ a { color: inherit; text-decoration: none; }
 .new-thread-btn:hover { background: var(--accent-light); border-color: var(--accent); }
 .threads-list {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 12px;
 }
 .spaces-head { display: flex; align-items: center; }
@@ -174,12 +218,15 @@ a { color: inherit; text-decoration: none; }
   padding: 2px; border-radius: 4px; display: flex; align-items: center; flex-shrink: 0;
 }
 .space-item:hover .space-gear, .thread-item:hover .thread-move { opacity: 0.7; }
+.thread-item .thread-move { display: none; }
+.thread-item:hover .thread-move, .thread-item:focus-within .thread-move { display: flex; }
 .space-item .space-gear:hover, .thread-item .thread-move:hover { opacity: 1; }
 .space-badge {
   font-size: 10px; color: var(--text-faint); background: var(--bg-elevated);
   border-radius: 10px; padding: 1px 7px; flex-shrink: 0;
 }
 .move-menu {
+  max-height: calc(100dvh - 24px); max-width: calc(100vw - 16px); overflow-y: auto;
   position: fixed; background: var(--bg-elevated); border: 1px solid var(--border-light);
   border-radius: 10px; padding: 4px; z-index: 200; min-width: 170px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.45);
@@ -196,7 +243,7 @@ a { color: inherit; text-decoration: none; }
 }
 .space-modal {
   background: var(--bg-elevated); border: 1px solid var(--border-light); border-radius: 14px;
-  padding: 20px; width: min(480px, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 12px;
+  padding: 20px; width: min(480px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
 }
 .space-modal h3 { margin: 0; font-size: 16px; }
 .space-modal input, .space-modal textarea {
@@ -266,7 +313,7 @@ a { color: inherit; text-decoration: none; }
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--accent-light); color: var(--text);
   border: 1px solid var(--border); border-radius: 999px;
-  font-size: 12px; padding: 3px 10px; margin: 6px 0 0;
+  font-size: 12px; padding: 3px 10px; margin: 6px 0 0; max-width: 100%; overflow-wrap: anywhere;
 }
 .attach-chip button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 0; line-height: 1; }
 .thread-item svg { flex-shrink: 0; opacity: 0.6; }
@@ -277,7 +324,7 @@ a { color: inherit; text-decoration: none; }
   padding: 12px;
 }
 .import-history-btn {
-  display: flex; align-items: center; gap: 8px; width: 100%;
+  display: flex; align-items: center; gap: 8px; width: 100%; min-height: 36px; line-height: 1.3;
   padding: 8px 10px; margin-bottom: 8px;
   background: none; border: 1px dashed var(--border); border-radius: var(--radius-sm);
   color: var(--text-muted); font-size: 12.5px; font-family: inherit;
@@ -291,7 +338,8 @@ a { color: inherit; text-decoration: none; }
 .import-modal-backdrop.open { display: flex; }
 .import-modal {
   background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
-  max-width: 560px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 24px;
+  max-width: 560px; width: 100%; max-height: 85vh; max-height: min(85vh, calc(100dvh - 24px)); overflow-y: auto; padding: 24px;
+  overflow-wrap: anywhere;
 }
 .import-modal h3 { margin: 0 0 6px; font-size: 17px; }
 .import-modal .sub { color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px; }
@@ -347,6 +395,7 @@ a { color: inherit; text-decoration: none; }
 /* ============ MAIN AREA ============ */
 .main {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -361,8 +410,9 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0;
   gap: 12px;
 }
-.main-header-left { display: flex; align-items: center; gap: 8px; }
-.breadcrumb { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+.main-header-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+.main-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.breadcrumb { font-size: 14px; color: var(--text-muted); font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .theme-toggle {
   display: flex;
   align-items: center;
@@ -382,13 +432,16 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 40px 20px;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
 .landing-inner {
   width: 100%;
-  max-width: 720px;
+  max-width: var(--answer-w, 720px);
+  margin: auto;
   text-align: center;
 }
 .landing-title {
@@ -427,7 +480,8 @@ a { color: inherit; text-decoration: none; }
 }
 .search-box svg { color: var(--text-faint); flex-shrink: 0; }
 .search-input {
-  flex: 1;
+  flex: 1 1 120px;
+  min-width: 0;
   font-size: 16px;
   line-height: 1.4;
   min-height: 24px;
@@ -483,6 +537,8 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0;
 }
 .searchbar-mini {
+  max-width: var(--answer-w, 720px);
+  margin: 0 auto;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -496,27 +552,33 @@ a { color: inherit; text-decoration: none; }
 .searchbar-mini svg { color: var(--text-faint); flex-shrink: 0; }
 .searchbar-mini input {
   flex: 1;
+  min-width: 0;
   font-size: 14.5px;
 }
 .searchbar-mini input::placeholder { color: var(--text-faint); }
 
 .results-scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 20px 24px 80px;
+  overflow-x: hidden;
+  padding: 20px 24px calc(var(--followup-h, 120px) + 24px);
 }
 .results-inner {
-  max-width: 780px;
+  max-width: var(--answer-w, 720px);
+  min-width: 0;
   margin: 0 auto;
 }
+.results-inner > * { min-width: 0; max-width: 100%; }
 
 /* Source cards */
-.sources-section { margin-bottom: 20px; }
+.sources-section { margin-bottom: 20px; min-width: 0; max-width: 100%; }
 .sources-row {
   display: flex;
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 4px;
+  max-width: 100%;
   -webkit-overflow-scrolling: touch;
 }
 .source-card {
@@ -604,10 +666,11 @@ a { color: inherit; text-decoration: none; }
 .searching-step.live { color: var(--text); font-weight: 500; }
 .searching-phases { display: flex; flex-direction: column; gap: 7px; margin: 4px 0; }
 /* v66: answer tab row (Perplexity thread view) */
-.answer-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 4px 0 14px; }
+.answer-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 4px 0 14px; overflow-x: auto; max-width: 100%; scrollbar-width: none; }
+.answer-tabs::-webkit-scrollbar { display: none; }
 .answer-tab {
   background: none; border: none; color: var(--text-muted); font-size: 13px; font-weight: 500;
-  padding: 8px 12px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: 8px 12px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; flex-shrink: 0; white-space: nowrap;
 }
 .answer-tab:hover { color: var(--text); }
 .answer-tab.active { color: var(--text); border-bottom-color: var(--text); }
@@ -616,14 +679,15 @@ a { color: inherit; text-decoration: none; }
 .links-list a { color: var(--accent); font-size: 13px; text-decoration: none; word-break: break-all; }
 .links-list a:hover { text-decoration: underline; }
 .tab-empty { color: var(--text-faint); font-size: 13px; padding: 8px 0; }
-.images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr)); gap: 10px; }
 .images-grid a { display: block; }
 .images-grid img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
 .images-grid .img-title { font-size: 11px; color: var(--text-faint); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .composer-pills { display: flex; align-items: center; gap: 6px; padding: 8px 4px 2px; flex-wrap: wrap; flex-basis: 100%; }
-.composer-pills .model-select, .composer-pills .width-toggle { border: 1px solid var(--border); border-radius: 999px; font-size: 12.5px; padding: 5px 12px; background: var(--bg-surface); height: auto; }
-.thread-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s ease; }
-.thread-item:hover .thread-actions { opacity: 1; }
+.composer-pills .model-select { max-width: 100%; text-overflow: ellipsis; }
+.composer-pills .model-select, .composer-pills .width-toggle { min-height: 32px; border: 1px solid var(--border); border-radius: 999px; font-size: 12.5px; padding: 5px 12px; background: var(--bg-surface); height: auto; }
+.thread-actions { display: none; gap: 2px; opacity: 0; transition: opacity 0.15s ease; flex-shrink: 0; }
+.thread-item:hover .thread-actions, .thread-item:focus-within .thread-actions { display: flex; opacity: 1; }
 .thread-actions button { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 3px; border-radius: 5px; display: flex; }
 .thread-actions button:hover { color: var(--text); background: var(--bg-elevated); }
 .search-timer { font-size: 12px; color: var(--text-faint); margin-left: 10px; }
@@ -638,7 +702,8 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: normal;
   margin: 0 0 16px auto;
   line-height: 1.5;
-  max-width: 600px;
+  max-width: min(600px, 100%);
+  overflow-wrap: anywhere;
   width: fit-content;
   background: color-mix(in srgb, var(--text) 4%, transparent);
   border-radius: 16px;
@@ -661,6 +726,8 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 8px;
 }
 .answer-content {
+  overflow-wrap: anywhere;
+  min-width: 0;
   font-family: var(--font-serif);
   font-size: 16px;
   line-height: 1.75;
@@ -729,6 +796,7 @@ a { color: inherit; text-decoration: none; }
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 .action-btn {
   display: flex;
@@ -779,11 +847,12 @@ a { color: inherit; text-decoration: none; }
   bottom: 0;
   background: rgba(0,0,0,0.6);
   backdrop-filter: blur(4px);
-  z-index: 100;
+  z-index: 400;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  overflow-y: auto;
 }
 .auth-modal {
   background: var(--bg-surface);
@@ -792,6 +861,7 @@ a { color: inherit; text-decoration: none; }
   padding: 32px;
   width: 100%;
   max-width: 400px;
+  margin: auto;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 .auth-logo {
@@ -874,18 +944,12 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 .followup-inner {
-  max-width: 780px;
+  max-width: var(--answer-w, 720px);
   margin: 0 auto;
   pointer-events: auto;
 }
 
-/* ============ ADJUSTABLE ANSWER WIDTH (default / wide / full) ============ */
-[data-width="wide"] .landing-inner { max-width: 960px; }
-[data-width="wide"] .results-inner { max-width: 1100px; }
-[data-width="wide"] .followup-inner { max-width: 1100px; }
-[data-width="full"] .landing-inner { max-width: 100%; }
-[data-width="full"] .results-inner { max-width: 100%; }
-[data-width="full"] .followup-inner { max-width: 100%; }
+/* ============ ADJUSTABLE ANSWER WIDTH (fit / full toggle + drag, via --answer-w) ============ */
 .width-toggle { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 12.5px; }
 .width-toggle:hover { color: var(--text); }
 .width-toggle.active { color: var(--accent); }
@@ -904,7 +968,7 @@ a { color: inherit; text-decoration: none; }
 }
 .followup-box:focus-within { border-color: var(--accent); }
 .followup-box svg { color: var(--text-faint); flex-shrink: 0; }
-.followup-box input { flex: 1; font-size: 14.5px; }
+.followup-box input { flex: 1 1 100px; min-width: 0; font-size: 14.5px; }
 .followup-box input::placeholder { color: var(--text-faint); }
 .followup-send {
   width: 32px;
@@ -960,16 +1024,69 @@ a { color: inherit; text-decoration: none; }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .sidebar { position: fixed; z-index: 50; height: 100%; }
-  .sidebar:not(.collapsed) { box-shadow: 4px 0 24px rgba(0,0,0,0.3); }
+  .landing { padding: 24px 16px; }
   .landing-title { font-size: 28px; }
-  .results-scroll { padding: 16px 16px 120px; }
+  .landing-subtitle { margin-bottom: 24px; }
+  .landing-footer { margin-top: 32px; }
+  .main-header { padding: 8px 12px; gap: 8px; }
+  .main-header .width-toggle span, .main-header .theme-toggle span { display: none; }
+  #widthToggle { display: none !important; }
+  .main-header .width-toggle, .main-header .theme-toggle, .main-header .icon-btn { min-width: 40px; min-height: 40px; justify-content: center; padding: 6px; }
+  .results-scroll { padding: 16px 16px calc(var(--followup-h, 120px) + 16px); }
   .searchbar-wrapper { padding: 12px 16px 0; }
   .followup-wrapper { padding: 12px 16px 16px; }
+  .search-box { gap: 8px; padding: 12px 14px; }
+  .followup-box { gap: 8px; padding: 8px 12px; }
+  .followup-box input, .searchbar-mini input, .thread-search, .auth-input { font-size: 16px; }
+  .attach-btn { width: 40px; height: 40px; }
+  .followup-send { width: 40px; height: 40px; }
+  .search-submit { width: 40px; height: 40px; }
+  .icon-btn { width: 40px; height: 40px; }
+  .new-thread-btn { min-height: 44px; }
+  .thread-item { min-height: 44px; }
+  .space-item { min-height: 40px; }
+  .space-add-btn { min-width: 36px; min-height: 36px; justify-content: center; }
+  .suggestion-chip, .related-item { min-height: 40px; }
+  .answer-tab { min-height: 40px; }
+  .action-btn { min-height: 38px; }
+  .composer-pills .model-select, .composer-pills .width-toggle { min-height: 38px; }
+  .composer-pills .model-select { flex: 1 1 160px; }
+  .import-history-btn { min-height: 44px; }
+  .user-row { min-height: 44px; }
+  .import-modal-backdrop { padding: 12px; }
+  .import-modal { padding: 18px; }
+  .import-modal button.primary, .space-modal .btn { min-height: 40px; }
+  .auth-modal { padding: 24px 20px; }
+  .auth-overlay { padding: 12px; }
+}
+@media (hover: none) {
+  /* touch: no hover — the active thread shows its actions at 36px targets */
+  .thread-item.active .thread-move, .thread-item.active .thread-actions { display: flex; opacity: 1; }
+  .thread-item { gap: 6px; }
+  .thread-item.active .thread-actions button, .thread-item.active .thread-move { min-width: 36px; min-height: 36px; align-items: center; justify-content: center; }
+  .space-item .space-gear { opacity: 0.7; min-width: 36px; min-height: 36px; justify-content: center; }
 }
 @media (max-width: 480px) {
-  .sidebar { width: 280px; }
-  .source-card { width: 150px; }
+  .source-card { width: 140px; }
+  .landing-title { font-size: 26px; }
+  .question-header { font-size: 15px; padding: 10px 14px; }
+  .answer-content { font-size: 15.5px; }
+  .answer-content table { font-size: 13px; }
+  .answer-content th, .answer-content td { padding: 6px 8px; }
+  .related-item { white-space: normal; }
+}
+@media (max-width: 400px) {
+  .followup-box > svg { display: none; }
+}
+@media (max-width: 340px) {
+  .main-header { padding: 6px 8px; gap: 4px; }
+  .main-header-right { gap: 2px; }
+  .landing { padding: 16px 12px; }
+  .results-scroll { padding-left: 12px; padding-right: 12px; }
+  .searchbar-wrapper { padding-left: 12px; padding-right: 12px; }
+  .followup-wrapper { padding-left: 12px; padding-right: 12px; }
+  .search-box { padding: 10px; }
+  .suggestion-chip { padding: 8px 12px; font-size: 13px; }
 }
 </style>
 </head>
@@ -1007,8 +1124,8 @@ a { color: inherit; text-decoration: none; }
         <button class="icon-btn" id="newThreadIcon" title="New thread">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         </button>
-        <button class="icon-btn" id="collapseSidebar" title="Collapse sidebar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        <button class="icon-btn" id="collapseSidebar" title="Collapse sidebar (Ctrl+B)" aria-label="Collapse sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M16 10l-2 2 2 2"/></svg>
         </button>
       </div>
     </div>
@@ -1041,18 +1158,20 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
     </div>
+    <div class="sidebar-resizer" id="sidebarResizer" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" tabindex="0" title="Drag to resize · double-click to reset"></div>
   </aside>
+  <div class="sidebar-scrim" id="sidebarScrim"></div>
 
   <!-- MAIN -->
   <main class="main">
     <div class="main-header">
       <div class="main-header-left">
-        <button class="icon-btn" id="expandSidebar" style="display:none">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        <button class="icon-btn" id="expandSidebar" style="display:none" title="Expand sidebar (Ctrl+B)" aria-label="Expand sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><path d="M14 10l2 2-2 2"/></svg>
         </button>
         <span class="breadcrumb" id="breadcrumb">Search</span>
       </div>
-      <div style="display:flex;align-items:center;gap:8px">
+      <div class="main-header-right" style="display:flex;align-items:center;gap:8px">
         <select class="model-select" id="modelSel" title="Model — uncensored options answer without hedging">
           <option value="general">Auto</option>
           <option value="flint">Flint v1.0</option>
@@ -1072,7 +1191,7 @@ a { color: inherit; text-decoration: none; }
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
           <span id="deepResearchLabel">Research</span>
         </button>
-        <button class="width-toggle" id="widthToggle" title="Adjust answer width">
+        <button class="width-toggle" id="widthToggle" title="Toggle answer width: fit / full (or drag the column edge)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
           <span id="widthLabel">Default</span>
         </button>
@@ -1085,7 +1204,7 @@ a { color: inherit; text-decoration: none; }
 
     <!-- LANDING -->
     <div class="landing" id="landing">
-      <div class="landing-inner">
+      <div class="landing-inner" id="landingInner">
         <h1 class="landing-title">Where knowledge <em>begins</em></h1>
         <p class="landing-subtitle">Ask anything. Powered by open-weight models.</p>
         <div class="search-container">
@@ -1132,6 +1251,7 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
 
+    <div class="answer-resizer" id="answerResizer" role="separator" aria-orientation="vertical" aria-label="Resize answer column" tabindex="0" title="Drag to resize · double-click to reset"></div>
     <!-- FOLLOW-UP INPUT -->
     <div class="followup-wrapper" id="followupWrapper" style="display:none">
       <div class="followup-inner">
@@ -1214,21 +1334,191 @@ function setTheme(theme) {
 setTheme(localStorage.getItem("ai_theme") || "light"); // v67: Perplexity defaults light for new users
 themeToggle.onclick = () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
 
-// Adjustable answer width: default → wide → full → default (persisted)
-const WIDTH_MODES = [
-  { key: "", label: "Default" },
-  { key: "wide", label: "Wide" },
-  { key: "full", label: "Full" }
-];
-let widthIdx = Math.max(0, WIDTH_MODES.findIndex(m => m.key === (localStorage.getItem("answerWidth") || "")));
-const applyWidth = () => {
-  const m = WIDTH_MODES[widthIdx % WIDTH_MODES.length];
-  document.documentElement.setAttribute("data-width", m.key);
-  document.getElementById("widthLabel").textContent = m.label;
-  localStorage.setItem("answerWidth", m.key);
-};
-document.getElementById("widthToggle").onclick = () => { widthIdx = (widthIdx + 1) % WIDTH_MODES.length; applyWidth(); };
-applyWidth();
+// ============ ADJUSTABLE LAYOUT (v73) ============
+// Sidebar drag-resize + collapse, answer-column drag-resize + fit/full toggle,
+// modal drag-resize. Pointer events with capture (mouse + touch), double-click /
+// double-tap resets, arrow keys on a focused handle, no text selection mid-drag.
+// localStorage keys: sidebarWidth, answerWidth ("fit"|"full"), answerWidthPx, artifactWidth.
+const layoutRoot = document.documentElement;
+const layoutClamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const layoutNum = (k) => { const n = parseFloat(localStorage.getItem(k)); return Number.isFinite(n) ? n : null; };
+const isMobileLayout = () => window.matchMedia("(max-width: 768px)").matches;
+
+// Generic drag helper. opts: start(e), move(e), end(e), reset(), nudge(dir, e), disabled()
+function attachDrag(handle, opts) {
+  let active = false, pid = null, lastTap = 0, moved = false, downX = 0;
+  handle.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (opts.disabled && opts.disabled()) return;
+    e.preventDefault();
+    active = true; moved = false; pid = e.pointerId; downX = e.clientX;
+    try { handle.setPointerCapture(pid); } catch (err) {}
+    handle.classList.add("dragging");
+    document.body.classList.add("is-resizing");
+    if (opts.start) opts.start(e);
+  });
+  handle.addEventListener("pointermove", (e) => {
+    if (!active || e.pointerId !== pid) return;
+    if (Math.abs(e.clientX - downX) > 3) moved = true;
+    opts.move(e);
+  });
+  const finish = (e) => {
+    if (!active || (e && e.pointerId !== undefined && e.pointerId !== pid)) return;
+    active = false;
+    try { handle.releasePointerCapture(pid); } catch (err) {}
+    handle.classList.remove("dragging");
+    document.body.classList.remove("is-resizing");
+    if (opts.end) opts.end(e, moved);
+    // touch has no dblclick: treat two quick taps without movement as a reset
+    if (e && e.type === "pointerup" && e.pointerType !== "mouse" && !moved) {
+      const now = Date.now();
+      if (now - lastTap < 350) { lastTap = 0; opts.reset(); } else lastTap = now;
+    }
+  };
+  handle.addEventListener("pointerup", finish);
+  handle.addEventListener("pointercancel", finish);
+  handle.addEventListener("lostpointercapture", finish);
+  handle.addEventListener("dblclick", (e) => { e.preventDefault(); if (!(opts.disabled && opts.disabled())) opts.reset(); });
+  handle.addEventListener("keydown", (e) => {
+    if (opts.disabled && opts.disabled()) return;
+    if (e.key === "ArrowLeft") { e.preventDefault(); opts.nudge && opts.nudge(-1, e); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); opts.nudge && opts.nudge(1, e); }
+    else if (e.key === "Home" || e.key === "Enter") { e.preventDefault(); opts.reset(); }
+  });
+}
+
+// ---- Sidebar: width + collapse ----
+(function initSidebarLayout() {
+  const SB_DEFAULT = 260, SB_MIN = 220, SB_MAX = 480;
+  const sbEl = document.getElementById("sidebar");
+  const handle = document.getElementById("sidebarResizer");
+  const expandBtn = document.getElementById("expandSidebar");
+  const scrim = document.getElementById("sidebarScrim");
+  const setW = (px, persist) => {
+    px = layoutClamp(Math.round(px), SB_MIN, SB_MAX);
+    layoutRoot.style.setProperty("--sidebar-width", px + "px");
+    handle.setAttribute("aria-valuenow", String(px));
+    if (persist) localStorage.setItem("sidebarWidth", String(px));
+    return px;
+  };
+  const curW = () => layoutClamp(parseFloat(getComputedStyle(layoutRoot).getPropertyValue("--sidebar-width")) || SB_DEFAULT, SB_MIN, SB_MAX);
+  handle.setAttribute("aria-valuemin", String(SB_MIN));
+  handle.setAttribute("aria-valuemax", String(SB_MAX));
+  if (isMobileLayout()) sbEl.classList.add("collapsed"); // never flash the drawer open on phones
+  const saved = layoutNum("sidebarWidth");
+  setW(saved === null ? SB_DEFAULT : saved, false);
+  attachDrag(handle, {
+    disabled: () => isMobileLayout() || sbEl.classList.contains("collapsed"),
+    start: () => sbEl.classList.add("resizing"),
+    move: (e) => setW(e.clientX - sbEl.getBoundingClientRect().left, false),
+    end: () => { sbEl.classList.remove("resizing"); setW(curW(), true); },
+    reset: () => { localStorage.removeItem("sidebarWidth"); setW(SB_DEFAULT, false); },
+    nudge: (dir, e) => setW(curW() + dir * (e.shiftKey ? 48 : 16), true)
+  });
+  // Keep the expand button + mobile scrim in sync with the .collapsed class no matter
+  // which path toggled it (collapse button, expand button, Ctrl+B, Ctrl+K, auto-collapse).
+  const sync = () => {
+    const collapsed = sbEl.classList.contains("collapsed");
+    expandBtn.style.display = collapsed ? "flex" : "none";
+    document.body.classList.toggle("sidebar-open", !collapsed && isMobileLayout());
+  };
+  new MutationObserver(sync).observe(sbEl, { attributes: true, attributeFilter: ["class"] });
+  window.addEventListener("resize", sync);
+  sync();
+  if (scrim) scrim.addEventListener("click", () => sbEl.classList.add("collapsed"));
+  // mobile overlay: picking a thread / starting a new one closes the drawer
+  sbEl.addEventListener("click", (e) => {
+    if (!isMobileLayout()) return;
+    const hit = e.target.closest(".thread-item, .new-thread-btn, #newThreadIcon");
+    if (!hit || e.target.closest(".thread-actions, .thread-move")) return;
+    setTimeout(() => sbEl.classList.add("collapsed"), 0);
+  });
+})();
+
+// ---- Answer column: fit/full toggle + drag ----
+(function initAnswerWidth() {
+  const FIT = 720, FULL = 1100, MIN = 560, MAX = 1400;
+  const handle = document.getElementById("answerResizer");
+  const main = document.querySelector(".main");
+  const btn = document.getElementById("widthToggle");
+  const label = document.getElementById("widthLabel");
+  const resultsScroll = document.getElementById("resultsScroll");
+  const resultsInner = document.getElementById("resultsInner");
+  const landingInner = document.getElementById("landingInner");
+  const followupWrapper = document.getElementById("followupWrapper");
+  // legacy values: "" / "wide" / "full" from the old 3-step cycle
+  const legacy = localStorage.getItem("answerWidth");
+  let mode = (legacy === "full" || legacy === "wide") ? "full" : "fit";
+  let customPx = layoutNum("answerWidthPx");
+  if (customPx !== null) customPx = layoutClamp(Math.round(customPx), MIN, MAX);
+  const apply = (persistMode) => {
+    const px = customPx !== null ? customPx : (mode === "full" ? FULL : FIT);
+    layoutRoot.style.setProperty("--answer-w", px + "px");
+    layoutRoot.setAttribute("data-width", customPx !== null ? "custom" : mode);
+    label.textContent = customPx !== null ? "Custom" : (mode === "full" ? "Full" : "Fit");
+    btn.classList.toggle("active", customPx !== null || mode === "full");
+    btn.title = customPx !== null ? "Custom width (" + px + "px) — click for fit/full, double-click the column edge to reset"
+      : (mode === "full" ? "Full width — click for fit" : "Fit width — click for full");
+    handle.setAttribute("aria-valuenow", String(px));
+    if (persistMode) localStorage.setItem("answerWidth", mode);
+  };
+  btn.onclick = () => {
+    // explicit toggle: clears any dragged width, then flips fit <-> full
+    if (customPx !== null) { customPx = null; localStorage.removeItem("answerWidthPx"); }
+    else mode = mode === "full" ? "fit" : "full";
+    apply(true);
+  };
+  apply(false);
+  handle.setAttribute("aria-valuemin", String(MIN));
+  handle.setAttribute("aria-valuemax", String(MAX));
+
+  const activeCol = () => {
+    const vis = (el) => el && el.getClientRects().length > 0;
+    if (vis(resultsInner)) return resultsInner;
+    if (vis(landingInner)) return landingInner;
+    return null;
+  };
+  const place = () => {
+    const col = activeCol();
+    if (!col || isMobileLayout()) { handle.classList.remove("show"); return; }
+    const mr = main.getBoundingClientRect(), cr = col.getBoundingClientRect();
+    const hdr = main.querySelector(".main-header");
+    const hw = handle.offsetWidth || 6;
+    handle.style.top = (hdr ? hdr.offsetHeight : 0) + "px";
+    handle.style.left = Math.min(cr.right - mr.left + 2, mr.width - hw - 2) + "px";
+    handle.classList.add("show");
+  };
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(place);
+    [main, resultsInner, landingInner].forEach(el => el && ro.observe(el));
+    const ro2 = new ResizeObserver(() => layoutRoot.style.setProperty("--followup-h", Math.ceil(followupWrapper.offsetHeight || 120) + "px"));
+    ro2.observe(followupWrapper);
+  }
+  window.addEventListener("resize", place);
+  window.addEventListener("load", place);
+  setTimeout(place, 0);
+
+  let startX = 0, startW = 0;
+  attachDrag(handle, {
+    disabled: () => isMobileLayout() || !activeCol(),
+    start: (e) => { const col = activeCol(); startX = e.clientX; startW = col ? col.getBoundingClientRect().width : FIT; },
+    move: (e) => {
+      // column is centered, so each pixel of pointer travel is 2px of width
+      const avail = Math.floor(main.getBoundingClientRect().width - 48); // can't exceed the visible pane
+      customPx = layoutClamp(Math.round(startW + 2 * (e.clientX - startX)), Math.min(MIN, startW), Math.max(Math.min(MIN, startW), Math.min(MAX, avail)));
+      apply(false);
+    },
+    end: () => { if (customPx !== null) localStorage.setItem("answerWidthPx", String(customPx)); },
+    reset: () => { customPx = null; localStorage.removeItem("answerWidthPx"); apply(false); },
+    nudge: (dir, e) => {
+      const col = activeCol();
+      const base = customPx !== null ? customPx : (col ? Math.round(col.getBoundingClientRect().width) : FIT);
+      customPx = layoutClamp(base + dir * (e.shiftKey ? 96 : 32), MIN, MAX);
+      localStorage.setItem("answerWidthPx", String(customPx));
+      apply(false);
+    }
+  });
+})();
 
 // Deep Research toggle (v61): when active, questions submit a background
 // Agent API run at high effort (minutes-long, expert-grade) and the UI polls
@@ -2643,6 +2933,52 @@ async function loadStatus(force) {
   }
 }
 
+// ===== v73: drag-resizable dialogs (import / shortcuts) — persisted "artifactWidth" =====
+// The app has no separate artifact/document pane (answers, links and images render inline in the
+// answer column); the import-history dialog is the only document-style surface, so it gets the
+// same right-edge handle. 480px..90vw, double-click resets.
+(function initModalResize() {
+  const MIN = 480, DEFAULT = 560;
+  const maxW = () => Math.floor(window.innerWidth * 0.9);
+  const saved = layoutNum("artifactWidth");
+  const widthNow = () => layoutClamp(saved === null ? DEFAULT : (layoutNum("artifactWidth") || DEFAULT), MIN, Math.max(MIN, maxW()));
+  document.querySelectorAll(".import-modal-backdrop").forEach((backdrop) => {
+    const modal = backdrop.querySelector(".import-modal");
+    if (!modal || backdrop.querySelector(".modal-resizer")) return;
+    const h = document.createElement("div");
+    h.className = "modal-resizer";
+    h.setAttribute("role", "separator"); h.setAttribute("aria-orientation", "vertical");
+    h.setAttribute("aria-label", "Resize dialog"); h.tabIndex = 0;
+    h.title = "Drag to resize · double-click to reset";
+    backdrop.appendChild(h);
+    const apply = (px, persist) => {
+      px = layoutClamp(Math.round(px), MIN, Math.max(MIN, maxW()));
+      modal.style.maxWidth = px + "px";
+      if (persist) localStorage.setItem("artifactWidth", String(px));
+      place();
+    };
+    function place() {
+      if (!backdrop.classList.contains("open") || isMobileLayout()) { h.classList.remove("show"); return; }
+      const r = modal.getBoundingClientRect();
+      h.style.left = (r.right - 3) + "px"; h.style.top = r.top + "px"; h.style.height = r.height + "px";
+      h.classList.add("show");
+    }
+    if (saved !== null) modal.style.maxWidth = widthNow() + "px";
+    if (window.ResizeObserver) { const ro = new ResizeObserver(place); ro.observe(modal); ro.observe(backdrop); }
+    new MutationObserver(place).observe(backdrop, { attributes: true, attributeFilter: ["class"] });
+    window.addEventListener("resize", place);
+    let startX = 0, startW = 0;
+    attachDrag(h, {
+      disabled: () => isMobileLayout(),
+      start: (e) => { startX = e.clientX; startW = modal.getBoundingClientRect().width; },
+      move: (e) => apply(startW + 2 * (e.clientX - startX), false),
+      end: () => apply(modal.getBoundingClientRect().width, true),
+      reset: () => { localStorage.removeItem("artifactWidth"); modal.style.maxWidth = ""; place(); },
+      nudge: (dir, e) => apply(modal.getBoundingClientRect().width + dir * (e.shiftKey ? 96 : 32), true)
+    });
+  });
+})();
+
 // ============ INIT ============
 (async function init() {
   const authed = await checkAuth();
@@ -2655,13 +2991,17 @@ async function loadStatus(force) {
   positionComposerPills();
   loadStatus(false);
   // v68: small screens start with the sidebar collapsed (Perplexity mobile behavior)
+  let lastW = null;
   const autoCollapse = () => {
-    const small = window.innerWidth <= 768;
+    const w = window.innerWidth;
+    const small = w <= 768;
     const btn = document.getElementById("expandSidebar");
-    if (small && !sidebar.classList.contains("collapsed")) {
+    // only react to width changes (a mobile keyboard resizes the height and must not close the drawer)
+    if (small && lastW !== w && !sidebar.classList.contains("collapsed")) {
       sidebar.classList.add("collapsed");
       if (btn) btn.style.display = "flex";
     }
+    lastW = w;
   };
   autoCollapse();
   window.addEventListener("resize", autoCollapse);
