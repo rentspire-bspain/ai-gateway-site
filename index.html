@@ -1703,6 +1703,80 @@ function speakAnswer(text) {
     }
   }
 })();
+
+// ===== v70: Keyboard shortcuts — Perplexity parity (Cmd+J new thread, "/" focus,
+// "?" help overlay) + Ctrl+I for a new session per Brett =====
+(function initShortcuts() {
+  // shortcuts help overlay (built once, Perplexity's "?" modal)
+  let help = document.getElementById("shortcutsBackdrop");
+  if (!help) {
+    help = document.createElement("div");
+    help.className = "import-modal-backdrop";
+    help.id = "shortcutsBackdrop";
+    const mac = /mac/i.test(navigator.platform || "");
+    const k = (...keys) => keys.map(x => "<b>" + (mac ? x.replace(/Ctrl/g, "⌘") : x) + "</b>").join(" / ");
+    const rows = [
+      [k("Ctrl+I", "Ctrl+J"), "New session (new thread)"],
+      [k("/"), "Focus the search box"],
+      [k("Ctrl+K"), "Search your threads"],
+      [k("Ctrl+B"), "Toggle the sidebar"],
+      [k("Esc"), "Close dialogs"],
+      [k("?"), "This shortcut list"]
+    ];
+    help.innerHTML = '<div class="import-modal"><h3>Keyboard shortcuts</h3>' +
+      '<div class="sub">Same muscle memory as Perplexity.</div>' +
+      '<table style="width:100%;font-size:13px;color:var(--text-muted)">' +
+      rows.map(r => '<tr><td style="padding:5px 8px 5px 0;white-space:nowrap">' + r[0] + '</td><td style="padding:5px 0">' + r[1] + '</td></tr>').join("") +
+      '</table><div class="close-row"><button class="primary" id="shortcutsClose">Done</button></div></div>';
+    document.body.appendChild(help);
+    help.addEventListener("click", (e) => { if (e.target === help) help.classList.remove("open"); });
+    document.getElementById("shortcutsClose").onclick = () => help.classList.remove("open");
+  }
+  function toggleSidebar() {
+    const sb = document.getElementById("sidebar");
+    const exp = document.getElementById("expandSidebar");
+    if (!sb || !exp) return;
+    if (sb.classList.contains("collapsed")) { sb.classList.remove("collapsed"); exp.style.display = "none"; }
+    else { sb.classList.add("collapsed"); exp.style.display = "flex"; }
+  }
+  document.addEventListener("keydown", (e) => {
+    const mod = e.ctrlKey || e.metaKey;
+    const el = document.activeElement;
+    const inInput = !!el && /input|textarea|select/i.test(el.tagName || "");
+    if (e.key === "Escape") {
+      document.getElementById("importBackdrop")?.classList.remove("open");
+      help.classList.remove("open");
+      return;
+    }
+    // Ctrl/Cmd+I or Ctrl/Cmd+J — new session
+    if (mod && (e.key === "i" || e.key === "I" || e.key === "j" || e.key === "J")) {
+      e.preventDefault();
+      newThread();
+      return;
+    }
+    // Ctrl/Cmd+B — toggle sidebar
+    if (mod && (e.key === "b" || e.key === "B")) { e.preventDefault(); toggleSidebar(); return; }
+    // Ctrl/Cmd+K — thread search (open the sidebar if collapsed)
+    if (mod && (e.key === "k" || e.key === "K")) {
+      e.preventDefault();
+      const sb = document.getElementById("sidebar");
+      if (sb && sb.classList.contains("collapsed")) toggleSidebar();
+      const ts = document.getElementById("threadSearch");
+      if (ts) ts.focus();
+      return;
+    }
+    // "/" — focus the active composer
+    if (e.key === "/" && !inInput) {
+      e.preventDefault();
+      const landing = document.getElementById("landing");
+      const target = (landing && landing.offsetParent !== null) ? document.getElementById("landingInput") : document.getElementById("followupInput");
+      if (target) target.focus();
+      return;
+    }
+    // "?" — shortcut help
+    if (e.key === "?" && !inInput) { e.preventDefault(); help.classList.add("open"); }
+  });
+})();
 function takeAttachment() {
   const att = pendingAttachment;
   pendingAttachment = null;
