@@ -256,6 +256,12 @@ a { color: inherit; text-decoration: none; }
   background: transparent; border: none; color: var(--text-muted); cursor: pointer; border-radius: 8px;
 }
 .attach-btn:hover { color: var(--text); background: var(--bg-elevated); }
+.mic-btn { position: relative; }
+.mic-btn:disabled { opacity: .4; cursor: not-allowed; }
+.mic-btn .mic-dot { display: none; position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: #ef4444; animation: micPulse 1s infinite; }
+.mic-btn.recording { color: #ef4444; background: rgba(239,68,68,.12); }
+.mic-btn.recording .mic-dot { display: block; }
+@keyframes micPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(1.4); } }
 .attach-chip {
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--accent-light); color: var(--text);
@@ -269,6 +275,41 @@ a { color: inherit; text-decoration: none; }
 .sidebar-footer {
   border-top: 1px solid var(--border);
   padding: 12px;
+}
+.import-history-btn {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 8px 10px; margin-bottom: 8px;
+  background: none; border: 1px dashed var(--border); border-radius: var(--radius-sm);
+  color: var(--text-muted); font-size: 12.5px; font-family: inherit;
+  cursor: pointer; transition: all 0.15s ease; text-align: left;
+}
+.import-history-btn:hover { color: var(--text); border-color: var(--accent); background: var(--bg-elevated); }
+.import-modal-backdrop {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 20px;
+}
+.import-modal-backdrop.open { display: flex; }
+.import-modal {
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+  max-width: 560px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 24px;
+}
+.import-modal h3 { margin: 0 0 6px; font-size: 17px; }
+.import-modal .sub { color: var(--text-muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px; }
+.import-modal ol { margin: 0 0 14px; padding-left: 20px; color: var(--text-muted); font-size: 13px; line-height: 1.7; }
+.import-modal ol b { color: var(--text); font-weight: 600; }
+.import-drop {
+  border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 26px 16px;
+  text-align: center; color: var(--text-muted); font-size: 13px; cursor: pointer;
+  transition: all 0.15s ease; margin-bottom: 12px;
+}
+.import-drop:hover, .import-drop.dragover { border-color: var(--accent); color: var(--text); background: var(--bg-elevated); }
+.import-status { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-top: 10px; min-height: 20px; }
+.import-status .ok { color: #16a34a; }
+.import-status .err { color: #dc2626; }
+.import-modal .close-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.import-modal button.primary {
+  background: var(--accent); color: white; border: none; border-radius: var(--radius-sm);
+  padding: 8px 16px; font-size: 13.5px; font-family: inherit; cursor: pointer;
 }
 .user-row {
   display: flex;
@@ -933,6 +974,27 @@ a { color: inherit; text-decoration: none; }
 </style>
 </head>
 <body>
+<!-- v69: Perplexity history import — export zip / JSON / HTML files become
+     searchable context (context_documents, RLS user-owned). -->
+<div class="import-modal-backdrop" id="importBackdrop">
+  <div class="import-modal">
+    <h3>Import your Perplexity history</h3>
+    <div class="sub">Your exported threads become your personal context on ai.spaincos.com — questions you ask here can draw on everything you researched on Perplexity, so nothing is lost.</div>
+    <ol>
+      <li>On <b>perplexity.ai</b>, open <b>Settings → Data Controls → Export data</b>.</li>
+      <li>Perplexity emails you a download link (a <b>.zip</b> of your threads).</li>
+      <li>Drop the <b>zip</b> (or any .json / .html / .txt files from it) below.</li>
+    </ol>
+    <div class="import-drop" id="importDrop">
+      <b>Drop your Perplexity export here</b><br>or click to choose files (.zip, .json, .html, .txt, .md)
+    </div>
+    <input type="file" id="importFile" multiple accept=".zip,.json,.html,.htm,.txt,.md" style="display:none">
+    <div class="import-status" id="importStatus"></div>
+    <div class="close-row">
+      <button class="primary" id="importClose">Done</button>
+    </div>
+  </div>
+</div>
 <div class="app">
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
@@ -967,6 +1029,10 @@ a { color: inherit; text-decoration: none; }
       <div id="threadItems"></div>
     </div>
     <div class="sidebar-footer">
+      <button class="import-history-btn" id="importHistoryBtn" title="Import your Perplexity history as searchable context">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+        Import Perplexity history
+      </button>
       <div class="user-row" id="userRow">
         <div class="user-avatar" id="userAvatar">?</div>
         <div class="user-info">
@@ -987,11 +1053,21 @@ a { color: inherit; text-decoration: none; }
         <span class="breadcrumb" id="breadcrumb">Search</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
-        <select class="model-select" id="modelSel">
+        <select class="model-select" id="modelSel" title="Model — uncensored options answer without hedging">
           <option value="general">Auto</option>
           <option value="flint">Flint v1.0</option>
           <option value="summary">Qwen3.8-27B</option>
+          <option value="kimi">Kimi K3.1 Pro</option>
+          <option value="deepseek-flash">DeepSeek V4.1 Flash</option>
+          <option value="gpt-oss">GPT-OSS 120B</option>
+          <option value="llama4">Llama 4 Maverick</option>
+          <option value="venice">Venice Uncensored</option>
+          <option value="dolphin">Dolphin Uncensored 24B</option>
         </select>
+        <button class="width-toggle" id="voiceToggle" title="Read answers aloud">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
+          <span id="voiceLabel">Voice</span>
+        </button>
         <button class="width-toggle" id="deepResearchToggle" title="Deep Research: minutes-long expert-grade reports (high effort, many sources)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
           <span id="deepResearchLabel">Research</span>
@@ -1016,7 +1092,8 @@ a { color: inherit; text-decoration: none; }
           <div class="search-box">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             <input class="search-input" id="landingInput" placeholder="Ask anything..." autocomplete="off">
-            <button class="attach-btn" id="landingAttach" title="Attach a text file (txt, md, csv, json)">
+            <button class="attach-btn mic-btn" id="landingMic" title="Voice input" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg><span class="mic-dot"></span></button>
+                        <button class="attach-btn" id="landingAttach" title="Attach a text file (txt, md, csv, json)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
             </button>
             <button class="search-submit" id="landingSubmit">
@@ -1061,7 +1138,8 @@ a { color: inherit; text-decoration: none; }
         <div class="followup-box">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
           <input id="followupInput" placeholder="Ask a follow-up..." autocomplete="off">
-          <button class="attach-btn" id="followupAttach" title="Attach a text file (txt, md, csv, json)">
+          <button class="attach-btn mic-btn" id="followupMic" title="Voice input" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg><span class="mic-dot"></span></button>
+                    <button class="attach-btn" id="followupAttach" title="Attach a text file (txt, md, csv, json)">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
           </button>
           <button class="followup-send" id="followupSend">
@@ -1385,6 +1463,246 @@ fileInput.onchange = async () => {
 };
 document.getElementById("landingAttach").onclick = () => fileInput.click();
 document.getElementById("followupAttach").onclick = () => fileInput.click();
+
+// ===== Voice v1: Web Speech API input + speechSynthesis output =====
+let voiceOn = localStorage.getItem("voiceOn") === "1";
+function stopSpeaking() { try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {} }
+function stripMarkdownForSpeech(t) {
+  return String(t || "")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`([^`]*)`/g, "$1")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[\d+\]/g, "")
+    .replace(/^#{1,6}\s*/gm, "")
+    .replace(/(\*\*|__|\*|_)/g, "")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/[\[\]()]/g, "")
+    .replace(/\n{2,}/g, ". ").replace(/\s+/g, " ").trim();
+}
+function speakAnswer(text) {
+  if (!voiceOn || !("speechSynthesis" in window)) return;
+  stopSpeaking();
+  const clean = stripMarkdownForSpeech(text);
+  if (!clean) return;
+  const u = new SpeechSynthesisUtterance(clean);
+  u.rate = 1.0;
+  speechSynthesis.speak(u);
+}
+(function initVoice() {
+  const vt = document.getElementById("voiceToggle");
+  const syncToggle = () => { vt.classList.toggle("active", voiceOn); vt.title = voiceOn ? "Voice on: answers are read aloud" : "Read answers aloud"; };
+  syncToggle();
+  if (!("speechSynthesis" in window)) { vt.disabled = true; vt.title = "Voice output not supported in this browser"; }
+  vt.onclick = () => { voiceOn = !voiceOn; localStorage.setItem("voiceOn", voiceOn ? "1" : "0"); if (!voiceOn) stopSpeaking(); syncToggle(); };
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null, activeBtn = null;
+  function bind(btnId, inputId) {
+    const btn = document.getElementById(btnId), input = document.getElementById(inputId);
+    if (!SR) { btn.disabled = true; btn.title = "Voice input not supported in this browser"; return; }
+    let downAt = 0;
+    const stop = () => { if (rec) { try { rec.stop(); } catch (e) {} } };
+    function start() {
+      stop(); stopSpeaking();
+      const base = input.value ? input.value.replace(/\s+$/, "") + " " : "";
+      rec = new SR(); rec.continuous = false; rec.interimResults = true; rec.lang = navigator.language || "en-US";
+      activeBtn = btn; btn.classList.add("recording"); btn.title = "Listening… click to stop";
+      rec.onresult = (ev) => {
+        let txt = "";
+        for (let i = 0; i < ev.results.length; i++) txt += ev.results[i][0].transcript;
+        input.value = base + txt.trim();
+      };
+      rec.onerror = (ev) => { if (ev.error === "not-allowed") { btn.title = "Microphone permission denied"; } };
+      rec.onend = () => { btn.classList.remove("recording"); btn.title = "Voice input"; activeBtn = null; rec = null; input.focus(); };
+      try { rec.start(); } catch (e) { btn.classList.remove("recording"); }
+    }
+    // Tap toggles; hold (>600ms) = hold-to-talk, stops on release.
+    let handled = false;
+    btn.addEventListener("pointerdown", () => {
+      downAt = Date.now(); handled = false;
+      if (activeBtn !== btn) { start(); handled = true; }
+    });
+    btn.addEventListener("pointerup", () => {
+      if (handled && activeBtn === btn && Date.now() - downAt > 600) stop();
+    });
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (handled) { handled = false; return; }
+      if (activeBtn === btn) stop();
+    });
+  }
+  bind("landingMic", "landingInput");
+  bind("followupMic", "followupInput");
+})();
+
+// ===== v69: Perplexity history import — export files become searchable context =====
+// Tolerant parser: accepts the Perplexity export zip (via JSZip, lazy-loaded
+// from CDN), or any .json / .html / .txt / .md file. Each extracted document
+// is stored in context_documents (source: perplexity-history, RLS user-owned)
+// where the gateway's search_my_context tool and the per-user context block
+// can draw on it. After import, the gateway's embed-context endpoint builds
+// the semantic (vector) index when OPENAI_API_KEY is configured.
+(function initImport() {
+  const backdrop = document.getElementById("importBackdrop");
+  const drop = document.getElementById("importDrop");
+  const fileInput = document.getElementById("importFile");
+  const status = document.getElementById("importStatus");
+  const btn = document.getElementById("importHistoryBtn");
+  if (!backdrop || !drop || !fileInput || !status || !btn) return;
+  let jszipOk = null; // null=unloaded, true/false=load result
+
+  const setStat = (html) => { status.innerHTML = html; };
+  const open = () => { backdrop.classList.add("open"); setStat("Ready for your export."); };
+  btn.onclick = open;
+  document.getElementById("importClose").onclick = () => backdrop.classList.remove("open");
+  backdrop.addEventListener("click", (e) => { if (e.target === backdrop) backdrop.classList.remove("open"); });
+
+  drop.onclick = () => fileInput.click();
+  ["dragover", "dragenter"].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("dragover"); }));
+  ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("dragover"); }));
+  drop.addEventListener("drop", (e) => { const fs = [...(e.dataTransfer?.files || [])]; if (fs.length) ingest(fs); });
+  fileInput.onchange = () => { const fs = [...fileInput.files]; if (fs.length) ingest(fs); fileInput.value = ""; };
+
+  async function loadJSZip() {
+    if (jszipOk !== null) return jszipOk;
+    try {
+      if (!window.JSZip) {
+        await new Promise((res, rej) => {
+          const sc = document.createElement("script");
+          sc.src = "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
+          sc.onload = res; sc.onerror = rej;
+          document.head.appendChild(sc);
+        });
+      }
+      jszipOk = !!window.JSZip;
+    } catch (e) { jszipOk = false; }
+    return jszipOk;
+  }
+
+  // HTML -> readable text (browser DOMParser, not regex)
+  function htmlToText(html, filename) {
+    try {
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      doc.querySelectorAll("script,style,noscript,nav,header,footer,aside").forEach(n => n.remove());
+      const title = (doc.querySelector("title")?.textContent || filename || "").trim();
+      const text = (doc.body?.innerText || doc.body?.textContent || "").replace(/\n{3,}/g, "\n\n").trim();
+      return { title, content: text };
+    } catch (e) { return null; }
+  }
+
+  // JSON -> documents. Tolerant: handles arrays of threads, single objects,
+  // or arbitrary shapes by collecting the meaningful strings.
+  function jsonToDocs(parsed, filename) {
+    const docs = [];
+    const push = (title, content) => {
+      const t = String(title || "").trim().slice(0, 200);
+      const c = String(content || "").trim();
+      if (c.length >= 40) docs.push({ title: t || "Imported thread", content: c });
+    };
+    const walk = (node, fallbackTitle) => {
+      if (Array.isArray(node)) { node.forEach(n => walk(n, fallbackTitle)); return; }
+      if (node && typeof node === "object") {
+        const title = node.title || node.name || node.thread_title || fallbackTitle;
+        const content = node.content || node.text || node.body || node.answer || node.markdown || null;
+        if (typeof content === "string") { push(title, content); return; }
+        // Perplexity export shapes: messages arrays
+        if (Array.isArray(node.messages)) {
+          const text = node.messages.map(m => (m.role ? m.role.toUpperCase() + ": " : "") + (typeof m.content === "string" ? m.content : JSON.stringify(m.content ?? ""))).join("\n\n");
+          push(title, text);
+          return;
+        }
+        for (const v of Object.values(node)) walk(v, title);
+      }
+    };
+    walk(parsed, filename);
+    return docs;
+  }
+
+  async function filesToDocs(files) {
+    const docs = [];
+    for (const f of files) {
+      const lower = f.name.toLowerCase();
+      try {
+        if (lower.endsWith(".zip")) {
+          if (!(await loadJSZip())) { setStat('<span class="err">Could not load the zip reader (offline?) — unzip and drop the files inside instead.</span>'); continue; }
+          const zip = await window.JSZip.loadAsync(await f.arrayBuffer());
+          const entries = Object.values(zip.files).filter(e => !e.dir);
+          for (const entry of entries) {
+            const el = entry.name.toLowerCase();
+            if (el.endsWith(".json")) {
+              try { docs.push(...jsonToDocs(JSON.parse(await entry.async("string")), entry.name)); } catch (e) {}
+            } else if (el.endsWith(".html") || el.endsWith(".htm")) {
+              const d = htmlToText(await entry.async("string"), entry.name.split("/").pop());
+              if (d) docs.push(d);
+            } else if (el.endsWith(".txt") || el.endsWith(".md")) {
+              const text = (await entry.async("string")).trim();
+              if (text.length >= 40) docs.push({ title: entry.name.split("/").pop(), content: text });
+            }
+          }
+        } else if (lower.endsWith(".json")) {
+          docs.push(...jsonToDocs(JSON.parse(await f.text()), f.name));
+        } else if (lower.endsWith(".html") || lower.endsWith(".htm")) {
+          const d = htmlToText(await f.text(), f.name);
+          if (d) docs.push(d);
+        } else if (lower.endsWith(".txt") || lower.endsWith(".md")) {
+          const text = (await f.text()).trim();
+          if (text.length >= 40) docs.push({ title: f.name, content: text });
+        }
+      } catch (e) { /* skip unreadable file */ }
+    }
+    return docs;
+  }
+
+  async function ingest(files) {
+    if (!currentUser) { setStat('<span class="err">Sign in first.</span>'); return; }
+    setStat("Reading your export…");
+    const docs = (await filesToDocs(files)).slice(0, 500);
+    if (!docs.length) { setStat('<span class="err">No readable threads found in those files. Make sure this is your Perplexity data export (Settings → Data Controls → Export data).</span>'); return; }
+
+    // Dedupe against already-imported history
+    setStat("Checking for duplicates…");
+    const { data: existing } = await sb.from("context_documents").select("title").eq("source", "perplexity-history").limit(1000);
+    const seen = new Set((existing || []).map(r => r.title));
+    const fresh = docs.filter(d => !seen.has(d.title)).map(d => ({ ...d, content: d.content.slice(0, 100000) }));
+    if (!fresh.length) { setStat('<span class="ok">All ' + docs.length + ' threads were already imported — nothing new to add.</span>'); return; }
+
+    setStat("Importing " + fresh.length + " threads…");
+    let imported = 0;
+    for (let i = 0; i < fresh.length; i += 20) {
+      const rows = fresh.slice(i, i + 20).map(d => ({
+        user_id: currentUser.id, source: "perplexity-history",
+        title: d.title.slice(0, 200), content: d.content,
+        source_url: null, message_id: null
+      }));
+      const { error } = await sb.from("context_documents").insert(rows);
+      if (error) { setStat('<span class="err">Import failed: ' + (error.message || "database rejected the rows") + '</span>'); return; }
+      imported += rows.length;
+      setStat("Importing… " + imported + " / " + fresh.length);
+    }
+
+    // Build the semantic index server-side (no-op message when no key is set)
+    setStat('<span class="ok">Imported ' + imported + ' threads.</span> Building semantic index…');
+    try {
+      const s = await sb.auth.getSession();
+      let total = 0, remaining = 1, guard = 0;
+      while (remaining > 0 && guard++ < 40) {
+        const r = await fetch(GATEWAY + "/gateway-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.data.session.access_token },
+          body: JSON.stringify({ embed_context: true })
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j?.error || ("HTTP " + r.status));
+        total += j.embedded || 0; remaining = j.remaining || 0;
+      }
+      setStat('<span class="ok">Imported ' + imported + ' threads — semantic index built over ' + total + ' documents.</span> Your Perplexity history is now searchable context on ai.spaincos.com.');
+    } catch (e) {
+      setStat('<span class="ok">Imported ' + imported + ' threads.</span> Keyword search works now; semantic (vector) indexing is pending the OPENAI_API_KEY secret — paste it once on the Supabase secrets page and re-import or ask any question to activate it.');
+    }
+  }
+})();
 function takeAttachment() {
   const att = pendingAttachment;
   pendingAttachment = null;
@@ -1964,6 +2282,7 @@ function renderAnswer(container, text, sources, related, images) {
 async function performSearch(query) {
   if (isSearching || !query.trim()) return;
   isSearching = true;
+  stopSpeaking();
   
   // Check auth
   const authed = await checkAuth();
@@ -2000,6 +2319,18 @@ async function performSearch(query) {
   const spaceInstr = threadSpace && threadSpace.instructions ? threadSpace.instructions : "";
 
   const purpose = document.getElementById("modelSel").value;
+  // v69: model picker — non-purpose models ride the `model` field straight to
+  // the gateway (finalModel = model || GLM-5.3). Uncensored options (Venice,
+  // Dolphin) answer bluntly without hedging or disclaimers.
+  const MODEL_OVERRIDES = {
+    kimi: "moonshotai/kimi-k3.1-pro",
+    "deepseek-flash": "deepseek/deepseek-v4.1-flash",
+    "gpt-oss": "openai/gpt-oss-120b",
+    llama4: "meta-llama/llama-4-maverick",
+    venice: "venice/uncensored",
+    dolphin: "cognitivecomputations/dolphin-mistral-24b-venice-edition"
+  };
+  const modelOverride = MODEL_OVERRIDES[purpose] || null;
   // v63: text/PDF attachments splice into the outgoing message; image
   // attachments ride the request's `attachment` field to the gateway's
   // vision lane (never into the thread text or the message cap).
@@ -2042,6 +2373,7 @@ async function performSearch(query) {
       const sources = extractSources(answerClean);
       const related = generateRelated(query, answer);
       renderAnswer(content, answerClean, sources, related, imageResults);
+      speakAnswer(answerClean);
       thread.messages.push({ role: "user", content: fullQuery });
       thread.messages.push({ role: "assistant", content: answerClean, sources, related, ...(imageResults.length ? { images: imageResults } : {}) });
       saveThreads();
@@ -2099,7 +2431,7 @@ async function performSearch(query) {
       const res = await fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
       if (!res.ok) {

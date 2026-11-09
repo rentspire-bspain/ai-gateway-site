@@ -1,0 +1,8 @@
+kokoro>=0.9.4
+misaki[en]
+soundfile
+numpy
+fastapi
+uvicorn[standard]
+python-multipart
+faster-whisper
