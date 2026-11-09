@@ -1235,6 +1235,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
       <button class="side-nav-btn" id="navLibrary" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Library</span></button>
       <button class="side-nav-btn" id="navSkills" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Skills</span></button>
       <button class="side-nav-btn" id="navDocs" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Docs</span></button>
+      <button class="side-nav-btn" id="navTasks" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Tasks</span></button>
     </div>
     <div class="threads-list" id="threadsList">
       <input class="thread-search" id="threadSearch" placeholder="Search threads..." autocomplete="off">
@@ -1418,6 +1419,30 @@ let threads = JSON.parse(localStorage.getItem("ai_threads") || "[]");
 let currentThreadId = null;
 let isSearching = false;
 let currentUser = null;
+// v76: one-time thread timestamp backfill (Library date groups / Usage counts)
+(function () {
+  let changed = false;
+  threads.forEach(t => {
+    if (!t.createdAt) {
+      const m = /^t(\d{13})$/.exec(String(t.id || ""));
+      t.createdAt = m ? Number(m[1]) : Date.now();
+      changed = true;
+    }
+    if (!t.updatedAt) { t.updatedAt = t.createdAt; changed = true; }
+  });
+  if (changed) { try { saveThreads(); } catch (e) {} }
+})();
+function getPersonalization() {
+  const ls = (k) => { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } };
+  let memory = [];
+  if (ls("ai_memory") !== "0") {
+    try {
+      const arr = JSON.parse(ls("ai_memory_items") || "[]");
+      if (Array.isArray(arr)) memory = arr.map(x => String(x && typeof x === "object" ? (x.text || "") : (x || "")).trim().slice(0, 200)).filter(Boolean).slice(0, 10);
+    } catch (e) {}
+  }
+  return { about: ls("ai_personalize").trim().slice(0, 600), tone: ls("ai_tone"), instructions: ls("ai_site_instructions").trim().slice(0, 1000), memory };
+}
 
 // ============ THEME ============
 const themeToggle = document.getElementById("themeToggle");
@@ -3180,7 +3205,7 @@ async function performSearch(query) {
       const submit = await fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, personalization: getPersonalization(), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       const sub = await submit.json();
       if (!submit.ok || !sub?.deep_research_id) throw new Error(sub?.error ?? "Deep research submit failed");
@@ -3203,7 +3228,7 @@ async function performSearch(query) {
       const res = await fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, personalization: getPersonalization(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
       if (!res.ok) {
@@ -3378,10 +3403,12 @@ async function loadStatus(force) {
 <script src="modules/library.js"></script>
 <script src="modules/skills.js"></script>
 <script src="modules/docs.js"></script>
+<script src="modules/monitors.js"></script>
 <script>
 document.getElementById("navLibrary").onclick = function () { window.LibraryUI && window.LibraryUI.open(); };
 document.getElementById("navSkills").onclick = function () { window.SkillsUI && window.SkillsUI.open(); };
 document.getElementById("navDocs").onclick = function () { window.DocsUI && window.DocsUI.open(); };
+document.getElementById("navTasks").onclick = function () { window.TasksUI && window.TasksUI.open(); };
 </script>
 </body>
 </html>

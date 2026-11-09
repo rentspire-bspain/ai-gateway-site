@@ -47,6 +47,7 @@
     brain: '<path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44A2.5 2.5 0 0 1 4.5 17.5a2.5 2.5 0 0 1-1.98-4A2.5 2.5 0 0 1 3 8.5a2.5 2.5 0 0 1 2.04-4.46A2.5 2.5 0 0 1 9.5 2z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.54-2.44 2.5 2.5 0 0 0 1.98-4A2.5 2.5 0 0 0 21 8.5a2.5 2.5 0 0 0-2.04-4.46A2.5 2.5 0 0 0 14.5 2z"/>',
     doc: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
     bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+    plug: '<path d="M9 7V2M15 7V2"/><path d="M6 7h12v4a6 6 0 0 1-6 6 6 6 0 0 1-6-6V7z"/><path d="M12 17v5"/>',
     chart: '<path d="M18 20V10M12 20V4M6 20v-6"/>',
     db: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
     info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
@@ -153,6 +154,7 @@
     { id: "memory", label: "Memory", icon: "brain" },
     { id: "instructions", label: "Site instructions", icon: "doc" },
     { id: "notifications", label: "Notifications", icon: "bell" },
+    { id: "connectors", label: "Connectors", icon: "plug" },
     { id: "usage", label: "Usage", icon: "chart" },
     { id: "data", label: "Data controls", icon: "db" },
     { id: "about", label: "About", icon: "info" }
@@ -382,27 +384,185 @@
     return pane;
   }
 
+  // ===== 5b. Connectors (E10) =====
+  // Available-but-disabled by default; the gateway/frontend reads this list
+  // via window.ConnectorPrefs.list() — no extra fetch needed.
+  var CONNECTOR_SEEDS = [
+    { id: "gmail-gcal", name: "Gmail", category: "Google", enabled: false, note: "Email and calendar (gcal)" },
+    { id: "google-drive", name: "Google Drive", category: "Google", enabled: false, note: "Files and documents" },
+    { id: "google-sheets", name: "Google Sheets", category: "Google", enabled: false, note: "Spreadsheets" },
+    { id: "dropbox", name: "Dropbox", category: "Files", enabled: false, note: "Files and folders" },
+    { id: "slack", name: "Slack", category: "Communication", enabled: false, note: "Workspaces and messages" },
+    { id: "github", name: "GitHub", category: "Developer", enabled: false, note: "Repositories, issues, and PRs" },
+    { id: "stripe", name: "Stripe", category: "Payments", enabled: false, note: "Payments and billing data" },
+    { id: "render", name: "Render", category: "Developer", enabled: false, note: "Services and deploys" },
+    { id: "supabase", name: "Supabase", category: "Developer", enabled: false, note: "Databases and auth" },
+    { id: "cloudflare", name: "Cloudflare", category: "Developer", enabled: false, note: "DNS, CDN, and security" }
+  ];
+  var CONNECTOR_HINT_KEY = "ai_connectors_hint_dismissed";
+  function connectorList() {
+    var raw = lsGet("ai_connectors");
+    if (raw == null) { // first run: seed available-but-disabled entries
+      lsSet("ai_connectors", JSON.stringify(CONNECTOR_SEEDS));
+      return CONNECTOR_SEEDS.slice();
+    }
+    return lsJSON("ai_connectors", []);
+  }
+  function saveConnectors(list) { lsSet("ai_connectors", JSON.stringify(list)); }
+
+  function paneConnectors() {
+    var pane = el("div", "stg-pane");
+    pane.appendChild(el("h3", "stg-pane-title", "Connectors"));
+    pane.appendChild(el("p", "stg-pane-sub", "Data sources the assistant can reference in your answers."));
+
+    // dismissible info line
+    if (lsGet(CONNECTOR_HINT_KEY) !== "1") {
+      var info = el("div", "stg-info");
+      var infoTxt = el("p", null, "Connectors you enable here tell the assistant what data it may reference; live per-connector access is configured by the administrator.");
+      var dismiss = el("button", "stg-icon-btn", svg("x"));
+      dismiss.type = "button";
+      dismiss.title = "Dismiss";
+      dismiss.setAttribute("aria-label", "Dismiss connector info");
+      dismiss.addEventListener("click", function () {
+        lsSet(CONNECTOR_HINT_KEY, "1");
+        renderPane("connectors");
+      });
+      info.appendChild(infoTxt);
+      info.appendChild(dismiss);
+      pane.appendChild(info);
+    }
+
+    // grouped connector list
+    var wrap = el("div");
+    function renderConnList() {
+      wrap.innerHTML = "";
+      var list = connectorList();
+      if (!list.length) {
+        wrap.appendChild(el("p", "stg-empty-note", "No connectors configured — add one below."));
+      } else {
+        var cats = [];
+        list.forEach(function (c) { if (cats.indexOf(c.category) < 0) cats.push(c.category); });
+        cats.forEach(function (cat) {
+          wrap.appendChild(el("div", "stg-group-label", esc(cat)));
+          list.filter(function (c) { return c.category === cat; }).forEach(function (c) {
+            var rowEl = el("div", "stg-conn-row");
+            var text = el("div", "stg-conn-text");
+            text.appendChild(el("div", "stg-conn-name", esc(c.name)));
+            if (c.note) text.appendChild(el("div", "stg-conn-note", esc(c.note)));
+            rowEl.appendChild(text);
+            if (cat === "Custom") {
+              var del = el("button", "stg-icon-btn danger", svg("trash"));
+              del.type = "button";
+              del.title = "Remove connector";
+              del.setAttribute("aria-label", "Remove " + c.name);
+              del.addEventListener("click", function () {
+                saveConnectors(connectorList().filter(function (x) { return x.id !== c.id; }));
+                renderConnList();
+              });
+              rowEl.appendChild(del);
+            }
+            rowEl.appendChild(makeToggle(c.enabled, function (on) {
+              var items = connectorList();
+              var i = items.findIndex(function (x) { return x.id === c.id; });
+              if (i >= 0) { items[i].enabled = on; saveConnectors(items); }
+            }, c.name));
+            wrap.appendChild(rowEl);
+          });
+        });
+      }
+    }
+    renderConnList();
+    pane.appendChild(wrap);
+
+    // add custom connector
+    var addWrap = el("div");
+    addWrap.style.marginTop = "18px";
+    var addBtn = el("button", "stg-btn ghost", "Add connector");
+    addBtn.type = "button";
+    addBtn.addEventListener("click", function () {
+      addWrap.innerHTML = "";
+      var form = el("div", "stg-memory-add");
+      form.style.flexDirection = "column";
+      var nameInput = el("input", "stg-input");
+      nameInput.type = "text";
+      nameInput.placeholder = "Connector name";
+      nameInput.setAttribute("aria-label", "Connector name");
+      var noteInput = el("input", "stg-input");
+      noteInput.type = "text";
+      noteInput.placeholder = "Note (optional) — what this source covers";
+      noteInput.setAttribute("aria-label", "Connector note");
+      var btns = el("div", "stg-confirm");
+      var cancel = el("button", "stg-btn ghost", "Cancel");
+      cancel.type = "button";
+      var save = el("button", "stg-btn", "Add");
+      save.type = "button";
+      function commit() {
+        var name = nameInput.value.trim();
+        if (!name) { nameInput.focus(); return; }
+        var items = connectorList();
+        items.push({ id: uid(), name: name, category: "Custom", enabled: false, note: noteInput.value.trim() });
+        saveConnectors(items);
+        renderConnList();
+        resetForm();
+      }
+      function resetForm() {
+        addWrap.innerHTML = "";
+        addWrap.appendChild(addBtn);
+      }
+      nameInput.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); commit(); } });
+      save.addEventListener("click", commit);
+      cancel.addEventListener("click", resetForm);
+      btns.appendChild(cancel); btns.appendChild(save);
+      form.appendChild(nameInput); form.appendChild(noteInput); form.appendChild(btns);
+      addWrap.appendChild(form);
+      nameInput.focus();
+    });
+    addWrap.appendChild(addBtn);
+    pane.appendChild(addWrap);
+
+    pane.appendChild(el("p", "stg-empty-note", "Toggle changes take effect on the next answer."));
+    return pane;
+  }
+
   // ===== 6. Usage =====
-  function usageStats() {
+  // ai_threads is stored most-recent-first (createThread unshifts; the server
+  // merge appends remote-only rows). Locally created threads carry no
+  // timestamps — only server-synced rows may keep updated_at/created_at.
+  function threadTs(t) {
+    var raw = t.updated_at || t.created_at || t.createdAt || t.ts;
+    if (!raw) return null;
+    var v = typeof raw === "number" ? raw : Date.parse(raw);
+    return Number.isFinite(v) ? v : null;
+  }
+  function monthCounts() {
     var threads = lsJSON("ai_threads", []);
-    var totalMsgs = 0, monthThreads = 0, monthMsgs = 0, hasTs = false;
-    var monthStart = new Date();
-    monthStart = new Date(monthStart.getFullYear(), monthStart.getMonth(), 1).getTime();
-    threads.forEach(function (t) {
+    var now = new Date();
+    var monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    var monthThreads = 0, monthMsgs = 0, earlierThreads = 0, earlierMsgs = 0, hasTs = false;
+    threads.forEach(function (t, i) {
       var msgs = Array.isArray(t.messages) ? t.messages.length : 0;
-      totalMsgs += msgs;
-      // threads carry no local timestamps; use server-synced fields when present
-      var raw = t.updated_at || t.created_at || t.createdAt || t.ts;
-      var ts = raw ? (typeof raw === "number" ? raw : Date.parse(raw)) : NaN;
-      if (Number.isFinite(ts)) {
+      var ts = threadTs(t);
+      if (ts != null) {
         hasTs = true;
         if (ts >= monthStart) { monthThreads++; monthMsgs += msgs; }
+        else { earlierThreads++; earlierMsgs += msgs; }
+      } else {
+        // No timestamp: estimate from position. The array is newest-first, so
+        // untimestamped entries that appear before the newest timestamped
+        // thread (and everything below it) can't be proven to fall in the
+        // current month — bucket them conservatively as "Earlier" activity.
+        earlierThreads++; earlierMsgs += msgs;
       }
     });
-    return { threads: threads.length, msgs: totalMsgs, monthThreads: monthThreads, monthMsgs: monthMsgs, hasTs: hasTs };
+    return {
+      monthThreads: monthThreads, monthMsgs: monthMsgs,
+      earlierThreads: earlierThreads, earlierMsgs: earlierMsgs,
+      hasTs: hasTs, totalThreads: threads.length
+    };
   }
+  window.UsageStats = { monthCounts: monthCounts };
   function paneUsage() {
-    var s = usageStats();
+    var s = monthCounts();
     var pane = el("div", "stg-pane");
     pane.appendChild(el("h3", "stg-pane-title", "Usage"));
     pane.appendChild(el("p", "stg-pane-sub", "Activity on this device, from your local thread library."));
@@ -413,21 +573,22 @@
       c.appendChild(el("div", "stg-stat-lbl", lbl));
       return c;
     }
-    grid.appendChild(stat(String(s.threads), "Total threads"));
-    grid.appendChild(stat(String(s.msgs), "Total messages"));
+    grid.appendChild(stat(String(s.totalThreads), "Total threads"));
+    grid.appendChild(stat(String(s.monthMsgs + s.earlierMsgs), "Total messages"));
     grid.appendChild(stat(s.hasTs ? String(s.monthThreads) : "—", "Threads this month"));
     grid.appendChild(stat(s.hasTs ? String(s.monthMsgs) : "—", "Messages this month"));
+    grid.appendChild(stat(String(s.earlierThreads), "Earlier threads (est.)"));
+    grid.appendChild(stat(String(s.earlierMsgs), "Earlier messages (est.)"));
     pane.appendChild(grid);
-    if (!s.hasTs) {
-      pane.appendChild(el("p", "stg-empty-note",
-        "Older threads don\u2019t carry timestamps, so this-month counts show — until new activity is recorded."));
-    }
+    pane.appendChild(el("p", "stg-empty-note",
+      "Month counts use recorded timestamps when present. Threads without timestamps \u2014 including those positioned before the newest timestamped thread \u2014 are estimated as earlier activity based on their position in your library."));
     return pane;
   }
 
   // ===== 7. Data controls =====
   var EXPORT_KEYS = ["ai_threads", "ai_spaces", "ai_theme", "ai_personalize", "ai_tone", "ai_memory",
     "ai_memory_items", "ai_site_instructions", "ai_notify_inapp", "ai_notify_email",
+    "ai_connectors", "ai_connectors_hint_dismissed",
     "voiceOn", "sidebarWidth", "answerWidth", "answerWidthPx", "artifactWidth"];
   var ALL_KEYS = EXPORT_KEYS.slice();
 
@@ -438,6 +599,7 @@
     data.data.ai_threads = lsJSON("ai_threads", []);
     data.data.ai_spaces = lsJSON("ai_spaces", []);
     data.data.ai_memory_items = lsJSON("ai_memory_items", []);
+    data.data.ai_connectors = lsJSON("ai_connectors", []);
     var blob;
     try { blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }); }
     catch (e) { return; }
@@ -595,6 +757,7 @@
   var RENDERERS = {
     preferences: panePreferences, personalize: panePersonalize, memory: paneMemory,
     instructions: paneInstructions, notifications: paneNotifications,
+    connectors: paneConnectors,
     usage: paneUsage, data: paneData, about: paneAbout
   };
 
@@ -706,5 +869,13 @@
     lastFocus = null;
   }
 
+  // Public read APIs for the host app (no fetch needed):
+  //   window.ConnectorPrefs.list() -> [{id, name, category, enabled, note}]
+  //   window.ConnectorPrefs.enabled() -> [names of enabled connectors]
+  //   window.UsageStats.monthCounts() -> {monthThreads, monthMsgs, earlierThreads, earlierMsgs, hasTs, totalThreads}
+  window.ConnectorPrefs = {
+    list: connectorList,
+    enabled: function () { return connectorList().filter(function (c) { return c.enabled; }).map(function (c) { return c.name; }); }
+  };
   window.SettingsUI = { open: open, close: close };
 })();

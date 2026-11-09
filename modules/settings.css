@@ -316,6 +316,40 @@
 .stg-memory-add .stg-input { flex: 1; }
 .stg-empty-note { font-size: 12.5px; color: var(--text-faint); margin: 10px 0 0; }
 
+/* ---- connectors pane ---- */
+.stg-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--accent-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 8px 10px 12px;
+  margin-bottom: 16px;
+}
+.stg-info p { flex: 1; font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+.stg-info .stg-icon-btn { margin-top: -2px; }
+.stg-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  margin: 18px 0 4px;
+}
+.stg-conn-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.stg-conn-row:last-child { border-bottom: none; }
+.stg-conn-text { flex: 1; min-width: 0; }
+.stg-conn-name { font-size: 13.5px; font-weight: 600; }
+.stg-conn-note { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.stg-conn-row .stg-memory-add { flex-direction: column; }
+
 /* ---- usage cards ---- */
 .stg-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 14px; }
 .stg-stat {
