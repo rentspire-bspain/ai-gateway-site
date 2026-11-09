@@ -151,6 +151,62 @@ a { color: inherit; text-decoration: none; }
   overflow-y: auto;
   padding: 0 12px;
 }
+.spaces-head { display: flex; align-items: center; }
+.space-add-btn {
+  background: none; border: none; color: var(--text-faint); cursor: pointer;
+  padding: 4px; border-radius: 6px; display: flex; align-items: center;
+}
+.space-add-btn:hover { color: var(--text); background: var(--bg-elevated); }
+.space-item {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px;
+  font-size: 13px; color: var(--text-muted); cursor: pointer; margin-bottom: 1px;
+}
+.space-item:hover { background: var(--bg-elevated); color: var(--text); }
+.space-item.active { background: var(--accent-light); color: var(--text); }
+.space-item .space-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.space-item .space-gear, .thread-item .thread-move {
+  opacity: 0; background: none; border: none; color: var(--text-faint); cursor: pointer;
+  padding: 2px; border-radius: 4px; display: flex; align-items: center; flex-shrink: 0;
+}
+.space-item:hover .space-gear, .thread-item:hover .thread-move { opacity: 0.7; }
+.space-item .space-gear:hover, .thread-item .thread-move:hover { opacity: 1; }
+.space-badge {
+  font-size: 10px; color: var(--text-faint); background: var(--bg-elevated);
+  border-radius: 10px; padding: 1px 7px; flex-shrink: 0;
+}
+.move-menu {
+  position: fixed; background: var(--bg-elevated); border: 1px solid var(--border-light);
+  border-radius: 10px; padding: 4px; z-index: 200; min-width: 170px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+}
+.move-menu button {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  color: var(--text-muted); font-size: 13px; padding: 6px 10px; border-radius: 6px; cursor: pointer;
+}
+.move-menu button:hover { background: var(--bg); color: var(--text); }
+.move-menu .menu-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); padding: 6px 10px 3px; }
+.space-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+}
+.space-modal {
+  background: var(--bg-elevated); border: 1px solid var(--border-light); border-radius: 14px;
+  padding: 20px; width: min(480px, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 12px;
+}
+.space-modal h3 { margin: 0; font-size: 16px; }
+.space-modal input, .space-modal textarea {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  font-size: 13px; padding: 9px 11px; width: 100%; box-sizing: border-box; font-family: inherit;
+}
+.space-modal textarea { min-height: 90px; resize: vertical; }
+.space-modal .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.space-modal .btn {
+  background: var(--accent); border: none; color: white; font-size: 13px; font-weight: 600;
+  padding: 8px 16px; border-radius: 8px; cursor: pointer;
+}
+.space-modal .btn.ghost { background: none; border: 1px solid var(--border); color: var(--text-muted); }
+.space-modal .btn.danger { background: none; border: 1px solid rgba(217,70,62,0.4); color: #D9463E; margin-right: auto; }
+.space-modal .hint { font-size: 11px; color: var(--text-faint); margin-top: -4px; }
 .threads-label {
   font-size: 11px;
   font-weight: 600;
@@ -491,6 +547,8 @@ a { color: inherit; text-decoration: none; }
 .searching-step { display: flex; align-items: center; gap: 8px; }
 .searching-step.done { color: var(--text-muted); }
 .searching-step.done::before { content: "✓"; color: var(--accent); }
+.searching-step.live { color: var(--text); font-weight: 500; }
+.searching-phases { display: flex; flex-direction: column; gap: 7px; margin: 4px 0; }
 
 /* Question */
 .question-header {
@@ -849,7 +907,14 @@ a { color: inherit; text-decoration: none; }
     </button>
     <div class="threads-list" id="threadsList">
       <input class="thread-search" id="threadSearch" placeholder="Search threads..." autocomplete="off">
-      <div class="threads-label">Recent</div>
+      <div class="spaces-head">
+        <div class="threads-label" style="flex:1">Spaces</div>
+        <button class="space-add-btn" id="newSpaceBtn" title="New space">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <div id="spaceItems"></div>
+      <div class="threads-label" id="recentLabel">Recent</div>
       <div id="threadItems"></div>
     </div>
     <div class="sidebar-footer">
@@ -1048,6 +1113,131 @@ document.getElementById("deepResearchToggle").onclick = () => {
 // ============ THREAD SEARCH (v62) ============
 document.getElementById("threadSearch").addEventListener("input", () => renderThreads());
 
+// ============ SPACES / PROJECTS (v64) ============
+// Perplexity-Projects parity: threads group under a space; each space carries
+// custom instructions that ride every request from its threads. Spaces sync to
+// the account's `spaces` table (RLS user-owned); threads carry space_id.
+let spaces = JSON.parse(localStorage.getItem("ai_spaces") || "[]");
+let activeSpaceId = null;
+function saveSpaces() {
+  localStorage.setItem("ai_spaces", JSON.stringify(spaces));
+  if (!currentUser) return;
+  for (const s of spaces) {
+    sb.from("spaces").upsert({ id: s.id, user_id: currentUser.id, name: s.name, instructions: s.instructions || null }).then(() => {}, () => {});
+  }
+}
+async function syncSpacesFromServer() {
+  if (!currentUser) return;
+  try {
+    const { data: remote, error } = await sb.from("spaces").select("id,name,instructions").limit(50);
+    if (error) return;
+    const byId = new Map(spaces.map(s => [s.id, s]));
+    for (const rs of (remote || [])) byId.set(rs.id, { id: rs.id, name: rs.name, instructions: rs.instructions || "" });
+    spaces = [...byId.values()];
+    saveSpaces();
+    renderSpaces();
+    renderThreads();
+  } catch (e) { /* offline-tolerant */ }
+}
+function renderSpaces() {
+  const container = document.getElementById("spaceItems");
+  if (!container) return;
+  container.innerHTML = "";
+  for (const s of spaces) {
+    const div = document.createElement("div");
+    div.className = "space-item" + (s.id === activeSpaceId ? " active" : "");
+    div.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+    const name = document.createElement("span");
+    name.className = "space-name";
+    name.textContent = s.name;
+    name.title = s.instructions ? s.instructions.slice(0, 200) : "No custom instructions";
+    const badge = document.createElement("span");
+    badge.className = "space-badge";
+    badge.textContent = threads.filter(t => t.spaceId === s.id).length;
+    const gear = document.createElement("button");
+    gear.className = "space-gear";
+    gear.title = "Space settings";
+    gear.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+    gear.onclick = (e) => { e.stopPropagation(); openSpaceModal(s); };
+    div.appendChild(name); div.appendChild(badge); div.appendChild(gear);
+    div.onclick = () => {
+      activeSpaceId = activeSpaceId === s.id ? null : s.id;
+      renderSpaces();
+      renderThreads();
+    };
+    container.appendChild(div);
+  }
+}
+function closeMoveMenu() { document.querySelectorAll(".move-menu").forEach(m => m.remove()); }
+function openMoveMenu(t, anchorEl) {
+  closeMoveMenu();
+  const menu = document.createElement("div");
+  menu.className = "move-menu";
+  const label = document.createElement("div");
+  label.className = "menu-label";
+  label.textContent = "Move to space";
+  menu.appendChild(label);
+  for (const s of spaces) {
+    const b = document.createElement("button");
+    b.textContent = s.name + (t.spaceId === s.id ? "  ✓" : "");
+    b.onclick = () => { t.spaceId = s.id; saveThreads(); pushThreadToServer(t); renderSpaces(); renderThreads(); closeMoveMenu(); };
+    menu.appendChild(b);
+  }
+  const none = document.createElement("button");
+  none.textContent = "No space";
+  none.onclick = () => { t.spaceId = null; saveThreads(); pushThreadToServer(t); renderSpaces(); renderThreads(); closeMoveMenu(); };
+  menu.appendChild(none);
+  const r = anchorEl.getBoundingClientRect();
+  menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 200)) + "px";
+  menu.style.top = Math.min(r.bottom + 4, window.innerHeight - 220) + "px";
+  document.body.appendChild(menu);
+  setTimeout(() => document.addEventListener("click", closeMoveMenu, { once: true }), 0);
+}
+function openSpaceModal(existing) {
+  document.querySelectorAll(".space-modal-overlay").forEach(m => m.remove());
+  const ov = document.createElement("div");
+  ov.className = "space-modal-overlay";
+  const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  ov.innerHTML = '<div class="space-modal">' +
+    '<h3>' + (existing ? "Space settings" : "New space") + '</h3>' +
+    '<input id="spaceNameInput" placeholder="Space name (e.g., Oak Street Deals)" value="' + (existing ? esc(existing.name) : "") + '">' +
+    '<textarea id="spaceInstrInput" placeholder="Custom instructions — applied to every thread in this space. E.g., &#10;&#10;Always answer with tables. Cite rent comps from my own data when relevant. Keep answers under 300 words.">' + (existing ? esc(existing.instructions) : "") + '</textarea>' +
+    '<div class="hint">Instructions ride every request from this space — tone, format, emphasis.</div>' +
+    '<div class="modal-actions">' +
+    (existing ? '<button class="btn danger" id="spaceDeleteBtn">Delete</button>' : "") +
+    '<button class="btn ghost" id="spaceCancelBtn">Cancel</button>' +
+    '<button class="btn" id="spaceSaveBtn">' + (existing ? "Save" : "Create") + '</button>' +
+    '</div></div>';
+  document.body.appendChild(ov);
+  ov.querySelector("#spaceCancelBtn").onclick = () => ov.remove();
+  ov.querySelector("#spaceSaveBtn").onclick = () => {
+    const name = ov.querySelector("#spaceNameInput").value.trim() || "Untitled space";
+    const instructions = ov.querySelector("#spaceInstrInput").value.trim();
+    if (existing) {
+      existing.name = name;
+      existing.instructions = instructions;
+    } else {
+      const s = { id: crypto.randomUUID(), name, instructions };
+      spaces.unshift(s);
+      activeSpaceId = s.id;
+    }
+    saveSpaces(); renderSpaces(); renderThreads();
+    ov.remove();
+  };
+  const del = ov.querySelector("#spaceDeleteBtn");
+  if (del) del.onclick = () => {
+    spaces = spaces.filter(x => x.id !== existing.id);
+    if (activeSpaceId === existing.id) activeSpaceId = null;
+    threads.forEach(t => { if (t.spaceId === existing.id) t.spaceId = null; });
+    if (currentUser) sb.from("spaces").delete().eq("id", existing.id).then(() => {}, () => {});
+    saveSpaces(); saveThreads(); renderSpaces(); renderThreads();
+    ov.remove();
+  };
+  ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
+  ov.querySelector("#spaceNameInput").focus();
+}
+document.getElementById("newSpaceBtn").onclick = () => openSpaceModal(null);
+
 // ============ FILE ATTACHMENTS (v62/v63) ============
 // Three kinds: plain text (content spliced into the message), PDF (text
 // extracted client-side with pdf.js, then spliced), and images (sent as a
@@ -1174,7 +1364,7 @@ let threadsSynced = false;
 async function pushThreadToServer(t) {
   if (!t || !currentUser) return;
   try {
-    await sb.from("threads").upsert({ id: t.id, title: t.title, user_id: currentUser.id });
+    await sb.from("threads").upsert({ id: t.id, title: t.title, user_id: currentUser.id, space_id: t.spaceId || null });
   } catch (e) { /* offline-tolerant: localStorage still has it */ }
 }
 async function pushThreadMessages(t) {
@@ -1190,16 +1380,16 @@ async function syncThreadsFromServer() {
   if (!currentUser || threadsSynced) return;
   threadsSynced = true;
   try {
-    const { data: remote, error } = await sb.from("threads").select("id,title,updated_at").order("updated_at", { ascending: false }).limit(50);
+    const { data: remote, error } = await sb.from("threads").select("id,title,updated_at,space_id").order("updated_at", { ascending: false }).limit(50);
     if (error) return;
     const remoteIds = new Set((remote || []).map(r => r.id));
     // load remote messages for threads we don't have locally cached
     const byId = new Map(threads.map(t => [t.id, t]));
     for (const rt of (remote || [])) {
       const local = byId.get(rt.id);
-      if (local && local.messages.length) continue; // local cache is richer
+      if (local && local.messages.length) { local.spaceId = local.spaceId || rt.space_id || null; continue; } // local cache is richer
       const { data: msgs } = await sb.from("thread_messages").select("role,content,sources,related").eq("thread_id", rt.id).order("created_at", { ascending: true });
-      byId.set(rt.id, { id: rt.id, title: rt.title, messages: (msgs || []).map(m => ({ role: m.role, content: m.content, sources: m.sources, related: m.related })) });
+      byId.set(rt.id, { id: rt.id, title: rt.title, spaceId: rt.space_id || null, messages: (msgs || []).map(m => ({ role: m.role, content: m.content, sources: m.sources, related: m.related })) });
     }
     threads = [...byId.values()];
     // push local-only threads up to the server (one-time migration).
@@ -1234,10 +1424,14 @@ function renderThreads() {
   // v62: live search over titles AND message content (client-side — all
   // synced threads are local; the server list merges in on login)
   const q = (document.getElementById("threadSearch")?.value || "").trim().toLowerCase();
-  const visible = !q ? threads : threads.filter(t =>
+  // v64: space filter (clicking a space shows only its threads) + search
+  const spaceVisible = activeSpaceId ? threads.filter(t => t.spaceId === activeSpaceId) : threads;
+  const visible = !q ? spaceVisible : spaceVisible.filter(t =>
     t.title.toLowerCase().includes(q) ||
     (t.messages || []).some(m => String(m.content || "").toLowerCase().includes(q))
   );
+  const label = document.getElementById("recentLabel");
+  if (label) label.textContent = activeSpaceId ? (spaces.find(s => s.id === activeSpaceId)?.name || "Space") : "Recent";
   visible.forEach(t => {
     const div = document.createElement("div");
     div.className = "thread-item" + (t.id === currentThreadId ? " active" : "");
@@ -1245,6 +1439,13 @@ function renderThreads() {
     const span = document.createElement("span");
     span.textContent = t.title;
     div.appendChild(span);
+    // v64: move-to-space button (visible on hover)
+    const move = document.createElement("button");
+    move.className = "thread-move";
+    move.title = "Move to space";
+    move.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+    move.onclick = (e) => { e.stopPropagation(); openMoveMenu(t, move); };
+    div.appendChild(move);
     div.onclick = () => loadThread(t.id);
     container.appendChild(div);
   });
@@ -1320,6 +1521,7 @@ async function checkAuth() {
     document.getElementById("userEmail").textContent = currentUser.email;
     document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
     syncThreadsFromServer(); // v61: merge server threads once per login
+    syncSpacesFromServer(); // v64: merge server spaces once per login
     return true;
   }
   return false;
@@ -1372,8 +1574,28 @@ document.getElementById("authBack").onclick = () => {
 
 // ============ SEARCH FLOW ============
 const searchingSteps = ["Parsing query", "Searching sources", "Reading results", "Synthesizing answer"];
+// v65: render all prior turns of the thread (Perplexity-style conversation
+// continuity — a follow-up no longer deletes the previous question/answer).
+function cleanQuestionText(content) {
+  return String(content || "").split("\n\n[Attached")[0];
+}
+function renderPriorTurns(content, thread) {
+  content.innerHTML = "";
+  for (const m of (thread.messages || [])) {
+    if (m.role === "user") {
+      const q = document.createElement("div");
+      q.className = "question-header";
+      q.textContent = cleanQuestionText(m.content);
+      content.appendChild(q);
+    } else {
+      renderAnswer(content, String(m.content || ""), m.sources || [], m.related || []);
+    }
+  }
+}
 function renderSearching(container, query) {
-  container.innerHTML = "";
+  // v65: no fake timed checklist — the status shows the real current step.
+  // The gateway narrates actual phases ("Searched the web — 6 sources") in the
+  // SSE stream; renderPhases() displays them as they arrive.
   const q = document.createElement("div");
   q.className = "question-header";
   q.textContent = query;
@@ -1382,20 +1604,24 @@ function renderSearching(container, query) {
   state.className = "searching-state";
   state.innerHTML = `
     <div class="searching-spinner"></div>
-    <div class="searching-text">Searching...</div>
-    <div class="searching-steps">
-      ${searchingSteps.map((s, i) => `<div class="searching-step" data-step="${i}">${s}</div>`).join("")}
-    </div>`;
+    <div class="searching-text">Analyzing your question…</div>`;
   container.appendChild(state);
-  // Animate steps
-  let step = 0;
-  const interval = setInterval(() => {
-    const el = state.querySelector(`[data-step="${step}"]`);
-    if (el) el.classList.add("done");
-    step++;
-    if (step >= searchingSteps.length) clearInterval(interval);
-  }, 600);
-  return { state, interval };
+  return { state, interval: null };
+}
+function renderPhases(state, phases) {
+  if (!state || !state.isConnected || !Array.isArray(phases)) return;
+  let box = state.querySelector(".searching-phases");
+  if (!box) {
+    state.innerHTML = "";
+    box = document.createElement("div");
+    box.className = "searching-phases";
+    state.appendChild(box);
+  }
+  box.innerHTML = phases.map(p =>
+    '<div class="searching-step ' + (p.done ? "done" : "live") + '">' +
+    (p.done ? "✓" : '<span class="searching-spinner" style="width:10px;height:10px;margin:0"></span>') +
+    " " + p.label + "</div>"
+  ).join("");
 }
 
 function extractSources(text) {
@@ -1559,20 +1785,28 @@ async function performSearch(query) {
   }
 
   showResults();
-  const content = document.getElementById("resultsContent");
-  const { state, interval } = renderSearching(content, query);
-  document.getElementById("breadcrumb").textContent = query;
-  
-  // Create or update thread
+  // v65: resolve the thread FIRST so prior turns render before the loading
+  // state — a follow-up keeps the whole conversation visible (Perplexity-style)
   let thread = threads.find(t => t.id === currentThreadId);
   if (!thread) {
     thread = createThread(query.slice(0, 60));
+    // v64: a new thread started while a space is active joins that space
+    if (activeSpaceId) thread.spaceId = activeSpaceId;
   } else {
     thread.title = query.slice(0, 60);
     saveThreads();
     renderThreads();
   }
-  
+
+  const content = document.getElementById("resultsContent");
+  renderPriorTurns(content, thread);
+  const { state, interval } = renderSearching(content, query);
+  document.getElementById("breadcrumb").textContent = query;
+
+  // v64: the thread's space carries custom instructions that ride the request
+  const threadSpace = spaces.find(s => s.id === (thread.spaceId || activeSpaceId));
+  const spaceInstr = threadSpace && threadSpace.instructions ? threadSpace.instructions : "";
+
   const purpose = document.getElementById("modelSel").value;
   // v63: text/PDF attachments splice into the outgoing message; image
   // attachments ride the request's `attachment` field to the gateway's
@@ -1597,16 +1831,15 @@ async function performSearch(query) {
   try {
     const { data: s } = await sb.auth.getSession();
 
-    // Final render (shared by streaming, deep research, and fallback paths)
+    // Final render (shared by streaming, deep research, and fallback paths).
+    // v65: prior turns are already in the DOM — only the loading state is
+    // replaced by the answer (the question header stays from renderSearching).
     const renderFinal = (answer) => {
       const fuMatch = answer.match(/\n?##\s*Suggested Follow-ups?[\s\S]*$/i);
       const answerClean = fuMatch ? answer.slice(0, fuMatch.index).trim() : answer;
       clearInterval(interval);
-      content.innerHTML = "";
-      const q = document.createElement("div");
-      q.className = "question-header";
-      q.textContent = query;
-      content.appendChild(q);
+      if (state && state.isConnected) state.remove();
+      if (liveAnswerEl) { liveAnswerEl.remove(); liveAnswerEl = null; }
       const sources = extractSources(answerClean);
       const related = generateRelated(query, answer);
       renderAnswer(content, answerClean, sources, related);
@@ -1616,7 +1849,9 @@ async function performSearch(query) {
       renderThreads();
       document.getElementById("resultsScroll").scrollTop = 0;
     };
-    // Live partial render during streaming (throttled)
+    // Live partial render during streaming (throttled). v65: renders into a
+    // single replaceable answer element so prior turns stay visible.
+    let liveAnswerEl = null;
     let lastRender = 0;
     const renderLive = (full) => {
       const now = Date.now();
@@ -1626,12 +1861,13 @@ async function performSearch(query) {
       const partial = (fuMatch ? full.slice(0, fuMatch.index).trim() : full).trim();
       if (!partial) return;
       clearInterval(interval);
-      content.innerHTML = "";
-      const q = document.createElement("div");
-      q.className = "question-header";
-      q.textContent = query;
-      content.appendChild(q);
-      renderAnswer(content, partial, extractSources(partial), []);
+      if (state && state.isConnected) state.remove();
+      if (!liveAnswerEl) {
+        liveAnswerEl = document.createElement("div");
+        content.appendChild(liveAnswerEl);
+      }
+      liveAnswerEl.innerHTML = "";
+      renderAnswer(liveAnswerEl, partial, extractSources(partial), []);
     };
 
     if (deepResearchOn) {
@@ -1641,7 +1877,7 @@ async function performSearch(query) {
       const submit = await fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(attachmentBody ? { attachment: attachmentBody } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       const sub = await submit.json();
       if (!submit.ok || !sub?.deep_research_id) throw new Error(sub?.error ?? "Deep research submit failed");
@@ -1664,7 +1900,7 @@ async function performSearch(query) {
       const res = await fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...(attachmentBody ? { attachment: attachmentBody } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
       if (!res.ok) {
@@ -1689,6 +1925,7 @@ async function performSearch(query) {
             if (payload === "[DONE]") continue;
             try {
               const evt = JSON.parse(payload);
+              if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); continue; }
               const delta = evt?.choices?.[0]?.delta?.content;
               if (delta) full += delta;
             } catch {}
@@ -1704,12 +1941,9 @@ async function performSearch(query) {
     }
 
   } catch (e) {
+    // v65: keep prior turns visible — only the loading state becomes the error
     clearInterval(interval);
-    content.innerHTML = "";
-    const q = document.createElement("div");
-    q.className = "question-header";
-    q.textContent = query;
-    content.appendChild(q);
+    if (state && state.isConnected) state.remove();
     const err = document.createElement("div");
     err.className = "searching-state";
     const errDiv = document.createElement("div");
@@ -1774,6 +2008,7 @@ async function loadStatus(force) {
     document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
   }
   renderThreads();
+  renderSpaces();
   loadStatus(false);
 })();
 </script>
