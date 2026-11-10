@@ -20,6 +20,10 @@
 
   var URL_ = "https://bnxermyboeigvwonfrzx.supabase.co/rest/v1/fleet_registry?select=id,kind,name,parent,project_ref,domain,description,status,schedule,owner,updated_at&order=name.asc&limit=1000";
   var ANON = "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb";
+  var DISP_URL = "https://bnxermyboeigvwonfrzx.supabase.co/rest/v1/fleet_dispatch?select=id,thread_id,instruction,priority,status,result,error,claimed_at,claimed_by,created_at,finished_at&order=created_at.desc&limit=30";
+  var disp = [];
+  var GURL = "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/guardian-runner";
+  var guards = [], gst = { loaded: false, error: "", busy: {} }, tab = "overview";
   var el = null, rows = [], st = { loading: true, error: "", showPaused: false };
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
   function load() {
@@ -31,18 +35,64 @@
     }).then(function (res) {
       if (res.status === 404) throw new Error("The fleet registry is not set up yet.");
       return res.json().then(function (j) { if (!res.ok || !Array.isArray(j)) throw new Error((j && j.message) || "Request failed (" + res.status + ")"); rows = j; st.error = ""; });
-    }).catch(function (e) { st.error = e.message; }).then(function () { st.loading = false; render(); });
+    }).catch(function (e) { st.error = e.message; }).then(loadDisp).then(function () { st.loading = false; render(); });
   }
-  function treeHtml(nodes, top) {
-    return '<ul class="fl-tree' + (top ? " fl-top" : "") + '">' + nodes.map(function (n) {
-      var r = n.row, leaf = r.kind !== "org", inner = "";
-      if (!leaf) {
-        var kids = n.children, kinds = countBy(kids.map(function (k) { return k.row; }), "kind");
-        inner = treeHtml(n.children.filter(function (k) { return k.row.kind === "org"; }), false) +
-          '<div class="fl-sum">' + Object.keys(kinds).filter(function (k) { return k !== "org"; }).map(function (k) { return esc(kinds[k] + " " + k.replace("_", " ") + "s"); }).join(" · ") + "</div>";
-      }
-      return '<li><div class="fl-node fl-k-' + esc(r.kind) + '"><b>' + esc(r.name) + "</b>" + (r.description && !leaf ? '<span class="fl-d">' + esc(r.description) + "</span>" : "") + "</div>" + inner + "</li>";
-    }).join("") + "</ul>";
+  // "Dispatched work": the user's fleet_dispatch rows (RLS-scoped); failures are non-fatal (table may not exist yet)
+  function loadDisp() {
+    var client = (typeof sb !== "undefined") ? sb : window.sb;
+    return client.auth.getSession().then(function (r) {
+      var tok = r && r.data && r.data.session && r.data.session.access_token;
+      if (!tok) return;
+      return fetch(DISP_URL, { headers: { Authorization: "Bearer " + tok, apikey: ANON } }).then(function (res) { return res.json(); }).then(function (j) { disp = Array.isArray(j) ? j : []; });
+    }).catch(function () { disp = []; });
+  }
+  function fmt(t) { return t ? new Date(t).toLocaleString() : ""; }
+  function dispHtml() {
+    if (!disp.length) return "";
+    return '<h3 class="fl-h">Dispatched work (' + disp.length + ') <button class="fl-rf" type="button">Refresh</button></h3><div class="fl-grid">' + disp.map(function (d) {
+      var out = d.error ? "Error: " + d.error : d.result;
+      var tl = ["Queued · " + fmt(d.created_at)];
+      if (d.claimed_at) tl.push("Claimed" + (d.claimed_by ? " by " + d.claimed_by : "") + " · " + fmt(d.claimed_at));
+      if (d.finished_at) tl.push((d.status === "error" ? "Failed" : "Done") + " · " + fmt(d.finished_at));
+      return '<div class="fl-card"><div class="fl-ct"><span class="fl-dot fl-s-' + (d.status === "done" ? "live" : d.status === "error" ? "paused" : "on_demand") + '"></span><b>' + esc(d.status) + "</b> · #" + esc(String(d.id).slice(0, 8)) + (d.priority === "high" ? " · high" : "") + '</div><div class="fl-m">' + esc(String(d.instruction).slice(0, 160)) + "</div>" +
+        '<ol class="fl-m" style="margin:6px 0 0 16px;padding:0">' + tl.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>" +
+        (out ? "<details><summary>Result</summary><pre style=\"white-space:pre-wrap\">" + esc(String(out).slice(0, 8000)) + "</pre></details>" : "") + "</div>";
+    }).join("") + "</div>";
+  }
+  // live ledger: poll every 8s while the Fleet page is open and any dispatch is still in flight
+  var pollT = null;
+  function poll() { if (!el) return; var busy = disp.some(function (d) { return d.status === "queued" || d.status === "running"; }); (busy ? loadDisp().then(render) : Promise.resolve()).then(function () { pollT = setTimeout(poll, 8000); }); }
+  // ---- Guardians tab: native guardian-runner edge function (list / update / run_now) ----
+  function gcall(body) {
+    var client = (typeof sb !== "undefined") ? sb : window.sb;
+    return client.auth.getSession().then(function (r) {
+      var tok = r && r.data && r.data.session && r.data.session.access_token;
+      if (!tok) throw new Error("Please sign in.");
+      return fetch(GURL, { method: "POST", headers: { Authorization: "Bearer " + tok, apikey: ANON, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    }).then(function (res) { return res.json().then(function (j) { if (!res.ok) throw new Error((j && j.error) || "Request failed (" + res.status + ")"); return j; }); });
+  }
+  function loadGuards() {
+    return gcall({ action: "list" }).then(function (j) { guards = j.guardians || []; gst.error = ""; })
+      .catch(function (e) { gst.error = e.message; }).then(function () { gst.loaded = true; render(); });
+  }
+  function gcard(g) {
+    var s = gst.busy[g.id] ? "running" : (g.last_status || "never");
+    return '<div class="fl-card" data-gid="' + esc(g.id) + '"><div class="fl-ct"><span class="fl-dot fl-s-' + (s === "ok" ? "live" : s === "fail" || s === "error" ? "paused" : "on_demand") + '"></span><b>' + esc(g.name) + '</b></div>' +
+      '<div class="fl-m">' + esc(g.schedule_label || g.schedule) + " · " + esc(s) + (g.last_run ? " · " + esc(fmt(g.last_run)) : "") + '</div>' +
+      (g.last_result ? '<div class="fl-m" style="white-space:pre-wrap;max-height:84px;overflow:auto;margin-top:6px">' + esc(g.last_result.split("\n").slice(0, 4).join("\n")) + "</div>" : "") +
+      '<div class="fl-m" style="margin-top:8px"><label><input type="checkbox" class="fl-gen"' + (g.enabled ? " checked" : "") + '> Enabled</label> ' +
+      '<button class="fl-grun" type="button"' + (gst.busy[g.id] ? " disabled" : "") + '>' + (gst.busy[g.id] ? "Running…" : "Run now") + "</button></div></div>";
+  }
+  function guardHtml() {
+    if (!gst.loaded) return '<p class="fl-msg">Loading guardians…</p>';
+    if (gst.error) return '<p class="fl-msg">' + esc(gst.error) + ' <button class="fl-grf" type="button">Retry</button></p>';
+    return '<h3 class="fl-h">Guardians (' + guards.length + ') <button class="fl-grf" type="button">Refresh</button></h3><div class="fl-grid">' + guards.map(gcard).join("") + "</div>";
+  }
+  function gAct(id, body) {
+    var g = guards.filter(function (x) { return x.id === id; })[0]; if (!g) return;
+    gst.busy[id] = true; render();
+    gcall(body).then(function (j) { var n = j.guardian; if (n) guards = guards.map(function (x) { return x.id === id ? n : x; }); })
+      .catch(function (e) { alert(e.message); }).then(function () { delete gst.busy[id]; render(); });
   }
   function card(r) {
     return '<div class="fl-card"><div class="fl-ct"><span class="fl-dot fl-s-' + esc(r.status) + '"></span><b>' + esc(r.name) + '</b></div><div class="fl-m">' +
@@ -52,15 +102,17 @@
   function render() {
     if (!el) return;
     var body = el.querySelector(".fl-body");
+    var tabs = '<div class="fl-tabs" style="display:flex;gap:8px;margin:0 0 12px"><button type="button" class="fl-tab" data-tab="overview"' + (tab === "overview" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Overview</button><button type="button" class="fl-tab" data-tab="guardians"' + (tab === "guardians" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Guardians</button></div>';
+    if (tab === "guardians") { body.innerHTML = '<div class="fl-wrap">' + tabs + guardHtml() + "</div>"; return; }
     if (st.loading) { body.innerHTML = '<p class="fl-msg">Loading fleet registry…</p>'; return; }
     if (st.error) { body.innerHTML = '<p class="fl-msg">' + esc(st.error) + "</p>"; return; }
     var by = function (k) { return rows.filter(function (r) { return r.kind === k; }); };
     var autos = by("automation"), live = autos.filter(function (r) { return r.status === "live"; }), paused = autos.filter(function (r) { return r.status === "paused"; });
-    body.innerHTML = '<div class="fl-wrap"><h3 class="fl-h">Org chart</h3>' + treeHtml(buildOrgTree(rows), true) +
+    body.innerHTML = '<div class="fl-wrap">' + tabs + '<h3 class="fl-h">Org chart</h3>' + treeHtml(buildOrgTree(rows), true) +
       section("Guardians (per-project specs)", by("guardian")) + section("Live automations", live) +
       '<h3 class="fl-h">Paused automations (' + paused.length + ') <button class="fl-tg" type="button">' + (st.showPaused ? "Hide" : "Show") + "</button></h3>" +
       (st.showPaused ? '<div class="fl-grid">' + paused.map(card).join("") + "</div>" : "") +
-      section("Build lanes", by("build_lane")) + section("Runtime agents", by("runtime_agent")) + "</div>";
+      dispHtml() + section("Build lanes", by("build_lane")) + section("Runtime agents", by("runtime_agent")) + "</div>";
   }
   function onKey(e) { if (e.key === "Escape") close(); }
   function open() {
@@ -71,11 +123,17 @@
     (document.getElementById("moduleRoot") || document.body).appendChild(el);
     el.addEventListener("click", function (e) {
       if (e.target.classList.contains("fl-x")) close();
+      var t = e.target, gc = t.closest && t.closest("[data-gid]");
+      if (t.classList.contains("fl-tab")) { tab = t.getAttribute("data-tab"); render(); if (tab === "guardians" && !gst.loaded) loadGuards(); return; }
+      if (t.classList.contains("fl-grf")) { gst.loaded = false; render(); loadGuards(); return; }
+      if (t.classList.contains("fl-grun") && gc) { gAct(gc.getAttribute("data-gid"), { action: "run_now", id: gc.getAttribute("data-gid") }); return; }
+      if (t.classList.contains("fl-gen") && gc) { gAct(gc.getAttribute("data-gid"), { action: "update", id: gc.getAttribute("data-gid"), enabled: t.checked }); return; }
+      if (e.target.classList.contains("fl-rf")) loadDisp().then(render);
       if (e.target.classList.contains("fl-tg")) { st.showPaused = !st.showPaused; render(); }
     });
     document.addEventListener("keydown", onKey);
-    st.loading = true; render(); load();
+    st.loading = true; render(); load().then(function () { pollT = setTimeout(poll, 8000); });
   }
-  function close() { if (!el) return; document.removeEventListener("keydown", onKey); el.remove(); el = null; }
+  function close() { if (!el) return; tab = "overview"; clearTimeout(pollT); document.removeEventListener("keydown", onKey); el.remove(); el = null; }
   root.FleetUI = { open: open, close: close };
 })(typeof window !== "undefined" ? window : globalThis);
