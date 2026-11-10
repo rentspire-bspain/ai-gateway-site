@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-9Vka2h01V2bUjy2B1gPX4zCxeve9E13BsAOJ9/VPM10=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-K1E2Ziqq8WnEex1ziwo7WOAfG++mH2RKl/12STEGk7M=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1511,6 +1511,23 @@ const SUPABASE_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
 const SUPABASE_ANON = "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb";
 const GATEWAY = SUPABASE_URL + "/functions/v1";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// v92: CSP-safe bridge for modules (no eval — the CSP blocks indirect eval).
+// Modules read/write the app's top-level bindings through these getters/setters.
+window.__appGlobals = {
+  get sb() { return sb; },
+  get GATEWAY() { return GATEWAY; },
+  get threads() { return threads; }, set threads(v) { threads = v; },
+  get spaces() { return spaces; }, set spaces(v) { spaces = v; },
+  get currentThreadId() { return currentThreadId; }, set currentThreadId(v) { currentThreadId = v; },
+  get currentUser() { return currentUser; },
+  get saveSpaces() { return saveSpaces; },
+  get saveThreads() { return saveThreads; },
+  get renderSpaces() { return renderSpaces; },
+  get renderThreads() { return renderThreads; },
+  get showLanding() { return showLanding; },
+  get newThread() { return newThread; },
+};
 
 // ============ STATE ============
 function safeLSArray(key) {

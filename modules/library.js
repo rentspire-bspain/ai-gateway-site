@@ -7,16 +7,16 @@
   var LS = window.localStorage;
   function jget(k, d) { try { var v = JSON.parse(LS.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
   function jset(k, v) { try { LS.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  function g(name) { try { return (0, eval)("typeof " + name + "!=='undefined'?" + name + ":undefined"); } catch (e) { return undefined; } }
+  function g(name) { try { return window.__appGlobals ? window.__appGlobals[name] : undefined; } catch (e) { return undefined; } }
   function call(name) { var f = g(name); if (typeof f === "function") { try { return f.apply(null, [].slice.call(arguments, 1)); } catch (e) { console.warn(name, e); } } }
   function getThreads() { var t = g("threads"); return Array.isArray(t) ? t : jget("ai_threads", []); }
   function removeThread(id) {
     window.__libTmp = getThreads().filter(function (x) { return x.id !== id; });
     var ok = false;
-    try { (0, eval)("threads=window.__libTmp"); ok = true; } catch (e) {}
+    try { if (window.__appGlobals) { window.__appGlobals.threads = window.__libTmp; ok = true; } } catch (e) {}
     if (!ok) jset("ai_threads", window.__libTmp);
     delete window.__libTmp;
-    if (g("currentThreadId") === id) { try { (0, eval)("currentThreadId=null"); } catch (e) {} call("showLanding"); }
+    if (g("currentThreadId") === id) { try { if (window.__appGlobals) window.__appGlobals.currentThreadId = null; } catch (e) {} call("showLanding"); }
     var sb = g("sb"), u = g("currentUser");
     if (sb && u) { try { sb.from("threads").delete().eq("id", id).then(function () {}, function () {}); } catch (e) {} }
     call("saveThreads"); call("renderSpaces"); call("renderThreads");

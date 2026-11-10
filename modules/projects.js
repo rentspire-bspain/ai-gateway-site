@@ -14,7 +14,7 @@
 
   function jget(k, d) { try { var v = JSON.parse(LS.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
   function jset(k, v) { try { LS.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  function g(name) { try { return (0, eval)("typeof " + name + "!==\"undefined\"?" + name + ":undefined"); } catch (e) { return undefined; } }
+  function g(name) { try { return window.__appGlobals ? window.__appGlobals[name] : undefined; } catch (e) { return undefined; } }
   function call(name) { var f = g(name); if (typeof f === "function") { try { return f.apply(null, [].slice.call(arguments, 1)); } catch (e) { console.warn(name, e); } } }
   function uid() { return window.crypto && crypto.randomUUID ? crypto.randomUUID() : "p" + Date.now() + Math.random().toString(36).slice(2); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>\"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'" : "&#39;" }[c]; }); }
@@ -35,7 +35,7 @@
   function commitSpaces(list) {
     window.__pjTmp = list;
     var ok = false;
-    try { (0, eval)("spaces=window.__pjTmp"); ok = true; } catch (e) {}
+    try { if (window.__appGlobals) { window.__appGlobals.spaces = window.__pjTmp; ok = true; } } catch (e) {}
     delete window.__pjTmp;
     var saved = ok && typeof g("saveSpaces") === "function" ? call("saveSpaces") : undefined;
     if (saved === undefined) jset(SPACES_KEY, list); // no app fn or it threw -> persist ourselves

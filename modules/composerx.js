@@ -13,7 +13,7 @@
   var INPUTS = ["landingInput", "searchbarInput", "followupInput"];
   var mentions = [], menu = null, items = [], sel = 0, activeInput = null, atStart = -1;
 
-  function g(name) { try { return (0, eval)("typeof " + name + "!==\"undefined\"?" + name + ":undefined"); } catch (e) { return undefined; } }
+  function g(name) { try { return window.__appGlobals ? window.__appGlobals[name] : undefined; } catch (e) { return undefined; } }
   function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
   function arr(x) { return Array.isArray(x) ? x : []; }
 
