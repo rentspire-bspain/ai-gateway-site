@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-DGL6rT1MqfvT5+PW2Wj/Zt6aK1DpVFi7RwPfgvjhw/w=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-CEzcVxPAGgNCECZG/WKF1dVSCQ3WwwTc7PUg1HA3hEI=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -4236,11 +4236,24 @@ async function performSearch(query) {
       // DEEP RESEARCH MODE: submit a background Agent API run (high effort,
       // minutes-long), then poll until the report is ready. The searching
       // indicator stays live the whole time.
-      const submit = await fetch(GATEWAY + "/gateway-chat", {
+      const drSubmitOnce = () => fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
         body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(incognitoOn || thread.incognito ? { incognito: true } : {}), personalization: persona(), ...getSourcesFilter(), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
+      // Upstream rate limit (HTTP 429, Retry-After): show "rate-limited — retrying" and retry instead of failing hard.
+      let submit = await drSubmitOnce();
+      for (let drTry = 0; submit.status === 429 && drTry < 4; drTry++) {
+        let body429 = null; try { body429 = await submit.clone().json(); } catch {}
+        let ra = parseInt(submit.headers.get("Retry-After") || "", 10);
+        if (!(ra > 0)) ra = parseInt(body429 && body429.retry_after, 10);
+        if (!(ra > 0)) ra = 6;
+        if (body429 && /spend cap/i.test(String(body429.error || ""))) break;   // monthly cap is not transient
+        const lbl = document.querySelector(".searching-state .ap-label");
+        if (lbl && lbl.lastChild) lbl.lastChild.textContent = " — Deep research is rate-limited — retrying (attempt " + (drTry + 2) + " of 5)";
+        await new Promise(r => setTimeout(r, Math.min(30, ra) * 1000));
+        submit = await drSubmitOnce();
+      }
       if (submit.authExpired) { AuthGuard.expire(); throw AuthGuard.makeError(); }
       let sub = null; try { sub = await submit.json(); } catch {}
       if (!submit.ok) throw new Error((sub && (sub.error?.message ?? sub.error ?? sub.message)) || ("Deep research could not start (HTTP " + submit.status + ")."));

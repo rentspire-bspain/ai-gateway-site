@@ -347,6 +347,10 @@
           stopTimers();
           return;
         }
+        if (j.status === "queued" && /rate-limited/i.test(String(j.result || ""))) {
+          // server re-queued the job after an upstream 429: say so instead of looking stuck
+          if (panel) { var rn = panel.querySelector(".dr-note"); if (rn) rn.textContent = "Deep research is rate-limited \u2014 retrying"; }
+        }
         if (j.status === "running") setStep("researching");
         if (Date.now() - started > MAX_WAIT_MS) {
           stopTimers();
