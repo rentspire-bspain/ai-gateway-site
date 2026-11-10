@@ -130,6 +130,12 @@
 
   /* ---------- XLSX ---------- */
   function colName(i) { var s = ''; for (i++; i > 0; i = Math.floor((i - 1) / 26)) s = String.fromCharCode(65 + (i - 1) % 26) + s; return s; }
+  function colWidths(rows, maxc) { // per-column width from content (8..60 chars; single text column = 100)
+    if (maxc === 1) return '<col min="1" max="1" width="100" customWidth="1"/>';
+    var out = '';
+    for (var c = 0; c < maxc; c++) { var w = 8; rows.slice(0, 200).forEach(function (r) { var l = r[c] == null ? 0 : String(r[c]).length; if (l > w) w = l; }); out += '<col min="' + (c + 1) + '" max="' + (c + 1) + '" width="' + Math.min(60, w + 2) + '" customWidth="1"/>'; }
+    return out;
+  }
   function xlsx(src) {
     var blocks = toBlocks(src), sheets = [], used = {};
     function addSheet(name, rows) {
@@ -163,7 +169,7 @@
         }
         return '<row r="' + (ri + 1) + '">' + cells + '</row>';
       }).join('');
-      files.push(['xl/worksheets/sheet' + (i + 1) + '.xml', XML + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols><col min="1" max="' + maxc + '" width="' + (maxc === 1 ? 100 : 22) + '" customWidth="1"/></cols><sheetData>' + data + '</sheetData></worksheet>']);
+      files.push(['xl/worksheets/sheet' + (i + 1) + '.xml', XML + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' + (s.rows.length > 1 && maxc > 1 ? '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' : '') + '<cols>' + colWidths(s.rows, maxc) + '</cols><sheetData>' + data + '</sheetData>' + (s.rows.length > 1 && maxc > 1 ? '<autoFilter ref="A1:' + colName(maxc - 1) + s.rows.length + '"/>' : '') + '</worksheet>']);
       ov.push(['/xl/worksheets/sheet' + (i + 1) + '.xml', 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml']);
       wbRels.push(['rId' + (i + 1), 'worksheet', 'worksheets/sheet' + (i + 1) + '.xml']);
     });

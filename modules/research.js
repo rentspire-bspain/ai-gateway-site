@@ -62,7 +62,7 @@
 
   function ensureCss() {
     if (document.querySelector('link[href*="research.css"]')) return;
-    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "modules/research.css"; document.head.appendChild(l);
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "/modules/research.css"; document.head.appendChild(l);
   }
 
   // ---- app reachability (index.html classic-script globals are on window) ----

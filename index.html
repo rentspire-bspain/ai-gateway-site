@@ -1,32 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-mJ8aqpdpSEbXRojxyDP48NZpkM/OiQXwdYkZm2RaC1s=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-PoA5OkjFR0U4FBfQPpgqfskG9UN5jKDID/EVYPBwhrg=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ai.spaincos.com — Where knowledge begins</title>
-<link rel="icon" type="image/webp" href="favicon.webp">
-<link rel="manifest" href="manifest.webmanifest">
+<script src="/spa-restore.js"></script>
+<link rel="icon" type="image/webp" href="/favicon.webp">
+<link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#14646B">
 <meta name="app-version" content="v84">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ai.spaincos">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://frontend-cdn.perplexity.ai" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2" crossorigin>
-<link rel="stylesheet" href="modules/composerx.css">
-<link rel="stylesheet" href="modules/settings.css">
-<link rel="stylesheet" href="modules/artifacts.css">
-<link rel="stylesheet" href="modules/cards.css">
-<link rel="stylesheet" href="modules/research.css">
-<link rel="stylesheet" href="modules/siteassets.css">
-<link rel="stylesheet" href="modules/sources.css">
-<link rel="stylesheet" href="modules/media.css">
-<link rel="stylesheet" href="modules/export.css">
-<link rel="stylesheet" href="modules/voice-convo.css">
+<link rel="stylesheet" href="/modules/composerx.css">
+<link rel="stylesheet" href="/modules/settings.css">
+<link rel="stylesheet" href="/modules/artifacts.css">
+<link rel="stylesheet" href="/modules/cards.css">
+<link rel="stylesheet" href="/modules/research.css">
+<link rel="stylesheet" href="/modules/siteassets.css">
+<link rel="stylesheet" href="/modules/sources.css">
+<link rel="stylesheet" href="/modules/media.css">
+<link rel="stylesheet" href="/modules/export.css">
+<link rel="stylesheet" href="/modules/voice-convo.css">
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
 @font-face { font-family: "pplxSans"; src: url("https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
@@ -1632,6 +1633,35 @@ let threads = safeLSArray("ai_threads");
 })();
 let currentThreadId = null;
 function setCurrentThread(id) { currentThreadId = id || null; try { if (id) sessionStorage.setItem("ai_current_thread", id); else sessionStorage.removeItem("ai_current_thread"); } catch (e) {} }
+// ---- thread slugs: /t/<slug> (or /t/<uuid> fallback) ----
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function slugifyTitle(title) {
+  const words = String(title || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/).filter(Boolean).slice(0, 8);
+  let s = words.join("-"); if (s.length > 60) s = s.slice(0, 60).replace(/-[^-]*$/, "") || s.slice(0, 60);
+  return s || "thread";
+}
+function ensureSlug(t) {
+  if (!t || t.slug) return t && t.slug;
+  const base = slugifyTitle(t.title); let s = base, n = 2;
+  while (threads.some(x => x !== t && x.slug === s)) s = base + "-" + (n++);
+  t.slug = s; return s;
+}
+function threadPath(t) { return "/t/" + encodeURIComponent((t && (t.slug || (t.incognito ? "" : ""))) || (t && t.id) || ""); }
+function threadFromPath(p) {
+  const m = /^\/t\/([^\/?#]+)/.exec(p || ""); if (!m) return null; const k = decodeURIComponent(m[1]);
+  return threads.find(t => t.slug === k || t.id === k) || null;
+}
+function syncUrl(t, replace) {
+  try {
+    const want = t && !t.incognito ? threadPath(t) : "/";
+    if (location.pathname === want) return;
+    history[replace ? "replaceState" : "pushState"]({ tid: t ? t.id : null }, "", want + location.search.replace(/^\?$/, ""));
+  } catch (e) {}
+}
+window.addEventListener("popstate", () => {
+  const t = threadFromPath(location.pathname);
+  if (t) loadThread(t.id, true); else { setCurrentThread(null); showLanding(); renderThreads(); }
+});
 let isSearching = false;
 let currentUser = null;
 // v76: one-time thread timestamp backfill (Library date groups / Usage counts)
@@ -2529,7 +2559,9 @@ let threadsSynced = false;
 async function pushThreadToServer(t) {
   if (!t || !currentUser) return;
   try {
-    await sb.from("threads").upsert({ id: t.id, title: t.title, user_id: currentUser.id, space_id: t.spaceId || null });
+    const row = { id: t.id, title: t.title, user_id: currentUser.id, space_id: t.spaceId || null };
+    const { data: up } = await sb.from("threads").upsert(row).select("slug").maybeSingle();
+    if (up && up.slug && up.slug !== t.slug) { t.slug = up.slug; if (currentThreadId === t.id) syncUrl(t, true); }
   } catch (e) { /* offline-tolerant: localStorage still has it */ }
 }
 async function pushThreadMessages(t) {
@@ -2545,7 +2577,7 @@ async function syncThreadsFromServer() {
   if (!currentUser || threadsSynced) return;
   threadsSynced = true;
   try {
-    const { data: remote, error } = await sb.from("threads").select("id,title,updated_at,space_id").order("updated_at", { ascending: false }).limit(50);
+    const { data: remote, error } = await sb.from("threads").select("id,title,slug,updated_at,space_id").order("updated_at", { ascending: false }).limit(50);
     if (error) return;
     const remoteIds = new Set((remote || []).map(r => r.id));
     // load remote messages for threads we don't have locally cached
@@ -2555,7 +2587,7 @@ async function syncThreadsFromServer() {
     const need = [];
     for (const rt of (remote || [])) {
       const local = byId.get(rt.id);
-      if (local && local.messages.length) { local.spaceId = local.spaceId || rt.space_id || null; continue; } // local cache is richer
+      if (local && local.messages.length) { local.spaceId = local.spaceId || rt.space_id || null; if (rt.slug) local.slug = rt.slug; continue; } // local cache is richer
       need.push(rt);
     }
     const msgsByThread = new Map();
@@ -2572,7 +2604,7 @@ async function syncThreadsFromServer() {
         if (!rows || rows.length < PAGE) break;
       }
     }
-    for (const rt of need) byId.set(rt.id, { id: rt.id, title: rt.title, spaceId: rt.space_id || null, messages: msgsByThread.get(rt.id) || [] });
+    for (const rt of need) byId.set(rt.id, { id: rt.id, title: rt.title, slug: rt.slug || null, spaceId: rt.space_id || null, messages: msgsByThread.get(rt.id) || [] });
     // v84: threads created/loaded while the awaits above were in flight must survive the merge —
     // dropping them left currentThreadId pointing at nothing, so the next follow-up started a NEW thread.
     for (const lt of threads) if (!byId.has(lt.id)) byId.set(lt.id, lt);
@@ -2594,6 +2626,8 @@ async function syncThreadsFromServer() {
     }
     saveThreads();
     renderThreads();
+    const dl = threadFromPath(location.pathname); // deep link that needed the server list
+    if (dl && currentThreadId !== dl.id) loadThread(dl.id, true);
   } catch (e) { /* offline-tolerant */ }
 }
 function saveThreads() {
@@ -2650,7 +2684,7 @@ function renderThreads() {
       if (name && name.trim()) { t.title = name.trim().slice(0, 60); saveThreads(); pushThreadToServer(t); renderThreads(); }
     }));
     actions.appendChild(mkBtn("Share", '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4M12 2v13"/></svg>', () => {
-      navigator.clipboard.writeText(location.href).then(() => {}, () => {});
+      navigator.clipboard.writeText(location.origin + threadPath(t)).then(() => {}, () => {});
     }));
     actions.appendChild(mkBtn("Delete", '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>', () => {
       if (!confirm("Delete this thread?")) return;
@@ -2665,7 +2699,7 @@ function renderThreads() {
   });
 }
 function newThread() {
-  setCurrentThread(null);
+  setCurrentThread(null); syncUrl(null, false);
   showLanding();
   renderThreads();
 }
@@ -2676,14 +2710,16 @@ function createThread(title) {
   threads.unshift(thread);
   if (threads.length > 50) threads = threads.slice(0, 50);
   setCurrentThread(thread.id);
+  if (!thread.incognito) { ensureSlug(thread); syncUrl(thread, false); }
   saveThreads();
   renderThreads();
   return thread;
 }
-async function loadThread(id) {
+async function loadThread(id, fromNav) {
   const thread = threads.find(t => t.id === id);
   if (!thread) return;
   setCurrentThread(id);
+  if (!thread.incognito) { ensureSlug(thread); syncUrl(thread, !!fromNav); }
   if (!!thread.incognito !== incognitoOn) { // opening a thread of the other kind switches the mode indicator
     incognitoOn = !!thread.incognito;
     document.getElementById("incognitoToggle").classList.toggle("active", incognitoOn);
@@ -4028,7 +4064,7 @@ function renderAnswer(container, text, sources, related, images, meta) {
   shareBtn.onclick = async () => {
     try {
       if (navigator.share && window.matchMedia("(pointer: coarse)").matches) { await navigator.share({ title: document.title, url: location.href }); return; }
-      await navigator.clipboard.writeText(location.href);
+      await navigator.clipboard.writeText(location.origin + threadPath(t));
       shareBtn.classList.add("active");
       setTimeout(() => shareBtn.classList.remove("active"), 1500);
     } catch {}
@@ -4584,7 +4620,7 @@ async function loadStatus(force) {
   const sync = () => bar.classList.toggle("show", navigator.onLine === false);
   window.addEventListener("offline", sync); window.addEventListener("online", sync); sync();
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
-    window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+    window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(() => {}); });
   }
   let deferred = null;
   const btn = document.getElementById("installAppBtn");
@@ -4606,7 +4642,8 @@ async function loadStatus(force) {
   if (document.readyState === "loading") await new Promise(r => document.addEventListener("DOMContentLoaded", r, { once: true }));
   // v84: restore the active thread after a reload so a follow-up continues it instead of starting a new one
   try {
-    const sid = sessionStorage.getItem("ai_current_thread");
+    const dl0 = threadFromPath(location.pathname);
+    const sid = dl0 ? dl0.id : sessionStorage.getItem("ai_current_thread");
     if (sid && !/[?&]share=/.test(location.search) && threads.some(t => t.id === sid && (t.messages || []).length)) await loadThread(sid);
   } catch (e) {}
   const authed = await authP;
@@ -4641,29 +4678,29 @@ async function loadStatus(force) {
 })();
 </script>
 <div id="moduleRoot"></div>
-<script src="modules/settings.js"></script>
-<script src="modules/connectors.js"></script>
-<script src="modules/skills.js"></script>
-<script src="modules/artifacts.js"></script>
-<script src="modules/cards.js"></script>
-<script src="modules/tasks.js"></script>
-<script src="modules/monitors.js"></script>
-<script src="modules/research.js"></script>
-<script src="modules/projects.js"></script>
-<script src="modules/safe-url.js"></script>
-<script src="modules/siteassets.js"></script>
-<script src="modules/composerx.js"></script>
-<script src="modules/skills-actions.js"></script>
-<script src="modules/plugins.js"></script>
-<script src="modules/settings-security.js"></script>
-<script src="modules/settings-org.js"></script>
-<script src="modules/voice-convo.js"></script>
-<script src="modules/artifacts-files.js"></script>
-<script src="modules/artifacts-gallery.js"></script>
-<script src="modules/repo-pr.js"></script>
-<script src="modules/sources.js"></script>
-<script src="modules/media.js"></script>
-<script src="modules/export.js"></script>
+<script src="/modules/settings.js"></script>
+<script src="/modules/connectors.js"></script>
+<script src="/modules/skills.js"></script>
+<script src="/modules/artifacts.js"></script>
+<script src="/modules/cards.js"></script>
+<script src="/modules/tasks.js"></script>
+<script src="/modules/monitors.js"></script>
+<script src="/modules/research.js"></script>
+<script src="/modules/projects.js"></script>
+<script src="/modules/safe-url.js"></script>
+<script src="/modules/siteassets.js"></script>
+<script src="/modules/composerx.js"></script>
+<script src="/modules/skills-actions.js"></script>
+<script src="/modules/plugins.js"></script>
+<script src="/modules/settings-security.js"></script>
+<script src="/modules/settings-org.js"></script>
+<script src="/modules/voice-convo.js"></script>
+<script src="/modules/artifacts-files.js"></script>
+<script src="/modules/artifacts-gallery.js"></script>
+<script src="/modules/repo-pr.js"></script>
+<script src="/modules/sources.js"></script>
+<script src="/modules/media.js"></script>
+<script src="/modules/export.js"></script>
 <script>
 // perf: on-demand modules + non-blocking stylesheets. These five overlays are only reachable through a click, so
 // their JS (and CSS) is fetched the first time they are opened — and prefetched at idle so the click is instant.

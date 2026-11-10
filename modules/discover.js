@@ -52,7 +52,7 @@
 
   function ensureCss() {
     if (document.querySelector('link[href*="discover.css"]')) return;
-    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "modules/discover.css"; document.head.appendChild(l);
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "/modules/discover.css"; document.head.appendChild(l);
   }
 
   function refresh() {

@@ -44,7 +44,7 @@
 
   function ensureCss() {
     if (document.querySelector('link[href*="apikeys.css"]')) return;
-    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "modules/apikeys.css"; document.head.appendChild(l);
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "/modules/apikeys.css"; document.head.appendChild(l);
   }
 
   function refresh() {

@@ -10,7 +10,7 @@
     { key: "openai", label: "OpenAI", full: "OpenAI" },
     { key: "perplexity", label: "Perplexity", full: "Perplexity" }
   ];
-  var DATA_PATH = "modules/data/docs-";
+  var DATA_PATH = "/modules/data/docs-";
 
   var state = {
     vendor: "claude",

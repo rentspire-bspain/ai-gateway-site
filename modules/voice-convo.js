@@ -1,6 +1,6 @@
 /* Hands-free voice conversation mode for ai.spaincos.com.
  * Integration (one line, before </body>, after the main script):
- *   <script src="modules/voice-convo.js"></script>
+ *   <script src="/modules/voice-convo.js"></script>
  * Self-wires: loads voice-convo.css, adds a "Talk" header button, wraps global
  * performSearch/speakAnswer (both are global function declarations).
  * Loop: listen -> silence (SILENCE_MS) -> auto-send -> thinking -> speak answer -> listen.
@@ -16,7 +16,7 @@
 
   function cssLoad() {
     var s = document.currentScript || document.querySelector('script[src$="voice-convo.js"]');
-    var href = s && s.src ? s.src.replace(/voice-convo\.js.*$/, "voice-convo.css") : "modules/voice-convo.css";
+    var href = s && s.src ? s.src.replace(/voice-convo\.js.*$/, "voice-convo.css") : "/modules/voice-convo.css";
     var l = document.createElement("link"); l.rel = "stylesheet"; l.href = href; document.head.appendChild(l);
   }
   function buildUI() {

@@ -20,7 +20,7 @@
   }
   function ensureCss() {
     if (document.querySelector('link[href*="hubs.css"]')) return;
-    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "modules/hubs.css"; document.head.appendChild(l);
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "/modules/hubs.css"; document.head.appendChild(l);
   }
   function user() {
     try { var c = client(); return c.auth.getSession().then(function (r) { return r && r.data && r.data.session ? r.data.session.user : null; }); } catch (e) { return Promise.resolve(null); }

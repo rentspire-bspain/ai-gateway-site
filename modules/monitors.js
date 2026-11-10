@@ -2,7 +2,7 @@
   "use strict";
   var URL_ = "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/monitors";
   var INTERVALS = [[15, "Every 15 min"], [30, "Every 30 min"], [60, "Every hour"], [360, "Every 6 hours"], [720, "Every 12 hours"], [1440, "Every 24 hours"]];
-  var root = null, tab = "monitors", monitors = [], events = [], timer = null;
+  var root = null, tab = "scheduled", monitors = [], events = [], timer = null;
   var workflows = [], runs = [], prefs = null, pcfg = null, pushCount = 0, draft = null, openRun = null, notice = "";
   var state = { loading: true, setup: false, error: "", running: {}, editing: null, creating: false, wfRunning: {} };
 
@@ -41,7 +41,7 @@
 
   function ensureCss() {
     if (document.querySelector('link[href*="monitors.css"]')) return;
-    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "modules/monitors.css"; document.head.appendChild(l);
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "/modules/monitors.css"; document.head.appendChild(l);
   }
 
   function refresh() {
@@ -221,9 +221,16 @@
     var body = root.querySelector(".tk-body"), scroll = body ? body.scrollTop : 0;
     var u = unread();
     root.querySelector(".tk-tabs").innerHTML =
+      (window.ScheduledTasks ? '<button class="tk-tab' + (tab === "scheduled" ? " active" : "") + '" data-tab="scheduled">Scheduled</button>' : '') +
       '<button class="tk-tab' + (tab === "monitors" ? " active" : "") + '" data-tab="monitors">Monitors</button>' +
       '<button class="tk-tab' + (tab === "workflows" ? " active" : "") + '" data-tab="workflows">Workflows</button>' +
       '<button class="tk-tab' + (tab === "inbox" ? " active" : "") + '" data-tab="inbox">Inbox' + (u ? ' <span class="tk-count">' + u + '</span>' : "") + '</button>';
+    if (tab === "scheduled" && !window.ScheduledTasks) tab = "monitors";
+    // Scheduled tab is owned by modules/tasks.js (own state/polling): mount once, never re-render it from monitor polling.
+    if (tab === "scheduled") {
+      if (!body.querySelector(".st-wrap")) { body.textContent = ""; window.ScheduledTasks.mount(body, { close: close }); }
+      return;
+    }
     var h;
     if (state.loading) h = '<div class="tk-msg">Connecting…</div>';
     else if (state.setup) h = '<div class="tk-msg">Tasks isn\'t set up yet. The monitors service is still being deployed — please check back shortly.</div>';
@@ -250,6 +257,7 @@
     var t = ev.target.closest("[data-tab],[data-act],.tk-x"); if (!t) return;
     if (t.classList.contains("tk-x")) return close();
     if (t.dataset.tab) { tab = t.dataset.tab; render(); if (tab === "inbox") refreshEvents(); return; }
+    if (tab === "scheduled") return;   // the Scheduled tab (modules/tasks.js) handles its own clicks
     var act = t.dataset.act;
     if (tab === "workflows" || act === "push-on" || act === "push-off" || act === "notify-test") { if (handleExtra(act, t)) return; }
     var card = t.closest("[data-id]"), id = card && card.dataset.id, m = id && find(id);

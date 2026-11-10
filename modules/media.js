@@ -8,9 +8,9 @@
   var FN = ((typeof GATEWAY !== "undefined" && GATEWAY) || "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1") + "/media-gen";
   var overlay = null, results = [], busy = false;
 
-  // Self-load companion assets (so index.html only needs ONE <script src="modules/media.js">).
+  // Self-load companion assets (so index.html only needs ONE <script src="/modules/media.js">).
   (function loadCompanions() {
-    var cs = document.currentScript, base = cs && cs.src ? cs.src.replace(/[^/]*$/, "") : "modules/";
+    var cs = document.currentScript, base = cs && cs.src ? cs.src.replace(/[^/]*$/, "") : "/modules/";
     function css(n) { if (document.querySelector('link[data-mg="' + n + '"]')) return; var l = document.createElement("link"); l.rel = "stylesheet"; l.href = base + n; l.setAttribute("data-mg", n); document.head.appendChild(l); }
     css("media.css"); css("media-labs.css");
     if (!window.MediaLabs && !document.querySelector('script[data-mg="labs"]')) { var s = document.createElement("script"); s.src = base + "media-labs.js"; s.defer = true; s.setAttribute("data-mg", "labs"); document.head.appendChild(s); }
