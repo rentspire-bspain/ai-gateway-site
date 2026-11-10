@@ -466,11 +466,20 @@
               });
               rowEl.appendChild(del);
             }
-            rowEl.appendChild(makeToggle(c.enabled, function (on) {
-              var items = connectorList();
-              var i = items.findIndex(function (x) { return x.id === c.id; });
-              if (i >= 0) { items[i].enabled = on; saveConnectors(items); }
-            }, c.name));
+            // Honesty: only connectors with a real authenticated data pipe are toggleable.
+            // The rest render as "Coming soon" until wave-2 connectors ship.
+            var LIVE_CONNECTOR_IDS = ["gmail-gcal"];
+            if (LIVE_CONNECTOR_IDS.indexOf(c.id) >= 0) {
+              rowEl.appendChild(makeToggle(c.enabled, function (on) {
+                var items = connectorList();
+                var i = items.findIndex(function (x) { return x.id === c.id; });
+                if (i >= 0) { items[i].enabled = on; saveConnectors(items); }
+              }, c.name));
+            } else {
+              var soon = el("span", "stg-conn-soon", "Coming soon");
+              soon.title = "This connector isn't wired to your data yet — the assistant can't reference it. It becomes a real toggle when its connection ships.";
+              rowEl.appendChild(soon);
+            }
             wrap.appendChild(rowEl);
           });
         });
