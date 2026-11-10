@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-FI/G8GwC3+LCLaQbv4DplOUP3436GUVJENayGvlNTu4=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-9Vka2h01V2bUjy2B1gPX4zCxeve9E13BsAOJ9/VPM10=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2641,14 +2641,20 @@ function showResults() {
 
 // ============ AUTH ============
 const authOverlay = document.getElementById("authOverlay");
-// v72: private-site lock — only the owner's account (plus the QA test account) may
-// use ai.spaincos.com. Anyone else is signed out and blocked at sign-in.
-const ALLOWED_EMAILS = ["bspain@spaincos.com", "eval-bot@spaincos.com"];
+// v72: private-site lock — only allowlisted accounts may use ai.spaincos.com.
+// v91: the allowlist is now LIVE (org_allowlist table, managed from Settings → Team).
+// Invites update it instantly — no code deploy needed to admit someone.
+async function signinAllowed(email) {
+  try {
+    const { data } = await sb.rpc("is_signin_allowed", { p_email: String(email || "").toLowerCase() });
+    return data === true;
+  } catch (e) { return false; }
+}
 async function checkAuth() {
   if (/[?&]share=/.test(location.search)) return true; // v79: public read-only share links bypass the login gate (ShareView owns the screen)
   const { data } = await sb.auth.getSession();
   if (data?.session?.user?.email) {
-    if (!ALLOWED_EMAILS.includes(data.session.user.email.toLowerCase())) {
+    if (!(await signinAllowed(data.session.user.email))) {
       // not on the allowlist — sign them out and keep the site blocked
       await sb.auth.signOut();
       currentUser = null;
@@ -2769,7 +2775,7 @@ document.getElementById("authPasswordBtn").onclick = async () => {
   const email = document.getElementById("authEmail").value.trim();
   const password = document.getElementById("authPassword").value;
   if (!email || !password) return err.textContent = "Enter your email and password.";
-  if (!ALLOWED_EMAILS.includes(email.toLowerCase())) return err.textContent = "This site is private.";
+  if (!(await signinAllowed(email))) return err.textContent = "This site is invite-only — ask the owner to invite your email.";
   const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { err.textContent = error.message; err.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
   authOverlay.style.display = "none";
@@ -2785,7 +2791,7 @@ document.getElementById("authPasskeyBtn").onclick = async () => {
     }
     const { data, error: pkErr } = await sb.auth.signInWithWebAuthn();
     if (pkErr) return err.textContent = pkErr.message;
-    if (data?.session?.user?.email && !ALLOWED_EMAILS.includes(data.session.user.email.toLowerCase())) {
+    if (data?.session?.user?.email && !(await signinAllowed(data.session.user.email))) {
       await sb.auth.signOut();
       return err.textContent = "This site is private.";
     }
@@ -2800,7 +2806,7 @@ document.getElementById("authSendCode").onclick = async () => {
   err.textContent = "";
   const email = document.getElementById("authEmail").value.trim();
   if (!email) return err.textContent = "Enter your email";
-  if (!ALLOWED_EMAILS.includes(email.toLowerCase())) return err.textContent = "This site is private.";
+  if (!(await signinAllowed(email))) return err.textContent = "This site is invite-only — ask the owner to invite your email.";
   const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
   if (error) {
     // v74: friendly rate-limit message instead of Supabase's raw 429 text

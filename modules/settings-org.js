@@ -177,9 +177,24 @@
       if (!validEmail(email)) { status.textContent = "Enter a valid email address."; emailInput.focus(); return; }
       inviteBtn.disabled = true;
       api({ action: "invite", email: email, role: roleSel.value })
-        .then(function () {
+        .then(function (r) {
           emailInput.value = "";
-          status.textContent = "";
+          if (r && r.temp_password) {
+            status.innerHTML = "";
+            var box = document.createElement("div");
+            box.className = "org-invite-pw";
+            box.style.cssText = "margin:8px 0;padding:10px 12px;border:1px solid var(--border,#26282E);border-radius:10px;background:rgba(127,180,255,.08)";
+            var l1 = document.createElement("div"); l1.textContent = "Account created for " + email + "."; l1.style.marginBottom = "4px";
+            var l2 = document.createElement("div"); l2.textContent = "One-time password (shown only here — copy and share it with them):"; l2.style.marginBottom = "4px"; l2.style.opacity = ".8";
+            var pw = document.createElement("code"); pw.textContent = r.temp_password; pw.style.cssText = "font-size:14px;padding:2px 8px;border-radius:6px;background:rgba(127,180,255,.15);word-break:break-all";
+            var l3 = document.createElement("div"); l3.textContent = "They sign in with this email + password, and can change it in Settings."; l3.style.marginTop = "6px"; l3.style.opacity = ".7"; l3.style.fontSize = "12px";
+            box.appendChild(l1); box.appendChild(l2); box.appendChild(pw); box.appendChild(l3);
+            status.appendChild(box);
+          } else if (r && r.note) {
+            status.textContent = r.note;
+          } else {
+            status.textContent = "Invited.";
+          }
           refresh();
         })
         .catch(function (e) { status.textContent = errText(e); })
@@ -192,7 +207,7 @@
     inviteForm.appendChild(inviteBtn);
     pane.appendChild(inviteForm);
     pane.appendChild(el("p", "stg-empty-note",
-      "Invites add the email to the member list and the sign-in allowlist. The teammate activates their account by signing in with that email."));
+      "Invites create the sign-in account and add the email to the sign-in allowlist. A one-time password is shown to you when you invite — share it with them directly."));
 
     // ---- allowlist ----
     pane.appendChild(el("div", "stg-group-label", "Sign-in allowlist"));
@@ -220,7 +235,7 @@
     pane.appendChild(allowWrap);
     pane.appendChild(allowForm);
     pane.appendChild(el("p", "stg-empty-note",
-      "The allowlist gates who can sign in to this site. (Wiring it into the sign-in form is a separate step.)"));
+      "The allowlist gates who can sign in to this site — only emails on this list can log in."));
 
     // ---- status + refresh ----
     pane.insertBefore(status, membersWrap);
