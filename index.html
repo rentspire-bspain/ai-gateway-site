@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-PoA5OkjFR0U4FBfQPpgqfskG9UN5jKDID/EVYPBwhrg=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-+Spp7COH2lNNyKul92mh4OxybPK0gLUsmDjb6ErNJ6M=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1173,7 +1173,7 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .followup-box:focus-within { border-color: var(--accent); }
 .followup-box svg { color: var(--text-faint); flex-shrink: 0; }
 .followup-box input, .followup-box textarea { flex: 1 1 100px; min-width: 0; font-size: 14.5px; line-height: 1.45; }
-.followup-box textarea { resize: none; overflow-y: auto; max-height: 200px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.followup-box textarea { resize: none; overflow-y: auto; min-height: 24px; max-height: 200px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .followup-box { position: relative; }
 .followup-inner { max-width: calc(var(--answer-w, 720px) + 120px); }
 .queued-msg { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(32,128,141,0.12); border: 1px dashed var(--accent); font-size: 13px; color: var(--text-muted); }
@@ -4497,7 +4497,7 @@ function submitQuery(query) {
   performSearch(query);
 }
 // Composer: auto-growing textarea, Enter sends / Shift+Enter newline, busy => message is queued (not dropped)
-function autosize(el) { el.style.height = "auto"; el.style.height = Math.min(el.scrollHeight, parseFloat(getComputedStyle(el).maxHeight) || 220) + "px"; }
+function autosize(el) { el.style.height = "auto"; const sh = el.scrollHeight; if (sh > 8) el.style.height = Math.min(sh, parseFloat(getComputedStyle(el).maxHeight) || 220) + "px"; }
 function wireComposer(inputId, sendId) {
   const el = document.getElementById(inputId), btn = document.getElementById(sendId);
   const send = () => { const v = el.value; if (!v.trim()) return; el.value = ""; autosize(el); submitQuery(v); };
