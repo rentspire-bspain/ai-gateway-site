@@ -16,7 +16,9 @@
   "use strict";
   var LS = window.localStorage, MAX = 512 * 1024, BUCKET = "site-assets";
   var KEYS = { favicon: "ai_site_favicon", logo: "ai_site_logo" };
-  var DEFAULT_DOMAIN = "spaincos.com";
+  // 2026-11-10: the default fetch target is the app itself — ai.spaincos.com serves favicon.webp.
+  // (spaincos.com is the marketing domain with no hosted site, so it has no favicon to fetch.)
+  var DEFAULT_DOMAIN = "ai.spaincos.com";
   var overlay = null, lastFocus = null, state = null;
 
   function g(name) { try { return window.__appGlobals ? window.__appGlobals[name] : undefined; } catch (e) { return undefined; } }
@@ -172,7 +174,7 @@
     p.appendChild(el("div", "sa-note", "Fetch an icon from a website, preview it, then apply it to this site. Nothing changes until you press Apply."));
     var row = el("div", "sa-row");
     var sel = el("select", "sa-sel"); [["favicon", "Favicon"], ["logo", "Logo"]].forEach(function (o) { var op = el("option", "", o[1]); op.value = o[0]; sel.appendChild(op); }); sel.value = state.kind;
-    var inp = el("input", "sa-input"); inp.type = "text"; inp.placeholder = "spaincos.com"; inp.value = opts.url || DEFAULT_DOMAIN; inp.setAttribute("aria-label", "Website URL");
+    var inp = el("input", "sa-input"); inp.type = "text"; inp.placeholder = "ai.spaincos.com"; inp.value = opts.url || DEFAULT_DOMAIN; inp.setAttribute("aria-label", "Website URL");
     var fetchBtn = el("button", "sa-btn primary", "Fetch"); fetchBtn.type = "button";
     row.appendChild(sel); row.appendChild(inp); row.appendChild(fetchBtn); p.appendChild(row);
     var status = el("div", "sa-status"); status.setAttribute("role", "status"); p.appendChild(status);
