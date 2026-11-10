@@ -1,0 +1,32 @@
+.cn-card{border:1px solid var(--border,#2a2d33);background:var(--bg-elevated,#1C1E23);border-radius:var(--radius,12px);padding:16px;margin:12px 0}
+.cn-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cn-logo{width:36px;height:36px;border-radius:50%;background:var(--accent-light,rgba(61,149,149,.14));color:var(--accent,#3D9595);display:flex;align-items:center;justify-content:center;font-weight:700}
+.cn-titles{flex:1;min-width:160px}
+.cn-title{font-weight:600;color:var(--text,#eee)}
+.cn-sub{font-size:13px;color:var(--text-muted,#9aa)}
+.cn-sub.on{color:var(--accent,#3D9595)}
+.cn-actions{display:flex;gap:8px;flex-wrap:wrap}
+.cn-danger{color:#e5736f}
+.cn-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.cn-li{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted,#9aa)}
+.cn-li.on{color:var(--text,#eee)}
+.cn-dot{width:8px;height:8px;border-radius:50%;background:var(--border,#2a2d33)}
+.cn-li.on .cn-dot{background:var(--accent,#3D9595)}
+.cn-li-t{flex:1}.cn-li-s{font-size:12px}
+.cn-note{font-size:12px;color:var(--text-muted,#9aa);margin:12px 0 0;line-height:1.5}
+.cn-msg{margin-top:10px;padding:8px 10px;border-radius:var(--radius-sm,8px);font-size:13px}
+.cn-msg.ok{background:rgba(61,149,149,.14);color:var(--accent-hover,#56ABAB)}
+.cn-msg.err{background:rgba(229,115,111,.14);color:#e5736f}
+.cn-msg.warn{background:rgba(230,180,80,.14);color:#e6b450}
+.cn-msg.info{background:var(--bg-surface,#1C1E23);color:var(--text-muted,#9aa)}
+.cn-acts{display:grid;gap:10px;margin:12px 0}
+.cn-act{border:1px solid var(--border,#2a2d33);background:var(--bg-elevated,#1C1E23);border-radius:var(--radius,12px);padding:14px;max-width:640px}
+.cn-act-title{font-weight:600;margin-bottom:8px;color:var(--text,#eee)}
+.cn-act-row{display:grid;grid-template-columns:90px 1fr;gap:8px;padding:4px 0;font-size:13px}
+.cn-act-k{color:var(--text-muted,#9aa)}
+.cn-act-v{color:var(--text,#eee);overflow-wrap:anywhere}
+.cn-act-v.pre{white-space:pre-wrap}
+.cn-act-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.cn-act-msg{font-size:13px;margin-top:8px}.cn-act-msg.ok{color:var(--accent-hover,#56ABAB)}.cn-act-msg.err{color:#e5736f}
+.cn-link{color:var(--accent,#3D9595)}
+@media (max-width:420px){.cn-act-row{grid-template-columns:1fr;gap:2px}}

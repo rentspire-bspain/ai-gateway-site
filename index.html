@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-GUw8/tiOoJwMuFCjyqc9yrUBXjZj7WW/Nag8Yr5R0Ys=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-wYpwKuSwkKppM0wcbJhCZn8vTRIIQ/9nA+QV2P3OCyg=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ai.spaincos.com — Where knowledge begins</title>
 <link rel="icon" type="image/webp" href="favicon.webp">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#14646B">
 <meta name="app-version" content="v84">
@@ -15,29 +14,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ai.spaincos">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://frontend-cdn.perplexity.ai" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2" crossorigin>
 <link rel="stylesheet" href="modules/composerx.css">
 <link rel="stylesheet" href="modules/settings.css">
-<link rel="stylesheet" href="modules/library.css">
-<link rel="stylesheet" href="modules/skills.css">
-<link rel="stylesheet" href="modules/docs.css">
 <link rel="stylesheet" href="modules/artifacts.css">
 <link rel="stylesheet" href="modules/cards.css">
 <link rel="stylesheet" href="modules/research.css">
-<link rel="stylesheet" href="modules/discover.css">
-<link rel="stylesheet" href="modules/apikeys.css">
-<link rel="stylesheet" href="modules/projects.css">
 <link rel="stylesheet" href="modules/siteassets.css">
 <link rel="stylesheet" href="modules/sources.css">
 <link rel="stylesheet" href="modules/media.css">
 <link rel="stylesheet" href="modules/export.css">
-<link rel="stylesheet" href="modules/settings-security.css">
-<link rel="stylesheet" href="modules/settings-org.css">
-<link rel="stylesheet" href="modules/skills-actions.css">
-<link rel="stylesheet" href="modules/plugins.css">
-<link rel="stylesheet" href="modules/hubs.css">
-<link rel="stylesheet" href="modules/repo-pr.css">
 <link rel="stylesheet" href="modules/voice-convo.css">
-<link rel="preconnect" href="https://frontend-cdn.perplexity.ai" crossorigin>
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
 @font-face { font-family: "pplxSans"; src: url("https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
@@ -76,9 +65,6 @@ body.incognito .question-header::after{content:"";}
 #installAppBtn.show{display:flex}
 @media(max-width:768px){.incognito-bar{top:52px}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js" integrity="sha384-XQqX/4yiUGu+oyr87jvWzRuqBUK/adrY0DunhL+tID9m/9dwSpV8h9Fk/Sg6ifVQ" crossorigin="anonymous"></script>
 <style>
 :root {
   /* Exact Perplexity dark theme (resolved values from perplexity.ai) */
@@ -743,18 +729,6 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.searching-text {
-  font-size: 14px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-.searching-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-faint);
-}
 .searching-step { display: flex; align-items: center; gap: 8px; }
 .searching-step.done { color: var(--text-muted); }
 .searching-step.done::before { content: "✓"; color: var(--accent); }
@@ -809,6 +783,39 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .link-row .lr-title { font-size:14px; font-weight:500; color:var(--accent); overflow-wrap:anywhere; }
 .link-row .lr-snip { font-size:12.5px; color:var(--text-muted); margin-top:2px; overflow-wrap:anywhere; }
 .source-card .src-num { font-size:10.5px; font-weight:600; color:var(--accent); margin-right:4px; }
+/* v94 citations polish — answer-top source cards, steps-box chips, richer Links rows */
+.sources-section { margin-bottom:16px; }
+.sources-head { display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--text-muted); margin:0 0 8px 2px; }
+.sources-head .sh-n { font-weight:500; color:var(--text-faint); }
+.sources-row { scroll-snap-type:x proximity; scrollbar-width:thin; padding:2px 2px 8px; margin:0 -2px; }
+.sources-row .source-card { width:172px; min-height:84px; display:flex; flex-direction:column; gap:6px; padding:9px 10px; text-decoration:none!important; color:var(--text)!important; scroll-snap-align:start; box-sizing:border-box; }
+.sources-row .source-card:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+.source-card .sc-top { display:flex; align-items:center; gap:6px; min-width:0; }
+.source-card .sc-fav { width:16px; height:16px; border-radius:4px; flex:0 0 16px; background:var(--bg-elevated); object-fit:cover; }
+.source-card .sc-fav.fb { display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--text-muted); border:1px solid var(--border); }
+.source-card .sc-dom { flex:1; min-width:0; font-size:11.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.source-card .sc-num { flex:0 0 auto; min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:999px; background:var(--bg-elevated); border:1px solid var(--border); color:var(--accent); font-size:10.5px; font-weight:600; line-height:16px; text-align:center; }
+.source-card .sc-title { font-size:12.5px; font-weight:500; line-height:1.35; color:var(--text); overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; word-break:break-word; }
+.source-card.sc-more { align-items:center; justify-content:center; text-align:center; width:108px; font:inherit; color:var(--text-muted)!important; background:var(--bg-surface); cursor:pointer; }
+.source-card.sc-more .sc-title { color:var(--text-muted); font-weight:600; -webkit-line-clamp:2; }
+.steps-chips { display:flex; flex-wrap:wrap; gap:5px; padding:3px 0 5px 12px; }
+.src-chip { display:inline-flex; align-items:center; gap:5px; max-width:200px; padding:2px 8px 2px 5px; border:1px solid var(--border); border-radius:999px; background:var(--bg-surface); color:var(--text-muted)!important; font-size:12px; line-height:18px; text-decoration:none!important; white-space:nowrap; box-sizing:border-box; }
+.src-chip:hover, .src-chip:focus-visible { border-color:var(--accent); color:var(--text)!important; outline:none; }
+.src-chip img, .src-chip .sc-fav { width:14px; height:14px; border-radius:3px; flex:0 0 14px; }
+.src-chip .sc-fav.fb { display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; border:1px solid var(--border); }
+.src-chip .cn { font-weight:600; color:var(--accent); font-size:11px; }
+.src-chip .cd { overflow:hidden; text-overflow:ellipsis; min-width:0; }
+.searching-phases .steps-chips { padding-left:20px; }
+.cite-card .cc-url { color:var(--text-faint); font-size:11.5px; overflow-wrap:anywhere; }
+.link-row { padding:12px 2px; }
+.link-row:hover { background:var(--bg-elevated); border-radius:8px; }
+.link-row .lr-dom img, .link-row .lr-dom .sc-fav { width:16px; height:16px; border-radius:4px; flex:0 0 16px; }
+.link-row .lr-dom .sc-fav.fb { display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; border:1px solid var(--border); }
+.link-row .lr-cited { margin-left:auto; flex:0 0 auto; font-size:11px; color:var(--text-faint); }
+.link-row .lr-title { font-size:15px; line-height:1.35; margin-top:2px; }
+.link-row .lr-snip { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; margin-top:4px; line-height:1.45; }
+.link-row .lr-url { font-size:11.5px; color:var(--text-faint); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width:768px) { .sources-row .source-card { width:150px; } .src-chip { max-width:170px; } }
 .side-nav { display:flex; flex-direction:column; gap:2px; padding:0 10px 6px; }
 .side-nav-btn { display:flex; align-items:center; gap:10px; width:100%; padding:7px 10px; border:none; border-radius:8px; background:transparent; color:var(--text-muted); font:inherit; font-size:13.5px; cursor:pointer; text-align:left; }
 .side-nav-btn:hover, .side-nav-btn:focus-visible { background:var(--bg-elevated); color:var(--text); outline:none; }
@@ -1199,6 +1206,15 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .answer-error-retry:disabled { opacity: 0.6; cursor: default; }
 .searching-phases .searching-step.done::before { content: none; }
 .searching-step.err { color: var(--error); }
+/* agentic: plan checklist (Steps box) — per-item pending / done / failed */
+.searching-step.plan-row { flex-wrap: wrap; }
+.plan-list { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; margin: 4px 0 2px 18px; padding: 0; list-style: none; }
+.plan-item { display: flex; align-items: baseline; gap: 7px; font-size: 12.5px; line-height: 1.4; color: var(--text-muted); font-weight: 400; overflow-wrap: anywhere; }
+.plan-item .pi-mark { flex: 0 0 14px; text-align: center; font-weight: 700; color: var(--text-faint); }
+.plan-item.done .pi-mark { color: var(--accent); }
+.plan-item.failed, .plan-item.failed .pi-mark { color: var(--error); }
+.plan-item.pending .pi-mark { font-weight: 400; }
+.plan-item .pi-ev { display: block; font-size: 11.5px; color: var(--text-faint); }
 .revised-badge { display:inline-block; margin-left:8px; padding:0 7px; border:1px solid var(--border-light); border-radius:999px; font-size:11px; line-height:17px; color:var(--text-muted); background:var(--bg-elevated); animation: revFade .6s ease; }
 @keyframes revFade { from { opacity:0; } to { opacity:1; } }
 @media (prefers-reduced-motion: reduce) { .revised-badge { animation:none; } }
@@ -1521,6 +1537,9 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js" integrity="sha384-XQqX/4yiUGu+oyr87jvWzRuqBUK/adrY0DunhL+tID9m/9dwSpV8h9Fk/Sg6ifVQ" crossorigin="anonymous"></script>
 <script>
 const SUPABASE_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
 const SUPABASE_ANON = "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb";
@@ -1559,8 +1578,10 @@ let threads = safeLSArray("ai_threads");
 // v83 (B8): incognito threads live in their own key with a 24h expiry; purged at boot
 (function () {
   const now = Date.now();
-  const live = safeLSArray("ai_incognito_threads").filter(t => t && t.expiresAt && t.expiresAt > now);
-  try { localStorage.setItem("ai_incognito_threads", JSON.stringify(live)); } catch (e) {}
+  const rawInc = safeLSArray("ai_incognito_threads");
+  const live = rawInc.filter(t => t && t.expiresAt && t.expiresAt > now);
+  // perf: skip the synchronous localStorage write at boot unless a thread actually expired
+  if (live.length !== rawInc.length) { try { localStorage.setItem("ai_incognito_threads", JSON.stringify(live)); } catch (e) {} }
   threads = threads.filter(t => t && !t.incognito).concat(live);
 })();
 let currentThreadId = null;
@@ -2766,7 +2787,7 @@ const accountMenu = (function () {
       const act = b.dataset.act;
       if (act === "theme") { themeToggle.click(); close(); return; }
       close();
-      if (act === "apikey") { window.ApiKeysUI && window.ApiKeysUI.open(); }
+      if (act === "apikey") { window.loadModule("apikeys").then(function () { window.ApiKeysUI && window.ApiKeysUI.open(); }); }
       else if (act === "settings") { window.SettingsUI && window.SettingsUI.open(); }
       else if (act === "kbd") { if (window.openShortcutsHelp) window.openShortcutsHelp(); }
       else if (act === "imp") { document.getElementById("importHistoryBtn").click(); }
@@ -2969,6 +2990,31 @@ function renderDegradedNote(container, phases, query) {
   }
   container.appendChild(note);
 }
+// agentic: plan checklist. Items carry {n,text,status:pending|done|failed,evidence?} (gateway v124); older gateways only sent a
+// glyph-prefixed title, shown as-is. Text is set via textContent only (model / web derived).
+function planItemsOf(p) {
+  return (p && p.kind === "plan" && Array.isArray(p.items) ? p.items : []).filter(i => i && (i.text || i.title));
+}
+function buildPlanList(items, cls) {
+  const ul = document.createElement("div");
+  ul.className = cls || "plan-list";
+  ul.setAttribute("role", "list");
+  items.slice(0, 8).forEach(i => {
+    const st = i.status === "done" ? "done" : i.status === "failed" ? "failed" : (i.status ? "pending" : "");
+    const li = document.createElement("div");
+    li.className = "plan-item" + (st ? " " + st : "");
+    li.setAttribute("role", "listitem");
+    const mark = document.createElement("span"); mark.className = "pi-mark";
+    mark.textContent = st === "done" ? "\u2713" : st === "failed" ? "\u2717" : (st ? "\u25cb" : "");
+    li.appendChild(mark);
+    const body = document.createElement("span");
+    body.textContent = i.text ? ((i.n != null ? i.n + ". " : "") + String(i.text).slice(0, 200)) : String(i.title || "").slice(0, 200);
+    if (i.evidence) { const ev = document.createElement("span"); ev.className = "pi-ev"; ev.textContent = String(i.evidence).slice(0, 200); body.appendChild(ev); }
+    li.appendChild(body);
+    ul.appendChild(li);
+  });
+  return ul;
+}
 function renderPhases(state, phases) {
   if (!state || !state.isConnected || !Array.isArray(phases)) return;
   let box = state.querySelector(".searching-phases");
@@ -2982,12 +3028,15 @@ function renderPhases(state, phases) {
   const t0 = Date.now();
   for (const p of phases) { // label comes from the server / the web: never innerHTML
     const row = document.createElement("div");
-    row.className = "searching-step " + (p.done ? "done" : "live") + (isDegradedPhase(p) ? " err" : "");
+    const planItems = planItemsOf(p);
+    row.className = "searching-step " + (p.done ? "done" : "live") + (isDegradedPhase(p) ? " err" : "") + (planItems.length ? " plan-row" : "");
     if (isDegradedPhase(p) || p.done) row.appendChild(document.createTextNode(isDegradedPhase(p) ? "\u26a0" : "\u2713"));
     else { const sp = document.createElement("span"); sp.className = "searching-spinner"; sp.style.cssText = "width:10px;height:10px;margin:0"; row.appendChild(sp); }
     row.appendChild(document.createTextNode(" " + String(p.label == null ? "" : p.label)));
     if (!p.done) { const tm = document.createElement("span"); tm.className = "step-timer"; tm.dataset.t0 = String(t0); row.appendChild(tm); }
+    if (planItems.length) row.appendChild(buildPlanList(planItems));
     box.appendChild(row);
+    if (p.kind === "search" && Array.isArray(p.items) && p.items.some(x => x && x.url)) { const chips = buildSrcChips(p.items, 18); if (chips) box.appendChild(chips); }
   }
   // v93: the pill's live agent count = running steps (min 1 — the pipeline itself is an agent)
   const pill = state.querySelector(".agents-pill");
@@ -3087,6 +3136,71 @@ function citeFavicon(domain) {
   im.onerror = function () { this.onerror = null; this.src = "https://icons.duckduckgo.com/ip3/" + domain + ".ico"; };
   return im;
 }
+// v94: favicon with a graceful end of the fallback chain (google s2 -> duckduckgo -> letter tile).
+// Always an <img> built with createElement (img-src allows https:); never innerHTML.
+function srcFavicon(domain, cls) {
+  const im = document.createElement("img");
+  im.className = "sc-fav" + (cls ? " " + cls : "");
+  im.alt = ""; im.loading = "lazy"; im.decoding = "async"; im.referrerPolicy = "no-referrer";
+  im.src = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(domain) + "&sz=32";
+  let tried = 0;
+  im.onerror = function () {
+    if (tried++ === 0) { this.src = "https://icons.duckduckgo.com/ip3/" + encodeURIComponent(domain) + ".ico"; return; }
+    this.onerror = null;
+    const fb = document.createElement("span");
+    fb.className = im.className + " fb"; fb.textContent = (String(domain || "?")[0] || "?").toUpperCase();
+    fb.setAttribute("aria-hidden", "true");
+    if (this.parentNode) this.parentNode.replaceChild(fb, this);
+  };
+  return im;
+}
+// v94: search sources carried by the phases SSE / x_phases (search step items: {title,url,domain,snippet?}).
+// The first finding is the synthesized live-search answer (not a page) — skip it; its URL reappears as a real source.
+const SYNTH_SRC_TITLE = /^(Perplexity Search \(live web\)|Image analysis \(vision\))$/i;
+function srcKey(u) { return String(u || "").replace(/#.*$/, "").replace(/\/+$/, ""); }
+function sourcesFromPhases(phases) {
+  const out = [], seen = new Set();
+  (Array.isArray(phases) ? phases : []).forEach(p => {
+    if (!p || p.kind !== "search" || !Array.isArray(p.items)) return;
+    p.items.forEach(it => {
+      if (!it || SYNTH_SRC_TITLE.test(String(it.title || ""))) return;
+      const url = SafeUrl.http(it.url); if (!url) return;
+      const k = srcKey(url); if (seen.has(k)) return; seen.add(k);
+      let host = ""; try { host = new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return; }
+      out.push({ url, domain: host, title: String(it.title || "").slice(0, 200), snippet: String(it.snippet || "").slice(0, 240) });
+    });
+  });
+  return out;
+}
+function mergeSources(primary, extra, cap) {
+  const out = [], seen = new Set();
+  (primary || []).concat(extra || []).forEach(s => {
+    if (!s || !s.url) return; const k = srcKey(s.url); if (seen.has(k) || out.length >= (cap || 20)) return;
+    seen.add(k); out.push(s);
+  });
+  return out;
+}
+// v94: compact favicon chips (steps box + live phases). items: [{title,url,domain,snippet}] — only http(s) items render.
+function buildSrcChips(items, limit) {
+  const list = sourcesFromPhases([{ kind: "search", items: items }]).slice(0, limit || 18);
+  if (list.length < 1) return null;
+  const wrap = document.createElement("div"); wrap.className = "steps-chips"; wrap.setAttribute("role", "list");
+  list.forEach((m, i) => {
+    const a = document.createElement("a"); a.className = "src-chip"; a.setAttribute("role", "listitem");
+    a.href = m.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+    const t = citeTitleFor(m.url, m.domain, m.title);
+    a.setAttribute("aria-label", "Source " + (i + 1) + ": " + m.domain + " — " + t);
+    a.appendChild(srcFavicon(m.domain));
+    const dd = document.createElement("span"); dd.className = "cd"; dd.textContent = m.domain; a.appendChild(dd);
+    const mm = { url: m.url, domain: m.domain, title: t, snippet: m.snippet };
+    a.addEventListener("mouseenter", () => showCiteCard(a, mm));
+    a.addEventListener("focus", () => showCiteCard(a, mm));
+    a.addEventListener("mouseleave", hideCiteCard);
+    a.addEventListener("blur", hideCiteCard);
+    wrap.appendChild(a);
+  });
+  return wrap;
+}
 function citeTitleFor(url, domain, text) {
   const t = String(text || "").trim();
   if (t && !/^\[?\d+\]?$/.test(t) && !/^https?:\/\//i.test(t)) return t;
@@ -3103,10 +3217,11 @@ function showCiteCard(chip, m) {
   const c = document.createElement("div");
   c.className = "cite-card";
   const d = document.createElement("div"); d.className = "cc-dom";
-  d.appendChild(citeFavicon(m.domain)); d.appendChild(document.createTextNode(m.domain));
+  d.appendChild(srcFavicon(m.domain)); d.appendChild(document.createTextNode(m.domain));
   const t = document.createElement("div"); t.className = "cc-title"; t.textContent = m.title;
   c.appendChild(d); c.appendChild(t);
   if (m.snippet) { const sn = document.createElement("div"); sn.className = "cc-snip"; sn.textContent = m.snippet; c.appendChild(sn); }
+  else if (m.url) { const ur = document.createElement("div"); ur.className = "cc-url"; ur.textContent = m.url.replace(/^https?:\/\/(www\.)?/, "").slice(0, 120); c.appendChild(ur); }
   document.body.appendChild(c);
   const r = chip.getBoundingClientRect(), cw = c.offsetWidth, ch = c.offsetHeight;
   let left = Math.max(8, Math.min(r.left, window.innerWidth - cw - 8));
@@ -3127,7 +3242,7 @@ function buildCitations(content, sources) {
       if (snippet && !m.snippet) m.snippet = snippet;
       return idx.get(url);
     }
-    master.push({ url, domain: host, title: citeTitleFor(url, host, title), snippet: snippet || "" });
+    master.push({ url, domain: host, title: citeTitleFor(url, host, title), snippet: snippet || "", cites: 0 });
     idx.set(url, master.length - 1);
     return master.length - 1;
   };
@@ -3139,7 +3254,7 @@ function buildCitations(content, sources) {
     if (!/^\[?\d+\]?$/.test(a.textContent.trim())) return;
     const i = idx.get(a.href);
     if (i === undefined) return;
-    const m = master[i];
+    const m = master[i]; m.cites++;
     // strip bracket text nodes wrapping the link: "[" <a>1</a> "]"
     const prev = a.previousSibling, next = a.nextSibling;
     if (prev && prev.nodeType === 3 && /\[\s*$/.test(prev.nodeValue) && next && next.nodeType === 3 && /^\s*\]/.test(next.nodeValue)) {
@@ -3217,6 +3332,7 @@ function renderMath(root) {
 // ===== v83 (A8/H3): steps list + council badge =====
 function stepGroup(p) {
   const k = String(p.kind || "");
+  if (k === "plan") return "Planned";
   if (k === "search") return "Searched";
   if (k === "read") return "Read";
   if (k) return "Reasoned";
@@ -3228,7 +3344,13 @@ function stepGroup(p) {
 function compactSteps(phases) {
   return (Array.isArray(phases) ? phases : []).filter(p => p && p.label && !(p.kind === "draft" && !p.done)).map(p => ({
     label: String(p.label).slice(0, 200), kind: p.kind || "", done: true,
-    items: (Array.isArray(p.items) ? p.items : []).slice(0, 8).map(i => ({ title: String(i.title || "").slice(0, 160), domain: i.domain || "" }))
+    items: (Array.isArray(p.items) ? p.items : []).slice(0, p.kind === "search" ? 18 : 8).map(i => {
+      const o = { title: String(i.title || "").slice(0, 160), domain: i.domain || "" };
+      if (i.status) { o.n = Number(i.n) || 0; o.text = String(i.text || "").slice(0, 200); o.status = String(i.status).slice(0, 8); if (i.evidence) o.evidence = String(i.evidence).slice(0, 200); }
+      const u = i.url ? SafeUrl.http(i.url) : ""; if (u) o.url = u.slice(0, 500);
+      if (i.snippet) o.snippet = String(i.snippet).slice(0, 240);
+      return o;
+    })
   }));
 }
 function councilFromPhases(phases, x) {
@@ -3253,14 +3375,17 @@ function renderMeta(container, meta) {
     const d = document.createElement("details"); d.className = "steps-list";
     const sm = document.createElement("summary"); sm.textContent = "Steps · " + steps.length; d.appendChild(sm);
     const body = document.createElement("div"); body.className = "steps-body";
-    ["Searched", "Read", "Reasoned"].forEach(g => {
+    ["Planned", "Searched", "Read", "Reasoned"].forEach(g => {
       const list = steps.filter(p => stepGroup(p) === g); if (!list.length) return;
       const grp = document.createElement("div");
       const h = document.createElement("div"); h.className = "steps-group-h"; h.textContent = g; grp.appendChild(h);
       list.forEach(p => {
         const it = document.createElement("div"); const bad = isDegradedPhase(p);
         it.className = "steps-item" + (bad ? " err" : ""); it.textContent = (bad ? "⚠ " : "✓ ") + p.label; grp.appendChild(it);
-        (p.items || []).slice(0, 6).forEach(x => { if (!x.title) return; const sub = document.createElement("div"); sub.className = "steps-sub"; sub.textContent = (x.domain ? x.domain + " — " : "") + x.title; grp.appendChild(sub); });
+        if (p.kind === "plan" && planItemsOf(p).length) { grp.appendChild(buildPlanList(planItemsOf(p), "plan-list steps-plan")); return; }
+        const chips = (p.items || []).some(x => x && x.url) ? buildSrcChips(p.items, 18) : null;
+        if (chips) grp.appendChild(chips);
+        (p.items || []).slice(0, 6).forEach(x => { if (!x.title || (chips && x.url)) return; const sub = document.createElement("div"); sub.className = "steps-sub"; sub.textContent = (x.domain ? x.domain + " — " : "") + x.title; grp.appendChild(sub); });
       });
       body.appendChild(grp);
     });
@@ -3288,50 +3413,11 @@ function renderAnswer(container, text, sources, related, images, meta) {
   // v74: an empty answer has no tabs / actions / suggestions — the caller shows
   // an error card instead (tabs and actions are tied to answer presence).
   if (!String(text || "").trim()) return;
+  hideCiteCard(); // v94: a rebuild (live stream tick) must not strand a hover card
   renderMeta(container, meta);
-  // Sources section
-  if (sources && sources.length) {
-    const sec = document.createElement("div");
-    sec.className = "sources-section";
-    sec.innerHTML = '<div class="sources-row"></div>';
-    const row = sec.querySelector(".sources-row");
-    sources.forEach((s, i) => {
-      const card = document.createElement("a");
-      card.className = "source-card";
-      card.href = SafeUrl.http(s.url) || "#";
-      card.target = "_blank";
-      card.rel = "noopener noreferrer";
-      const favicon = document.createElement("div");
-      favicon.className = "source-favicon";
-      favicon.textContent = (s.domain || "?")[0].toUpperCase();
-      const domainEl = document.createElement("div");
-      domainEl.className = "source-domain";
-      domainEl.textContent = (s.domain || "");
-      const numEl = document.createElement("span");
-      numEl.className = "src-num";
-      numEl.textContent = String(i + 1);
-      domainEl.insertBefore(numEl, domainEl.firstChild);
-      const titleEl = document.createElement("div");
-      titleEl.className = "source-title";
-      // v68: never show a raw URL as the card title (Perplexity shows a readable
-      // title) — derive one from the path, or fall back to the domain
-      let t = String(s.title || "");
-      if (/^https?:\/\//i.test(t) || /^www\./i.test(t)) {
-        try {
-          const u = new URL(t.startsWith("www.") ? "https://" + t : t);
-          const seg = u.pathname.split("/").filter(Boolean).pop() || "";
-          t = seg.replace(/\.(html?|php|aspx?)$/i, "").replace(/[-_]+/g, " ").trim() || u.hostname.replace(/^www\./, "");
-        } catch { t = s.domain || ""; }
-      }
-      titleEl.textContent = t;
-      titleEl.title = s.title || "";
-      card.appendChild(favicon);
-      card.appendChild(domainEl);
-      card.appendChild(titleEl);
-      row.appendChild(card);
-    });
-    container.appendChild(sec);
-  }
+  // v94: answer-top source cards — slot reserved here (above the answer), filled once the master list exists
+  const srcSlot = document.createElement("div");
+  container.appendChild(srcSlot);
 
   // Answer section
   const ansSec = document.createElement("div");
@@ -3356,6 +3442,41 @@ function renderAnswer(container, text, sources, related, images, meta) {
     w.appendChild(tbl);
   });
   const master = buildCitations(content, sources);
+  const moreBtns = [];
+  if (master.length) {
+    const sec = document.createElement("div"); sec.className = "sources-section";
+    const head = document.createElement("div"); head.className = "sources-head";
+    head.appendChild(document.createTextNode("Sources "));
+    const hn = document.createElement("span"); hn.className = "sh-n"; hn.textContent = "· " + master.length; head.appendChild(hn);
+    sec.appendChild(head);
+    const row = document.createElement("div"); row.className = "sources-row"; row.setAttribute("role", "list");
+    const SHOW = 12;
+    master.slice(0, SHOW).forEach((m, i) => {
+      const card = document.createElement("a");
+      card.className = "source-card"; card.setAttribute("role", "listitem");
+      card.href = SafeUrl.http(m.url) || "#"; card.target = "_blank"; card.rel = "noopener noreferrer";
+      card.setAttribute("aria-label", "Source " + (i + 1) + ": " + m.domain + " — " + m.title);
+      const top = document.createElement("div"); top.className = "sc-top";
+      top.appendChild(srcFavicon(m.domain));
+      const dom = document.createElement("span"); dom.className = "sc-dom"; dom.textContent = m.domain;
+      const num = document.createElement("span"); num.className = "sc-num"; num.textContent = String(i + 1);
+      top.appendChild(dom); top.appendChild(num);
+      const ti = document.createElement("div"); ti.className = "sc-title"; ti.textContent = m.title;
+      card.appendChild(top); card.appendChild(ti);
+      card.addEventListener("mouseenter", () => showCiteCard(card, m));
+      card.addEventListener("focus", () => showCiteCard(card, m));
+      card.addEventListener("mouseleave", hideCiteCard);
+      card.addEventListener("blur", hideCiteCard);
+      row.appendChild(card);
+    });
+    if (master.length > SHOW) {
+      const more = document.createElement("button"); more.type = "button"; more.className = "source-card sc-more";
+      const mt = document.createElement("div"); mt.className = "sc-title"; mt.textContent = "View all " + master.length + " sources";
+      more.appendChild(mt); row.appendChild(more); moreBtns.push(more);
+    }
+    sec.appendChild(row);
+    srcSlot.appendChild(sec);
+  }
   ansSec.appendChild(content);
   renderMath(content);
   if (meta && meta.council) renderCouncilDrafts(ansSec, meta.council);
@@ -3387,11 +3508,13 @@ function renderAnswer(container, text, sources, related, images, meta) {
       const num = document.createElement("div"); num.className = "lr-num"; num.textContent = String(i + 1);
       const body = document.createElement("div"); body.className = "lr-body";
       const dom = document.createElement("div"); dom.className = "lr-dom";
-      dom.appendChild(citeFavicon(m.domain));
-      dom.appendChild(document.createTextNode(m.domain));
+      dom.appendChild(srcFavicon(m.domain));
+      const dn = document.createElement("span"); dn.textContent = m.domain; dom.appendChild(dn);
+      if (m.cites) { const ct = document.createElement("span"); ct.className = "lr-cited"; ct.textContent = "Cited " + m.cites + (m.cites === 1 ? " time" : " times"); dom.appendChild(ct); }
       const ti = document.createElement("div"); ti.className = "lr-title"; ti.textContent = m.title;
       body.appendChild(dom); body.appendChild(ti);
       if (m.snippet) { const sn = document.createElement("div"); sn.className = "lr-snip"; sn.textContent = m.snippet; body.appendChild(sn); }
+      const ur = document.createElement("div"); ur.className = "lr-url"; ur.textContent = m.url.replace(/^https?:\/\/(www\.)?/, "").slice(0, 140); body.appendChild(ur);
       a.appendChild(num); a.appendChild(body);
       ul.appendChild(a);
     });
@@ -3441,6 +3564,7 @@ function renderAnswer(container, text, sources, related, images, meta) {
     imagesPanel.style.display = "";
     [...tabs.querySelectorAll(".answer-tab")].forEach(b => b.classList.toggle("active", b === imagesTab));
   });
+  moreBtns.forEach(b => { b.onclick = () => { hideCiteCard(); linksTab.click(); tabs.scrollIntoView({ block: "nearest", behavior: "smooth" }); }; });
   answerTab.classList.add("active");
   tabs.appendChild(answerTab);
   tabs.appendChild(linksTab);
@@ -3640,6 +3764,7 @@ async function performSearch(query) {
   const persona = () => (incognitoOn || thread.incognito) ? { ...getPersonalization(), memory: [] } : getPersonalization();
   
   let liveAnswerEl = null; // partial streamed answer (kept visible if the stream fails midway)
+  let liveTimer = null;    // trailing live-render timer (cleared in finally so it can never leak into the next search)
   try {
     const { data: s } = await sb.auth.getSession();
 
@@ -3648,11 +3773,13 @@ async function performSearch(query) {
     // replaced by the answer (the question header stays from renderSearching).
     // v67: imageResults (gateway image_search) render in the Images tab.
     let imageResults = [];
+    let pendingActions = [];   // F15: email/calendar previews (x_actions) -> Approve cards
     let degradedPhases = [];
     let lastPhases = [];  // v83: final phase list -> Steps / Council
     let councilX = null;  // v83: x_council from the non-streaming response
     let revisedText = ""; // v80 (I7 pass-2): full replacement text from a `revision` SSE event
     const renderFinal = (answer, revised) => {
+      if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
       const answerClean = splitFollowups(answer).body;
       const scBefore = document.getElementById("resultsScroll");
       const prevTop = scBefore ? scBefore.scrollTop : 0;
@@ -3673,11 +3800,12 @@ async function performSearch(query) {
       if (revised) stamp.appendChild(revisedBadge());
       content.appendChild(stamp);
       renderDegradedNote(content, degradedPhases, query);
-      const sources = extractSources(answerClean);
+      const sources = mergeSources(sourcesFromPhases(lastPhases), extractSources(answerClean), 20);
       const related = generateRelated(query, answer);
       const councilInfo = councilOn ? councilFromPhases(lastPhases, councilX) : null;
       const stepsC = compactSteps(lastPhases);
       renderAnswer(content, answerClean, sources, related, imageResults, { steps: stepsC, council: councilInfo });
+      if (pendingActions.length && window.ConnectorsUI) { try { window.ConnectorsUI.renderActions(content, pendingActions); } catch (_e) {} pendingActions = []; }
       speakAnswer(answerClean);
       thread.messages.push({ role: "user", content: fullQuery });
       thread.updatedAt = Date.now();
@@ -3692,10 +3820,18 @@ async function performSearch(query) {
     };
     // Live partial render during streaming (throttled). v65: renders into a
     // single replaceable answer element so prior turns stay visible.
-    let lastRender = 0;
+    // perf: every live render rebuilds the whole answer (marked + DOMPurify + citations) — O(n) per tick,
+    // O(n^2) per answer. The gap between renders now scales with the measured cost of the last render
+    // (>= 120ms, ~3x render time), and a trailing timer paints the newest text once the stream pauses.
+    let lastRender = 0, renderGap = 120, liveLatest = "";
     const renderLive = (full) => {
       const now = Date.now();
-      if (now - lastRender < 120) return;
+      liveLatest = full;
+      if (now - lastRender < renderGap) {
+        if (!liveTimer) liveTimer = setTimeout(() => { liveTimer = null; renderLive(liveLatest); }, renderGap - (now - lastRender) + 5);
+        return;
+      }
+      if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
       lastRender = now;
       const partial = splitFollowups(full).body;
       if (!partial) return;
@@ -3706,13 +3842,14 @@ async function performSearch(query) {
         content.appendChild(liveAnswerEl);
       }
       liveAnswerEl.innerHTML = "";
-      renderAnswer(liveAnswerEl, partial, extractSources(partial), [], []);
+      renderAnswer(liveAnswerEl, partial, mergeSources(sourcesFromPhases(lastPhases), extractSources(partial), 20), [], []);
       if (revisedText) {
         const rv = document.createElement("div");
         rv.className = "search-timer";
         rv.appendChild(revisedBadge());
         liveAnswerEl.insertBefore(rv, liveAnswerEl.firstChild);
       }
+      renderGap = Math.max(120, Math.min(1000, (Date.now() - now) * 3));
     };
 
     if (deepResearchOn) {
@@ -3773,6 +3910,7 @@ async function performSearch(query) {
               const evt = JSON.parse(payload);
               if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); degradedPhases = evt.phases.filter(isDegradedPhase); lastPhases = evt.phases; }
               if (Array.isArray(evt?.images)) { imageResults = evt.images; }
+              if (Array.isArray(evt?.actions)) { pendingActions = evt.actions; continue; }
               if (Array.isArray(evt?.phases)) continue;
               if (typeof evt?.revision === "string" && evt.revision.trim()) {
                 // swap the rendered answer for the revised text, keeping the reader's scroll position
@@ -3796,6 +3934,7 @@ async function performSearch(query) {
         if (Array.isArray(data?.images)) imageResults = data.images;
         if (Array.isArray(data?.x_phases)) { lastPhases = data.x_phases; degradedPhases = lastPhases.filter(isDegradedPhase); }
         if (data?.x_council) councilX = data.x_council;
+        if (Array.isArray(data?.x_actions)) pendingActions = data.x_actions;
         const _msg = data?.choices?.[0]?.message ?? {};
         if (typeof data?.revision === "string" && data.revision.trim()) _msg.content = data.revision;
         renderFinal(_msg.content || "", data?.revised === true || (typeof data?.revision === "string" && !!data.revision.trim()));
@@ -3810,6 +3949,7 @@ async function performSearch(query) {
     const netFail = /failed to fetch|networkerror|load failed|network request failed/i.test(emsg);
     renderAnswerError(content, netFail ? "Couldn't reach the gateway" : "Something went wrong", netFail ? "Network request failed (" + emsg + "). Check your connection and retry." : emsg, query);
   } finally {
+    if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
     isSearching = false;
   }
 }
@@ -3936,19 +4076,27 @@ async function loadStatus(force) {
 
 // ============ INIT ============
 (async function init() {
-  const authed = await checkAuth();
+  // perf: paint the sidebar from the local cache immediately — auth (getSession + allowlist RPC) runs in
+  // parallel instead of gating the first render of threads/spaces and the restored thread.
+  renderThreads();
+  renderSpaces();
+  positionComposerPills();
+  const authP = checkAuth();
+  // the module scripts are classic (blocking) scripts that patch renderAnswer etc.; wait for them (DOMContentLoaded)
+  // before rendering a restored thread so it goes through the patched path — NOT for the network.
+  if (document.readyState === "loading") await new Promise(r => document.addEventListener("DOMContentLoaded", r, { once: true }));
+  // v84: restore the active thread after a reload so a follow-up continues it instead of starting a new one
+  try {
+    const sid = sessionStorage.getItem("ai_current_thread");
+    if (sid && !/[?&]share=/.test(location.search) && threads.some(t => t.id === sid && (t.messages || []).length)) await loadThread(sid);
+  } catch (e) {}
+  const authed = await authP;
   if (authed && currentUser) {
     document.getElementById("userEmail").textContent = currentUser.email;
     document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
   }
   renderThreads();
   renderSpaces();
-  positionComposerPills();
-  // v84: restore the active thread after a reload so a follow-up continues it instead of starting a new one
-  try {
-    const sid = sessionStorage.getItem("ai_current_thread");
-    if (sid && !/[?&]share=/.test(location.search) && threads.some(t => t.id === sid && (t.messages || []).length)) await loadThread(sid);
-  } catch (e) {}
   if (!/[?&]share=/.test(location.search)) loadStatus(false);
   // v68: small screens start with the sidebar collapsed (Perplexity mobile behavior)
   let lastW = null;
@@ -3969,15 +4117,12 @@ async function loadStatus(force) {
 </script>
 <div id="moduleRoot"></div>
 <script src="modules/settings.js"></script>
-<script src="modules/library.js"></script>
+<script src="modules/connectors.js"></script>
 <script src="modules/skills.js"></script>
-<script src="modules/docs.js"></script>
 <script src="modules/artifacts.js"></script>
 <script src="modules/cards.js"></script>
 <script src="modules/monitors.js"></script>
 <script src="modules/research.js"></script>
-<script src="modules/discover.js"></script>
-<script src="modules/apikeys.js"></script>
 <script src="modules/projects.js"></script>
 <script src="modules/safe-url.js"></script>
 <script src="modules/siteassets.js"></script>
@@ -3989,19 +4134,62 @@ async function loadStatus(force) {
 <script src="modules/voice-convo.js"></script>
 <script src="modules/artifacts-files.js"></script>
 <script src="modules/artifacts-gallery.js"></script>
-<script src="modules/hubs.js"></script>
 <script src="modules/repo-pr.js"></script>
 <script src="modules/sources.js"></script>
 <script src="modules/media.js"></script>
 <script src="modules/export.js"></script>
 <script>
-document.getElementById("navLibrary").onclick = function () { window.LibraryUI && window.LibraryUI.open(); };
+// perf: on-demand modules + non-blocking stylesheets. These five overlays are only reachable through a click, so
+// their JS (and CSS) is fetched the first time they are opened — and prefetched at idle so the click is instant.
+(function () {
+  var MODS = { library: ["library"], docs: ["docs"], discover: ["discover"], apikeys: ["apikeys"], hubs: ["hubs"] }; // name -> css files
+  var loaded = {};
+  function cssLink(n) {
+    if (document.querySelector('link[href*="modules/' + n + '.css"]')) return null;
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "modules/" + n + ".css"; document.head.appendChild(l);
+    return l;
+  }
+  window.loadModule = function (name) {
+    if (loaded[name]) return loaded[name];
+    loaded[name] = new Promise(function (resolve) {
+      var waits = [];
+      (MODS[name] || []).forEach(function (n) {
+        var l = cssLink(n);
+        if (l) waits.push(new Promise(function (r) { l.onload = l.onerror = r; setTimeout(r, 3000); }));
+      });
+      var s = document.createElement("script"); s.src = "modules/" + name + ".js";
+      waits.push(new Promise(function (r) { s.onload = r; s.onerror = function () { delete loaded[name]; r(); }; }));
+      document.head.appendChild(s);
+      Promise.all(waits).then(resolve);
+    });
+    return loaded[name];
+  };
+  // stylesheets for overlays whose JS is still eager (nothing in them styles first-paint UI): attached after first paint,
+  // or immediately on the first user interaction, whichever comes first.
+  var IDLE_CSS = ["skills", "projects", "settings-security", "settings-org", "skills-actions", "plugins", "repo-pr"];
+  var done = false;
+  function attachIdle() {
+    if (done) return; done = true;
+    IDLE_CSS.forEach(cssLink);
+    // warm the HTTP/SW cache for the on-demand modules so the first click does not wait on the network
+    Object.keys(MODS).forEach(function (n) {
+      var l = document.createElement("link"); l.rel = "prefetch"; l.as = "script"; l.href = "modules/" + n + ".js"; document.head.appendChild(l);
+    });
+  }
+  var idle = function () { (window.requestIdleCallback || function (f) { setTimeout(f, 300); })(attachIdle, { timeout: 2000 }); };
+  if (document.readyState === "complete") idle(); else window.addEventListener("load", idle);
+  ["pointerdown", "keydown", "touchstart"].forEach(function (ev) { window.addEventListener(ev, attachIdle, { once: true, passive: true, capture: true }); });
+})();
+function openModule(name, global, method, arg) {
+  window.loadModule(name).then(function () { window[global] && window[global][method](arg); });
+}
+document.getElementById("navLibrary").onclick = function () { openModule("library", "LibraryUI", "open"); };
 document.getElementById("navSkills").onclick = function () { window.SkillsUI && window.SkillsUI.open(); };
-document.getElementById("navDocs").onclick = function () { window.DocsUI && window.DocsUI.open(); };
+document.getElementById("navDocs").onclick = function () { openModule("docs", "DocsUI", "open"); };
 document.getElementById("navTasks").onclick = function () { window.TasksUI && window.TasksUI.open(); };
 document.getElementById("navProjects").onclick = function () { window.ProjectsUI && window.ProjectsUI.open(); };
-document.getElementById("navDiscover").onclick = function () { window.DiscoverUI && window.DiscoverUI.open(); };
-document.getElementById("navHubs").onclick = function () { window.LiveHubs && window.LiveHubs.open("finance"); };
+document.getElementById("navDiscover").onclick = function () { openModule("discover", "DiscoverUI", "open"); };
+document.getElementById("navHubs").onclick = function () { openModule("hubs", "LiveHubs", "open", "finance"); };
 document.getElementById("navPlugins").onclick = function () { window.PluginsUI && window.PluginsUI.open(); };
 </script>
 </body>

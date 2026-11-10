@@ -417,11 +417,13 @@
     var pane = el("div", "stg-pane");
     pane.appendChild(el("h3", "stg-pane-title", "Connectors"));
     pane.appendChild(el("p", "stg-pane-sub", "Data sources the assistant can reference in your answers."));
+    // F7/F15: live Google connect (Gmail + Calendar) — modules/connectors.js
+    if (window.ConnectorsUI && window.ConnectorsUI.card) pane.appendChild(window.ConnectorsUI.card());
 
     // dismissible info line
     if (lsGet(CONNECTOR_HINT_KEY) !== "1") {
       var info = el("div", "stg-info");
-      var infoTxt = el("p", null, "Connectors you enable here tell the assistant what data it may reference; live per-connector access is configured by the administrator.");
+      var infoTxt = el("p", null, "Google (Gmail and Calendar) is live: connect above and the assistant can read your mail and calendar and prepare emails and events for your approval. The list below is a set of preferences telling the assistant what else you want it to reference.");
       var dismiss = el("button", "stg-icon-btn", svg("x"));
       dismiss.type = "button";
       dismiss.title = "Dismiss";

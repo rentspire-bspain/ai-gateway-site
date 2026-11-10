@@ -58,8 +58,15 @@
       const val = loc && expiry(loc.value) ? loc.value : null;
       if (val && val !== known) { known = val; put({ key: loc.key, value: val, expires_at: expiry(val) }); }
       else if (!val && known) { known = null; del(); } // signed out here
-    }, 3000);
+    }, 1000);
   }
+  // Sign-out fix: the site signs out and reloads immediately, faster than the 1 s poll above. Flush the
+  // sign-out to the shared store on pagehide so the next page load does not re-adopt the stale session.
+  window.addEventListener("pagehide", () => {
+    if (!alive()) return;
+    const loc = localEntry();
+    if (known && !(loc && expiry(loc.value))) { known = null; del(); }
+  });
   try {
     chrome.storage.onChanged.addListener((ch, area) => {
       if (area !== "local" || !ch[STORE]) return;
@@ -86,6 +93,8 @@
   }
   async function ask(text, submit) {
     const deadline = Date.now() + 10000;
+    // Wait for the site's inline script to bind its Enter handler (it runs while the document is still parsing).
+    while (document.readyState !== "complete" && Date.now() < deadline) await new Promise((r) => setTimeout(r, 100));
     let el = pickInput();
     while (!el && Date.now() < deadline) { await new Promise((r) => setTimeout(r, 200)); el = pickInput(); }
     if (!el) return false;
@@ -102,9 +111,11 @@
       if (e.origin !== EXT_ORIGIN || e.source !== window.parent) return;
       const d = e.data;
       if (!d || d.source !== "aispaincos-ext" || d.type !== "ask" || typeof d.text !== "string") return;
-      if (window.__aiscDone && window.__aiscDone.has(d.id)) { e.source.postMessage({ source: "aispaincos-bridge", type: "ack", id: d.id }, e.origin); return; }
-      (window.__aiscDone = window.__aiscDone || new Set()).add(d.id);
-      const ok = await ask(d.text, d.submit !== false);
+      // One ask() per id; retries from the panel wait for the same result instead of getting a premature ack.
+      const done = (window.__aiscDone = window.__aiscDone || new Map());
+      if (!done.has(d.id)) done.set(d.id, ask(d.text, d.submit !== false));
+      const ok = await done.get(d.id);
+      if (!ok) done.delete(d.id); // allow a later retry if the composer was not found
       e.source.postMessage({ source: "aispaincos-bridge", type: ok ? "ack" : "nack", id: d.id }, e.origin);
     });
     // Tell the side panel we are listening.
