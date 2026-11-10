@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-K1E2Ziqq8WnEex1ziwo7WOAfG++mH2RKl/12STEGk7M=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-GUw8/tiOoJwMuFCjyqc9yrUBXjZj7WW/Nag8Yr5R0Ys=' 'sha256-Uj0lrE+iX8MQ/ndDlxoFfeDVNnZmqjV8Yl7QtJnp7+8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -760,6 +760,21 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .searching-step.done::before { content: "✓"; color: var(--accent); }
 .searching-step.live { color: var(--text); font-weight: 500; }
 .searching-phases { display: flex; flex-direction: column; gap: 7px; margin: 4px 0; }
+/* v93 AGENTS PILL — Perplexity-style floating status pill, better: live agent count,
+   expandable agent list, per-step elapsed timers, and a total Working timer in one control. */
+.agents-pill {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px 8px 11px;
+  border: 1px solid var(--border); border-radius: 999px; background: var(--bg-elevated);
+  font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; user-select: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,.14); transition: border-color .15s ease; font-family: inherit;
+}
+.agents-pill:hover, .agents-pill:focus-visible { border-color: var(--accent); outline: none; }
+.agents-pill svg { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
+.agents-pill .ap-label { color: var(--text); }
+.agents-pill .ap-count { color: var(--accent); }
+.agents-pill .ap-chev { font-size: 10px; color: var(--text-faint); transition: transform .15s ease; margin-left: 2px; }
+.agents-pill.expanded .ap-chev { transform: rotate(180deg); }
+.searching-step .step-timer { font-size: 11px; color: var(--text-faint); margin-left: 6px; font-variant-numeric: tabular-nums; font-weight: 400; }
 /* v66: answer tab row (Perplexity thread view) */
 .answer-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 4px 0 14px; overflow-x: auto; max-width: 100%; scrollbar-width: none; }
 .answer-tabs::-webkit-scrollbar { display: none; }
@@ -2881,10 +2896,11 @@ function renderPriorTurns(content, thread, showRelatedForLast) {
   });
 }
 function renderSearching(container, query) {
-  // v65/v66: no fake timed checklist — the status shows the real current step.
-  // The gateway narrates actual phases ("Searched the web — 6 sources") in the
-  // SSE stream; renderPhases() displays them as they arrive. A live "Working Ns"
-  // timer matches Perplexity's elapsed-time display.
+  // v93 AGENTS PILL (owner directive 2026-11-10): every agent working shows up.
+  // Perplexity-style floating pill — paper-plane icon, live "N agents working" count,
+  // expandable list of every agent step (spinners, ✓, per-step elapsed timers),
+  // and the total "Working Ns" timer, all in one control. Steps render expanded by
+  // default (the gateway narrates REAL phases as they happen — nothing is invented).
   const q = document.createElement("div");
   q.className = "question-header";
   q.textContent = query;
@@ -2892,13 +2908,29 @@ function renderSearching(container, query) {
   const state = document.createElement("div");
   state.className = "searching-state";
   state.innerHTML = `
-    <div class="searching-spinner"></div>
-    <div class="searching-text">Analyzing your question…<span class="search-timer">Working 0s</span></div>`;
+    <button type="button" class="agents-pill expanded" aria-expanded="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+      <span class="ap-label"><span class="ap-count">1</span> agent working</span>
+      <span class="ap-chev">▾</span>
+      <span class="search-timer">Working 0s</span>
+    </button>
+    <div class="searching-phases"></div>`;
   container.appendChild(state);
+  const pill = state.querySelector(".agents-pill");
+  const phasesBox = state.querySelector(".searching-phases");
+  pill.addEventListener("click", () => {
+    const expanded = pill.classList.toggle("expanded");
+    pill.setAttribute("aria-expanded", String(expanded));
+    phasesBox.style.display = expanded ? "flex" : "none";
+  });
   const started = Date.now();
   const timer = setInterval(() => {
     const t = state.querySelector(".search-timer");
     if (t) t.textContent = "Working " + Math.round((Date.now() - started) / 1000) + "s";
+    // per-step elapsed timers tick on every live agent row
+    state.querySelectorAll(".searching-step.live .step-timer").forEach(el => {
+      el.textContent = Math.round((Date.now() - Number(el.dataset.t0)) / 1000) + "s";
+    });
   }, 1000);
   return { state, interval: timer, started };
 }
@@ -2947,13 +2979,25 @@ function renderPhases(state, phases) {
     state.appendChild(box);
   }
   box.textContent = "";
+  const t0 = Date.now();
   for (const p of phases) { // label comes from the server / the web: never innerHTML
     const row = document.createElement("div");
     row.className = "searching-step " + (p.done ? "done" : "live") + (isDegradedPhase(p) ? " err" : "");
     if (isDegradedPhase(p) || p.done) row.appendChild(document.createTextNode(isDegradedPhase(p) ? "\u26a0" : "\u2713"));
     else { const sp = document.createElement("span"); sp.className = "searching-spinner"; sp.style.cssText = "width:10px;height:10px;margin:0"; row.appendChild(sp); }
     row.appendChild(document.createTextNode(" " + String(p.label == null ? "" : p.label)));
+    if (!p.done) { const tm = document.createElement("span"); tm.className = "step-timer"; tm.dataset.t0 = String(t0); row.appendChild(tm); }
     box.appendChild(row);
+  }
+  // v93: the pill's live agent count = running steps (min 1 — the pipeline itself is an agent)
+  const pill = state.querySelector(".agents-pill");
+  if (pill) {
+    const live = phases.filter(p => !p.done && !isDegradedPhase(p)).length;
+    const n = Math.max(1, live);
+    const count = pill.querySelector(".ap-count");
+    const label = pill.querySelector(".ap-label");
+    if (count) count.textContent = String(n);
+    if (label) label.lastChild.textContent = n === 1 ? " agent working" : " agents working";
   }
 }
 
@@ -3499,8 +3543,8 @@ async function fetchRetry(url, opts, note) {
     }
   }
   function reconnecting(n) {
-    const t = document.querySelector(".searching-state .searching-text");
-    if (t) t.firstChild.textContent = "Reconnecting… (attempt " + (n + 2) + " of " + (delays.length + 1) + ")";
+    const t = document.querySelector(".searching-state .ap-label");
+    if (t) t.lastChild.textContent = " — reconnecting (attempt " + (n + 2) + " of " + (delays.length + 1) + ")";
   }
 }
 async function performSearch(query) {
