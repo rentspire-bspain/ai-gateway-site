@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-IX1h4SDdAzFoAYw7mtFJNpXj+AdueWXGqKrNIriUIE8=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-LTxK7rfSlTCWcv0cF5m85E5aWAlthBwpy93K6Wlwj08=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2445,6 +2445,21 @@ function speakAnswer(text) {
             }
           }
         } else if (lower.endsWith(".json")) {
+          // v97: a Perplexity MEMORY export (memory_items.json) loads straight into the site's
+          // memory store (localStorage ai_memory_items) instead of being treated as threads.
+          if (/(^|\/)[a-z-]*memory[-_a-z0-9]*\.json$/i.test(f.name)) {
+            try {
+              const arr = JSON.parse(await f.text());
+              if (Array.isArray(arr) && arr.length && arr.every(x => x && x.id && (x.text || x.key))) {
+                const cur = JSON.parse(localStorage.getItem("ai_memory_items") || "[]");
+                const have = new Set((Array.isArray(cur) ? cur : []).map(x => x.id));
+                const add = arr.filter(x => !have.has(x.id)).map(x => ({ id: x.id, text: String(x.text || x.key), createdAt: x.createdAt || new Date().toISOString() }));
+                localStorage.setItem("ai_memory_items", JSON.stringify((Array.isArray(cur) ? cur : []).concat(add).slice(-5000)));
+                window.__memImported = (window.__memImported || 0) + add.length;
+                continue;   // consumed as memories, not as a thread document
+              }
+            } catch (e) { /* fall through: treat as an ordinary export file */ }
+          }
           docs.push(...jsonToDocs(JSON.parse(await f.text()), f.name));
         } else if (lower.endsWith(".html") || lower.endsWith(".htm")) {
           const d = htmlToText(await f.text(), f.name);
@@ -2462,7 +2477,10 @@ function speakAnswer(text) {
     if (!currentUser) { setStat('<span class="err">Sign in first.</span>'); return; }
     setStat("Reading your export…");
     const docs = (await filesToDocs(files)).slice(0, 500);
-    if (!docs.length) { setStat('<span class="err">No readable threads found in those files. Make sure this is your Perplexity data export (Settings → Data Controls → Export data).</span>'); return; }
+    if (!docs.length) {
+      if (window.__memImported) { setStat('<span class="ok">Imported ' + window.__memImported + ' memories. Drop your Perplexity conversations export here too to import threads.</span>'); return; }
+      setStat('<span class="err">No readable threads found in those files. Make sure this is your Perplexity data export (Settings → Data Controls → Export data).</span>'); return;
+    }
 
     // Dedupe against already-imported history
     setStat("Checking for duplicates…");
@@ -2486,7 +2504,7 @@ function speakAnswer(text) {
     }
 
     // Build the semantic index server-side (no-op message when no key is set)
-    setStat('<span class="ok">Imported ' + imported + ' threads.</span> Building semantic index…');
+    setStat('<span class="ok">Imported ' + imported + ' threads' + (window.__memImported ? ' and ' + window.__memImported + ' memories' : '') + '.</span> Building semantic index…');
     try {
       const s = await sb.auth.getSession();
       let total = 0, remaining = 1, guard = 0;
