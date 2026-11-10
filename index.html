@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-JK0s0HpPEjkq8XgcCijYoXEBhFOacSE2HNIx8gyKWQA=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-Z+dvHuva2GTT0GOBMR1Feo61r8ftMNQWjTCLdXB4Sq4=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ai.spaincos.com — Where knowledge begins</title>
 <script src="/spa-restore.js"></script>
+<style>
+html.pre-boot #landing{display:none!important}
+html.pre-boot body::before{content:"";position:fixed;top:72px;left:50%;transform:translateX(-50%);width:min(720px,86vw);height:60vh;border-radius:12px;z-index:5;background:linear-gradient(90deg,rgba(128,128,128,.10) 25%,rgba(128,128,128,.22) 50%,rgba(128,128,128,.10) 75%);background-size:200% 100%;animation:preBootShimmer 1.2s linear infinite}
+@keyframes preBootShimmer{to{background-position:-200% 0}}
+</style>
 <link rel="icon" type="image/webp" href="/favicon.webp">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#14646B">
@@ -38,6 +43,8 @@
 /* ===== v83: council, steps, math, incognito, offline, drop overlay ===== */
 .width-toggle#councilToggle.active,.width-toggle#incognitoToggle.active{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
 .answer-meta{display:flex;flex-direction:column;gap:8px;margin:4px 0 10px}
+.ops-fleet-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border-radius:999px;padding:2px 10px}
+.ops-fleet-msg{border-left:3px solid var(--accent);background:var(--accent-light);border-radius:8px;padding:8px 12px;font-size:.93em}
 .council-badge{display:inline-flex;align-items:center;gap:5px;align-self:flex-start;font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-light);border:1px solid var(--border-light);border-radius:999px;padding:2px 10px}
 details.steps-list,details.council-drafts{border:1px solid var(--border-light);border-radius:var(--radius-sm);background:var(--bg-elevated);font-size:13.5px}
 details.steps-list>summary,details.council-drafts>summary{cursor:pointer;padding:8px 12px;color:var(--text-muted);font-weight:500;list-style:none;display:flex;align-items:center;gap:6px}
@@ -1389,7 +1396,6 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 .answer-content a { color: var(--accent); text-decoration: none; } .answer-content a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .answer-content blockquote { border-left: 2px solid var(--border-light); padding: 2px 0 2px 16px; }
 .answer-content pre { border-radius: 12px; font-size: 13.5px; line-height: 1.55; }
-.question-header { font-size: 28px; line-height: 1.3; font-weight: 500; letter-spacing: -.01em; margin: 8px 0 20px; }
 </style>
 </head>
 <body>
@@ -2667,7 +2673,8 @@ async function syncThreadsFromServer() {
     renderThreads();
     const dl = threadFromPath(location.pathname); // deep link that needed the server list
     if (dl && currentThreadId !== dl.id) loadThread(dl.id, true);
-  } catch (e) { /* offline-tolerant */ }
+    window.__endPreBoot && window.__endPreBoot();
+  } catch (e) { window.__endPreBoot && window.__endPreBoot(); /* offline-tolerant */ }
 }
 function saveThreads() {
   localStorage.setItem("ai_threads", JSON.stringify(threads.filter(t => !t.incognito)));
@@ -3961,6 +3968,9 @@ function renderAnswer(container, text, sources, related, images, meta) {
   // v74: an empty answer has no tabs / actions / suggestions — the caller shows
   // an error card instead (tabs and actions are tied to answer presence).
   if (!String(text || "").trim()) return;
+  // OPS FLEET: coordination messages posted by the platform start with "[OPS FLEET]"; strip it, add an accent badge + distinct styling (older clients just show the plain text)
+  let isOps = false;
+  if (/^\s*\[OPS FLEET\]/.test(String(text))) { isOps = true; text = String(text).replace(/^\s*\[OPS FLEET\]\s*/, ""); }
   hideCiteCard(); // v94: a rebuild (live stream tick) must not strand a hover card
   renderMeta(container, meta);
   // v94: answer-top source cards — slot reserved here (above the answer), filled once the master list exists
@@ -3970,7 +3980,8 @@ function renderAnswer(container, text, sources, related, images, meta) {
   // Answer section
   const ansSec = document.createElement("div");
   ansSec.className = "answer-section";
-  ansSec.innerHTML = '<div class="answer-label">Answer</div>';
+  ansSec.innerHTML = isOps ? '<div class="answer-label"><span class="ops-fleet-pill">OPS FLEET</span></div>' : '<div class="answer-label">Answer</div>';
+  if (isOps) ansSec.classList.add("ops-fleet-msg");
   const content = document.createElement("div");
   content.className = "answer-content";
   // Render with marked (proper markdown: tables, headings, code blocks, lists)
@@ -4728,6 +4739,7 @@ async function loadStatus(force) {
     const sid = dl0 ? dl0.id : sessionStorage.getItem("ai_current_thread");
     if (sid && !/[?&]share=/.test(location.search) && threads.some(t => t.id === sid && (t.messages || []).length)) await loadThread(sid);
   } catch (e) {}
+  try { if (!(/^\/t\/./.test(location.pathname) && !threadFromPath(location.pathname) && !currentThreadId)) window.__endPreBoot && window.__endPreBoot(); } catch (e) {} // else wait for server list / 3s timeout
   const authed = await authP;
   if (authed && currentUser) {
     document.getElementById("userEmail").textContent = currentUser.email;
