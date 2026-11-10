@@ -9,8 +9,8 @@
   function el(t, c, txt) { var e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; }
   function slug(s) { return String(s || 'document').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'document'; }
   function fmtSize(n) { return !n ? '' : n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
-  var MIME = { md: 'text/markdown', csv: 'text/csv', txt: 'text/plain', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', pdf: 'application/pdf' };
-  var KIND_LABEL = { md: 'Markdown', csv: 'CSV', txt: 'Text', xlsx: 'Spreadsheet', docx: 'Word document', pdf: 'PDF' };
+  var MIME = { md: 'text/markdown', csv: 'text/csv', txt: 'text/plain', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', pdf: 'application/pdf', webapp: 'text/html' };
+  var KIND_LABEL = { md: 'Markdown', csv: 'CSV', txt: 'Text', xlsx: 'Spreadsheet', docx: 'Word document', pdf: 'PDF', webapp: 'Web app' };
   var ICO = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg>';
 
   /* ---------- safe markdown ---------- */
@@ -201,6 +201,15 @@
     tabsEl.hidden = true; tabsEl.textContent = ''; bodyEl.textContent = ''; bodyEl.scrollTop = 0;
     dlMenu.textContent = ''; downloadOptions(it).forEach(function (o) { var b = el('button', '', o.label); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.onclick = function () { dlMenu.hidden = true; try { o.run(); } catch (e) { console.error(e); } }; dlMenu.appendChild(b); });
     if (it.kind === 'md' || it.kind === 'txt') bodyEl.appendChild(it.kind === 'md' ? renderMd(it.text) : (function () { var p = el('pre', 'dp-md'); p.textContent = it.text; return p; })());
+    else if (it.kind === 'webapp') {
+      // v145: live web app — sandboxed iframe right in the side panel (Perplexity Computer app parity)
+      var bar2 = el('div', 'dp-appbar');
+      var nt2 = el('button', 'dp-btn', 'Open in new tab'); nt2.type = 'button';
+      nt2.onclick = function () { var u = URL.createObjectURL(new Blob([it.text || ''], { type: 'text/html' })); window.open(u, '_blank', 'noopener,noreferrer'); setTimeout(function () { URL.revokeObjectURL(u); }, 60000); };
+      bar2.appendChild(nt2); bodyEl.appendChild(bar2);
+      var fr = el('iframe', 'dp-frame'); fr.title = it.title; fr.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals allow-popups');
+      fr.setAttribute('referrerpolicy', 'no-referrer'); fr.srcdoc = String(it.text || ''); bodyEl.appendChild(fr);
+    }
     else if (it.kind === 'csv') bodyEl.appendChild(grid(parseCsv(it.text)));
     else if (it.kind === 'xlsx') {
       bodyEl.appendChild(el('div', 'dp-note', 'Reading spreadsheet\u2026'));
@@ -237,7 +246,7 @@
     return heads >= 4 || (heads >= 3 && /^#\s+\S/m.test(t) && t.length > 3500);
   }
   function titleOf(t) { var m = String(t).match(/^#{1,2}\s+(.+)$/m); return m ? m[1].replace(/[*_`#]/g, '').trim().slice(0, 90) : 'Report'; }
-  var FILE_ASK = /\b(report|document|docx?|word|memo|brief|white ?paper|write[- ]?up|spreadsheet|xlsx|excel|csv|pdf|file)\b/i;
+  var FILE_ASK = /\b(report|document|docx?|word|memo|brief|white ?paper|write[- ]?up|spreadsheet|xlsx|excel|csv|pdf|file|artifact|tracker|checklist|template)\b|\.md\b/i;
   var seen = new WeakMap(), autoTimer = null;
   function host(ac) { return ac.closest('.answer-section') || ac.parentNode; }
   function place(ac, text, query) {
@@ -250,7 +259,7 @@
     var actions = h.querySelector(':scope > .answer-actions'); if (actions) actions.after(row); else h.appendChild(row);
     if (query && FILE_ASK.test(query) && !seen.get(ac)) { clearTimeout(autoTimer); autoTimer = setTimeout(function () { if (document.contains(row) && !seen.get(ac)) { seen.set(ac, 1); open(it); } }, 1500); }
   }
-  var KIND_BY_EXT = { md: 'md', markdown: 'md', txt: 'txt', csv: 'csv', xlsx: 'xlsx', docx: 'docx', pdf: 'pdf' };
+  var KIND_BY_EXT = { md: 'md', markdown: 'md', txt: 'txt', csv: 'csv', xlsx: 'xlsx', docx: 'docx', pdf: 'pdf', html: 'webapp', htm: 'webapp' };
   function b64ToBytes(b) { var s = atob(b), a = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); return a; }
   function assetToItem(a) {
     var name = a.name || '', ext = (name.split('.').pop() || '').toLowerCase(), kind = KIND_BY_EXT[ext];

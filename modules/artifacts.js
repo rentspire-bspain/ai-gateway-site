@@ -32,6 +32,19 @@
     return lang ? lang.toUpperCase() + ' snippet' : 'Code';
   }
 
+  // v145: fenced MARKDOWN (```markdown / ```md, or an untagged doc-shaped fence) is a DOCUMENT
+  // artifact, not code — it renders rich (headings/tables/bold) in the side panel like Perplexity.
+  function mdTitle(body) {
+    var m = body.match(/^#{1,2}\s+(.+)$/m);
+    return m ? m[1].replace(/[*_`#]/g, '').trim().slice(0, 90) : 'Document';
+  }
+  function docShapedMarkdown(body) {
+    if (body.length < 600) return false;
+    var heads = (body.match(/^#{1,3}\s+\S/gm) || []).length;
+    if (heads < 3) return false;
+    return /\|.*\|/.test(body) || /\*\*[^*\n]+\*\*/.test(body) || /^[-*]\s+\S/m.test(body);
+  }
+
   function extractFromAnswer(text) {
     var out = [];
     text = String(text || '');
@@ -43,6 +56,8 @@
           var spec = JSON.parse(body);
           if (spec && /^(bar|line|pie)$/.test(spec.type) && spec.data) a = { kind: 'chart', lang: 'chart', title: spec.title || 'Chart', content: body };
         } catch (e) {}
+      } else if (lang === 'markdown' || lang === 'md' || (!lang && docShapedMarkdown(body))) {
+        a = { kind: 'markdown', lang: 'md', title: mdTitle(body), content: body };
       } else if (lang === 'svg' || (/<svg[\s>]/i.test(body) && (lang === 'html' || lang === 'xml' || !lang) && lines < 400 && /^\s*(<\?xml|<svg|<!doctype|<html)/i.test(body))) {
         a = { kind: 'html', lang: 'svg', title: deriveTitle('svg', body) === 'SVG snippet' ? 'SVG graphic' : deriveTitle('svg', body), content: body };
       } else if ((lang === 'html' || lang === 'htm') && /<!doctype html|<html[\s>]/i.test(body)) {
@@ -185,6 +200,16 @@
     return c;
   }
   function open(a) {
+    // v145: documents and web apps open in the Perplexity-style SIDE PANEL (rich markdown
+    // rendering / live sandboxed iframe), not in a code overlay.
+    if ((a.kind === 'markdown' || a.kind === 'webapp' || a.kind === 'html') && window.ArtifactPanel) {
+      try {
+        window.ArtifactPanel.open(a.kind === 'markdown'
+          ? { kind: 'md', title: a.title, text: a.content, name: String(a.title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) + '.md' }
+          : { kind: 'webapp', title: a.title, text: a.content, name: String(a.title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) + '.html' });
+        return null;
+      } catch (e) { /* fall through to the overlay below */ }
+    }
     close();
     var prevFocus = document.activeElement;
     var ov = el('div', { 'class': 'artifact-overlay', role: 'dialog', 'aria-modal': 'true', 'aria-label': a.title, tabindex: '-1' });
@@ -244,7 +269,8 @@
     code: '<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
     chart: '<path d="M3 3v18h18"/><path d="M7 16V10M12 16V6M17 16v-4"/>',
     html: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>',
-    webapp: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>'
+    webapp: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>',
+    markdown: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/>'
   };
   function renderInline(container, a) {
     var row = container.querySelector(':scope > .artifact-row');
@@ -272,6 +298,9 @@
   function lastQuery() { var q = document.querySelector('.question-header, .question-title, #queryText'); return q ? (q.textContent || '').trim().slice(0, 120) : ''; }
   function runHooks(ac, text) { (window.ArtifactsHooks || []).forEach(function (h) { try { h(ac, text); } catch (e) {} }); }
 
+  // v145: Perplexity parity — when the assistant produces a document or a web app, the side panel
+  // opens with it automatically (once per artifact), the way Perplexity opens a created artifact.
+  var autoOpened = {};
   function placeCards(answerContent, text) {
     var arts = extractFromAnswer(text);
     runHooks(answerContent, text);
@@ -287,6 +316,12 @@
     var actions = host.querySelector(':scope > .answer-actions');
     if (actions) actions.after(row);
     arts.forEach(function (a) { renderInline(row, a); });
+    arts.forEach(function (a) {
+      if ((a.kind === 'markdown' || a.kind === 'webapp' || a.kind === 'html') && !autoOpened[a.id]) {
+        autoOpened[a.id] = 1;
+        setTimeout(function () { try { open(a); } catch (e) {} }, 700);
+      }
+    });
     return arts.length;
   }
 
