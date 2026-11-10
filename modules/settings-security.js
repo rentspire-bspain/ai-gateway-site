@@ -339,6 +339,61 @@
     return pane;
   }
 
+  // ---------- Two-factor authentication (TOTP, optional) ----------
+  function paneTwoFA() {
+    var pane = el("div", "stg-pane");
+    pane.appendChild(el("h3", "stg-pane-title", "Two-factor authentication"));
+    pane.appendChild(el("p", "stg-pane-sub", "Optional. Add an authenticator-app code (TOTP) as a second step after your password. You will only be asked for a code if you turn this on."));
+    var body = el("div", "sec-actions"); pane.appendChild(body);
+    var status = el("p", "stg-pane-sub", ""); pane.appendChild(status);
+    pane.appendChild(el("p", "stg-pane-sub", "Recovery: if you lose your authenticator, use Devices \u2192 Sign out everywhere, then ask the owner to remove the factor. Keep the setup key somewhere safe."));
+    var mfa = function () { return sb.auth.mfa; };
+    function btn(t, cls, fn) { var b = el("button", "stg-btn " + cls, t); b.type = "button"; b.addEventListener("click", fn); return b; }
+    function refresh() {
+      body.innerHTML = "";
+      mfa().listFactors().then(function (r) {
+        if (r.error) throw r.error;
+        var all = (r.data && r.data.all) || [];
+        all.filter(function (f) { return f.factor_type === "totp" && f.status !== "verified"; }).forEach(function (f) { mfa().unenroll({ factorId: f.id }); });
+        var ok = (r.data && r.data.totp) || [];
+        if (ok.length) {
+          body.appendChild(el("span", "", "Status: <b>On</b> "));
+          body.appendChild(btn("Turn off", "ghost", function () {
+            var code = window.prompt("Enter a current 6-digit code to turn off 2FA");
+            if (!code) return;
+            mfa().challengeAndVerify({ factorId: ok[0].id, code: code.trim() }).then(function (v) {
+              if (v.error) throw v.error;
+              return mfa().unenroll({ factorId: ok[0].id });
+            }).then(function () { status.textContent = "Two-factor authentication is off."; refresh(); })
+              .catch(function (e) { status.textContent = errText(e); });
+          }));
+        } else {
+          body.appendChild(el("span", "", "Status: Off "));
+          body.appendChild(btn("Set up authenticator", "solid", enroll));
+        }
+      }).catch(function (e) { status.textContent = errText(e); });
+    }
+    function enroll() {
+      mfa().enroll({ factorType: "totp", friendlyName: "Authenticator " + Date.now() }).then(function (r) {
+        if (r.error) throw r.error;
+        var f = r.data; body.innerHTML = "";
+        var img = el("img"); img.alt = "TOTP QR code"; img.width = 160; img.height = 160; img.src = f.totp.qr_code; img.id = "totpQr";
+        body.appendChild(img);
+        var sec = el("code", "", esc(f.totp.secret)); sec.id = "totpSecret"; body.appendChild(el("div", "", "Setup key: ")); body.lastChild.appendChild(sec);
+        var inp = el("input", "stg-input"); inp.placeholder = "6-digit code"; inp.inputMode = "numeric"; inp.id = "totpCode"; body.appendChild(inp);
+        body.appendChild(btn("Verify and turn on", "solid", function () {
+          mfa().challengeAndVerify({ factorId: f.id, code: inp.value.trim() }).then(function (v) {
+            if (v.error) throw v.error;
+            status.textContent = "Two-factor authentication is on."; refresh();
+          }).catch(function (e) { status.textContent = errText(e); });
+        }));
+        body.appendChild(btn("Cancel", "ghost", function () { mfa().unenroll({ factorId: f.id }).then(refresh); }));
+      }).catch(function (e) { status.textContent = errText(e); });
+    }
+    refresh();
+    return pane;
+  }
+
   // ---------- register panes ----------
   function register() {
     if (!window.SettingsUI || typeof window.SettingsUI.registerPane !== "function") return;
@@ -354,6 +409,13 @@
       label: "Credentials",
       icon: '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3-3.5 3.5z"/>',
       render: paneCredentials,
+      after: "devices"
+    });
+    window.SettingsUI.registerPane({
+      id: "twofa",
+      label: "Two-factor",
+      icon: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+      render: paneTwoFA,
       after: "devices"
     });
   }

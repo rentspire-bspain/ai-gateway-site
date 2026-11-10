@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-+Spp7COH2lNNyKul92mh4OxybPK0gLUsmDjb6ErNJ6M=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-tmVNXYQsQWwcDDSgOmp7zFxB6tf9Roshy13/wrr1hs8=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -3065,10 +3065,27 @@ document.getElementById("authPasswordBtn").onclick = async () => {
   if (!(await signinAllowed(email))) return err.textContent = "This site is invite-only — ask the owner to invite your email.";
   const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { err.textContent = error.message; err.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
+  // Optional 2FA: only challenge when the user has a verified TOTP factor
+  try {
+    const aal = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal.data && aal.data.nextLevel === "aal2" && aal.data.currentLevel !== "aal2") {
+      const fl = await sb.auth.mfa.listFactors();
+      const f = fl.data && fl.data.totp && fl.data.totp[0];
+      if (f) {
+        window.__mfaFactor = f.id;
+        document.getElementById("authStep1").style.display = "none";
+        document.getElementById("authStep2").style.display = "block";
+        document.getElementById("authCode").placeholder = "Authenticator code";
+        document.getElementById("authVerify").dataset.mfa = "1";
+        return;
+      }
+    }
+  } catch (e) {}
   authOverlay.style.display = "none";
   location.reload();
 };
 // ---- PASSKEY SIGN-IN (v72) ----
+if (!window.PublicKeyCredential) document.getElementById("authPasskeyBtn").style.display = "none";
 document.getElementById("authPasskeyBtn").onclick = async () => {
   const err = document.getElementById("authError");
   err.textContent = "";
@@ -3113,6 +3130,11 @@ document.getElementById("authVerify").onclick = async () => {
   err.textContent = "";
   const email = document.getElementById("authEmail").value.trim();
   const code = document.getElementById("authCode").value.trim();
+  if (window.__mfaFactor) {
+    const r = await sb.auth.mfa.challengeAndVerify({ factorId: window.__mfaFactor, code });
+    if (r.error) return err.textContent = r.error.message;
+    window.__mfaFactor = null; authOverlay.style.display = "none"; location.reload(); return;
+  }
   const { error } = await sb.auth.verifyOtp({ email, token: code, type: "email" });
   if (error) return err.textContent = error.message;
   authOverlay.style.display = "none";
