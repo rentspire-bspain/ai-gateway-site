@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-LTxK7rfSlTCWcv0cF5m85E5aWAlthBwpy93K6Wlwj08=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-8wMcLbH3vKGr+TOnLn/gtkWyF7CB+fwW3sKMSy6KuW8=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1053,8 +1053,22 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
   color: var(--text);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
+.related-item { max-width: min(100%, 560px); }
+.related-item span {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
 .related-item:hover { border-color: var(--accent); background: var(--bg-elevated); }
 .related-item svg { color: var(--text-faint); flex-shrink: 0; }
+.related-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.related-head .related-label { margin-bottom: 0; }
+.related-runall {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 12px; cursor: pointer; transition: border-color .15s ease, color .15s ease;
+}
+.related-runall:hover { border-color: var(--accent); color: var(--text); }
+.related-runall.running { color: var(--accent); border-color: var(--accent); }
 
 /* Auth modal */
 .auth-overlay {
@@ -1715,6 +1729,7 @@ window.addEventListener("popstate", () => {
   if (t) loadThread(t.id, true); else { setCurrentThread(null); showLanding(); renderThreads(); }
 });
 let isSearching = false;
+let runAllState = { active: false, stop: false };   // v97: "Run all" follow-ups state
 let currentUser = null;
 // v76: one-time thread timestamp backfill (Library date groups / Usage counts)
 (function () {
@@ -4247,8 +4262,23 @@ function renderAnswer(container, text, sources, related, images, meta) {
   if (related.length) {
     const relSec = document.createElement("div");
     relSec.className = "related-section";
-    relSec.innerHTML = '<div class="related-label">Related</div><div class="related-list"></div>';
+    relSec.innerHTML = '<div class="related-head"><span class="related-label">Related</span><button type="button" class="related-runall"></button></div><div class="related-list"></div>';
     const list = relSec.querySelector(".related-list");
+    const runBtn = relSec.querySelector(".related-runall");
+    // v97 (owner request 2026-11-10): "Run all" fires every follow-up in sequence — no copy/pasting.
+    // Module-level state so the button re-created by each new answer can stop an in-flight run.
+    if (typeof runAllState.active === "undefined") runAllState.active = false;
+    const paint = () => { runBtn.textContent = runAllState.active ? "Stop" : "Run all"; runBtn.classList.toggle("running", runAllState.active); };
+    runBtn.onclick = async () => {
+      if (runAllState.active) { runAllState.stop = true; paint(); return; }
+      runAllState.active = true; runAllState.stop = false; paint();
+      for (const r of related) {
+        if (runAllState.stop || !document.body.contains(runBtn)) break;
+        try { await performSearch(r); } catch (e) { break; }
+      }
+      runAllState.active = false; paint();
+    };
+    paint();
     related.forEach(r => {
       const item = document.createElement("div");
       item.className = "related-item";

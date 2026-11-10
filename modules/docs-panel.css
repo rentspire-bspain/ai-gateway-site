@@ -21,7 +21,8 @@ body.dp-open .main{margin-right:var(--dp-w)}
 .dp-tabs button[aria-selected=true]{color:var(--accent);border-color:var(--accent)}
 .dp-body{flex:1;min-height:0;overflow:auto}
 .dp-md{padding:20px 24px 40px;font-size:14.5px;line-height:1.65;max-width:820px;margin:0 auto}
-.dp-md h1{font-size:1.7em;margin:.2em 0 .6em}.dp-md h2{font-size:1.35em;margin:1.4em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--border)}.dp-md h3{font-size:1.12em;margin:1.2em 0 .4em}.dp-md h4,.dp-md h5,.dp-md h6{margin:1em 0 .3em}
+/* v97: compact heading scale — a doc panel is a side column, not a landing page */
+.dp-md h1{font-size:1.25em;margin:.6em 0 .4em}.dp-md h2{font-size:1.1em;margin:1.1em 0 .4em;padding-bottom:.25em;border-bottom:1px solid var(--border)}.dp-md h3{font-size:1em;margin:1em 0 .3em}.dp-md h4,.dp-md h5,.dp-md h6{font-size:.95em;margin:.9em 0 .25em}
 .dp-md p{margin:.6em 0}.dp-md ul,.dp-md ol{padding-left:1.5em;margin:.5em 0}.dp-md li{margin:.2em 0}
 .dp-md code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em;background:var(--bg-elevated);padding:1px 5px;border-radius:4px}
 .dp-md pre{background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:12px 14px;overflow:auto}.dp-md pre code{background:none;padding:0}
