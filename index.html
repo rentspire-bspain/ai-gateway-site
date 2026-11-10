@@ -888,6 +888,10 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .thread-actions button { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 3px; border-radius: 5px; display: flex; }
 .thread-actions button:hover { color: var(--text); background: var(--bg-elevated); }
 .search-timer { font-size: 12px; color: var(--text-faint); margin-left: 10px; }
+/* v129 MODEL BADGE: the model that actually served this answer, appended to the
+   Finished stamp — makes the orchestrator's routing visible per response. */
+.model-badge { margin-left: 8px; color: var(--text-muted); }
+.model-badge::before { content: "·"; margin-right: 8px; color: var(--text-faint); }
 
 /* Question — v66 carbon-copy: Perplexity renders the user's question as a
    rounded pill (measured live on perplexity.ai): pplxSans 16px, translucent
@@ -1496,15 +1500,17 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
       </div>
       <div class="main-header-right" style="display:flex;align-items:center;gap:8px">
         <select class="model-select" id="modelSel" title="Model — uncensored options answer without hedging">
-          <option value="general">Auto</option>
-          <option value="flint">Flint v1.0</option>
-          <option value="summary">Qwen3.8-27B</option>
-          <option value="kimi">Kimi K3.1 Pro</option>
-          <option value="deepseek-flash">DeepSeek V4.1 Flash</option>
-          <option value="gpt-oss">GPT-OSS 120B</option>
-          <option value="llama4">Llama 4 Maverick</option>
-          <option value="venice">Venice Uncensored</option>
-          <option value="dolphin">Dolphin Uncensored 24B</option>
+          <!-- v129: every option carries its one-line "best at" description so the
+               choice is self-explanatory in the dropdown itself. -->
+          <option value="general">Auto — everyday default (GLM-5.3)</option>
+          <option value="flint">Flint v1.0 — coding & agents (free)</option>
+          <option value="summary">Qwen3.8-27B — fast summaries (free)</option>
+          <option value="kimi">Kimi K3.1 Pro — long-context reasoning</option>
+          <option value="deepseek-flash">DeepSeek V4.1 Flash — fast generalist</option>
+          <option value="gpt-oss">GPT-OSS 120B — balanced open-weight</option>
+          <option value="llama4">Llama 4 Maverick — general chat</option>
+          <option value="venice">Venice Uncensored — blunt, no hedging</option>
+          <option value="dolphin">Dolphin Uncensored 24B — blunt, no hedging</option>
         </select>
         <button class="width-toggle" id="voiceToggle" title="Read answers aloud">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
@@ -3212,6 +3218,16 @@ function renderPriorTurns(content, thread, showRelatedForLast) {
       content.appendChild(q);
     } else {
       const rel = (showRelatedForLast && i === lastAssistant) ? cleanRelated(m.related) : [];
+      // v129: saved threads keep their model citation — a small stamp above the answer
+      if (m.servedModel) {
+        const st = document.createElement("div");
+        st.className = "search-timer";
+        const mb = document.createElement("span");
+        mb.className = "model-badge";
+        mb.textContent = FRIENDLY_MODEL(m.servedModel) + (m.budgetFallback ? " · free fallback (budget cap)" : "");
+        st.appendChild(mb);
+        content.appendChild(st);
+      }
       renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council) ? { steps: m.steps || [], council: m.council || null } : null);
     }
   });
@@ -3838,6 +3854,42 @@ function stepGroup(p) {
 // the frontend never RENDERS raw model IDs, "Intent: ...; complexity: ..." or the synthetic "Perplexity Search (live web)".
 const MODEL_ID_RE = /\b[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.:-]*\b/gi;
 const BRAND_CASE = { gpt: "GPT", oss: "OSS", glm: "GLM", llama: "Llama", qwen: "Qwen", qwen3: "Qwen3", kimi: "Kimi", deepseek: "DeepSeek", mistral: "Mistral", dolphin: "Dolphin", venice: "Venice", claude: "Claude", gemini: "Gemini", sonar: "Sonar", flint: "Flint", maverick: "Maverick", pro: "Pro", flash: "Flash", v: "V" };
+
+/* v129 MODEL GUIDE (owner directive 2026-11-10): the dropdown options carry one-line
+   descriptions; the select's hover title shows the fuller "best at" text for the current
+   choice; and every answer is stamped with the model that actually served it (the
+   gateway's x-model response header — the orchestrator's real pick, budget fallbacks
+   included). The routing facts come from the gateway itself (call-model DEFAULTS and
+   gateway-chat's finalModel = model || GLM-5.3): Auto routes to GLM-5.3, flint/summary
+   are the free coding/summarization lanes, the rest are explicit model overrides. */
+const MODEL_INFO = {
+  general: { best: "Auto — GLM-5.3, the everyday default. Best all-round quality for general questions. If the paid budget cap is hit, the free Qwen summarizer takes over (the answer is stamped 'free fallback')." },
+  flint: { best: "Flint v1.0 — the free coding & agent specialist (OpenRouter). Best for code, tool work, and agentic tasks." },
+  summary: { best: "Qwen3.8-27B — fast, free summarization (Groq). Best for quick recaps and short answers." },
+  kimi: { best: "Kimi K3.1 Pro — long-context reasoning. Best for long documents, multi-step analysis, and research-heavy questions." },
+  "deepseek-flash": { best: "DeepSeek V4.1 Flash — the fast generalist. Best for everyday questions at speed." },
+  "gpt-oss": { best: "GPT-OSS 120B — a balanced open-weight generalist. A good all-rounder." },
+  llama4: { best: "Llama 4 Maverick — Meta's open-weight generalist. Best for general chat and brainstorming." },
+  venice: { best: "Venice Uncensored (Dolphin Mistral 24B) — answers bluntly, without hedging or disclaimers." },
+  dolphin: { best: "Dolphin Uncensored 24B — answers bluntly, without hedging or disclaimers." },
+};
+const FRIENDLY_MODEL = (m) => !m ? "" :
+  m.includes("glm-5.3") ? "GLM-5.3" :
+  m.includes("flint") ? "Flint v1.0" :
+  m.includes("qwen") ? "Qwen3.8-27B" :
+  m.includes("kimi") ? "Kimi K3.1 Pro" :
+  m.includes("deepseek") ? "DeepSeek V4.1 Flash" :
+  m.includes("gpt-oss") ? "GPT-OSS 120B" :
+  (m.includes("llama") || m.includes("maverick")) ? "Llama 4 Maverick" :
+  m.includes("dolphin") ? "Dolphin Uncensored 24B" :
+  String(m).split("/").pop();
+{
+  /* keep the select's hover title in sync with the current choice */
+  const sel = document.getElementById("modelSel");
+  const syncTitle = () => { const i = MODEL_INFO[sel.value]; if (i) sel.title = i.best; };
+  sel.addEventListener("change", syncTitle);
+  syncTitle();
+}
 function prettyModel(id) {
   let t = String(id == null ? "" : id).trim();
   if (!t) return "";
@@ -4359,6 +4411,8 @@ async function performSearchInner(query) {
     let lastCanon = [];   // v128: the gateway's canonical numbered source list (sticky: a later phases event without items must not erase it)
     let councilX = null;  // v83: x_council from the non-streaming response
     let revisedText = ""; // v80 (I7 pass-2): full replacement text from a `revision` SSE event
+    let servedModel = null;  // v129: the model that ACTUALLY served this response (the gateway's x-model header / x_model body field — the orchestrator's real pick, budget fallbacks included)
+    let budgetFallback = false; // v129: the paid cap was hit — a free model took over
     const renderFinal = (answer, revised) => {
       if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
       const answerClean = splitFollowups(answer).body;
@@ -4378,6 +4432,17 @@ async function performSearchInner(query) {
       const stamp = document.createElement("div");
       stamp.className = "search-timer";
       stamp.textContent = "Finished " + Math.max(1, Math.round((Date.now() - started) / 1000)) + "s";
+      // v129 MODEL CITATION: the model that actually served this answer, appended to
+      // the stamp — the orchestrator's routing made visible (Auto shows the resolved
+      // model; a paid-budget fallback is flagged). Council responses also carry their
+      // per-model chips below the answer.
+      const served = servedModel || modelOverride || purpose;
+      if (served) {
+        const mb = document.createElement("span");
+        mb.className = "model-badge";
+        mb.textContent = (purpose === "general" && !modelOverride ? "Auto → " : "") + FRIENDLY_MODEL(served) + (budgetFallback ? " · free fallback (budget cap)" : "");
+        stamp.appendChild(mb);
+      }
       if (revised) stamp.appendChild(revisedBadge());
       content.appendChild(stamp);
       renderDegradedNote(content, degradedPhases, query);
@@ -4390,7 +4455,7 @@ async function performSearchInner(query) {
       speakAnswer(answerClean);
       thread.messages.push({ role: "user", content: fullQuery });
       thread.updatedAt = Date.now();
-      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(revised ? { revised: true } : {}), ...(imageResults.length ? { images: imageResults } : {}), ...(stepsC.length ? { steps: stepsC } : {}), ...(councilInfo ? { council: councilInfo } : {}) });
+      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(servedModel ? { servedModel } : {}), ...(budgetFallback ? { budgetFallback: true } : {}), ...(revised ? { revised: true } : {}), ...(imageResults.length ? { images: imageResults } : {}), ...(stepsC.length ? { steps: stepsC } : {}), ...(councilInfo ? { council: councilInfo } : {}) });
       saveThreads();
       renderThreads();
       // v74: stay where the reader is — jump to the bottom ONLY if they were
@@ -4508,6 +4573,10 @@ async function performSearchInner(query) {
         throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
       }
       const ct = res.headers.get("content-type") || "";
+      // v129: capture the orchestrator's actual pick from the response headers
+      // (x-model is what the gateway served — including any budget fallback).
+      servedModel = res.headers.get("x-model") || servedModel;
+      if (res.headers.get("x-budget-exceeded") === "1") budgetFallback = true;
       if (ct.includes("text/event-stream") && res.body) {
         const reader = res.body.getReader();
         const dec = new TextDecoder();
@@ -4549,6 +4618,8 @@ async function performSearchInner(query) {
         renderFinal(revisedText || full, !!revisedText);
       } else {
         const data = await res.json();
+        if (typeof data?.x_model === "string" && data.x_model) servedModel = data.x_model; // v129: the non-streaming path carries the served model in the body
+        if (data?.x_budget_exceeded === true || data?.x_budget_exceeded === "1") budgetFallback = true;
         if (Array.isArray(data?.images)) imageResults = data.images;
         if (Array.isArray(data?.x_phases)) { lastPhases = data.x_phases; degradedPhases = lastPhases.filter(isDegradedPhase); const si = sourcesFromPhases(lastPhases).filter(x => x.canon); if (si.length) lastCanon = si; }
         if (Array.isArray(data?.x_sources)) { const si = sourcesFromPhases([{ kind: "search", items: data.x_sources }]); if (si.length) lastCanon = si; }
