@@ -236,6 +236,50 @@
   function memoryItems() { return lsJSON("ai_memory_items", []); }
   function saveMemoryItems(list) { lsSet("ai_memory_items", JSON.stringify(list)); }
 
+  // v97: SERVER-SIDE MEMORY SYNC — the store lives in public.memory_items (database);
+  // localStorage is now a cache. Write-through on every mutation, one pull-merge per session.
+  // deterministic uuid-format id for locally-created items (the server table requires UUIDs)
+  function memUuid(str) {
+    var h1 = 0x811c9dc5, h2 = 0x1000193, i;
+    for (i = 0; i < str.length; i++) { h1 = (h1 ^ str.charCodeAt(i)) * 16777619 >>> 0; h2 = (h2 + str.charCodeAt(i) * 31) >>> 0; }
+    var p = function (n, w) { var x = n.toString(16); while (x.length < w) x = "0" + x; return x; };
+    return [p(h1, 8), p(h2 & 0xffff, 4), "4" + p((h2 >> 4) & 0xfff, 3), "8" + p((h1 >> 8) & 0xfff, 3), p(((h1 << 16) ^ h2) & 0xffffffff, 8)].join("-").slice(0, 36);
+  }
+  function memSyncUpsert(item) {
+    try {
+      if (typeof sb === "undefined" || !sb || typeof currentUser === "undefined" || !currentUser) return;
+      var isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(item.id));
+      var sid = isUuid ? item.id : memUuid(String(item.id) + ":" + String(item.text).slice(0, 40));
+      sb.from("memory_items").upsert({ id: sid, user_id: currentUser.id, text: String(item.text || "").slice(0, 5000), created_at: item.createdAt || new Date().toISOString() }).then(function () {}, function () {});
+    } catch (e) {}
+  }
+  function memSyncDelete(id) {
+    try {
+      if (typeof sb === "undefined" || !sb) return;
+      sb.from("memory_items").delete().eq("id", id).then(function () {}, function () {});
+    } catch (e) {}
+  }
+  var memPulled = false;
+  function memSyncPull() {
+    if (memPulled || typeof sb === "undefined" || !sb || typeof currentUser === "undefined" || !currentUser) return Promise.resolve(false);
+    memPulled = true;
+    return sb.from("memory_items").select("id,text,created_at").order("created_at", { ascending: false }).limit(2000)
+      .then(function (r) {
+        if (!r || r.error || !Array.isArray(r.data)) return false;
+        var server = (r.data || []).map(function (x) { return { id: x.id, text: x.text, createdAt: x.created_at }; }).filter(function (x) { return x.text; });
+        var local = memoryItems();
+        // dedupe by TEXT (server wins): locally-imported items may carry px- ids the server re-keyed
+        var serverText = {}; server.forEach(function (x) { serverText[x.text.slice(0, 80)] = 1; });
+        var kept = local.filter(function (x) { return x.text && !serverText[x.text.slice(0, 80)]; });
+        kept.forEach(function (x) { if (x.text) memSyncUpsert(x); });
+        var haveIds = {}; (kept.concat(server)).forEach(function (x) { haveIds[x.id] = 1; });
+        var add = server.filter(function (x) { return !haveIds[x.id]; });
+        var merged = kept.concat(add);
+        if (merged.length !== local.length || add.length) saveMemoryItems(merged);
+        return add.length > 0;
+      }, function () { return false; });
+  }
+
   function paneMemory() {
     var pane = el("div", "stg-pane");
     pane.appendChild(el("h3", "stg-pane-title", "Memory"));
@@ -273,8 +317,10 @@
         var v = input.value.trim();
         if (!v) return;
         var items2 = memoryItems();
-        items2.push({ id: uid(), text: v, createdAt: new Date().toISOString() });
+        var added = { id: uid(), text: v, createdAt: new Date().toISOString() };
+        items2.push(added);
         saveMemoryItems(items2);
+        memSyncUpsert(added);
         input.value = "";
         renderList();
         input.focus();
@@ -285,8 +331,9 @@
       listWrap.appendChild(add);
     }
     renderList();
-    pane.appendChild(row("Memory entries", "Add, edit, or remove individual memories.", null, true));
+    pane.appendChild(row("Memory entries", "Stored in your account (synced across devices); this browser keeps a working copy.", null, true));
     pane.appendChild(listWrap);
+    memSyncPull().then(function (changed) { if (changed) renderList(); });
     return pane;
   }
   function memoryRow(m, rerender) {
@@ -306,6 +353,7 @@
       delBtn.setAttribute("aria-label", "Delete memory");
       delBtn.addEventListener("click", function () {
         saveMemoryItems(memoryItems().filter(function (x) { return x.id !== m.id; }));
+        memSyncDelete(m.id);
         rerender();
       });
       rowEl.appendChild(editBtn);
@@ -330,8 +378,8 @@
         var items = memoryItems();
         var i = items.findIndex(function (x) { return x.id === m.id; });
         if (i >= 0) {
-          if (v) { items[i].text = v; saveMemoryItems(items); }
-          else items.splice(i, 1), saveMemoryItems(items);
+          if (v) { items[i].text = v; saveMemoryItems(items); memSyncUpsert(items[i]); }
+          else { items.splice(i, 1); saveMemoryItems(items); memSyncDelete(m.id); }
         }
         rerender();
       }
