@@ -33,6 +33,20 @@
   }
   var SEP = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
   function cells(l) { return l.trim().replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); }); }
+  function codeBlock(lines) {
+    var wrap = el('div', 'dp-code');
+    var bar = el('div', 'dp-codebar');
+    var cp = el('button', 'dp-btn', 'Copy'); cp.type = 'button';
+    cp.onclick = function () { copyText(lines.join('\n')).then(function () { cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy'; }, 1500); }); };
+    bar.appendChild(cp); wrap.appendChild(bar);
+    var pre = el('pre'); pre.appendChild(el('code', '', lines.join('\n'))); wrap.appendChild(pre);
+    return wrap;
+  }
+  function copyText(t) {
+    try { if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t); } catch (e) {}
+    try { var ta = el('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); } catch (e) {}
+    return Promise.resolve();
+  }
   function renderMd(text) {
     var root = el('div', 'dp-md'), lines = String(text || '').replace(/\r/g, '').split('\n'), i = 0, m;
     while (i < lines.length) {
@@ -40,7 +54,15 @@
       if ((m = ln.match(/^\s*(`{3,}|~{3,})/))) {
         var code = []; i++;
         while (i < lines.length && !new RegExp('^\\s*' + m[1][0] + '{' + m[1].length + ',}\\s*$').test(lines[i])) code.push(lines[i++]);
-        i++; var pre = el('pre'); pre.appendChild(el('code', '', code.join('\n'))); root.appendChild(pre); continue;
+        i++; root.appendChild(codeBlock(code)); continue;
+      }
+      // v97: indented code blocks (4+ spaces) — previously rendered as body text
+      if (/^ {4,}\S/.test(ln)) {
+        var ind = []; 
+        while (i < lines.length && (/^ {4,}\S/.test(lines[i]) || (lines[i].trim() === '' && lines[i + 1] && /^ {4,}\S/.test(lines[i + 1])))) {
+          ind.push(lines[i].replace(/^ {1,4}/, '')); i++;
+        }
+        root.appendChild(codeBlock(ind)); continue;
       }
       if (/^\s*\|.*\|\s*$/.test(ln) && i + 1 < lines.length && SEP.test(lines[i + 1])) {
         var wrap = el('div', 'dp-tw'), tb = el('table'), th = el('thead'), tr = el('tr');

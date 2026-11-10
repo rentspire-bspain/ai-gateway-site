@@ -310,6 +310,28 @@
   // v145: Perplexity parity — when the assistant produces a document or a web app, the side panel
   // opens with it automatically (once per artifact), the way Perplexity opens a created artifact.
   var autoOpened = {};
+  // v97: a fenced DOCUMENT no longer dumps its full raw text in the chat stream — the block is
+  // collapsed into a compact chip (like Perplexity's artifact preview) that opens the side panel.
+  function collapseDocBlock(answerContent, a) {
+    if (!answerContent || a.kind !== 'markdown') return;
+    var want = String(a.content || '').trim();
+    var pres = answerContent.querySelectorAll('pre');
+    for (var i = 0; i < pres.length; i++) {
+      var t = (pres[i].innerText || '').trim();
+      if (!t || t.length < 300) continue;
+      var head = want.slice(0, 160);
+      if (t.indexOf(head) !== 0 && want.indexOf(t.slice(0, 160)) !== 0) continue;
+      var pre = pres[i];
+      if (pre.getAttribute('data-doc-collapsed')) continue;
+      pre.setAttribute('data-doc-collapsed', '1');
+      pre.style.display = 'none';
+      var chip = el('button', { 'class': 'artifact-card doc-chip', type: 'button', 'aria-label': 'Open ' + a.title });
+      chip.innerHTML = '<span class="af-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></span><span class="af-txt"><span class="af-title"></span><span class="af-kind">Markdown document · click to open</span></span><span class="af-open">Open</span>';
+      chip.querySelector('.af-title').textContent = a.title;
+      chip.onclick = function () { open(a); };
+      pre.parentNode.insertBefore(chip, pre);
+    }
+  }
   function placeCards(answerContent, text) {
     var arts = extractFromAnswer(text);
     runHooks(answerContent, text);
@@ -325,6 +347,7 @@
     var actions = host.querySelector(':scope > .answer-actions');
     if (actions) actions.after(row);
     arts.forEach(function (a) { renderInline(row, a); });
+    arts.forEach(function (a) { collapseDocBlock(answerContent, a); });
     arts.forEach(function (a) {
       if ((a.kind === 'markdown' || a.kind === 'webapp' || a.kind === 'html') && !autoOpened[a.id]) {
         autoOpened[a.id] = 1;

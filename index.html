@@ -156,6 +156,7 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  overflow: hidden;   /* v97: squeezed sidebars must clip, never bleed text over the main column */
   transition: width 0.2s ease, transform 0.2s ease, visibility 0s;
 }
 .sidebar.resizing { transition: none; }
@@ -805,7 +806,7 @@ a.cite-plain:hover, a.cite-plain:focus-visible { text-decoration:underline!impor
 .composer-pills > *, .composer-pills .sources-pill { flex:0 0 auto; }
 #followupPills .pill-txt, #followupPills #incognitoLabel { display:none; }
 #followupPills .width-toggle { padding-left:10px; padding-right:10px; }
-#followupPills .model-select { max-width:140px; }
+#followupPills .model-select { max-width:170px; }
 .composer-pills .model-select { max-width:180px; }
 .composer-pills .width-toggle#deepResearchToggle.active { background:var(--accent-btn); color:#fff; border-color:var(--accent-btn); font-weight:600; box-shadow:0 0 0 3px var(--accent-light); }
 .composer-pills .width-toggle#deepResearchToggle.active svg { stroke:#fff; }
@@ -1502,13 +1503,13 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
         <select class="model-select" id="modelSel" title="Model — uncensored options answer without hedging">
           <!-- v129: every option carries its one-line "best at" description so the
                choice is self-explanatory in the dropdown itself. -->
-          <option value="general">Auto — everyday default (GLM-5.3)</option>
-          <option value="flint">Flint v1.0 — coding & agents (free)</option>
-          <option value="summary">Qwen3.8-27B — fast summaries (free)</option>
-          <option value="kimi">Kimi K3.1 Pro — long-context reasoning</option>
-          <option value="deepseek-flash">DeepSeek V4.1 Flash — fast generalist</option>
-          <option value="gpt-oss">GPT-OSS 120B — balanced open-weight</option>
-          <option value="llama4">Llama 4 Maverick — general chat</option>
+          <option value="general" title="Auto — GLM-5.3, the everyday default. Best all-round quality; free Qwen fallback if the budget cap is hit.">Auto (GLM-5.3)</option>
+          <option value="flint" title="Flint v1.0 — coding and agentic work (free).">Flint v1.0 (free)</option>
+          <option value="summary" title="Qwen3.8-27B — fast summaries (free).">Qwen3.8 (free)</option>
+          <option value="kimi" title="Kimi K3.1 Pro — long-context reasoning.">Kimi K3.1 Pro</option>
+          <option value="deepseek-flash" title="DeepSeek V4.1 Flash — fast generalist.">DeepSeek V4.1 Flash</option>
+          <option value="gpt-oss" title="GPT-OSS 120B — balanced open-weight.">GPT-OSS 120B</option>
+          <option value="llama4" title="Llama 4 Maverick — general chat.">Llama 4 Maverick</option>
           <option value="venice">Venice Uncensored — blunt, no hedging</option>
           <option value="dolphin">Dolphin Uncensored 24B — blunt, no hedging</option>
         </select>
