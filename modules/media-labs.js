@@ -240,7 +240,10 @@
     ["landingPills", "followupPills"].forEach(function (id) {
       var host = document.getElementById(id);
       if (!host || host.querySelector(".ml-pill")) return;
-      var b = el("button", "width-toggle ml-pill", "🧪 Labs"); b.type = "button"; b.title = "Labs: build an app or report";
+      var b = el("button", "width-toggle ml-pill"); b.type = "button";
+      var bi = document.createElement("span"); bi.className = "pill-ico"; bi.textContent = "🧪";
+      var bt = document.createElement("span"); bt.className = "pill-txt"; bt.textContent = "Labs";
+      b.appendChild(bi); b.appendChild(bt); b.setAttribute("aria-label", "Labs"); b.title = "Labs: build an app or report";
       b.onclick = function (e) { e.stopPropagation(); open(); };
       host.appendChild(b);
     });

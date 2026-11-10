@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-wYpwKuSwkKppM0wcbJhCZn8vTRIIQ/9nA+QV2P3OCyg=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-DGL6rT1MqfvT5+PW2Wj/Zt6aK1DpVFi7RwPfgvjhw/w=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -761,11 +761,42 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .tab-panel { margin-bottom: 14px; }
 
 /* v75 citation chips + links tab */
-.cite-chip { display:inline-flex; align-items:center; gap:4px; vertical-align:baseline; margin:0 2px; padding:1px 7px 1px 4px; max-width:150px; border:1px solid var(--border); border-radius:999px; background:var(--bg-elevated); color:var(--text-muted)!important; font-size:11.5px; line-height:18px; text-decoration:none!important; position:relative; white-space:nowrap; cursor:pointer; }
+.cite-chip { display:inline-flex; align-items:baseline; gap:4px; vertical-align:baseline; margin:0 2px; padding:0 7px; max-width:120px; border:1px solid var(--border); border-radius:999px; background:var(--bg-elevated); color:var(--text-muted)!important; font-size:11.5px; line-height:18px; text-decoration:none!important; position:relative; white-space:nowrap; cursor:pointer; }
 .cite-chip:hover, .cite-chip:focus-visible { border-color:var(--accent); color:var(--text)!important; outline:none; }
 .cite-chip img { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
 .cite-chip .cn { font-weight:600; color:var(--accent); }
 .cite-chip .cd { overflow:hidden; text-overflow:ellipsis; min-width:0; }
+/* v95 compact "domain N" chip (Perplexity-style); plain [N] inside table cells */
+.cite-chip { font-size:11px; line-height:16px; top:-1px; }
+.cite-chip .cd { order:1; }
+.cite-chip .cn { order:2; font-weight:600; color:var(--accent); }
+a.cite-plain { color:var(--accent)!important; text-decoration:none!important; font-size:11.5px; font-weight:600; white-space:nowrap; }
+a.cite-plain:hover, a.cite-plain:focus-visible { text-decoration:underline!important; outline:none; }
+/* v95 favicon letter tile: consistent hashed background, white letter */
+.sc-fav.fb { color:#fff!important; border:none!important; text-transform:uppercase; box-sizing:border-box; }
+.source-card .sc-title, .source-title { overflow-wrap:break-word; word-break:normal!important; hyphens:auto; }
+/* v95 loading state: live query line + stable question scroll anchor */
+.searching-query { max-width:100%; margin:2px 0 4px; font-size:13px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; }
+.question-header { scroll-margin-top:12px; }
+/* v95 composer toolbar: one row, stable order, obvious Research state */
+.composer-pills { flex-wrap:nowrap!important; overflow-x:auto; scrollbar-width:none; }
+.composer-pills::-webkit-scrollbar { display:none; }
+.composer-pills > *, .composer-pills .sources-pill { flex:0 0 auto; }
+#followupPills .pill-txt, #followupPills #incognitoLabel { display:none; }
+#followupPills .width-toggle { padding-left:10px; padding-right:10px; }
+#followupPills .model-select { max-width:140px; }
+.composer-pills .model-select { max-width:180px; }
+.composer-pills .width-toggle#deepResearchToggle.active { background:var(--accent-btn); color:#fff; border-color:var(--accent-btn); font-weight:600; box-shadow:0 0 0 3px var(--accent-light); }
+.composer-pills .width-toggle#deepResearchToggle.active svg { stroke:#fff; }
+.composer-pills .width-toggle#deepResearchToggle.active:hover { background:var(--accent-btn-hover); color:#fff; }
+/* v95 council badge: expandable per-model chips */
+button.council-badge { cursor:pointer; font-family:inherit; }
+button.council-badge:hover, button.council-badge:focus-visible { border-color:var(--accent); outline:none; }
+.council-badge .cb-chev { font-size:9px; transition:transform .15s ease; }
+.council-badge[aria-expanded="true"] .cb-chev { transform:rotate(180deg); }
+.council-models { display:flex; flex-wrap:wrap; gap:5px; }
+.council-models[hidden] { display:none; }
+.council-model { display:inline-flex; align-items:center; padding:2px 9px; border:1px solid var(--border); border-radius:999px; background:var(--bg-surface); color:var(--text-muted); font-size:12px; line-height:18px; }
 .cite-card { position:fixed; z-index:9999; width:280px; max-width:calc(100vw - 16px); padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--bg-elevated); color:var(--text); box-shadow:0 8px 24px rgba(0,0,0,.25); font-size:12.5px; line-height:1.4; pointer-events:none; }
 .cite-card .cc-dom { display:flex; align-items:center; gap:6px; color:var(--text-muted); font-size:11.5px; margin-bottom:4px; }
 .cite-card .cc-dom img { width:14px; height:14px; border-radius:3px; }
@@ -1008,7 +1039,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   bottom: 0;
   background: rgba(0,0,0,0.6);
   backdrop-filter: blur(4px);
-  z-index: 400;
+  z-index: 20000; /* above every module overlay (max 10001) so the expired-session gate is never hidden */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1412,7 +1443,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
           <span id="voiceLabel">Voice</span>
         </button>
-        <button class="width-toggle" id="deepResearchToggle" title="Deep Research: minutes-long expert-grade reports (high effort, many sources)">
+        <button class="width-toggle" id="deepResearchToggle" aria-pressed="false" title="Deep Research: minutes-long expert-grade reports (high effort, many sources)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg>
           <span id="deepResearchLabel">Research</span>
         </button>
@@ -1468,12 +1499,6 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
     </div>
 
     <!-- SEARCH RESULTS -->
-    <div class="searchbar-wrapper" id="searchbarWrapper" style="display:none">
-      <div class="searchbar-mini">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="searchbarInput" placeholder="Ask a follow-up..." autocomplete="off">
-      </div>
-    </div>
     <div class="results-scroll" id="resultsScroll" style="display:none">
       <div class="results-inner" id="resultsInner">
         <div class="status-banner" id="statusBanner" style="display:none">
@@ -1838,8 +1863,10 @@ function attachDrag(handle, opts) {
 let deepResearchOn = false;
 document.getElementById("deepResearchToggle").onclick = () => {
   deepResearchOn = !deepResearchOn;
-  document.getElementById("deepResearchToggle").classList.toggle("active", deepResearchOn);
-  document.getElementById("deepResearchLabel").textContent = deepResearchOn ? "Deep" : "Research";
+  const drb = document.getElementById("deepResearchToggle");
+  drb.classList.toggle("active", deepResearchOn);
+  drb.setAttribute("aria-pressed", String(deepResearchOn));
+  document.getElementById("deepResearchLabel").textContent = deepResearchOn ? "Deep \u2713" : "Research";
 };
 
 // ===== v83: Council (H3) + Incognito (B8) toggles =====
@@ -2663,7 +2690,6 @@ document.getElementById("newThreadIcon").onclick = newThread;
 function showLanding() {
   document.getElementById("landing").style.display = "flex";
   positionComposerPills();
-  document.getElementById("searchbarWrapper").style.display = "none";
   document.getElementById("resultsScroll").style.display = "none";
   document.getElementById("followupWrapper").style.display = "none";
   document.getElementById("breadcrumb").textContent = "Search";
@@ -2676,14 +2702,17 @@ function positionComposerPills() {
   const landingVisible = document.getElementById("landing").style.display !== "none";
   const target = landingVisible ? document.getElementById("landingPills") : document.getElementById("followupPills");
   if (!target) return;
+  // v95: fixed order everywhere: Model, Research, Sources (module-placed right after Research), Council, Incognito
   target.appendChild(document.getElementById("modelSel"));
   target.appendChild(document.getElementById("deepResearchToggle"));
+  const srcPill = target.querySelector(".sources-pill");
+  if (srcPill) target.appendChild(srcPill);
   target.appendChild(document.getElementById("councilToggle"));
   target.appendChild(document.getElementById("incognitoToggle"));
+  target.querySelectorAll(".mg-pill:not(.mg-pill-video), .mg-pill-video, .ml-pill").forEach(b => target.appendChild(b)); // media entry points always last
 }
 function showResults() {
   document.getElementById("landing").style.display = "none";
-  document.getElementById("searchbarWrapper").style.display = "block";
   document.getElementById("resultsScroll").style.display = "block";
   document.getElementById("followupWrapper").style.display = "block";
   // v74: relocate the Model / Research pills AFTER the landing is hidden — before,
@@ -2694,6 +2723,153 @@ function showResults() {
 
 // ============ AUTH ============
 const authOverlay = document.getElementById("authOverlay");
+// ---- AuthGuard: ONE place that knows what a dead session looks like ----
+// Every gateway / edge-function / PostgREST call that carries the user's JWT goes through the fetch wrapper below.
+// A 401 first tries one token refresh (and transparently replays the request); only when the refresh itself is
+// rejected is the session considered dead -> stale state is cleared, the sign-in gate is shown with
+// "Your session expired — sign in again." and every caller can render the same message where its answer would go.
+// Sign-out is local-first: it clears all local auth state even when the server session is already gone.
+const AuthGuard = (function () {
+  const KEY_RE = /^sb-[a-z0-9]+-auth-token(?:-code-verifier|-user)?$/; // supabase-js keys; the extension bridge mirrors sb-<ref>-auth-token
+  const EXPIRED_MSG = "Your session expired — sign in again.";
+  const nativeFetch = window.fetch.bind(window);
+  let expired = false, inflight = null, lastVerify = 0;
+  const wait = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
+
+  function clearLocal() {
+    try { sb.auth.stopAutoRefresh(); } catch (e) {}
+    for (const store of [window.localStorage, window.sessionStorage]) {
+      try {
+        const keys = [];
+        for (let i = 0; i < store.length; i++) { const k = store.key(i); if (k && KEY_RE.test(k)) keys.push(k); }
+        keys.forEach(k => store.removeItem(k));
+      } catch (e) {}
+    }
+    try { localStorage.removeItem("sb-bnxermyboeigvwonfrzx-auth-token"); } catch (e) {}
+    // tell the extension bridge to drop its mirrored copy right now (it also notices on its 1 s poll / pagehide)
+    try { window.dispatchEvent(new CustomEvent("aisc:signout")); } catch (e) {}
+    currentUser = null;
+    try { document.getElementById("userEmail").textContent = "Sign in"; document.getElementById("userAvatar").textContent = "?"; } catch (e) {}
+  }
+  function showGate(msg) {
+    const ov = document.getElementById("authOverlay"); if (!ov) return;
+    const sub = ov.querySelector(".auth-subtitle");
+    if (sub) sub.textContent = msg || "Sign in to start searching";
+    const err = document.getElementById("authError"); if (err) err.textContent = "";
+    const s1 = document.getElementById("authStep1"), s2 = document.getElementById("authStep2");
+    if (s1) s1.style.display = ""; if (s2) s2.style.display = "none";
+    ov.style.display = "flex";
+  }
+  // typed on purpose: only errors raised after the server rejected BOTH the token and a refresh may sign the user out
+  function isAuthError(e) { return !!e && e.authExpired === true; }
+  function makeError() { const e = new Error(EXPIRED_MSG); e.authExpired = true; return e; }
+  // flip the app to signed-out; idempotent, always (re)shows the gate
+  function expire(msg) {
+    if (!expired) {
+      expired = true;
+      clearLocal();
+      try { wait(sb.auth.signOut({ scope: "local" }), 1500).catch(() => {}); } catch (e) {} // drop supabase-js' in-memory session (no server dependency)
+    }
+    showGate(msg || EXPIRED_MSG);
+    return msg || EXPIRED_MSG;
+  }
+  // true => the server rejected the session AND a refresh; false => alive or unknown (offline etc.). Replays nothing.
+  async function refreshOrDead() {
+    if (inflight) return inflight;
+    inflight = (async () => {
+      try {
+        const r = await wait(sb.auth.refreshSession(), 8000);
+        if (r && r.data && r.data.session) return { alive: true, token: r.data.session.access_token };
+        const err = r && r.error;
+        if (!err) return { alive: false, dead: true };
+        const retryable = err.name === "AuthRetryableFetchError" || /fetch|network|timeout/i.test(String(err.message)) || (err.status >= 500);
+        return retryable ? { alive: false, dead: false } : { alive: false, dead: true };
+      } catch (e) { return { alive: false, dead: false }; }
+      finally { setTimeout(() => { inflight = null; }, 0); }
+    })();
+    return inflight;
+  }
+  // proactive check (init + tab focus): a revoked/expired session must not keep looking signed in
+  async function verify(force) {
+    if (expired || !currentUser) return true;
+    if (!force && Date.now() - lastVerify < 5 * 60 * 1000) return true;
+    lastVerify = Date.now();
+    try {
+      const r = await wait(sb.auth.getUser(), 8000);
+      if (r && r.data && r.data.user) return true;
+      const err = r && r.error;
+      if (err && (err.name === "AuthRetryableFetchError" || /fetch|network|timeout/i.test(String(err.message)) || err.status >= 500)) return true;
+    } catch (e) { return true; }
+    const rd = await refreshOrDead();
+    if (rd.dead) { expire(); return false; }
+    return true;
+  }
+  const urlOf = (i) => typeof i === "string" ? i : (i && i.url) || String(i || "");
+  window.fetch = async function (input, init) {
+    const res = await nativeFetch(input, init);
+    if (res.status !== 401 || expired) return res;
+    try {
+      const url = urlOf(input);
+      if (!(url.startsWith(SUPABASE_URL + "/functions/v1") || url.startsWith(SUPABASE_URL + "/rest/v1") || url.startsWith(SUPABASE_URL + "/storage/v1"))) return res;
+      const h = new Headers((init && init.headers) || (typeof input === "object" && input.headers) || {});
+      const tok = (h.get("authorization") || "").replace(/^Bearer\s+/i, "");
+      if (!tok || tok === SUPABASE_ANON) return res; // anonymous call -> a 401 here is not a session problem
+      const rd = await refreshOrDead();
+      if (rd.dead) { expire(); try { Object.defineProperty(res, "authExpired", { value: true }); } catch (e) {} return res; }
+      if (rd.alive && rd.token && rd.token !== tok && (!init || init.body == null || typeof init.body === "string") && typeof input === "string") {
+        h.set("Authorization", "Bearer " + rd.token); // token was merely stale: replay once with the fresh one
+        return nativeFetch(input, Object.assign({}, init, { headers: h }));
+      }
+    } catch (e) {}
+    return res;
+  };
+  // any module asking for a session while the app believes it is signed in, and getting none, means the session is gone
+  const origGetSession = sb.auth.getSession.bind(sb.auth);
+  sb.auth.getSession = async function () {
+    const r = await origGetSession();
+    try {
+      if (currentUser && !expired && r && r.data && !r.data.session) {
+        const err = r.error;
+        const retryable = err && (err.name === "AuthRetryableFetchError" || /fetch|network/i.test(String(err.message)));
+        if (!retryable) expire();
+      }
+    } catch (e) {}
+    return r;
+  };
+  // Sign out that ALWAYS works: server revoke is best-effort and time-boxed; local state is wiped regardless.
+  async function signOut(opts) {
+    opts = opts || {};
+    expired = true;
+    clearLocal();
+    showGate(opts.message || "You've been signed out.");
+    try { await wait(sb.auth.signOut(), 2500); } catch (e) {} // may fail with a dead session or no network: ignored
+    clearLocal(); // supabase-js can re-persist during the call above; wipe again
+    try { sessionStorage.setItem("ai_gate_msg", opts.message || "You've been signed out."); } catch (e) {}
+    if (opts.reload !== false) setTimeout(() => { try { location.reload(); } catch (e) {} }, 50);
+  }
+  // used by the allowlist-deny paths (they sign out but keep their own message)
+  async function localSignOut() {
+    clearLocal();
+    try { await wait(sb.auth.signOut(), 2500); } catch (e) {}
+    clearLocal();
+  }
+  // put an unsent question back in the composer so a failed send never loses what the user typed
+  function stashQuery(q) {
+    if (!q) return;
+    try { sessionStorage.setItem("ai_pending_query", String(q).slice(0, 4000)); } catch (e) {}
+    for (const id of ["followupInput", "landingInput"]) { const el = document.getElementById(id); if (el && !el.value) { el.value = q; } }
+  }
+  function restoreQuery() {
+    try {
+      const q = sessionStorage.getItem("ai_pending_query"); if (!q) return;
+      sessionStorage.removeItem("ai_pending_query");
+      const el = document.getElementById("landingInput"); if (el && !el.value) el.value = q;
+    } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") verify(false); });
+  return { EXPIRED_MSG, isAuthError, makeError, expire, showGate, verify, refreshOrDead, signOut, localSignOut, clearLocal, stashQuery, restoreQuery };
+})();
+window.AuthGuard = AuthGuard;
 // v72: private-site lock — only allowlisted accounts may use ai.spaincos.com.
 // v91: the allowlist is now LIVE (org_allowlist table, managed from Settings → Team).
 // Invites update it instantly — no code deploy needed to admit someone.
@@ -2709,8 +2885,7 @@ async function checkAuth() {
   if (data?.session?.user?.email) {
     if (!(await signinAllowed(data.session.user.email))) {
       // not on the allowlist — sign them out and keep the site blocked
-      await sb.auth.signOut();
-      currentUser = null;
+      await AuthGuard.localSignOut();
       const sub = document.querySelector(".auth-subtitle");
       if (sub) sub.textContent = "This site is private. Sign in with an authorized account.";
       authOverlay.style.display = "flex";
@@ -2791,7 +2966,7 @@ const accountMenu = (function () {
       else if (act === "settings") { window.SettingsUI && window.SettingsUI.open(); }
       else if (act === "kbd") { if (window.openShortcutsHelp) window.openShortcutsHelp(); }
       else if (act === "imp") { document.getElementById("importHistoryBtn").click(); }
-      else if (act === "out") { await sb.auth.signOut(); currentUser = null; location.reload(); }
+      else if (act === "out") { await AuthGuard.signOut(); }
     });
     document.body.appendChild(scrim);
     document.body.appendChild(menu);
@@ -2845,7 +3020,7 @@ document.getElementById("authPasskeyBtn").onclick = async () => {
     const { data, error: pkErr } = await sb.auth.signInWithWebAuthn();
     if (pkErr) return err.textContent = pkErr.message;
     if (data?.session?.user?.email && !(await signinAllowed(data.session.user.email))) {
-      await sb.auth.signOut();
+      await AuthGuard.localSignOut();
       return err.textContent = "This site is private.";
     }
     authOverlay.style.display = "none";
@@ -2935,7 +3110,9 @@ function renderSearching(container, query) {
       <span class="ap-chev">▾</span>
       <span class="search-timer">Working 0s</span>
     </button>
+    <div class="searching-query"></div>
     <div class="searching-phases"></div>`;
+  state.querySelector(".searching-query").textContent = "\u201c" + clipWords(query, 140) + "\u201d";
   container.appendChild(state);
   const pill = state.querySelector(".agents-pill");
   const phasesBox = state.querySelector(".searching-phases");
@@ -2944,15 +3121,21 @@ function renderSearching(container, query) {
     pill.setAttribute("aria-expanded", String(expanded));
     phasesBox.style.display = expanded ? "flex" : "none";
   });
+  // v95: ONE source of truth for elapsed time. `started` is the single clock; the pill total and every
+  // per-step timer are derived from it in the same tick (same rounding), so they can never disagree.
   const started = Date.now();
-  const timer = setInterval(() => {
+  state._started = started;
+  state._seen = Object.create(null); // step key -> ms offset from `started` when the step first appeared
+  const tick = () => {
+    const el = Math.max(0, Math.floor((Date.now() - started) / 1000));
     const t = state.querySelector(".search-timer");
-    if (t) t.textContent = "Working " + Math.round((Date.now() - started) / 1000) + "s";
-    // per-step elapsed timers tick on every live agent row
-    state.querySelectorAll(".searching-step.live .step-timer").forEach(el => {
-      el.textContent = Math.round((Date.now() - Number(el.dataset.t0)) / 1000) + "s";
+    if (t) t.textContent = "Working " + el + "s";
+    state.querySelectorAll(".searching-step.live .step-timer").forEach(x => {
+      x.textContent = Math.max(0, Math.min(el, el - Math.floor(Number(x.dataset.off || 0) / 1000))) + "s";
     });
-  }, 1000);
+  };
+  state._tick = tick;
+  const timer = setInterval(tick, 1000);
   return { state, interval: timer, started };
 }
 // v79 (I10): phases that report a degraded/failed step get an error style and a
@@ -3025,19 +3208,24 @@ function renderPhases(state, phases) {
     state.appendChild(box);
   }
   box.textContent = "";
-  const t0 = Date.now();
-  for (const p of phases) { // label comes from the server / the web: never innerHTML
+  state._seen = state._seen || Object.create(null);
+  const base = state._started || Date.now();
+  for (const p0 of phases) { // label comes from the server / the web: never innerHTML
+    const p = publicPhase(p0);
+    const seenKey = String(p0.kind || "") + "|" + String(p0.label || "");
+    if (state._seen[seenKey] == null) state._seen[seenKey] = Math.max(0, Date.now() - base);
     const row = document.createElement("div");
     const planItems = planItemsOf(p);
     row.className = "searching-step " + (p.done ? "done" : "live") + (isDegradedPhase(p) ? " err" : "") + (planItems.length ? " plan-row" : "");
     if (isDegradedPhase(p) || p.done) row.appendChild(document.createTextNode(isDegradedPhase(p) ? "\u26a0" : "\u2713"));
     else { const sp = document.createElement("span"); sp.className = "searching-spinner"; sp.style.cssText = "width:10px;height:10px;margin:0"; row.appendChild(sp); }
     row.appendChild(document.createTextNode(" " + String(p.label == null ? "" : p.label)));
-    if (!p.done) { const tm = document.createElement("span"); tm.className = "step-timer"; tm.dataset.t0 = String(t0); row.appendChild(tm); }
+    if (!p.done) { const tm = document.createElement("span"); tm.className = "step-timer"; tm.dataset.off = String(state._seen[seenKey]); row.appendChild(tm); }
     if (planItems.length) row.appendChild(buildPlanList(planItems));
     box.appendChild(row);
     if (p.kind === "search" && Array.isArray(p.items) && p.items.some(x => x && x.url)) { const chips = buildSrcChips(p.items, 18); if (chips) box.appendChild(chips); }
   }
+  if (typeof state._tick === "function") state._tick();
   // v93: the pill's live agent count = running steps (min 1 — the pipeline itself is an agent)
   const pill = state.querySelector(".agents-pill");
   if (pill) {
@@ -3129,45 +3317,95 @@ function generateRelated(query, answer) {
 // v75: Perplexity-style citation chips. Builds one master source list
 // (gateway sources first, then any other http links in the answer, in order of
 // first appearance) so chips, source cards and the Links tab share numbering.
-function citeFavicon(domain) {
-  const im = document.createElement("img");
-  im.alt = ""; im.loading = "lazy";
-  im.src = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(domain) + "&sz=32";
-  im.onerror = function () { this.onerror = null; this.src = "https://icons.duckduckgo.com/ip3/" + domain + ".ico"; };
-  return im;
-}
-// v94: favicon with a graceful end of the fallback chain (google s2 -> duckduckgo -> letter tile).
+// v95: favicon fallback chain: Google s2 -> DuckDuckGo -> clean domain-letter tile (hashed, consistent background).
 // Always an <img> built with createElement (img-src allows https:); never innerHTML.
+function domainHue(domain) { let h = 0; const d = String(domain || "?"); for (let k = 0; k < d.length; k++) h = (h * 31 + d.charCodeAt(k)) >>> 0; return h % 360; }
+function letterTile(domain, className) {
+  const fb = document.createElement("span");
+  fb.className = (className ? className + " " : "") + "fb";
+  const d = String(domain || "?").replace(/^www\./, "");
+  fb.textContent = (d.match(/[a-z0-9]/i) || ["?"])[0].toUpperCase();
+  fb.style.background = "hsl(" + domainHue(domain) + ",42%,38%)";
+  fb.setAttribute("aria-hidden", "true");
+  return fb;
+}
 function srcFavicon(domain, cls) {
   const im = document.createElement("img");
   im.className = "sc-fav" + (cls ? " " + cls : "");
   im.alt = ""; im.loading = "lazy"; im.decoding = "async"; im.referrerPolicy = "no-referrer";
-  im.src = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(domain) + "&sz=32";
-  let tried = 0;
+  const chain = [
+    "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(domain) + "&sz=64",
+    "https://icons.duckduckgo.com/ip3/" + encodeURIComponent(domain) + ".ico"
+  ];
+  let step = 0;
+  im.src = chain[0];
+  // Google answers an unknown host with a 404 + a 16px default globe that still "loads": treat a 16px s2 result as a miss
+  im.onload = function () { if (step === 0 && this.naturalWidth > 0 && this.naturalWidth <= 16) this.onerror(); };
   im.onerror = function () {
-    if (tried++ === 0) { this.src = "https://icons.duckduckgo.com/ip3/" + encodeURIComponent(domain) + ".ico"; return; }
+    if (++step < chain.length) { this.src = chain[step]; return; }
     this.onerror = null;
-    const fb = document.createElement("span");
-    fb.className = im.className + " fb"; fb.textContent = (String(domain || "?")[0] || "?").toUpperCase();
-    fb.setAttribute("aria-hidden", "true");
-    if (this.parentNode) this.parentNode.replaceChild(fb, this);
+    if (this.parentNode) this.parentNode.replaceChild(letterTile(domain, im.className.replace(/\bfb\b/, "").trim()), this);
   };
   return im;
+}
+// v95: ellipsize a domain at a label/word boundary (never mid-word): drop leading subdomains first, then cut at a hyphen.
+function shortDomain(domain, max) {
+  let d = String(domain || "").replace(/^www\./, ""); max = max || 22;
+  if (d.length <= max) return d;
+  const labels = d.split(".");
+  // keep the registrable domain (3 labels for co.uk-style suffixes)
+  const keep = (labels.length > 2 && labels[labels.length - 1].length === 2 && labels[labels.length - 2].length <= 3) ? 3 : 2;
+  while (labels.length > keep && labels.join(".").length > max) labels.shift();
+  d = labels.join(".");
+  if (d.length <= max) return d;
+  const cut = d.slice(0, max - 1), k = /[-.]/.test(d.charAt(max - 1)) ? cut.length : Math.max(cut.lastIndexOf("-"), cut.lastIndexOf("."));
+  return k > 3 ? cut.slice(0, k) + "\u2026" : d; // single over-long word: keep whole (CSS ellipsis is the last resort)
+}
+// compact label for the inline "domain N" chip: registrable name without TLD ("nytimes" for www.nytimes.com)
+function chipDomain(domain) {
+  const labels = String(domain || "").replace(/^www\./, "").split(".");
+  let base = labels.length > 2 && labels[labels.length - 2].length <= 3 ? labels[labels.length - 3] : (labels.length > 1 ? labels[labels.length - 2] : labels[0]);
+  base = base || String(domain || "");
+  if (base.length > 14) { const cut = base.slice(0, 14); const k = cut.lastIndexOf("-"); base = k > 3 ? cut.slice(0, k) + "\u2026" : base.slice(0, 13) + "\u2026"; }
+  return base;
+}
+// v95: clip a title at a WORD boundary
+function clipWords(t, max) {
+  t = String(t || "").replace(/\s+/g, " ").trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max), sp = cut.lastIndexOf(" ");
+  return (sp > max * 0.5 ? cut.slice(0, sp) : cut).replace(/[\s,;:\-\u2013\u2014|]+$/, "") + "\u2026";
 }
 // v94: search sources carried by the phases SSE / x_phases (search step items: {title,url,domain,snippet?}).
 // The first finding is the synthesized live-search answer (not a page) — skip it; its URL reappears as a real source.
 const SYNTH_SRC_TITLE = /^(Perplexity Search \(live web\)|Image analysis \(vision\))$/i;
 function srcKey(u) { return String(u || "").replace(/#.*$/, "").replace(/\/+$/, ""); }
+// v128: defense in depth for junk hosts. The gateway already normalizes, but older saved threads / other lanes may still carry a
+// canary/staging fingerprint host (www-ta-awsma.nytimes.com): rewrite it to the publisher host, drop IP/bare hosts, strip tracking params.
+function canonSrcUrl(u) {
+  try {
+    const x = new URL(String(u || "")); if (!/^https?:$/.test(x.protocol)) return "";
+    let h = x.hostname.toLowerCase(); const L = h.split(".");
+    const JT = ["ta", "stg", "stage", "staging", "qa", "uat", "dev", "test", "canary", "preprod", "origin", "edge"];
+    if (L.length >= 3 && (/^www\d*-[a-z0-9-]+$/.test(L[0]) || /^(canary|staging|stage|stg|preprod|uat)$/.test(L[0]) || (L[0].indexOf("-") > 0 && L[0].split("-").some(t => JT.indexOf(t) >= 0)))) {
+      const two = L[L.length - 1].length === 2 && ["co", "com", "org", "net", "gov", "edu", "ac", "or", "ne", "go"].indexOf(L[L.length - 2]) >= 0;
+      const reg = L.slice(two ? -3 : -2).join("."); h = /^www/.test(L[0]) ? "www." + reg : reg; x.hostname = h;
+    }
+    if (h.indexOf(".") < 0 || /^\d{1,3}(\.\d{1,3}){3}$/.test(h)) return "";
+    x.hash = ""; Array.from(x.searchParams.keys()).forEach(k => { if (/^(utm_[a-z]+|fbclid|gclid|msclkid|mc_cid|mc_eid)$/i.test(k)) x.searchParams.delete(k); });
+    return x.toString();
+  } catch (e) { return ""; }
+}
 function sourcesFromPhases(phases) {
   const out = [], seen = new Set();
   (Array.isArray(phases) ? phases : []).forEach(p => {
     if (!p || p.kind !== "search" || !Array.isArray(p.items)) return;
     p.items.forEach(it => {
       if (!it || SYNTH_SRC_TITLE.test(String(it.title || ""))) return;
-      const url = SafeUrl.http(it.url); if (!url) return;
+      const url = SafeUrl.http(canonSrcUrl(it.url)); if (!url) return;
       const k = srcKey(url); if (seen.has(k)) return; seen.add(k);
       let host = ""; try { host = new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return; }
-      out.push({ url, domain: host, title: String(it.title || "").slice(0, 200), snippet: String(it.snippet || "").slice(0, 240) });
+      out.push(Object.assign({ url, domain: host, title: String(it.title || "").slice(0, 200), snippet: String(it.snippet || "").slice(0, 240) }, Number(it.n) > 0 ? { n: Number(it.n), canon: true } : {}));
     });
   });
   return out;
@@ -3177,6 +3415,44 @@ function mergeSources(primary, extra, cap) {
   (primary || []).concat(extra || []).forEach(s => {
     if (!s || !s.url) return; const k = srcKey(s.url); if (seen.has(k) || out.length >= (cap || 20)) return;
     seen.add(k); out.push(s);
+  });
+  return out;
+}
+// v128: ONE source list for the cards row, the steps chips and the Links tab. The gateway's canonical list (phases items / `sources` event /
+// x_sources; each item carries n == its [N] marker) wins; only answers with no canonical list fall back to phases + URLs found in the text.
+function unifiedSources(phases, canon, text) {
+  const all = (canon && canon.length) ? canon : sourcesFromPhases(phases);
+  const c = all.filter(s => s && s.canon).sort((a, b) => a.n - b.n);
+  if (c.length) return c.slice(0, 30);
+  return mergeSources(all, extractSources(text || ""), 20);
+}
+// v128: phases for the Steps row: guarantee the search step carries the canonical items and that its "N sources" label equals the chips shown.
+function withCanonPhase(phases, canon) {
+  const ph = Array.isArray(phases) ? phases.slice() : [];
+  if (!canon || !canon.length) return ph;
+  const has = ph.some(p => p && p.kind === "search" && Array.isArray(p.items) && p.items.some(i => i && i.url && Number(i.n) > 0));
+  if (has) return ph;
+  const items = canon.map(c => ({ title: c.title, url: c.url, domain: c.domain, n: c.n, snippet: c.snippet }));
+  const i = ph.findIndex(p => p && p.kind === "search" && /sources?\b/i.test(String(p.label || "")));
+  const row = { label: "Searched the web \u2014 " + canon.length + " source" + (canon.length === 1 ? "" : "s"), done: true, kind: "search", count: canon.length, items };
+  if (i >= 0) ph[i] = Object.assign({}, ph[i], row); else ph.splice(Math.min(1, ph.length), 0, row);
+  return ph;
+}
+function fixSearchLabel(p) {
+  const l = String(p.label || "");
+  if (p.kind !== "search" || !Array.isArray(p.items)) return l;
+  const k = sourcesFromPhases([{ kind: "search", items: p.items }]).length;
+  return k > 0 && /\b\d+ sources?\b/i.test(l) ? l.replace(/\b\d+ sources?\b/i, k + " source" + (k === 1 ? "" : "s")) : l;
+}
+// v128: Images tab guard (the gateway already filters; this covers saved threads + other lanes): dedupe by URL, drop favicons / served icons / logos.
+function cleanImgList(list) {
+  const seen = new Set(), out = [];
+  (list || []).forEach(im => {
+    const u = SafeUrl.http(im && im.image_url); if (!u) return;
+    let x; try { x = new URL(u); } catch (e) { return; }
+    if (/favicon|apple-touch-icon|touch-icon|sprite|\.ico$|\/s2\/favicons|faviconV2|\/icons?\/|wikipedia-?logo|wikimedia-?logo|[-_.\/]logo[-_.\/@]|\/static\/images\//i.test(x.hostname + x.pathname)) return;
+    const k = x.hostname.replace(/^www\./, "") + x.pathname; if (seen.has(k)) return; seen.add(k);
+    out.push(im);
   });
   return out;
 }
@@ -3191,7 +3467,7 @@ function buildSrcChips(items, limit) {
     const t = citeTitleFor(m.url, m.domain, m.title);
     a.setAttribute("aria-label", "Source " + (i + 1) + ": " + m.domain + " — " + t);
     a.appendChild(srcFavicon(m.domain));
-    const dd = document.createElement("span"); dd.className = "cd"; dd.textContent = m.domain; a.appendChild(dd);
+    const dd = document.createElement("span"); dd.className = "cd"; dd.textContent = shortDomain(m.domain, 24); a.title = m.domain; a.appendChild(dd);
     const mm = { url: m.url, domain: m.domain, title: t, snippet: m.snippet };
     a.addEventListener("mouseenter", () => showCiteCard(a, mm));
     a.addEventListener("focus", () => showCiteCard(a, mm));
@@ -3201,13 +3477,27 @@ function buildSrcChips(items, limit) {
   });
   return wrap;
 }
+const JUNK_TITLE = /^(untitled|home|index|just a moment\.{0,3}|access denied|attention required.*|are you a robot\??|403 forbidden|404.*|not found|page not found|error|redirecting\.{0,3}|loading\.{0,3}|please wait\.{0,3}|log ?in|sign ?in|null|undefined|n\/a)$/i;
+function isJunkTitle(t, domain) {
+  t = String(t || "").trim();
+  if (t.length < 3) return true;
+  if (/^\[?\d+\]?$/.test(t) || /^https?:\/\//i.test(t) || /^www\./i.test(t)) return true;
+  if (JUNK_TITLE.test(t)) return true;
+  if (domain && t.toLowerCase().replace(/^www\./, "") === String(domain).toLowerCase()) return true;
+  if (!/\s/.test(t) && t.length > 24 && /\d/.test(t)) return true; // opaque id / hash slug
+  if ((t.match(/[a-z]/gi) || []).length < t.length * 0.4) return true; // mostly digits / symbols
+  if (!/\s/.test(t) && ((t.match(/\d/g) || []).length / t.length >= 0.3 || /^[a-z_-]+\d{4,}$/i.test(t))) return true; // article316900069, news-12345
+  if (!/\s/.test(t) && /^[a-z0-9]+([-_][a-z0-9]+)+$/.test(t)) return true; // raw url slug
+  if (t === t.toLowerCase() && t.split(/\s+/).length <= 3 && t.length <= 16 && /[a-z]/.test(t)) return true; // query-fragment sludge: "rust vs go"
+  return false;
+}
 function citeTitleFor(url, domain, text) {
   const t = String(text || "").trim();
-  if (t && !/^\[?\d+\]?$/.test(t) && !/^https?:\/\//i.test(t)) return t;
+  if (!isJunkTitle(t, domain)) return clipWords(t, 120);
   try {
     const u = new URL(url);
     const seg = decodeURIComponent(u.pathname.split("/").filter(Boolean).pop() || "").replace(/\.(html?|php|aspx?)$/i, "").replace(/[-_+]+/g, " ").trim();
-    if (seg && !/^\d+$/.test(seg)) return seg.charAt(0).toUpperCase() + seg.slice(1);
+    if (seg && /\s/.test(seg) && !isJunkTitle(seg, domain)) return clipWords(seg.charAt(0).toUpperCase() + seg.slice(1), 120);
   } catch (e) {}
   return domain;
 }
@@ -3233,42 +3523,60 @@ function showCiteCard(chip, m) {
 function hideCiteCard() { if (_citeCard) { _citeCard.remove(); _citeCard = null; } }
 function buildCitations(content, sources) {
   const master = [], idx = new Map();
-  const add = (url, title, snippet) => {
+  const add = (url, title, snippet, src) => {
+    url = canonSrcUrl(url); if (!url) return -1;
     let host = "";
     try { host = new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return -1; }
-    if (!/^https?:/i.test(url)) return -1;
-    if (idx.has(url)) {
-      const m = master[idx.get(url)];
+    const key = srcKey(url);
+    if (idx.has(key)) {
+      const m = master[idx.get(key)];
       if (snippet && !m.snippet) m.snippet = snippet;
-      return idx.get(url);
+      return idx.get(key);
     }
-    master.push({ url, domain: host, title: citeTitleFor(url, host, title), snippet: snippet || "", cites: 0 });
-    idx.set(url, master.length - 1);
+    master.push(Object.assign({ url, domain: host, title: citeTitleFor(url, host, title), snippet: snippet || "", cites: 0 }, src && src.canon ? { n: src.n, canon: true } : {}));
+    idx.set(key, master.length - 1);
     return master.length - 1;
   };
-  (sources || []).forEach(s => { if (s && s.url) add(s.url, s.title, s.snippet || s.description || ""); });
+  (sources || []).forEach(s => { if (s && s.url) add(s.url, s.title, s.snippet || s.description || "", s); });
   const anchors = [...content.querySelectorAll("a[href]")];
-  anchors.forEach(a => { if (/^https?:/i.test(a.href)) add(a.href, a.textContent, ""); });
-  // convert numeric-citation anchors into chips
-  anchors.forEach(a => {
-    if (!/^\[?\d+\]?$/.test(a.textContent.trim())) return;
-    const i = idx.get(a.href);
-    if (i === undefined) return;
-    const m = master[i]; m.cites++;
-    // strip bracket text nodes wrapping the link: "[" <a>1</a> "]"
+  // v128: with the gateway's canonical list the master list IS that list: a link the model wrote that is not in it is not a source.
+  const strictSrc = (sources || []).length > 0 && (sources || []).every(s => s && s.canon);
+  if (!strictSrc) anchors.forEach(a => { if (/^https?:/i.test(a.href)) add(a.href, a.textContent, ""); });
+  // v95: convert numeric-citation anchors into COMPACT "domain N" chips (Perplexity-style).
+  // Inside table cells they stay a plain linked [N]; consecutive duplicates of the same source are dropped.
+  const stripBrackets = (a) => {
     const prev = a.previousSibling, next = a.nextSibling;
     if (prev && prev.nodeType === 3 && /\[\s*$/.test(prev.nodeValue) && next && next.nodeType === 3 && /^\s*\]/.test(next.nodeValue)) {
       prev.nodeValue = prev.nodeValue.replace(/\[\s*$/, "");
       next.nodeValue = next.nodeValue.replace(/^\s*\]/, "");
     }
+  };
+  const isGap = (n) => n && n.nodeType === 3 && /^[\s,;]*$/.test(n.nodeValue);
+  const converted = [];
+  anchors.forEach(a => {
+    if (!/^\[?\d+\]?$/.test(a.textContent.trim())) return;
+    const i = idx.get(srcKey(canonSrcUrl(a.href) || a.href));
+    if (i === undefined) return;
+    const m = master[i];
+    // dedupe: previous sibling (skipping bare separators) is already a chip/plain cite for the same source
+    stripBrackets(a);
+    let pv = a.previousSibling;
+    while (isGap(pv)) pv = pv.previousSibling;
+    if (pv && pv.nodeType === 1 && pv.dataset && pv.dataset.cite === String(i)) { a.remove(); return; }
+    m.cites++;
     const chip = document.createElement("a");
-    chip.className = "cite-chip";
+    chip.dataset.cite = String(i);
     chip.href = SafeUrl.http(m.url) || "#"; chip.target = "_blank"; chip.rel = "noopener noreferrer";
     chip.setAttribute("aria-label", "Source " + (i + 1) + ": " + m.domain);
-    chip.appendChild(citeFavicon(m.domain));
-    const n = document.createElement("span"); n.className = "cn"; n.textContent = String(i + 1);
-    const dd = document.createElement("span"); dd.className = "cd"; dd.textContent = m.domain;
-    chip.appendChild(n); chip.appendChild(dd);
+    if (a.closest("td, th")) {
+      chip.className = "cite-plain";
+      chip.textContent = "[" + (i + 1) + "]";
+    } else {
+      chip.className = "cite-chip";
+      const dd = document.createElement("span"); dd.className = "cd"; dd.textContent = chipDomain(m.domain);
+      const n = document.createElement("span"); n.className = "cn"; n.textContent = String(i + 1);
+      chip.appendChild(dd); chip.appendChild(n);
+    }
     chip.addEventListener("mouseenter", () => showCiteCard(chip, m));
     chip.addEventListener("focus", () => showCiteCard(chip, m));
     chip.addEventListener("mouseleave", hideCiteCard);
@@ -3341,14 +3649,53 @@ function stepGroup(p) {
   if (/read|fetch|page|image|attached/i.test(l)) return "Read";
   return "Reasoned";
 }
+// v95: UI-only scrubbing of gateway internals. The SSE payload / saved steps keep everything for debugging;
+// the frontend never RENDERS raw model IDs, "Intent: ...; complexity: ..." or the synthetic "Perplexity Search (live web)".
+const MODEL_ID_RE = /\b[a-z0-9][a-z0-9_.-]*\/[a-z0-9][a-z0-9_.:-]*\b/gi;
+const BRAND_CASE = { gpt: "GPT", oss: "OSS", glm: "GLM", llama: "Llama", qwen: "Qwen", qwen3: "Qwen3", kimi: "Kimi", deepseek: "DeepSeek", mistral: "Mistral", dolphin: "Dolphin", venice: "Venice", claude: "Claude", gemini: "Gemini", sonar: "Sonar", flint: "Flint", maverick: "Maverick", pro: "Pro", flash: "Flash", v: "V" };
+function prettyModel(id) {
+  let t = String(id == null ? "" : id).trim();
+  if (!t) return "";
+  t = t.split("/").pop().replace(/:(free|nitro|online|thinking|extended)$/i, "").replace(/-\d{8}$/, "").replace(/-edition$/i, "");
+  return t.split(/[-_]+/).filter(Boolean).map(w => {
+    const lw = w.toLowerCase();
+    if (BRAND_CASE[lw]) return BRAND_CASE[lw];
+    if (/^\d/.test(w) || /^[a-z]\d/i.test(w)) return w.toUpperCase();
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  }).join(" ").replace(/\bV (\d)/g, "V$1");
+}
+function scrubModelIds(text) {
+  const t = String(text == null ? "" : text);
+  if (/https?:\/\//i.test(t)) return t;
+  return t.replace(MODEL_ID_RE, m => prettyModel(m));
+}
+function publicLabel(label) {
+  let l = String(label == null ? "" : label);
+  if (/\bintent\s*:|\bcomplexity\s*:/i.test(l)) return "Understanding your question";
+  if (/perplexity search\s*\(live web\)/i.test(l)) return "Searching the web";
+  if (/image analysis\s*\(vision\)/i.test(l)) return "Analyzing the image";
+  return scrubModelIds(l);
+}
+function publicPhase(p) {
+  if (!p) return p;
+  const out = Object.assign({}, p, { label: publicLabel(p.label) });
+  if (Array.isArray(p.items)) {
+    const isCouncilStep = /^Consulted \d+ models?/i.test(String(p.label || ""));
+    out.items = isCouncilStep ? [] // model list lives in the Council badge (friendly names), not in the steps
+      : p.items.filter(x => x && !SYNTH_SRC_TITLE.test(String(x.title || "")) && !/\bintent\s*:|\bcomplexity\s*:/i.test(String(x.title || x.text || "")))
+               .map(x => (x.title && !x.url) ? Object.assign({}, x, { title: scrubModelIds(x.title) }) : x);
+  }
+  return out;
+}
 function compactSteps(phases) {
   return (Array.isArray(phases) ? phases : []).filter(p => p && p.label && !(p.kind === "draft" && !p.done)).map(p => ({
-    label: String(p.label).slice(0, 200), kind: p.kind || "", done: true,
+    label: fixSearchLabel(p).slice(0, 200), kind: p.kind || "", done: true,
     items: (Array.isArray(p.items) ? p.items : []).slice(0, p.kind === "search" ? 18 : 8).map(i => {
       const o = { title: String(i.title || "").slice(0, 160), domain: i.domain || "" };
       if (i.status) { o.n = Number(i.n) || 0; o.text = String(i.text || "").slice(0, 200); o.status = String(i.status).slice(0, 8); if (i.evidence) o.evidence = String(i.evidence).slice(0, 200); }
       const u = i.url ? SafeUrl.http(i.url) : ""; if (u) o.url = u.slice(0, 500);
       if (i.snippet) o.snippet = String(i.snippet).slice(0, 240);
+      if (Number(i.n) > 0 && !i.status) o.n = Number(i.n);
       return o;
     })
   }));
@@ -3360,16 +3707,31 @@ function councilFromPhases(phases, x) {
   return { models: models.slice(0, 8), chars: (x && x.chars) || [] };
 }
 function renderMeta(container, meta) {
-  const steps = meta && meta.steps || [];
+  const steps = ((meta && meta.steps) || []).map(publicPhase);
   if (!meta || (!steps.length && !meta.council)) return null;
   const wrap = document.createElement("div");
   wrap.className = "answer-meta";
   if (meta.council) {
-    const b = document.createElement("span");
-    b.className = "council-badge";
-    b.textContent = "Council · " + (meta.council.models.length || "several") + " models";
-    b.title = "Several models drafted independently; one writer synthesized the final answer";
+    // v95: badge is a toggle; per-model chips (friendly names) in the tooltip AND an expandable row
+    const names = (meta.council.models || []).map(prettyModel).filter(Boolean);
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "council-badge";
+    b.setAttribute("aria-expanded", "false");
+    const bl = document.createElement("span"); bl.textContent = "Council \u00b7 " + (names.length || "several") + " models"; b.appendChild(bl);
+    const chev = document.createElement("span"); chev.className = "cb-chev"; chev.textContent = "\u25BE"; chev.setAttribute("aria-hidden", "true"); b.appendChild(chev);
+    b.title = "Several models drafted independently; one writer synthesized the final answer" + (names.length ? ". Drafted by: " + names.join(", ") : "");
     wrap.appendChild(b);
+    if (names.length) {
+      const row = document.createElement("div"); row.className = "council-models"; row.hidden = true;
+      names.forEach((n, k) => {
+        const c = document.createElement("span"); c.className = "council-model";
+        const ch = meta.council.chars && meta.council.chars[k];
+        c.textContent = n; if (ch) c.title = ch + " characters drafted";
+        row.appendChild(c);
+      });
+      wrap.appendChild(row);
+      b.addEventListener("click", () => { row.hidden = !row.hidden; b.setAttribute("aria-expanded", String(!row.hidden)); });
+    }
   }
   if (steps.length) {
     const d = document.createElement("details"); d.className = "steps-list";
@@ -3401,11 +3763,11 @@ function renderCouncilDrafts(parent, council) {
   const body = document.createElement("div"); body.className = "steps-body";
   council.models.forEach((m, i) => {
     const it = document.createElement("div"); it.className = "steps-item";
-    it.textContent = "Draft " + (i + 1) + " — " + m + (council.chars && council.chars[i] ? " (" + council.chars[i] + " chars)" : "");
+    it.textContent = "Draft " + (i + 1) + " — " + prettyModel(m) + (council.chars && council.chars[i] ? " (" + council.chars[i] + " chars)" : "");
     body.appendChild(it);
   });
   const note = document.createElement("div"); note.className = "steps-sub";
-  note.textContent = "The gateway returns which models drafted, not their text; the answer above is the synthesis.";
+  note.textContent = "Each model drafted independently; the answer above is the synthesis.";
   body.appendChild(note);
   d.appendChild(body); parent.appendChild(d);
 }
@@ -3458,7 +3820,7 @@ function renderAnswer(container, text, sources, related, images, meta) {
       card.setAttribute("aria-label", "Source " + (i + 1) + ": " + m.domain + " — " + m.title);
       const top = document.createElement("div"); top.className = "sc-top";
       top.appendChild(srcFavicon(m.domain));
-      const dom = document.createElement("span"); dom.className = "sc-dom"; dom.textContent = m.domain;
+      const dom = document.createElement("span"); dom.className = "sc-dom"; dom.textContent = shortDomain(m.domain, 17); dom.title = m.domain;
       const num = document.createElement("span"); num.className = "sc-num"; num.textContent = String(i + 1);
       top.appendChild(dom); top.appendChild(num);
       const ti = document.createElement("div"); ti.className = "sc-title"; ti.textContent = m.title;
@@ -3525,7 +3887,7 @@ function renderAnswer(container, text, sources, related, images, meta) {
   const imagesPanel = document.createElement("div");
   imagesPanel.className = "tab-panel";
   const imgList = (Array.isArray(images) && images.length)
-    ? images
+    ? cleanImgList(images)
     : [...content.querySelectorAll("img")].map(im => ({ image_url: im.src, origin_url: (im.parentElement && im.parentElement.tagName === "A") ? im.parentElement.href : "", title: im.alt || "" }));
   if (imgList.length) {
     const grid = document.createElement("div");
@@ -3689,9 +4051,19 @@ async function performSearch(query) {
   }
   
   // Check auth
+  const wasSignedIn = !!currentUser;
   const authed = await checkAuth();
   if (!authed) {
-    authOverlay.style.display = "flex";
+    // never a silent no-op: show the gate AND say why where the answer would have rendered
+    const msg = wasSignedIn ? AuthGuard.EXPIRED_MSG : "Sign in to ask a question.";
+    AuthGuard.expire(msg);
+    showResults();
+    const ct1 = document.getElementById("resultsContent");
+    const th1 = threads.find(t => t.id === currentThreadId);
+    if (th1) renderPriorTurns(ct1, th1, false); else ct1.innerHTML = "";
+    const q1 = document.createElement("div"); q1.className = "question-header"; q1.textContent = query; ct1.appendChild(q1);
+    renderAnswerError(ct1, wasSignedIn ? "Your session expired" : "Sign in required", msg, "");
+    AuthGuard.stashQuery(query);
     isSearching = false;
     return;
   }
@@ -3717,6 +4089,12 @@ async function performSearch(query) {
   renderPriorTurns(content, thread, false);
   const { state, interval, started } = renderSearching(content, query);
   document.getElementById("breadcrumb").textContent = query;
+  // v95: a follow-up must land on the NEW turn — scroll its question header to the top of the reader
+  { const qh = content.querySelectorAll(".question-header"); const last = qh[qh.length - 1];
+    // give the loading block enough height that the new question can actually reach the top of the reader
+    const scr = document.getElementById("resultsScroll");
+    if (last && scr) state.style.minHeight = Math.max(0, scr.clientHeight - last.offsetHeight - (Number.parseInt(getComputedStyle(scr).paddingBottom, 10) || 0) - 48) + "px";
+    if (last) requestAnimationFrame(() => { try { last.scrollIntoView({ block: "start", behavior: "smooth" }); } catch (e) { last.scrollIntoView(); } }); }
 
   // v64: the thread's space carries custom instructions that ride the request
   const threadSpace = spaces.find(s => s.id === (thread.spaceId || activeSpaceId));
@@ -3767,6 +4145,7 @@ async function performSearch(query) {
   let liveTimer = null;    // trailing live-render timer (cleared in finally so it can never leak into the next search)
   try {
     const { data: s } = await sb.auth.getSession();
+    if (!s || !s.session || !s.session.access_token) throw AuthGuard.makeError(); // session vanished between checkAuth and send
 
     // Final render (shared by streaming, deep research, and fallback paths).
     // v65: prior turns are already in the DOM — only the loading state is
@@ -3776,6 +4155,7 @@ async function performSearch(query) {
     let pendingActions = [];   // F15: email/calendar previews (x_actions) -> Approve cards
     let degradedPhases = [];
     let lastPhases = [];  // v83: final phase list -> Steps / Council
+    let lastCanon = [];   // v128: the gateway's canonical numbered source list (sticky: a later phases event without items must not erase it)
     let councilX = null;  // v83: x_council from the non-streaming response
     let revisedText = ""; // v80 (I7 pass-2): full replacement text from a `revision` SSE event
     const renderFinal = (answer, revised) => {
@@ -3800,10 +4180,10 @@ async function performSearch(query) {
       if (revised) stamp.appendChild(revisedBadge());
       content.appendChild(stamp);
       renderDegradedNote(content, degradedPhases, query);
-      const sources = mergeSources(sourcesFromPhases(lastPhases), extractSources(answerClean), 20);
+      const sources = unifiedSources(lastPhases, lastCanon, answerClean);
       const related = generateRelated(query, answer);
       const councilInfo = councilOn ? councilFromPhases(lastPhases, councilX) : null;
-      const stepsC = compactSteps(lastPhases);
+      const stepsC = compactSteps(withCanonPhase(lastPhases, lastCanon));
       renderAnswer(content, answerClean, sources, related, imageResults, { steps: stepsC, council: councilInfo });
       if (pendingActions.length && window.ConnectorsUI) { try { window.ConnectorsUI.renderActions(content, pendingActions); } catch (_e) {} pendingActions = []; }
       speakAnswer(answerClean);
@@ -3842,7 +4222,7 @@ async function performSearch(query) {
         content.appendChild(liveAnswerEl);
       }
       liveAnswerEl.innerHTML = "";
-      renderAnswer(liveAnswerEl, partial, mergeSources(sourcesFromPhases(lastPhases), extractSources(partial), 20), [], []);
+      renderAnswer(liveAnswerEl, partial, unifiedSources(lastPhases, lastCanon, partial), [], []);
       if (revisedText) {
         const rv = document.createElement("div");
         rv.className = "search-timer";
@@ -3861,15 +4241,27 @@ async function performSearch(query) {
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
         body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(incognitoOn || thread.incognito ? { incognito: true } : {}), personalization: persona(), ...getSourcesFilter(), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
-      const sub = await submit.json();
-      if (!submit.ok || !sub?.deep_research_id) throw new Error(sub?.error ?? "Deep research submit failed");
+      if (submit.authExpired) { AuthGuard.expire(); throw AuthGuard.makeError(); }
+      let sub = null; try { sub = await submit.json(); } catch {}
+      if (!submit.ok) throw new Error((sub && (sub.error?.message ?? sub.error ?? sub.message)) || ("Deep research could not start (HTTP " + submit.status + ")."));
+      if (!sub?.deep_research_id) throw new Error("Deep research did not start — the server returned no job id. Nothing was queued; retry in a moment.");
       const started = Date.now();
+      let pollFails = 0;
       while (true) {
         await new Promise(r => setTimeout(r, 5000));
-        const pr = await fetch(GATEWAY + "/gateway-chat?deep_research_id=" + encodeURIComponent(sub.deep_research_id), {
-          headers: { "Authorization": "Bearer " + s.session.access_token },
-        });
-        const p = await pr.json();
+        let p = null;
+        try {
+          const pr = await fetch(GATEWAY + "/gateway-chat?deep_research_id=" + encodeURIComponent(sub.deep_research_id), {
+            headers: { "Authorization": "Bearer " + (await sb.auth.getSession()).data.session.access_token },
+          });
+          if (pr.authExpired) { AuthGuard.expire(); throw AuthGuard.makeError(); }
+          p = await pr.json();
+          pollFails = 0;
+        } catch (pe) {
+          if (AuthGuard.isAuthError(pe)) throw pe;
+          if (++pollFails >= 4) throw new Error("Lost contact with the research job (" + (pe && pe.message ? pe.message : pe) + "). It may still be running server-side.");
+          continue; // transient network blip: keep polling
+        }
         if (p.status === "completed" && p.answer) { renderFinal(p.answer); break; }
         if (p.error) throw new Error(p.error);
         if (Date.now() - started > 15 * 60 * 1000) throw new Error("Deep research timed out after 15 minutes");
@@ -3884,7 +4276,14 @@ async function performSearch(query) {
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
         body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
-      if (res.status === 401 || res.status === 403) throw new Error("Not authenticated — sign in again.");
+      if (res.authExpired) { AuthGuard.expire(); throw AuthGuard.makeError(); }
+      if (res.status === 401) throw new Error("The gateway rejected this request as unauthenticated (HTTP 401) although your session is still valid. Retry; if it persists, sign out and back in.");
+      if (res.status === 403) {
+        // 403 is only treated as a dead session when the server also refuses a refresh; otherwise it is an authorization error
+        const rd = await AuthGuard.refreshOrDead();
+        if (rd.dead) { AuthGuard.expire(); throw AuthGuard.makeError(); }
+        throw new Error("The gateway refused this request (HTTP 403 — not authorized).");
+      }
       if (!res.ok) {
         let data = {};
         try { data = await res.json(); } catch {}
@@ -3909,6 +4308,8 @@ async function performSearch(query) {
             try {
               const evt = JSON.parse(payload);
               if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); degradedPhases = evt.phases.filter(isDegradedPhase); lastPhases = evt.phases; }
+              if (Array.isArray(evt?.phases)) { const si = sourcesFromPhases(evt.phases).filter(x => x.canon); if (si.length) lastCanon = si; }
+              if (Array.isArray(evt?.sources)) { const si = sourcesFromPhases([{ kind: "search", items: evt.sources }]); if (si.length) lastCanon = si; }
               if (Array.isArray(evt?.images)) { imageResults = evt.images; }
               if (Array.isArray(evt?.actions)) { pendingActions = evt.actions; continue; }
               if (Array.isArray(evt?.phases)) continue;
@@ -3932,7 +4333,8 @@ async function performSearch(query) {
       } else {
         const data = await res.json();
         if (Array.isArray(data?.images)) imageResults = data.images;
-        if (Array.isArray(data?.x_phases)) { lastPhases = data.x_phases; degradedPhases = lastPhases.filter(isDegradedPhase); }
+        if (Array.isArray(data?.x_phases)) { lastPhases = data.x_phases; degradedPhases = lastPhases.filter(isDegradedPhase); const si = sourcesFromPhases(lastPhases).filter(x => x.canon); if (si.length) lastCanon = si; }
+        if (Array.isArray(data?.x_sources)) { const si = sourcesFromPhases([{ kind: "search", items: data.x_sources }]); if (si.length) lastCanon = si; }
         if (data?.x_council) councilX = data.x_council;
         if (Array.isArray(data?.x_actions)) pendingActions = data.x_actions;
         const _msg = data?.choices?.[0]?.message ?? {};
@@ -3946,6 +4348,13 @@ async function performSearch(query) {
     clearInterval(interval);
     if (state && state.isConnected) state.remove();
     const emsg = String(e && e.message ? e.message : e);
+    if (AuthGuard.isAuthError(e)) {
+      // dead session: gate + message in the thread; the unsent question goes back to the composer
+      AuthGuard.expire();
+      renderAnswerError(content, "Your session expired", AuthGuard.EXPIRED_MSG, "");
+      AuthGuard.stashQuery(query);
+      return;
+    }
     const netFail = /failed to fetch|networkerror|load failed|network request failed/i.test(emsg);
     renderAnswerError(content, netFail ? "Couldn't reach the gateway" : "Something went wrong", netFail ? "Network request failed (" + emsg + "). Check your connection and retry." : emsg, query);
   } finally {
@@ -3963,9 +4372,6 @@ function submitQuery(query) {
 }
 document.getElementById("landingSubmit").onclick = () => { const v = document.getElementById("landingInput").value; document.getElementById("landingInput").value = ""; submitQuery(v); };
 document.getElementById("landingInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") { const v = e.target.value; e.target.value = ""; submitQuery(v); }
-});
-document.getElementById("searchbarInput").addEventListener("keydown", e => {
   if (e.key === "Enter") { const v = e.target.value; e.target.value = ""; submitQuery(v); }
 });
 document.getElementById("followupSend").onclick = () => { const v = document.getElementById("followupInput").value; document.getElementById("followupInput").value = ""; submitQuery(v); };
@@ -3995,6 +4401,8 @@ async function loadStatus(force) {
     if (!Array.isArray(data.results)) throw new Error("status unavailable");
     const probeAuthFail = data.results.length && data.results.every(r => r.status !== "pass" && /unauthori[sz]ed|gateway token|\b40[13]\b/i.test(String(r.error || "")));
     if (probeAuthFail && !force) { banner.style.display = "none"; console.warn("gateway-status probe unauthorized (server-side probe token) — banner suppressed"); return; }
+    // v95: the model-health banner is explicit-only (clicking "Model status"); the passive boot probe never shows it
+    if (!force) { const sl = document.getElementById("statusLink"); if (sl) sl.title = data.results.every(r => r.status === "pass") ? "All models operational" : "One or more models degraded — click for details"; return; }
     const allPass = data.results.every(r => r.status === "pass");
     const anyPass = data.results.some(r => r.status === "pass");
     dot.className = "status-dot" + (allPass ? "" : anyPass ? " warn" : " err");
@@ -4003,6 +4411,7 @@ async function loadStatus(force) {
     banner.style.display = "flex";
     setTimeout(() => banner.style.display = "none", 10000);
   } catch (e) {
+    if (!force) return; // v95: passive probe failures stay silent
     dot.className = "status-dot err";
     text.textContent = "Status endpoint unreachable";
     banner.style.display = "flex";
@@ -4094,7 +4503,13 @@ async function loadStatus(force) {
   if (authed && currentUser) {
     document.getElementById("userEmail").textContent = currentUser.email;
     document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
+    AuthGuard.verify(true); // background: a revoked/expired server session must not keep looking signed in
   }
+  try { // after a sign-out reload: land on the sign-in gate (with the reason), and put any unsent question back
+    const gm = sessionStorage.getItem("ai_gate_msg");
+    if (gm) { sessionStorage.removeItem("ai_gate_msg"); if (!currentUser) AuthGuard.showGate(gm); }
+    if (authed && currentUser) AuthGuard.restoreQuery();
+  } catch (e) {}
   renderThreads();
   renderSpaces();
   if (!/[?&]share=/.test(location.search)) loadStatus(false);

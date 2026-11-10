@@ -226,14 +226,20 @@
   }
 
   /* ---------- composer entry point ('/image' via standalone pill; SkillsSlash has no registration API) ---------- */
+  // v95: icon + text spans so the follow-up composer can collapse these pills to icon-only (one-row toolbar)
+  function pillLabel(b, ico, txt) {
+    var i = document.createElement("span"); i.className = "pill-ico"; i.textContent = ico;
+    var t = document.createElement("span"); t.className = "pill-txt"; t.textContent = txt;
+    b.appendChild(i); b.appendChild(t); b.setAttribute("aria-label", txt);
+  }
   function mountPills() {
     ["landingPills", "followupPills"].forEach(function (id) {
       var host = document.getElementById(id);
       if (!host || host.querySelector(".mg-pill")) return;
-      var b = el("button", "width-toggle mg-pill", "🖼 Image"); b.type = "button"; b.title = "Generate an image (/image)";
+      var b = el("button", "width-toggle mg-pill"); pillLabel(b, "🖼", "Image"); b.type = "button"; b.title = "Generate an image (/image)";
       b.onclick = function (e) { e.stopPropagation(); open(); };
       host.appendChild(b);
-      var v = el("button", "width-toggle mg-pill mg-pill-video", "🎬 Video"); v.type = "button"; v.title = "Generate a short video";
+      var v = el("button", "width-toggle mg-pill mg-pill-video"); pillLabel(v, "🎬", "Video"); v.type = "button"; v.title = "Generate a short video";
       v.onclick = function (e) { e.stopPropagation(); open("", "video"); };
       host.appendChild(v);
     });

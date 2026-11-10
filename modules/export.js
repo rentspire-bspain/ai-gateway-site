@@ -215,18 +215,23 @@
   function decorate(row) {
     if (!row || row.getAttribute("data-ex") === "1") return;
     row.setAttribute("data-ex", "1");
-    var ex = mkBtn(row, "ex-export", ICON.exp + " Export", "Export this answer");
+    var ex = mkBtn(row, "ex-export", ICON.exp + " Export \u25BE", "Export this answer");
     var rw = mkBtn(row, "ex-rewrite", ICON.rw + " Rewrite", "Re-run with another model");
     var up = mkBtn(row, "ex-up", ICON.up, "Good answer");
     var dn = mkBtn(row, "ex-down down", ICON.down, "Bad answer");
     ex.addEventListener("click", function (e) {
       e.stopPropagation(); var c = ctxFor(row), base = slug(c.question);
-      showMenu(ex, [
+      var items = [
         { label: "Markdown (.md)", run: function () { download(base + ".md", "text/markdown", buildMd(c)); } },
         { label: "Plain text (.txt)", run: function () { download(base + ".txt", "text/plain", buildTxt(c)); } },
         { label: "HTML (.html)", run: function () { download(base + ".html", "text/html", buildHtml(c, false)); } },
         { label: "PDF (print)", run: function () { printPdf(c); } }
-      ]);
+      ];
+      // v95: Word / Excel / PowerPoint / PDF files from artifacts-files.js live in this same menu (no second button)
+      if (window.ArtifactsFiles && window.ArtifactsFiles.menuItems) {
+        try { items = items.concat(window.ArtifactsFiles.menuItems(function () { return { text: c.answer }; })); } catch (err) {}
+      }
+      showMenu(ex, items);
     });
     rw.addEventListener("click", function (e) {
       e.stopPropagation(); var c = ctxFor(row);

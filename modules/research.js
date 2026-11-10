@@ -37,14 +37,22 @@
   }
 
   // ---- auth + api (same client pattern as monitors.js) ----
+  var EXPIRED = "Your session expired — sign in again.";
+  function guard() { return window.AuthGuard || null; }
+  // dead session: flip the app to the sign-in gate (central AuthGuard) and raise a typed error the callers render
+  function authError() {
+    var g = guard(); if (g) g.expire();
+    var e = new Error(EXPIRED); e.authExpired = true; e.status = 401; return e;
+  }
   function api(body) {
     var client = (typeof sb !== "undefined") ? sb : window.sb;
-    if (!client || !client.auth || !client.auth.getSession) return Promise.reject(new Error("Please sign in to use Deep Research."));
+    if (!client || !client.auth || !client.auth.getSession) return Promise.reject(authError());
     return client.auth.getSession().then(function (r) {
       var tok = r && r.data && r.data.session && r.data.session.access_token;
-      if (!tok) throw new Error("Please sign in to use Deep Research.");
+      if (!tok) throw authError();
       return fetch(URL_, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok }, body: JSON.stringify(body) });
     }).then(function (res) {
+      if (res.authExpired) throw authError(); // set by AuthGuard only after the token AND a refresh were rejected
       return res.json().catch(function () { return {}; }).then(function (j) {
         if (!res.ok) { var e = new Error(clean(j.error || j.message) || "Request failed (" + res.status + ")"); e.status = res.status; throw e; }
         return j;
@@ -214,14 +222,23 @@
     stopTimers();
     if (panel) { panel.remove(); panel = null; }
   }
-  function showError(message) {
+  // Always visible: switch to the results view (the error used to render into a hidden container while the
+  // landing page stayed on screen, so a failed submit looked like nothing happened), keep the question on screen.
+  function showError(message, question, authExpired) {
     closePanel();
+    enterResultsView();
     var content = resultsContent(); if (!content) return;
+    if (question && !content.querySelector(".dr-question")) {
+      var q = document.createElement("div"); q.className = "dr-question"; q.textContent = question;
+      content.innerHTML = ""; content.appendChild(q);
+    }
     var errFn = appFn("renderAnswerError");
-    if (errFn) { errFn(content, "Deep Research failed", message, ""); return; }
+    var title = authExpired ? "Your session expired" : "Deep Research failed";
+    var detail = authExpired ? EXPIRED : message;
+    if (errFn) { errFn(content, title, detail, ""); return; }
     var d = document.createElement("div");
-    d.className = "dr-error";
-    d.textContent = "Deep Research failed: " + message;
+    d.className = "dr-error"; d.setAttribute("role", "alert");
+    d.textContent = authExpired ? detail : "Deep Research failed: " + detail;
     content.appendChild(d);
   }
   function showPanel(question) {
@@ -316,9 +333,11 @@
   // ---- poll loop ----
   function watchJob(jobId, question) {
     var started = Date.now();
+    var fails = 0;
     setStep("queued");
     var poll = function () {
       api({ action: "status", id: jobId }).then(function (r) {
+        fails = 0;
         var j = r && r.job;
         if (!j) throw new Error("job not found");
         if (j.status === "done" || j.status === "error") {
@@ -337,8 +356,10 @@
           }
         }
       }).catch(function (e) {
+        var net = !e.authExpired && !e.status && /failed to fetch|networkerror|load failed|network request failed/i.test(String(e && e.message));
+        if (net && ++fails < 4) return; // transient network blip: the job runs server-side, keep polling
         stopTimers();
-        showError(clean(e.message));
+        showError(net ? "Lost contact with the research service (" + clean(e.message) + "). The job may still be running — reopen it from Research jobs." : clean(e.message), question, e.authExpired);
       });
     };
     poll();
@@ -364,12 +385,13 @@
       if (!q) { reject(new Error("empty question")); return; }
       api({ action: "create", question: q }).then(function (r) {
         var job = r && r.job;
-        if (!job || !job.id) throw new Error("no job id returned");
+        if (!job || !job.id) throw new Error("Deep Research did not start — the server returned no job id. Nothing was queued; retry in a moment.");
         showPanel(q);
         watchJob(job.id, q);
         resolve(job);
       }).catch(function (e) {
-        showError(clean(e.message));
+        showError(clean(e.message), q, e.authExpired);
+        var g = guard(); if (g && g.stashQuery) g.stashQuery(q);
         reject(e);
       });
     });

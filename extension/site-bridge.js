@@ -67,6 +67,9 @@
     const loc = localEntry();
     if (known && !(loc && expiry(loc.value))) { known = null; del(); }
   });
+  // The page's AuthGuard dispatches "aisc:signout" when it wipes a dead/ended session: drop the mirrored copy
+  // immediately so the next load cannot re-adopt the stale session (DOM events cross the content-script boundary).
+  window.addEventListener("aisc:signout", () => { if (!alive()) return; known = null; del(); });
   try {
     chrome.storage.onChanged.addListener((ch, area) => {
       if (area !== "local" || !ch[STORE]) return;

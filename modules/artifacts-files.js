@@ -342,16 +342,16 @@
       }); });
     }).observe(document.body, { childList: true });
   }
-  function hookAnswers() {
-    function add(ac, text) {
-      var host = ac.closest('.answer-section') || ac.parentNode, actions = host && host.querySelector(':scope > .answer-actions');
-      if (!actions || actions.querySelector('.artifact-export')) return;
-      actions.appendChild(exportMenu(function () { return { text: text }; }, 'action-btn'));
-    }
-    (window.ArtifactsHooks = window.ArtifactsHooks || []).push(add);
+  /* v95: the answer footer has ONE Export menu (owned by export.js). It pulls the file formats from here
+     via menuItems() instead of rendering a second "Export ▾" button next to it. */
+  function menuItems(getSrc) {
+    return Object.keys(FORMATS).map(function (f) {
+      return { label: FORMATS[f].label, run: function () { try { download(f, getSrc()); } catch (err) { console.error(err); } } };
+    });
   }
+  function hookAnswers() { /* no-op: see menuItems() */ }
   function ready() { if (document.body) { hookViewer(); hookAnswers(); } else document.addEventListener('DOMContentLoaded', function () { hookViewer(); hookAnswers(); }); }
 
-  window.ArtifactsFiles = { _loaded: true, generate: generate, download: download, fileName: fileName, formats: Object.keys(FORMATS), exportMenu: exportMenu, parseMd: parseMd, zip: zip };
+  window.ArtifactsFiles = { _loaded: true, generate: generate, download: download, fileName: fileName, formats: Object.keys(FORMATS), exportMenu: exportMenu, menuItems: menuItems, parseMd: parseMd, zip: zip };
   ready();
 })();
