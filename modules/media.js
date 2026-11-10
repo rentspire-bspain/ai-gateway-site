@@ -315,6 +315,26 @@
   var mo = new MutationObserver(function () { mountPills(); scan(document); });
   function start() { attach(); mo.observe(document.body, { childList: true, subtree: true }); }
 
-  window.MediaGen = { api: api, shrink: shrink, generate: generate, open: open, close: close, videoIds: videoIds, attach: attach };
+  /* worse-elimination (2026-11-10): "I need you to generate IMAGES - I need to actually see designs" typed as a normal chat turn used to be answered
+     (in Deep mode) with SVG source to copy into a file. isImageAsk() detects the request; offer() opens this generator pre-filled from the thread. */
+  function isImageAsk(q) {
+    q = String(q || "");
+    if (q.length > 600) return false;
+    var verb = /\b(generate|create|make|render|produce|draw|design|show|give)\b/i, noun = /\b(images?|pictures?|photos?|renders?|renderings?|mock-?ups?|visuals?|illustrations?)\b/i;
+    if (verb.test(q) && noun.test(q)) return true;
+    if (/\bneed\b.{0,20}\bimages?\b/i.test(q)) return true;
+    return /\b(see|visuali[sz]e)\b.{0,30}\b(designs?|renders?|room|space)\b/i.test(q) && /\b(images?|pictures?|renders?|renderings?|mock-?ups?)\b/i.test(q);
+  }
+  function offer(query, messages) {
+    var ctx = "";
+    (messages || []).slice(-6).forEach(function (m) {
+      if (m && m.role === "user" && typeof m.content === "string" && !isImageAsk(m.content)) ctx += m.content.replace(/\s+/g, " ").slice(0, 220) + " ";
+    });
+    var prompt = ("Photorealistic interior design rendering. " + ctx.trim() + " " + String(query || "").replace(/\s+/g, " ")).replace(/\s+/g, " ").trim().slice(0, 1000);
+    open(prompt);
+    setTimeout(function () { var go = document.querySelector(".mg-overlay .mg-go"); if (go && !go.disabled) go.click(); }, 150);
+  }
+
+  window.MediaGen = { api: api, shrink: shrink, generate: generate, open: open, close: close, videoIds: videoIds, attach: attach, isImageAsk: isImageAsk, offer: offer };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();

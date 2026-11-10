@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-CEzcVxPAGgNCECZG/WKF1dVSCQ3WwwTc7PUg1HA3hEI=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-mJ8aqpdpSEbXRojxyDP48NZpkM/OiQXwdYkZm2RaC1s=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -567,6 +567,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   line-height: 1.4;
   min-height: 24px;
 }
+.search-input { resize: none; overflow-y: auto; max-height: 220px; white-space: pre-wrap; overflow-wrap: anywhere; align-self: center; }
 .search-input::placeholder { color: var(--text-faint); }
 .search-submit {
   width: 36px;
@@ -734,6 +735,15 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .searching-step.done::before { content: "✓"; color: var(--accent); }
 .searching-step.live { color: var(--text); font-weight: 500; }
 .searching-phases { display: flex; flex-direction: column; gap: 7px; margin: 4px 0; }
+/* v130 parallel agents: grouped rows under an agent subheader */
+.agent-group { display: flex; flex-direction: column; gap: 6px; padding: 2px 0 2px 10px; border-left: 2px solid var(--border); }
+.agent-group:has(.agent-h.live) { border-left-color: var(--accent); }
+.agent-h { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); overflow-wrap: anywhere; }
+.agent-h .agent-dot { color: var(--accent); font-size: 9px; vertical-align: 1px; }
+.agent-h.live { color: var(--text); }
+.agent-h.live .agent-dot { animation: agentPulse 1.2s ease-in-out infinite; }
+@keyframes agentPulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .agent-h.live .agent-dot { animation: none; } }
 /* v93 AGENTS PILL — Perplexity-style floating status pill, better: live agent count,
    expandable agent list, per-step elapsed timers, and a total Working timer in one control. */
 .agents-pill {
@@ -1160,7 +1170,18 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 }
 .followup-box:focus-within { border-color: var(--accent); }
 .followup-box svg { color: var(--text-faint); flex-shrink: 0; }
-.followup-box input { flex: 1 1 100px; min-width: 0; font-size: 14.5px; }
+.followup-box input, .followup-box textarea { flex: 1 1 100px; min-width: 0; font-size: 14.5px; line-height: 1.45; }
+.followup-box textarea { resize: none; overflow-y: auto; max-height: 200px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.followup-box { position: relative; }
+.followup-inner { max-width: calc(var(--answer-w, 720px) + 120px); }
+.queued-msg { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(32,128,141,0.12); border: 1px dashed var(--accent); font-size: 13px; color: var(--text-muted); }
+.queued-msg[hidden] { display: none; }
+.queued-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; animation: qpulse 1.2s ease-in-out infinite; }
+@keyframes qpulse { 50% { opacity: .3; } }
+.queued-text { color: var(--text); opacity: .7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 0 1 auto; min-width: 0; }
+.queued-label { margin-left: auto; font-size: 12px; color: var(--accent); white-space: nowrap; }
+.queued-cancel { color: var(--text-faint); font-size: 18px; line-height: 1; padding: 0 4px; cursor: pointer; }
+.queued-cancel:hover { color: var(--text); }
 .followup-box input::placeholder { color: var(--text-faint); }
 .followup-send {
   width: 32px;
@@ -1474,7 +1495,7 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
         <div class="search-container">
           <div class="search-box">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input class="search-input" id="landingInput" placeholder="Ask anything..." autocomplete="off">
+            <textarea class="search-input" id="landingInput" rows="1" placeholder="Ask anything..." autocomplete="off" aria-label="Ask anything"></textarea>
             <button class="attach-btn mic-btn" id="landingMic" title="Voice input" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg><span class="mic-dot"></span></button>
                         <button class="attach-btn" id="landingAttach" title="Attach a text file (txt, md, csv, json)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
@@ -1515,7 +1536,7 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
       <div class="followup-inner">
         <div class="followup-box">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          <input id="followupInput" placeholder="Ask a follow-up..." autocomplete="off">
+          <div class="queued-msg" id="queuedMsg" hidden><span class="queued-dot"></span><span class="queued-text" id="queuedText"></span><span class="queued-label">Queued — sends when the current answer finishes</span><button type="button" class="queued-cancel" id="queuedCancel" title="Cancel queued message" aria-label="Cancel queued message">&times;</button></div><textarea id="followupInput" rows="1" placeholder="Ask a follow-up..." autocomplete="off" aria-label="Ask a follow-up"></textarea>
           <button class="attach-btn mic-btn" id="followupMic" title="Voice input" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg><span class="mic-dot"></span></button>
                     <button class="attach-btn" id="followupAttach" title="Attach a text file (txt, md, csv, json)">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
@@ -3141,6 +3162,7 @@ function renderSearching(container, query) {
 // v79 (I10): phases that report a degraded/failed step get an error style and a
 // retry notice in the answer, with the gateway's reason shown verbatim.
 function isDegradedPhase(p) {
+  if (p && p.agent) return p.failed === true;   // v130: named agents report failure explicitly (a topic like "rate limits" must not read as an error)
   return !!(p && /unavailable|failed|couldn.?t|could not|timed out|time-?out|skipped|error|rate.?limit/i.test(String(p.label || "")));
 }
 function revisedBadge() {
@@ -3198,6 +3220,22 @@ function buildPlanList(items, cls) {
   });
   return ul;
 }
+// v130: true when any phase row names its agent (new optional gateway fields; older gateways never send them)
+function hasAgentRows(phases) { return Array.isArray(phases) && phases.some(p => p && typeof p.agent === "string" && p.agent); }
+// "RESEARCH · rent trends" / "COUNCIL · Draft 2" / "WRITER". agentName is server/web text: scrubbed + clipped, rendered via textContent only.
+function agentTitle(p) {
+  const n = scrubModelIds(String((p && (p.agentName || p.agent)) || "")).replace(/\s+/g, " ").trim();
+  return (n || "AGENT").slice(0, 80);
+}
+// v130: the pill's TRUE concurrent-agent count. With named agents: distinct running agents (+1 for the lead pipeline if any of its rows is running).
+// Without them: the legacy rule (one per running step, min 1).
+function liveAgentCount(phases) {
+  const list = Array.isArray(phases) ? phases : [];
+  if (!hasAgentRows(list)) return Math.max(1, list.filter(p => !p.done && !isDegradedPhase(p)).length);
+  const run = new Set(); let lead = false;
+  for (const p of list) { if (!p || p.done || isDegradedPhase(p)) continue; if (p.agent) run.add(String(p.agent)); else lead = true; }
+  return Math.max(1, run.size + (lead ? 1 : 0));
+}
 function renderPhases(state, phases) {
   if (!state || !state.isConnected || !Array.isArray(phases)) return;
   let box = state.querySelector(".searching-phases");
@@ -3210,27 +3248,49 @@ function renderPhases(state, phases) {
   box.textContent = "";
   state._seen = state._seen || Object.create(null);
   const base = state._started || Date.now();
-  for (const p0 of phases) { // label comes from the server / the web: never innerHTML
-    const p = publicPhase(p0);
-    const seenKey = String(p0.kind || "") + "|" + String(p0.label || "");
-    if (state._seen[seenKey] == null) state._seen[seenKey] = Math.max(0, Date.now() - base);
-    const row = document.createElement("div");
-    const planItems = planItemsOf(p);
-    row.className = "searching-step " + (p.done ? "done" : "live") + (isDegradedPhase(p) ? " err" : "") + (planItems.length ? " plan-row" : "");
-    if (isDegradedPhase(p) || p.done) row.appendChild(document.createTextNode(isDegradedPhase(p) ? "\u26a0" : "\u2713"));
-    else { const sp = document.createElement("span"); sp.className = "searching-spinner"; sp.style.cssText = "width:10px;height:10px;margin:0"; row.appendChild(sp); }
-    row.appendChild(document.createTextNode(" " + String(p.label == null ? "" : p.label)));
-    if (!p.done) { const tm = document.createElement("span"); tm.className = "step-timer"; tm.dataset.off = String(state._seen[seenKey]); row.appendChild(tm); }
-    if (planItems.length) row.appendChild(buildPlanList(planItems));
-    box.appendChild(row);
-    if (p.kind === "search" && Array.isArray(p.items) && p.items.some(x => x && x.url)) { const chips = buildSrcChips(p.items, 18); if (chips) box.appendChild(chips); }
+  // v130 PARALLEL AGENTS: when the gateway names agents (phase.agent / phase.agentName) the rows are grouped under an agent subheader
+  // ("RESEARCH · rent trends", "COUNCIL · Draft 2", "WRITER"); rows with no agent are the lead pipeline. No agent fields -> the flat list is unchanged.
+  const grouped = hasAgentRows(phases);
+  const groups = [];   // [{ key, name, rows: [] }] in first-appearance order
+  if (grouped) {
+    const byKey = Object.create(null);
+    for (const p0 of phases) {
+      const key = p0 && p0.agent ? "a:" + String(p0.agent) : "lead";
+      if (!byKey[key]) { byKey[key] = { key, name: key === "lead" ? "LEAD AGENT" : agentTitle(p0), rows: [] }; groups.push(byKey[key]); }
+      byKey[key].rows.push(p0);
+    }
+  } else groups.push({ key: "", name: "", rows: phases });
+  for (const g of groups) {
+    let host = box;
+    if (grouped) {
+      const gEl = document.createElement("div"); gEl.className = "agent-group"; gEl.dataset.agent = g.key;
+      const live = g.rows.some(r => r && !r.done && !isDegradedPhase(r));
+      const hd = document.createElement("div"); hd.className = "agent-h" + (live ? " live" : "");
+      const dot = document.createElement("span"); dot.className = "agent-dot"; dot.setAttribute("aria-hidden", "true"); dot.textContent = live ? "\u25CF" : "\u2713"; hd.appendChild(dot);
+      hd.appendChild(document.createTextNode(" " + g.name));
+      gEl.appendChild(hd); box.appendChild(gEl); host = gEl;
+    }
+    for (const p0 of g.rows) { // label comes from the server / the web: never innerHTML
+      const p = publicPhase(p0);
+      const seenKey = String(p0.agent || "") + "|" + String(p0.kind || "") + "|" + String(p0.label || "");
+      if (state._seen[seenKey] == null) state._seen[seenKey] = Math.max(0, Date.now() - base);
+      const row = document.createElement("div");
+      const planItems = planItemsOf(p);
+      row.className = "searching-step " + (p.done ? "done" : "live") + (isDegradedPhase(p) ? " err" : "") + (planItems.length ? " plan-row" : "");
+      if (isDegradedPhase(p) || p.done) row.appendChild(document.createTextNode(isDegradedPhase(p) ? "\u26a0" : "\u2713"));
+      else { const sp = document.createElement("span"); sp.className = "searching-spinner"; sp.style.cssText = "width:10px;height:10px;margin:0"; row.appendChild(sp); }
+      row.appendChild(document.createTextNode(" " + String(p.label == null ? "" : p.label)));
+      if (!p.done) { const tm = document.createElement("span"); tm.className = "step-timer"; tm.dataset.off = String(state._seen[seenKey]); row.appendChild(tm); }
+      if (planItems.length) row.appendChild(buildPlanList(planItems));
+      host.appendChild(row);
+      if (p.kind === "search" && Array.isArray(p.items) && p.items.some(x => x && x.url)) { const chips = buildSrcChips(p.items, 18); if (chips) host.appendChild(chips); }
+    }
   }
   if (typeof state._tick === "function") state._tick();
   // v93: the pill's live agent count = running steps (min 1 — the pipeline itself is an agent)
   const pill = state.querySelector(".agents-pill");
   if (pill) {
-    const live = phases.filter(p => !p.done && !isDegradedPhase(p)).length;
-    const n = Math.max(1, live);
+    const n = liveAgentCount(phases);
     const count = pill.querySelector(".ap-count");
     const label = pill.querySelector(".ap-label");
     if (count) count.textContent = String(n);
@@ -3690,6 +3750,7 @@ function publicPhase(p) {
 function compactSteps(phases) {
   return (Array.isArray(phases) ? phases : []).filter(p => p && p.label && !(p.kind === "draft" && !p.done)).map(p => ({
     label: fixSearchLabel(p).slice(0, 200), kind: p.kind || "", done: true,
+    ...(p.agent ? { agent: String(p.agent).slice(0, 40), agentName: String(p.agentName || "").slice(0, 80) } : {}),
     items: (Array.isArray(p.items) ? p.items : []).slice(0, p.kind === "search" ? 18 : 8).map(i => {
       const o = { title: String(i.title || "").slice(0, 160), domain: i.domain || "" };
       if (i.status) { o.n = Number(i.n) || 0; o.text = String(i.text || "").slice(0, 200); o.status = String(i.status).slice(0, 8); if (i.evidence) o.evidence = String(i.evidence).slice(0, 200); }
@@ -3737,8 +3798,15 @@ function renderMeta(container, meta) {
     const d = document.createElement("details"); d.className = "steps-list";
     const sm = document.createElement("summary"); sm.textContent = "Steps · " + steps.length; d.appendChild(sm);
     const body = document.createElement("div"); body.className = "steps-body";
-    ["Planned", "Searched", "Read", "Reasoned"].forEach(g => {
-      const list = steps.filter(p => stepGroup(p) === g); if (!list.length) return;
+    // v130: answers produced with named parallel agents group the saved Steps by agent (lead pipeline first); everything else keeps the 4 classic groups
+    const stepGroups = [];
+    if (hasAgentRows(steps)) {
+      const order = [], by = Object.create(null);
+      steps.forEach(p => { const k = p.agent ? "a:" + p.agent : "lead"; if (!by[k]) { by[k] = { name: k === "lead" ? "LEAD AGENT" : agentTitle(p), list: [] }; order.push(k); } by[k].list.push(p); });
+      order.forEach(k => stepGroups.push(by[k]));
+    } else ["Planned", "Searched", "Read", "Reasoned"].forEach(g => stepGroups.push({ name: g, list: steps.filter(p => stepGroup(p) === g) }));
+    stepGroups.forEach(({ name: g, list }) => {
+      if (!list.length) return;
       const grp = document.createElement("div");
       const h = document.createElement("div"); h.className = "steps-group-h"; h.textContent = g; grp.appendChild(h);
       list.forEach(p => {
@@ -4034,6 +4102,10 @@ async function fetchRetry(url, opts, note) {
   }
 }
 async function performSearch(query) {
+  if (isSearching) return;
+  try { await performSearchInner(query); } finally { drainQueue(); }
+}
+async function performSearchInner(query) {
   if (isSearching || !query.trim()) return;
   try { window.EntityCards && window.EntityCards.questionHint && window.EntityCards.questionHint(query); } catch (e) {}
   isSearching = true;
@@ -4232,7 +4304,10 @@ async function performSearch(query) {
       renderGap = Math.max(120, Math.min(1000, (Date.now() - now) * 3));
     };
 
-    if (deepResearchOn) {
+    // worse-elimination (2026-11-10): a conversational "generate IMAGES / I need to see designs" turn is not a research job. Skip Deep mode and open the image generator.
+    const imageGenAsk = !!(window.MediaGen && window.MediaGen.isImageAsk && window.MediaGen.isImageAsk(query));
+    if (imageGenAsk) { try { window.MediaGen.offer(query, thread.messages); } catch (e) {} }
+    if (deepResearchOn && !imageGenAsk) {
       // DEEP RESEARCH MODE: submit a background Agent API run (high effort,
       // minutes-long), then poll until the report is ready. The searching
       // indicator stays live the whole time.
@@ -4379,18 +4454,40 @@ async function performSearch(query) {
 // ============ EVENT HANDLERS ============
 // v77: user-submitted queries pass through the (optional) Research Mode hook first
 function submitQuery(query) {
+  if (isSearching && query && query.trim()) { queuedQuery = query.trim(); showQueued(); return; }
   if (window.SiteAssets && window.SiteAssets.intercept && window.SiteAssets.intercept(query)) return;
   if (window.ResearchMode && window.ResearchMode.intercept && window.ResearchMode.intercept(query)) return;
   performSearch(query);
 }
-document.getElementById("landingSubmit").onclick = () => { const v = document.getElementById("landingInput").value; document.getElementById("landingInput").value = ""; submitQuery(v); };
-document.getElementById("landingInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") { const v = e.target.value; e.target.value = ""; submitQuery(v); }
-});
-document.getElementById("followupSend").onclick = () => { const v = document.getElementById("followupInput").value; document.getElementById("followupInput").value = ""; submitQuery(v); };
-document.getElementById("followupInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") { const v = e.target.value; e.target.value = ""; submitQuery(v); }
-});
+// Composer: auto-growing textarea, Enter sends / Shift+Enter newline, busy => message is queued (not dropped)
+function autosize(el) { el.style.height = "auto"; el.style.height = Math.min(el.scrollHeight, parseFloat(getComputedStyle(el).maxHeight) || 220) + "px"; }
+function wireComposer(inputId, sendId) {
+  const el = document.getElementById(inputId), btn = document.getElementById(sendId);
+  const send = () => { const v = el.value; if (!v.trim()) return; el.value = ""; autosize(el); submitQuery(v); };
+  el.addEventListener("input", () => autosize(el));
+  el.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); }
+  });
+  btn.onclick = send;
+  autosize(el);
+}
+wireComposer("landingInput", "landingSubmit");
+wireComposer("followupInput", "followupSend");
+// Observe programmatic value changes (voice, restored drafts) by resizing on focus
+["landingInput", "followupInput"].forEach(id => document.getElementById(id).addEventListener("focus", e => autosize(e.target)));
+let queuedQuery = null;
+function showQueued() {
+  const box = document.getElementById("queuedMsg");
+  if (!queuedQuery) { box.hidden = true; return; }
+  document.getElementById("queuedText").textContent = queuedQuery;
+  box.hidden = false;
+}
+document.getElementById("queuedCancel").onclick = () => { queuedQuery = null; showQueued(); };
+function drainQueue() {
+  if (!queuedQuery || isSearching) return;
+  const q = queuedQuery; queuedQuery = null; showQueued();
+  setTimeout(() => submitQuery(q), 50);
+}
 document.querySelectorAll(".suggestion-chip").forEach(chip => {
   chip.onclick = () => submitQuery(chip.dataset.q);
 });
@@ -4549,6 +4646,7 @@ async function loadStatus(force) {
 <script src="modules/skills.js"></script>
 <script src="modules/artifacts.js"></script>
 <script src="modules/cards.js"></script>
+<script src="modules/tasks.js"></script>
 <script src="modules/monitors.js"></script>
 <script src="modules/research.js"></script>
 <script src="modules/projects.js"></script>
