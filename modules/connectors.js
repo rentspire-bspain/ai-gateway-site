@@ -23,9 +23,9 @@
   // ---------- Settings card ----------
   var SERVICES = [["gmail_read", "Read email"], ["gmail_send", "Send email (with your approval)"], ["calendar", "Calendar: read + create events"], ["drive", "Google Drive (read-only)"], ["sheets", "Google Sheets (read-only)"]];
   var PROVS = [
-    { id: "dropbox", name: "Dropbox", logo: "D", kind: "oauth", hosts: ["www.dropbox.com"], note: "Ask in chat: “list my Dropbox files”, “read /notes/todo.txt”." },
-    { id: "slack", name: "Slack", logo: "S", kind: "oauth", hosts: ["slack.com"], note: "Ask in chat: “search Slack for the vendor invoice”. Uses your own Slack user token, read-only in chat." },
-    { id: "github", name: "GitHub", logo: "H", kind: "oauth", hosts: ["github.com"], note: "Ask in chat: “open issues in my repo”, “search my code for fetchUser”." },
+    { id: "dropbox", name: "Dropbox", logo: "D", kind: "oauth", keyLabel: "Dropbox access token", help: "Or paste a token: Dropbox App Console > your app > Settings > Generated access token (short-lived), or a full access token.", hosts: ["www.dropbox.com"], note: "Ask in chat: “list my Dropbox files”, “read /notes/todo.txt”." },
+    { id: "slack", name: "Slack", logo: "S", kind: "oauth", keyLabel: "Slack token (xoxp- / xoxb-)", help: "Or paste a Slack user token (xoxp-) or bot token (xoxb-) from your app’s OAuth & Permissions page.", hosts: ["slack.com"], note: "Ask in chat: “search Slack for the vendor invoice”. Uses your own Slack user token, read-only in chat." },
+    { id: "github", name: "GitHub", logo: "H", kind: "oauth", keyLabel: "GitHub fine-grained token", help: "Or paste a fine-grained personal access token, read-only (github.com/settings/personal-access-tokens: Contents, Issues, Pull requests, Metadata = Read).", hosts: ["github.com"], note: "Ask in chat: “open issues in my repo”, “search my code for fetchUser”." },
     { id: "render", name: "Render", logo: "R", kind: "key", keyLabel: "Render API key", help: "Render dashboard > Account Settings > API Keys > Create API Key.", note: "Ask in chat: “what’s the deploy status of my Render services”." },
     { id: "supabase", name: "Supabase", logo: "B", kind: "key", keyLabel: "Supabase access token", help: "supabase.com/dashboard/account/tokens > Generate new token.", note: "Ask in chat: “list my Supabase projects”, “is my project healthy”." }
   ];
@@ -86,14 +86,14 @@
     }
     if (connected) { var d = el("button", "stg-btn ghost cn-danger", "Disconnect"); d.type = "button"; d.disabled = busyP; d.addEventListener("click", function () { pdisconnect(P); }); acts.appendChild(d); }
     head.appendChild(acts); c.appendChild(head);
-    if (st && P.kind === "key" && !connected) {
+    if (st && P.keyLabel && !connected) {
       var row = el("div", "cn-act-btns"), inp = el("input", "stg-input"); inp.type = "password"; inp.autocomplete = "off"; inp.spellcheck = false;
       inp.placeholder = "Paste " + P.keyLabel; inp.setAttribute("aria-label", P.keyLabel);
-      var sv = el("button", "stg-btn", busyP ? "Checking…" : "Save key"); sv.type = "button"; sv.disabled = busyP;
+      var sv = el("button", "stg-btn", busyP ? "Checking…" : (P.kind === "oauth" ? "Save token" : "Save key")); sv.type = "button"; sv.disabled = busyP;
       sv.addEventListener("click", function () { var v = inp.value.trim(); inp.value = ""; if (v) psetkey(P, v); });
       row.appendChild(inp); row.appendChild(sv); c.appendChild(row); c.appendChild(el("div", "cn-note", P.help));
     }
-    if (unconf) c.appendChild(el("div", "cn-msg warn", "Not available yet: the " + P.name + " app credentials have not been added to the server."));
+    if (unconf && !P.keyLabel) c.appendChild(el("div", "cn-msg warn", "Not available yet: the " + P.name + " app credentials have not been added to the server."));
     if (st && st.error) c.appendChild(el("div", "cn-msg err", st.error));
     var bn = pbanner[P.id]; if (bn) { var m = el("div", "cn-msg " + bn.kind, bn.msg); m.setAttribute("role", "alert"); c.appendChild(m); }
     var ul = el("ul", "cn-list");
