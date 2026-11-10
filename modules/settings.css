@@ -447,3 +447,4 @@
 }
 .stg-btn{background:var(--accent-btn)!important;color:#fff!important}
 .stg-btn:hover{background:var(--accent-btn-hover)!important}
+.stg-conn-soon.on { color: var(--accent-hover,#56ABAB); border-style: solid; border-color: var(--accent-hover,#56ABAB); }

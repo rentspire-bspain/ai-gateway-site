@@ -6,7 +6,7 @@
    All dynamic text is set with textContent (no innerHTML). */
 (function (root) {
   "use strict";
-  var status = null, busy = false, banner = null, hosts = [];
+  var status = null, busy = false, banner = null, hosts = [], pstat = {}, pbusy = {}, pbanner = {}, badges = [];
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   function fnBase() { return (typeof GATEWAY !== "undefined" && GATEWAY) || ((typeof SUPABASE_URL !== "undefined" ? SUPABASE_URL : "") + "/functions/v1"); }
@@ -21,16 +21,93 @@
   }
 
   // ---------- Settings card ----------
-  var SERVICES = [["gmail_read", "Read email"], ["gmail_send", "Send email (with your approval)"], ["calendar", "Calendar: read + create events"]];
-
-  function loadStatus() {
-    return call("connectors", { action: "status" }).then(function (d) { status = d && !d.error ? d : { connected: false, error: d && d.error }; render(); }).catch(function (e) { status = { connected: false, error: e.message }; render(); });
+  var SERVICES = [["gmail_read", "Read email"], ["gmail_send", "Send email (with your approval)"], ["calendar", "Calendar: read + create events"], ["drive", "Google Drive (read-only)"], ["sheets", "Google Sheets (read-only)"]];
+  var PROVS = [
+    { id: "dropbox", name: "Dropbox", logo: "D", kind: "oauth", hosts: ["www.dropbox.com"], note: "Ask in chat: “list my Dropbox files”, “read /notes/todo.txt”." },
+    { id: "slack", name: "Slack", logo: "S", kind: "oauth", hosts: ["slack.com"], note: "Ask in chat: “search Slack for the vendor invoice”. Uses your own Slack user token, read-only in chat." },
+    { id: "github", name: "GitHub", logo: "H", kind: "oauth", hosts: ["github.com"], note: "Ask in chat: “open issues in my repo”, “search my code for fetchUser”." },
+    { id: "render", name: "Render", logo: "R", kind: "key", keyLabel: "Render API key", help: "Render dashboard > Account Settings > API Keys > Create API Key.", note: "Ask in chat: “what’s the deploy status of my Render services”." },
+    { id: "supabase", name: "Supabase", logo: "B", kind: "key", keyLabel: "Supabase access token", help: "supabase.com/dashboard/account/tokens > Generate new token.", note: "Ask in chat: “list my Supabase projects”, “is my project healthy”." }
+  ];
+  function loadAll() {
+    return call("connectors", { action: "status", provider: "all" }).then(function (d) {
+      if (d && d.providers) { pstat = d.providers; if (d.providers.google && !d.providers.google.error) status = d.providers.google; }
+      render(); notifyBadges();
+    }).catch(function () { render(); notifyBadges(); });
   }
+  function notifyBadges() { badges = badges.filter(function (b) { return b.node.isConnected; }); badges.forEach(function (b) { paintBadge(b); }); }
+  // Settings-list badge: reflects REAL connection status (no fake toggles).
+  var BADGE_MAP = { "gmail-gcal": ["google", null], "google-drive": ["google", "drive"], "google-sheets": ["google", "sheets"], dropbox: ["dropbox"], slack: ["slack"], github: ["github"], render: ["render"], supabase: ["supabase"] };
+  function paintBadge(b) {
+    var m = b.map, st = pstat[m[0]], on = false, soon = false;
+    if (!st) { b.node.textContent = "Checking…"; b.node.className = "stg-conn-soon"; return; }
+    if (m[0] === "google") on = !!st.connected && (!m[1] || !!(st.services && st.services[m[1]]));
+    else { on = !!st.connected; soon = st.configured === false; }
+    b.node.textContent = on ? "Connected" : soon ? "Coming soon" : "Not connected";
+    b.node.className = "stg-conn-soon" + (on ? " on" : "");
+    b.node.title = soon ? "Needs app credentials on the server." : "";
+  }
+  function badge(settingsId) {
+    var m = BADGE_MAP[settingsId]; if (!m) return null;
+    var n = el("span", "stg-conn-soon", "Checking…"); var b = { node: n, map: m }; badges.push(b); paintBadge(b);
+    if (!Object.keys(pstat).length) loadAll();
+    return n;
+  }
+  function pcall(id, body) { return call("connectors", Object.assign({ provider: id }, body)); }
+  function pconnect(P) {
+    if (pbusy[P.id]) return; pbusy[P.id] = true; render();
+    pcall(P.id, { action: "start" }).then(function (d) {
+      var u; try { u = new URL(d.url); } catch (e) { u = null; }
+      if (!d.url || !u || u.protocol !== "https:" || P.hosts.indexOf(u.hostname) < 0) { pbusy[P.id] = false; pbanner[P.id] = { msg: d.error || "Unexpected connect URL; aborting.", kind: "err" }; render(); return; }
+      root.location.href = u.href;
+    }).catch(function (e) { pbusy[P.id] = false; pbanner[P.id] = { msg: e.message, kind: "err" }; render(); });
+  }
+  function pdisconnect(P) {
+    if (pbusy[P.id] || !root.confirm("Disconnect " + P.name + "? The stored credential is deleted.")) return;
+    pbusy[P.id] = true; render();
+    pcall(P.id, { action: "disconnect" }).then(function (d) { pbusy[P.id] = false; if (!d.error) pstat[P.id] = d; pbanner[P.id] = { msg: d.error || P.name + " disconnected.", kind: d.error ? "err" : "ok" }; render(); notifyBadges(); }).catch(function (e) { pbusy[P.id] = false; pbanner[P.id] = { msg: e.message, kind: "err" }; render(); });
+  }
+  function psetkey(P, key) {
+    if (pbusy[P.id]) return; pbusy[P.id] = true; render();
+    pcall(P.id, { action: "setkey", key: key }).then(function (d) { pbusy[P.id] = false; if (d.error) pbanner[P.id] = { msg: d.error, kind: "err" }; else { pstat[P.id] = d; pbanner[P.id] = { msg: P.name + " connected.", kind: "ok" }; } render(); notifyBadges(); }).catch(function (e) { pbusy[P.id] = false; pbanner[P.id] = { msg: e.message, kind: "err" }; render(); });
+  }
+  function provCard(P) {
+    var st = pstat[P.id] || null, connected = !!(st && st.connected), unconf = !!(st && st.configured === false), busyP = !!pbusy[P.id];
+    var c = el("div", "cn-card"), head = el("div", "cn-head");
+    var logo = el("div", "cn-logo", P.logo); logo.setAttribute("aria-hidden", "true");
+    var t = el("div", "cn-titles"); t.appendChild(el("div", "cn-title", P.name));
+    var sub = !st ? "Checking connection…" : connected ? "Connected" + (st.account ? " — " + st.account : "") : unconf ? "Coming soon" : "Not connected";
+    var subEl = el("div", "cn-sub" + (connected ? " on" : ""), sub); subEl.setAttribute("role", "status"); t.appendChild(subEl);
+    head.appendChild(logo); head.appendChild(t);
+    var acts = el("div", "cn-actions");
+    if (st && P.kind === "oauth" && !unconf) {
+      var b = el("button", "stg-btn" + (connected ? " ghost" : ""), busyP ? "Working…" : connected ? "Reconnect" : "Connect " + P.name);
+      b.type = "button"; b.disabled = busyP; b.addEventListener("click", function () { pconnect(P); }); acts.appendChild(b);
+    }
+    if (connected) { var d = el("button", "stg-btn ghost cn-danger", "Disconnect"); d.type = "button"; d.disabled = busyP; d.addEventListener("click", function () { pdisconnect(P); }); acts.appendChild(d); }
+    head.appendChild(acts); c.appendChild(head);
+    if (st && P.kind === "key" && !connected) {
+      var row = el("div", "cn-act-btns"), inp = el("input", "stg-input"); inp.type = "password"; inp.autocomplete = "off"; inp.spellcheck = false;
+      inp.placeholder = "Paste " + P.keyLabel; inp.setAttribute("aria-label", P.keyLabel);
+      var sv = el("button", "stg-btn", busyP ? "Checking…" : "Save key"); sv.type = "button"; sv.disabled = busyP;
+      sv.addEventListener("click", function () { var v = inp.value.trim(); inp.value = ""; if (v) psetkey(P, v); });
+      row.appendChild(inp); row.appendChild(sv); c.appendChild(row); c.appendChild(el("div", "cn-note", P.help));
+    }
+    if (unconf) c.appendChild(el("div", "cn-msg warn", "Not available yet: the " + P.name + " app credentials have not been added to the server."));
+    if (st && st.error) c.appendChild(el("div", "cn-msg err", st.error));
+    var bn = pbanner[P.id]; if (bn) { var m = el("div", "cn-msg " + bn.kind, bn.msg); m.setAttribute("role", "alert"); c.appendChild(m); }
+    var ul = el("ul", "cn-list");
+    ((st && st.permissions) || []).forEach(function (txt) { var li = el("li", "cn-li" + (connected ? " on" : "")); li.appendChild(el("span", "cn-dot")); li.appendChild(el("span", "cn-li-t", txt)); li.appendChild(el("span", "cn-li-s", connected ? "Granted" : "Off")); ul.appendChild(li); });
+    c.appendChild(ul); c.appendChild(el("p", "cn-note", P.note + " Credentials are encrypted on the server and never sent to your browser."));
+    return c;
+  }
+
+  function loadStatus() { return loadAll().then(function () { if (!status) { status = { connected: false }; render(); } }); }
   function say(msg, kind) { banner = msg ? { msg: msg, kind: kind || "info" } : null; render(); }
 
   function connect() {
     if (busy) return; busy = true; render();
-    call("connectors", { action: "start", services: ["gmail", "calendar"] }).then(function (d) {
+    call("connectors", { action: "start", services: ["gmail", "calendar", "drive", "sheets"] }).then(function (d) {
       if (!d.url) { busy = false; say(d.error || "Could not start the Google connection.", "err"); return; }
       // Only ever navigate to Google's own consent endpoint.
       var u; try { u = new URL(d.url); } catch (e) { u = null; }
@@ -50,7 +127,7 @@
     var head = el("div", "cn-head");
     var logo = el("div", "cn-logo", "G"); logo.setAttribute("aria-hidden", "true");
     var t = el("div", "cn-titles");
-    t.appendChild(el("div", "cn-title", "Google — Gmail and Calendar"));
+    t.appendChild(el("div", "cn-title", "Google — Gmail, Calendar, Drive and Sheets"));
     var connected = status && status.connected;
     var sub = !status ? "Checking connection…" : connected ? ("Connected" + (status.email ? " as " + status.email : "")) : "Not connected";
     var subEl = el("div", "cn-sub" + (connected ? " on" : ""), sub); subEl.setAttribute("role", "status");
@@ -74,12 +151,12 @@
       ul.appendChild(li);
     });
     c.appendChild(ul);
-    c.appendChild(el("p", "cn-note", "Ask in chat: “what’s on my calendar Friday”, “find the email from my landlord”, “email John about the lease”. Emails and events are always shown as a preview and only sent or created after you press Approve. Your Google token is encrypted on the server and never sent to your browser."));
+    c.appendChild(el("p", "cn-note", "Ask in chat: “what’s on my calendar Friday”, “find the email from my landlord”, “find the lease spreadsheet in my Drive”. If you connected Google earlier, press Reconnect once to add Drive and Sheets. Emails and events are always shown as a preview and only sent or created after you press Approve. Your Google token is encrypted on the server and never sent to your browser."));
     return c;
   }
-  function render() { hosts = hosts.filter(function (h) { return h.isConnected; }); hosts.forEach(function (h) { h.textContent = ""; h.appendChild(build()); }); }
+  function render() { hosts = hosts.filter(function (h) { return h.isConnected; }); hosts.forEach(function (h) { h.textContent = ""; h.appendChild(build()); PROVS.forEach(function (P) { h.appendChild(provCard(P)); }); }); }
   function card() {
-    var h = el("div", "cn-host"); hosts.push(h); h.appendChild(build());
+    var h = el("div", "cn-host"); hosts.push(h); h.appendChild(build()); PROVS.forEach(function (P) { h.appendChild(provCard(P)); });
     loadStatus();
     return h;
   }
@@ -91,15 +168,15 @@
     var code = p.get("connector_code"), state = p.get("connector_state"), err = p.get("connector_error");
     try { root.history.replaceState(null, "", root.location.pathname + root.location.search); } catch (e) {}   // drop the one-time code from the URL immediately
     function openPane() { if (root.SettingsUI && root.SettingsUI.open) root.SettingsUI.open("connectors"); }
-    if (err) { banner = { msg: err === "access_denied" ? "Google access was not granted." : "Google connection failed (" + err.replace(/[^a-z_]/gi, "").slice(0, 40) + ").", kind: "err" }; setTimeout(openPane, 400); return; }
+    if (err) { banner = { msg: err === "access_denied" ? "Access was not granted." : "Connection failed (" + err.replace(/[^a-z_]/gi, "").slice(0, 40) + ").", kind: "err" }; setTimeout(openPane, 400); return; }
     if (!code || !state) return;
     var tries = 0;
     (function go() {
-      if (typeof sb === "undefined" || ++tries > 40) { banner = { msg: "Sign in, then connect Google again.", kind: "err" }; return openPane(); }
+      if (typeof sb === "undefined" || ++tries > 40) { banner = { msg: "Sign in, then connect again.", kind: "err" }; return openPane(); }
       session().then(function () {
         return call("connectors", { action: "exchange", code: code, state: state });
       }).then(function (d) {
-        if (d.error) banner = { msg: d.error, kind: "err" }; else { status = d; banner = { msg: "Google connected" + (d.email ? " as " + d.email : "") + ".", kind: "ok" }; }
+        if (d.error) banner = { msg: d.error, kind: "err" }; else { var nm = d.provider ? d.provider.charAt(0).toUpperCase() + d.provider.slice(1) : "Google"; if (d.provider) pstat[d.provider] = d; else status = d; banner = { msg: nm + " connected" + (d.email || d.account ? " as " + (d.email || d.account) : "") + ".", kind: "ok" }; }
         openPane();
       }).catch(function () { setTimeout(go, 500); });
     })();
@@ -148,6 +225,6 @@
     if (wrap.childNodes.length) container.appendChild(wrap);
   }
 
-  root.ConnectorsUI = { card: card, renderActions: renderActions, refresh: loadStatus, _handleReturn: handleReturn };
+  root.ConnectorsUI = { card: card, badge: badge, renderActions: renderActions, refresh: loadStatus, _handleReturn: handleReturn };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", handleReturn); else handleReturn();
 })(window);

@@ -468,16 +468,12 @@
             }
             // Honesty: only connectors with a real authenticated data pipe are toggleable.
             // The rest render as "Coming soon" until wave-2 connectors ship.
-            var LIVE_CONNECTOR_IDS = ["gmail-gcal"];
-            if (LIVE_CONNECTOR_IDS.indexOf(c.id) >= 0) {
-              rowEl.appendChild(makeToggle(c.enabled, function (on) {
-                var items = connectorList();
-                var i = items.findIndex(function (x) { return x.id === c.id; });
-                if (i >= 0) { items[i].enabled = on; saveConnectors(items); }
-              }, c.name));
-            } else {
+            // Status reflects the REAL connection (modules/connectors.js); no local toggle that does nothing.
+            var bdg = window.ConnectorsUI && window.ConnectorsUI.badge ? window.ConnectorsUI.badge(c.id) : null;
+            if (bdg) rowEl.appendChild(bdg);
+            else {
               var soon = el("span", "stg-conn-soon", "Coming soon");
-              soon.title = "This connector isn't wired to your data yet — the assistant can't reference it. It becomes a real toggle when its connection ships.";
+              soon.title = "This connector isn't wired to your data yet.";
               rowEl.appendChild(soon);
             }
             wrap.appendChild(rowEl);
