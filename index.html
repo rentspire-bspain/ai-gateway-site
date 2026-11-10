@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-KS98V3iOMQDwxgdRaTW2ruzk1lCdB+veckumYUYVRZg=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-IX1h4SDdAzFoAYw7mtFJNpXj+AdueWXGqKrNIriUIE8=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2791,6 +2791,12 @@ async function loadThread(id, fromNav) {
   }
   const content = document.getElementById("resultsContent");
   renderPriorTurns(content, thread, true);
+  // v97 (owner request 2026-11-10): restoring a session lands you at the LATEST message, not the top.
+  // Two rAFs so the full thread (markdown, citations, artifact cards) has laid out before scrolling.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const sc = document.getElementById("resultsScroll");
+    if (sc) sc.scrollTop = sc.scrollHeight;
+  }));
 }
 document.getElementById("newThreadBtn").onclick = newThread;
 document.getElementById("newThreadIcon").onclick = newThread;
