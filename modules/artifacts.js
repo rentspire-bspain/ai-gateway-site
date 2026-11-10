@@ -67,6 +67,15 @@
       }
       if (a) { a.id = 'art-' + hash(a.kind + a.content); out.push(a); }
     }
+    // v145: some writer models drop the ```html fence markers — still detect a full unfenced
+    // HTML document (with a script) so the app renders live instead of dumping raw markup.
+    if (!out.some(function (x) { return x.kind === 'webapp' || x.kind === 'html'; })) {
+      var hm = text.match(/<!doctype html[\s\S]*<\/html>/i) || text.match(/<html[\s>][\s\S]*<\/html>/i);
+      if (hm && /<script/i.test(hm[0]) && hm[0].length > 400) {
+        var doc = hm[0];
+        out.push({ kind: 'webapp', lang: 'html', title: deriveTitle('html', doc), content: doc, id: 'art-' + hash('webapp' + doc) });
+      }
+    }
     return out;
   }
 
