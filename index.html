@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-tmVNXYQsQWwcDDSgOmp7zFxB6tf9Roshy13/wrr1hs8=' 'sha256-4vgIbqF822Nu9DXPZK/LCUdE8SpiX7r+mJZHPcSBM+k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-JK0s0HpPEjkq8XgcCijYoXEBhFOacSE2HNIx8gyKWQA=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,6 +67,7 @@ body.incognito .question-header::after{content:"";}
 #installAppBtn{display:none}
 #installAppBtn.show{display:flex}
 @media(max-width:768px){.incognito-bar{top:52px}}
+
 </style>
 <style>
 :root {
@@ -1354,6 +1355,41 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
   .search-box { padding: 10px; }
   .suggestion-chip { padding: 8px 12px; font-size: 13px; }
 }
+/* ===== Perplexity-style live status line ===== */
+.searching-state { align-items: stretch; justify-content: flex-start; padding: 8px 0 16px; gap: 10px; }
+.searching-state .searching-query { display: none; }
+.pplx-status { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-muted); min-height: 24px; }
+.pplx-mark { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border-light); border-top-color: var(--accent); animation: pplxspin .9s linear infinite; position: relative; flex: none; }
+.pplx-mark::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--accent); opacity: .5; animation: pplxpulse 1.6s ease-in-out infinite; }
+.pplx-text { position: relative; display: inline-grid; }
+.pplx-phase { grid-area: 1/1; white-space: nowrap; background: linear-gradient(90deg, var(--text-muted) 40%, var(--text) 50%, var(--text-muted) 60%) 200% 0/250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: pplxshim 2.2s linear infinite; }
+.pplx-phase.in { animation: pplxshim 2.2s linear infinite, pplxin .26s ease-out; }
+.pplx-phase.out { animation: pplxout .26s ease-in forwards; }
+.pplx-skel { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.pplx-skel i { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--border-light) 50%, var(--bg-elevated) 75%) 0 0/200% 100%; animation: pplxsk 1.4s ease-in-out infinite; }
+.pplx-skel i:nth-child(1) { width: 92%; } .pplx-skel i:nth-child(2) { width: 78%; } .pplx-skel i:nth-child(3) { width: 55%; }
+.searching-state .agents-pill { align-self: flex-start; font-size: 12px; opacity: .8; }
+@keyframes pplxspin { to { transform: rotate(360deg); } }
+@keyframes pplxpulse { 50% { transform: scale(.5); opacity: .2; } }
+@keyframes pplxshim { to { background-position: -50% 0; } }
+@keyframes pplxin { from { opacity: 0; transform: translateY(5px); } }
+@keyframes pplxout { to { opacity: 0; transform: translateY(-5px); } }
+@keyframes pplxsk { 50% { background-position: -100% 0; } }
+@keyframes pplxerr { 0%,100% { box-shadow: none; } 40% { box-shadow: 0 0 0 3px rgba(229,72,77,.45); } }
+.answer-error { animation: pplxerr .9s ease-out 1; }
+body.pplx-hidden .pplx-mark, body.pplx-hidden .pplx-mark::after, body.pplx-hidden .pplx-phase, body.pplx-hidden .pplx-skel i { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .pplx-mark, .pplx-mark::after, .pplx-phase, .pplx-skel i { animation: none; } .pplx-phase { color: var(--text-muted); -webkit-text-fill-color: currentColor; } }
+/* ===== Perplexity typography/geometry ===== */
+body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.answer-content { font-size: 16px; line-height: 1.6; }
+.answer-content p { margin-bottom: 16px; }
+.answer-content li { margin-bottom: 4px; }
+.answer-content h1 { font-size: 24px; line-height: 1.3; } .answer-content h2 { font-size: 20px; line-height: 1.35; } .answer-content h3 { font-size: 18px; } .answer-content h4 { font-size: 16px; }
+.answer-content h1, .answer-content h2, .answer-content h3, .answer-content h4 { margin: 24px 0 8px; }
+.answer-content a { color: var(--accent); text-decoration: none; } .answer-content a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.answer-content blockquote { border-left: 2px solid var(--border-light); padding: 2px 0 2px 16px; }
+.answer-content pre { border-radius: 12px; font-size: 13.5px; line-height: 1.55; }
+.question-header { font-size: 28px; line-height: 1.3; font-weight: 500; letter-spacing: -.01em; margin: 8px 0 20px; }
 </style>
 </head>
 <body>
@@ -1406,6 +1442,7 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
       <button class="side-nav-btn" id="navDocs" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Docs</span></button>
       <button class="side-nav-btn" id="navTasks" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Tasks</span></button>
       <button class="side-nav-btn" id="navHubs" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M3 20V10l9-7 9 7v10"/></svg><span>Hubs</span></button>
+      <button class="side-nav-btn" id="navFleet" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5V13M12 13l-7 3.5M12 13l7 3.5"/></svg><span>Fleet</span></button>
       <button class="side-nav-btn" id="navPlugins" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg><span>Plugins</span></button>
       <button class="side-nav-btn" id="navDiscover" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2.1 6.3-6.3 2.1 2.1-6.3z"/></svg><span>Discover</span></button>
     </div>
@@ -3185,14 +3222,16 @@ function renderSearching(container, query) {
   const state = document.createElement("div");
   state.className = "searching-state";
   state.innerHTML = `
-    <button type="button" class="agents-pill expanded" aria-expanded="true">
+    <div class="pplx-status" role="status" aria-live="polite"><span class="pplx-mark" aria-hidden="true"></span><span class="pplx-text"><span class="pplx-phase">Searching…</span></span></div>
+    <div class="pplx-skel" aria-hidden="true"><i></i><i></i><i></i></div>
+    <button type="button" class="agents-pill" aria-expanded="false" title="Show detailed steps">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
       <span class="ap-label"><span class="ap-count">1</span> agent working</span>
       <span class="ap-chev">▾</span>
       <span class="search-timer">Working 0s</span>
     </button>
     <div class="searching-query"></div>
-    <div class="searching-phases"></div>`;
+    <div class="searching-phases" style="display:none"></div>`;
   state.querySelector(".searching-query").textContent = "\u201c" + clipWords(query, 140) + "\u201d";
   container.appendChild(state);
   const pill = state.querySelector(".agents-pill");
@@ -3296,6 +3335,24 @@ function liveAgentCount(phases) {
   for (const p of list) { if (!p || p.done || isDegradedPhase(p)) continue; if (p.agent) run.add(String(p.agent)); else lead = true; }
   return Math.max(1, run.size + (lead ? 1 : 0));
 }
+// Perplexity-style single status line: crossfades between phases ("Searching", "Reading 12 sources", "Analyzing", "Writing the answer").
+function pplxStatus(state, phases) {
+  const el = state.querySelector(".pplx-text"); if (!el) return;
+  const list = phases.map(publicPhase).filter(Boolean);
+  const live = list.filter(p => !p.done && !isDegradedPhase(p));
+  const cur = live[live.length - 1] || list[list.length - 1];
+  let n = 0; for (const p of list) if (p.kind === "search" && Array.isArray(p.items)) n += p.items.filter(x => x && x.url).length;
+  const lab = String((cur && cur.label) || ""); let txt;
+  if (/writ|draft|answer|synth/i.test(lab)) txt = "Writing the answer";
+  else if (n && /read|fetch|open|brows/i.test(lab + " " + (cur && cur.kind))) txt = "Reading " + n + " source" + (n === 1 ? "" : "s");
+  else if (n && cur && cur.kind === "search") txt = "Reading " + n + " source" + (n === 1 ? "" : "s");
+  else if (/analy|think|reason|council|review|check/i.test(lab)) txt = "Analyzing";
+  else txt = clipWords(lab, 60) || "Searching\u2026";
+  const old = el.lastElementChild;
+  if (old && old.textContent === txt) return;
+  const nx = document.createElement("span"); nx.className = "pplx-phase in"; nx.textContent = txt; el.appendChild(nx);
+  if (old) { old.classList.add("out"); setTimeout(() => old.remove(), 260); }
+}
 function renderPhases(state, phases) {
   if (!state || !state.isConnected || !Array.isArray(phases)) return;
   let box = state.querySelector(".searching-phases");
@@ -3346,6 +3403,7 @@ function renderPhases(state, phases) {
       if (p.kind === "search" && Array.isArray(p.items) && p.items.some(x => x && x.url)) { const chips = buildSrcChips(p.items, 18); if (chips) host.appendChild(chips); }
     }
   }
+  pplxStatus(state, phases);
   if (typeof state._tick === "function") state._tick();
   // v93: the pill's live agent count = running steps (min 1 — the pipeline itself is an agent)
   const pill = state.querySelector(".agents-pill");
@@ -4731,7 +4789,7 @@ async function loadStatus(force) {
 // perf: on-demand modules + non-blocking stylesheets. These five overlays are only reachable through a click, so
 // their JS (and CSS) is fetched the first time they are opened — and prefetched at idle so the click is instant.
 (function () {
-  var MODS = { library: ["library"], docs: ["docs"], discover: ["discover"], apikeys: ["apikeys"], hubs: ["hubs"] }; // name -> css files
+  var MODS = { library: ["library"], docs: ["docs"], discover: ["discover"], fleet: ["fleet"], apikeys: ["apikeys"], hubs: ["hubs"] }; // name -> css files
   var loaded = {};
   function cssLink(n) {
     if (document.querySelector('link[href*="modules/' + n + '.css"]')) return null;
@@ -4778,8 +4836,10 @@ document.getElementById("navDocs").onclick = function () { openModule("docs", "D
 document.getElementById("navTasks").onclick = function () { window.TasksUI && window.TasksUI.open(); };
 document.getElementById("navProjects").onclick = function () { window.ProjectsUI && window.ProjectsUI.open(); };
 document.getElementById("navDiscover").onclick = function () { openModule("discover", "DiscoverUI", "open"); };
+document.getElementById("navFleet").onclick = function () { openModule("fleet", "FleetUI", "open"); };
 document.getElementById("navHubs").onclick = function () { openModule("hubs", "LiveHubs", "open", "finance"); };
 document.getElementById("navPlugins").onclick = function () { window.PluginsUI && window.PluginsUI.open(); };
 </script>
+<script>document.addEventListener("visibilitychange",function(){document.body.classList.toggle("pplx-hidden",document.hidden)});</script>
 </body>
 </html>
