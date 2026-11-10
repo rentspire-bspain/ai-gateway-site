@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="/modules/sources.css">
 <link rel="stylesheet" href="/modules/media.css">
 <link rel="stylesheet" href="/modules/export.css">
+<link rel="stylesheet" href="/modules/docs-panel.css">
 <link rel="stylesheet" href="/modules/voice-convo.css">
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
@@ -4697,10 +4698,12 @@ async function loadStatus(force) {
 <script src="/modules/voice-convo.js"></script>
 <script src="/modules/artifacts-files.js"></script>
 <script src="/modules/artifacts-gallery.js"></script>
+<script src="/modules/docs-panel.js"></script>
 <script src="/modules/repo-pr.js"></script>
 <script src="/modules/sources.js"></script>
 <script src="/modules/media.js"></script>
 <script src="/modules/export.js"></script>
+<script src="/modules/tabstatus.js"></script>
 <script>
 // perf: on-demand modules + non-blocking stylesheets. These five overlays are only reachable through a click, so
 // their JS (and CSS) is fetched the first time they are opened — and prefetched at idle so the click is instant.
