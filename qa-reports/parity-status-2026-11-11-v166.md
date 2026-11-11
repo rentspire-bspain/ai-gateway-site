@@ -629,5 +629,64 @@ Promotions category excluded (not core parity). Core consumer experience (featur
 6. **Models (55)** — close the 12-model dropdown gap with registry entries.
 7. **Enterprise/desktop/comet/mobile** — deliberate later phases; they are 12 pts of the 47.4 remaining but cost the most per point.
 
+## 27. Retention hooks, acquisition, and virality — every section-23 company (added v166)
+Sources: [Perplexity growth interview](https://elsewhere.news/en/zhenfund/perplexity-3-7), [referral program](https://www.perplexity.ai/hub/legal/refer-a-friend-program), [Comet Invite & Earn](https://www.testingcatalog.com/perplexity-prepares-limited-invite-and-earn-program-for-comet/), [growth loops](https://www.productgrowth.blog/p/how-perplexity-hacked-its-growth), plus sections 19-20 imports. **Order: Perplexity first.**
+
+### 27a. Perplexity (deepest — our template)
+- **Acquisition:** ~80% organic word-of-mouth ("curiosity traffic" — organic/referral users retain better than paid); users need 3-7 touches before trying; big distribution partnerships; media-hype loop (each funding round = press = new users); campus ambassador program (.edu free month + gift-card rewards for 50/100 referrals, est. 50-100k students).
+- **Virality mechanics:** shareable answer pages (every shared thread is a public SEO page — user-generated content loop); Comet referral: $15 cash (US; $10/$5/$2 geo) via DUB + friend gets 1 month Pro; Pro refer-a-friend: 1 month Pro both sides, cap 12/billing cycle; freemium with zero-friction trial.
+- **Retention hooks (ranked):** 1) weekly quotas (Pro Searches 400/week, weekly Computer usage, 100-1000 file uploads/week) — recurring allowance = habit loop; 2) Projects/Spaces file storage (5 GB per project, retained until deleted — data lock-in); 3) Brain memory (self-improving model of your projects/people/files — grows more valuable with use); 4) scheduled tasks (automated recurring engagement); 5) credits with monthly refresh + one-time bonuses with 30-day expiry (urgency); 6) Discord community (Pro-gated); 7) Model Council/Labs novelty features; 8) subscription billing inertia.
+- **Our gaps → builds:** referral program (double-sided credits — costs us ~nothing at 100% margin: give 500 credits each side); public shareable answer pages for SEO (thread share links exist but aren't public/SEO-indexed — biggest missing loop); weekly-allowance framing on free tier; scheduled digests via automations (already built); community space.
+
+### 27b. The other five
+| Company | Retention hooks | Acquisition | Virality |
+|---|---|---|---|
+| **Muse** (Meta) | Goals tab (ongoing plans), proactive agent texts (habit loop — it messages you first), persistent Secure VM (your files/computer live there), editable Memory files, avatar + name + voice (emotional attachment), WhatsApp channel (lives where you already are), background work notifications | Meta distribution: 900k downloads in ~days, #1 free App Store, 700k DAU in 11 days — near-zero CAC via Instagram/WhatsApp/App Store surfaces | Meta's social graph; WhatsApp conversations about Muse; free tier |
+| **Instinct** | Trusted Person network (your spouse's/colleagues' agents must also be Instinct — multiplayer lock-in; recurring coordinations create dependence), single continuous thread (accumulated context = switching cost), Vault (passwords + cards stored = highest switching cost — 37% store a password in 3 weeks), proactive texts, 40% share a card by week 3, 80% retention after first sensitive share | Invite-only scarcity + waitlist + 5 invites per member; SF tech-scene buzz; Wired/Verge coverage; $1B annualized transaction volume with 14 people | Inherently viral: every coordination (dinner with Patrick, group trip, tennis league) requires the counterpart to have Instinct — 300k+ coordinations in week one |
+| **Town** | Named Townie with own @town.com email + phone (relationship), routines on schedules (daily habit), wiki that learns you nightly (lock-in deepens over time), credit pools, team plans, Townie-to-Townie collaboration (your team's agents know each other) | SOC 2 + enterprise sales motion; product-led reach via Slack/Teams where users already work; free 30 msgs/mo | Every outbound Townie email/text to customers/partners/candidates is an advertisement; teammate-join loop |
+| **Manus** | Skills marketplace (your custom skills live there), Projects knowledge base, Cloud Computer (apps run 24/7 = hosted state), 300 daily-refresh free credits (come-back-daily habit), version-control rollback of generated work | Viral demo videos (screen recordings of "Manus's Computer" doing tasks), GAIA-benchmark #1 claims, community showcase, free tier | Shareable task replays; community skills marketplace; $100M ARR in 8 months |
+| **Wabi** | Group chats (the family group IS the retention unit — leaving means leaving the group's shared brain), generated mini-apps/games/mascots (your creations live there), location-aware arrival help, health data connection, playful features | Consumer social: invite family/friends into a chat to use it at all | Multiplayer by design — every group requires inviting others; home-screen widgets; "remix each other's apps" |
+
+### 27c. The synthesis for ai.spaincos
+The strongest hooks across all six: (1) **multiplayer lock-in** (Instinct's Trusted Person, Wabi's groups, Town's team) — your people are in it, so you stay; (2) **accumulating memory** (Brain, Town's wiki, Muse's Memory files) — the product gets better the more you use it, making leaving costly; (3) **stored state** (VMs, Vaults, project files, skills) — your stuff lives there; (4) **the agent initiates** (proactive texts — habit formation); (5) **recurring allowances** (weekly quotas, daily credits — scheduled return triggers). Our build order (Perplexity-first): public share pages + referral credits + weekly-allowance framing now; then memory UI (Brain-style) and scheduled digests; multiplayer (shared threads) as the Instinct-grade phase. Each of these is a section-19/24 line item already queued.
+
+## 28. Storage / memory / context — full parity matrix (added v166)
+Sources: [Perplexity Projects](https://www.perplexity.ai/help-center/en/articles/10352961-spaces), [Enterprise file limits](https://www.perplexity.ai/help-center/en/articles/12009761-enterprise-file-limits), [plan comparison](https://www.perplexity.ai/help-center/en/articles/11187416-which-perplexity-subscription-plan-is-right-for-you), plus section 19-20 imports. **Perplexity first; 100% parity target on every row.**
+
+### 28a. Perplexity's storage/memory/context offer (the bar)
+| Surface | Limit | Notes |
+|---|---|---|
+| Project files | 10,000 files + 5 GB per project, 100 MB/file | same on every plan; retained until deleted; unlimited projects |
+| My Files (personal repository) | 10,000 files | Max subscribers |
+| Session uploads | 30 files x 50 MB per upload (Enterprise); Pro/Max weekly limits (100-1000/week); Computer files up to 200 MB | session files retained 7 days then deleted |
+| Personal memory | on by default; "use session creator's memory" toggle; disabled in shared projects | cross-session |
+| Project Brain | ongoing memory of all project work; auto-update uses owner's credits; owner controls automatic/manual | the self-improving layer |
+| Brain (Computer, Max) | self-improving working model of projects, people, files | Research Preview, free during preview |
+| Context handling | anchor + recent turns (we replicated v159); Pro searches 400/week | "conversation too large" eliminated on ours |
+
+### 28b. Everyone else
+| Company | Memory | Storage | Context |
+|---|---|---|---|
+| Muse | persistent across conversations; user-editable Memory files (Memory.md); permissions UI | persistent Secure VM with file system + terminal (your own computer); artifacts | one long main conversation + side chats; interruptible multitasking |
+| Instinct | single continuous thread (/new resets); preferences persist (remembered customs-form details) | persistent cloud computer with cached credentials; Vault (logins, cards, addresses — excluded from training); Files pages shareable by link | one thread by design; "no new interfaces" |
+| Town | 4 server-side systems: wiki (nightly refresh), memory store (global + per-routine facts), library (docs + routine output), people model (contacts + inter-agent approvals); personality is a separate editable doc; add/update/delete memory tools | library of documents + routine outputs | routines scoped memory; Mac app with messages/contacts/screen |
+| Manus | Projects knowledge; skills = unlimited bundled knowledge without context bloat (progressive disclosure) | Cloud Computer (agents/bots running 24/7); version control with rollback; library of generated files | expanded context window (1.5+); parallel sub-agents |
+| Wabi | group-shared context (the chat's shared brain); connections (email, calendar, photos, health) | generated mini-apps, plans, trackers live in chats; widgets | multiplayer context |
+
+### 28c. ai.spaincos current state vs the bar
+| Item | Perplexity bar | Ours | Status |
+|---|---|---|---|
+| Server-side memory | personal + project Brain, auto-update | 1,495 memories, RLS, merged into personalization; no Brain-style auto-updating project memory | 🟡 |
+| Project file storage | 10k files/5GB/100MB per project, unlimited projects | context_documents table (user docs); no per-project quota system or file browser | 🔴 |
+| Personal file repository | My Files 10k files | none | 🔴 |
+| Session attachments | 30x50MB, 7-day retention; Computer 200MB | attachments handled per-thread; no quota policy | 🟡 |
+| Persistent VM | (Muse/Manus/Instinct all have one) | run_python sandbox is ephemeral | 🔴 |
+| Long-thread handling | anchor + recent turns | shipped v159 (anchor + last 22 sent, 40 rendered) | ✅ |
+| Cross-session search | full history | shipped v165 (server-backed sidebar + Library search) | ✅ |
+| Memory transparency | editable Memory.md (Muse); wiki (Town) | memories inspectable via settings? partial | 🟡 |
+| Version history | project file versions; Manus rollback | docs panel version dropdown exists | 🟡 |
+
+**Build order for 100% parity (Perplexity rows first):** (1) per-project storage quota system mirroring 10k files/5GB/100MB exactly (Supabase storage bucket + counters — cheap, our 8GB DB holds metadata only); (2) My Files personal repository; (3) Brain-style auto-updating project memory on top of existing memory infra; (4) session-attachment quota policy (100/week Pro framing); (5) persistent VM (the Muse/Manus/Instinct row — already section 19 P1); (6) memory transparency UI (edit/delete memories, per-project scoping).
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
