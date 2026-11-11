@@ -30,3 +30,9 @@
 .cn-act-msg{font-size:13px;margin-top:8px}.cn-act-msg.ok{color:var(--accent-hover,#56ABAB)}.cn-act-msg.err{color:#e5736f}
 .cn-link{color:var(--accent,#3D9595)}
 @media (max-width:420px){.cn-act-row{grid-template-columns:1fr;gap:2px}}
+
+/* Accidental-disconnect alert card (v164) */
+.cn-drop { border-left: 3px solid #d97706; background: rgba(217,119,6,.06); }
+.cn-drop .cn-actions { margin-top: 8px; }
+.cn-card .stg-switch { flex: none; }
+.cn-actions { gap: 10px; }
