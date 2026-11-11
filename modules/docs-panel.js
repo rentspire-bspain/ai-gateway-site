@@ -277,7 +277,7 @@
   }
   function titleOf(t) { var m = String(t).match(/^#{1,2}\s+(.+)$/m); return m ? m[1].replace(/[*_`#]/g, '').trim().slice(0, 90) : 'Report'; }
   var FILE_ASK = /\b(report|document|docx?|word|memo|brief|white ?paper|write[- ]?up|spreadsheet|xlsx|excel|csv|pdf|file|artifact|tracker|checklist|template)\b|\.md\b/i;
-  var seen = new WeakMap(), autoTimer = null;
+  var seen = new WeakMap();
   function host(ac) { return ac.closest('.answer-section') || ac.parentNode; }
   function place(ac, text, query) {
     if (!isDocShaped(text)) return;
@@ -287,7 +287,9 @@
     if (old) old.remove();
     var row = el('div', 'dp-row'); row.setAttribute('data-id', id); row.appendChild(card(it));
     var actions = h.querySelector(':scope > .answer-actions'); if (actions) actions.after(row); else h.appendChild(row);
-    if (query && FILE_ASK.test(query) && !seen.get(ac)) { clearTimeout(autoTimer); autoTimer = setTimeout(function () { if (document.contains(row) && !seen.get(ac)) { seen.set(ac, 1); open(it); } }, 1500); }
+    // v163 (owner directive): NO auto-open from the FILE_ASK heuristic. The chip at the end
+    // of the answer is the only entry point; the panel opens only on explicit user click.
+    // Never replaces a doc that is already open in the panel.
   }
   var KIND_BY_EXT = { md: 'md', markdown: 'md', txt: 'txt', csv: 'csv', xlsx: 'xlsx', docx: 'docx', pdf: 'pdf', html: 'webapp', htm: 'webapp' };
   function b64ToBytes(b) { var s = atob(b), a = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); return a; }
@@ -303,7 +305,8 @@
     if (!items.length) return [];
     hostEl = hostEl || (function () { var s = document.querySelectorAll('#resultsContent .answer-section'); return s[s.length - 1]; })();
     if (hostEl) { var row = el('div', 'dp-row'); items.forEach(function (it) { row.appendChild(card(it)); }); hostEl.appendChild(row); }
-    open(items[0]); return items;
+    // v163: NO auto-open — file assets appear as chips at the end of the answer; open only on click.
+    return items;
   }
 
   /* patch renderAnswer (chained after artifacts.js) + sniff JSON chat responses for file assets */
