@@ -181,9 +181,16 @@ def frontend(base):
         chips = pg.locator(".related-item").count()
         check("follow-up chips render", chips >= 1, str(chips))
         check("Run-all button present", pg.locator(".related-runall").count() == 1)
-        # doc panel
+        # doc panel — v163 (owner directive): NO auto-open. The chip is the entry point;
+        # the panel opens only on explicit click. Verify chip present, click it, then check rendering.
+        chip = pg.locator(".doc-chip, .dp-row .dp-card").first
+        chip_ok = chip.count() >= 1
+        check("doc chip present (no auto-open)", chip_ok)
+        if chip_ok:
+            chip.click()
+            pg.wait_for_timeout(700)
         dp = pg.evaluate("() => ({open: document.body.classList.contains('dp-open'), h1: (h => h ? getComputedStyle(h).fontSize : 'x')(document.querySelector('.dp-panel .dp-md h1')), code: !!document.querySelector('.dp-panel .dp-codebar button'), mono: (c => c ? getComputedStyle(c).fontFamily.includes('monospace') : false)(document.querySelector('.dp-panel .dp-code pre code'))})")
-        check("doc panel auto-opens", dp["open"])
+        check("doc panel opens on chip click", dp["open"])
         check("doc h1 heading scale (20-28px)", dp["open"] and dp["h1"] != "x" and 20 <= float(str(dp["h1"]).replace("px", "")) <= 28, str(dp))
         check("doc code monospace + copy", dp["code"] and dp["mono"])
         check("doc-chip collapses raw markdown", pg.locator(".doc-chip").count() >= 1)
