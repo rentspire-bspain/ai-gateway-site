@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-rBEmj3nW1YPFnUmMJjhFfOlpRErmXP93VNyRq8TL+UI=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-QmzNYxPCcIfZqihsYG0R0DOwTvq+spqEaDsEjBGXG9E=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1159,6 +1159,8 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
   margin-top: 8px;
   text-align: center;
 }
+.auth-link { display:block; width:100%; background:none; border:none; color:var(--accent,#1a6b5a); font:inherit; font-size:12.5px; cursor:pointer; padding:6px 0 0; }
+.auth-link:hover { text-decoration: underline; }
 .auth-note {
   font-size: 12px;
   color: var(--text-faint);
@@ -1638,6 +1640,16 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
       <button class="auth-btn" id="authPasswordBtn">Sign in with password</button>
       <button class="auth-btn-secondary" id="authSendCode">Send email code instead</button>
       <button class="auth-btn-secondary" id="authPasskeyBtn" style="margin-top:8px">Sign in with passkey</button>
+      <button class="auth-link" id="authSetPass" type="button" style="margin-top:10px">Set or reset my password (email link)</button>
+    </div>
+    <div id="authStep3" style="display:none">
+      <div class="auth-input-group">
+        <input class="auth-input" id="authNewPass" type="password" placeholder="New password (8+ characters)" autocomplete="new-password">
+      </div>
+      <div class="auth-input-group">
+        <input class="auth-input" id="authNewPass2" type="password" placeholder="Repeat new password" autocomplete="new-password">
+      </div>
+      <button class="auth-btn" id="authSavePass">Save password</button>
     </div>
     <div id="authStep2" style="display:none">
       <div class="auth-input-group">
@@ -1651,7 +1663,7 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js" integrity="sha384-uteMfOloLDGt042uDz+xHGF3ym63/WQ6rFq7murQRG8Ih7QrXGEGNtWd8688sb4O" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js" integrity="sha384-XQqX/4yiUGu+oyr87jvWzRuqBUK/adrY0DunhL+tID9m/9dwSpV8h9Fk/Sg6ifVQ" crossorigin="anonymous"></script>
 <script>
@@ -2174,36 +2186,56 @@ document.getElementById("newSpaceBtn").onclick = () => openSpaceModal(null);
 // base64 data URI on the request's `attachment` field — the gateway's
 // Perplexity vision lane analyzes them; the image itself never enters the
 // thread history or the writing agents).
-let pendingAttachment = null; // {kind:"text"|"pdf", name, content} | {kind:"image", name, dataUrl}
+const ATTACH_MAX_FILES = 10, ATTACH_MAX_BYTES = 10_000_000, ATTACH_TEXT_CAP = 1_000_000, ATTACH_PDF_PAGES = 20, ATTACH_PDF_CHARS = 40_000, ATTACH_DOC_CAP = 60_000;
+let pendingAttachments = []; // [{kind:"text"|"pdf"|"docx"|"xlsx"|"pptx", name, content, note?} | {kind:"image", name, dataUrl} | {kind:"unsupported", name, note}]
 const fileInput = document.createElement("input");
 fileInput.type = "file";
-fileInput.accept = ".txt,.md,.csv,.json,.log,.ts,.js,.py,.sql,.yml,.yaml,.html,.css,text/*,.pdf,image/png,image/jpeg,image/webp,image/gif";
+fileInput.multiple = true;
+fileInput.accept = ".txt,.md,.csv,.tsv,.json,.log,.ts,.js,.py,.sql,.yml,.yaml,.html,.css,text/*,.pdf,.docx,.xlsx,.pptx,image/png,image/jpeg,image/webp,image/gif";
 fileInput.style.display = "none";
 document.body.appendChild(fileInput);
+function attachNotice(msg) {
+  for (const id of ["landingAttachChip", "followupAttachChip"]) {
+    const el = document.getElementById(id); if (!el) continue;
+    const n = document.createElement("div");
+    n.className = "attach-notice"; n.setAttribute("role", "status");
+    n.style.cssText = "font-size:12px;color:var(--text-muted);padding:2px 6px";
+    n.textContent = msg; el.appendChild(n);
+    setTimeout(() => n.remove(), 6000);
+  }
+}
 function renderAttachChips() {
   for (const id of ["landingAttachChip", "followupAttachChip"]) {
     const el = document.getElementById(id);
     if (!el) continue;
     el.innerHTML = "";
-    if (!pendingAttachment) continue;
-    const chip = document.createElement("div");
-    chip.className = "attach-chip";
-    // v158: Perplexity parity — image attachments show a real thumbnail chip, not text
-    if (pendingAttachment.kind === "image") {
-      const th = document.createElement("img");
-      th.src = pendingAttachment.dataUrl; th.alt = ""; th.className = "attach-thumb";
-      chip.appendChild(th);
-    }
-    const name = document.createElement("span");
-    name.textContent = pendingAttachment.kind === "image"
-      ? pendingAttachment.name
-      : pendingAttachment.name + " (" + pendingAttachment.content.length + " chars)";
-    const x = document.createElement("button");
-    x.textContent = "×";
-    x.title = "Remove attachment";
-    x.onclick = () => { pendingAttachment = null; renderAttachChips(); };
-    chip.appendChild(name); chip.appendChild(x);
-    el.appendChild(chip);
+    pendingAttachments.forEach((a, idx) => {
+      const chip = document.createElement("div");
+      chip.className = "attach-chip";
+      chip.dataset.kind = a.kind;
+      if (a.kind === "image") {
+        const th = document.createElement("img");
+        th.src = a.dataUrl; th.alt = ""; th.className = "attach-thumb";
+        chip.appendChild(th);
+      } else {
+        const ty = document.createElement("span");
+        ty.className = "attach-type";
+        ty.style.cssText = "font-size:10px;font-weight:600;text-transform:uppercase;opacity:.7";
+        ty.textContent = (a.name.split(".").pop() || a.kind).slice(0, 5);
+        chip.appendChild(ty);
+      }
+      const name = document.createElement("span");
+      name.textContent = a.kind === "image" ? a.name
+        : a.kind === "unsupported" ? a.name + " (unsupported type)"
+        : a.name + " (" + a.content.length + " chars" + (a.note ? ", truncated" : "") + ")";
+      const x = document.createElement("button");
+      x.textContent = "×";
+      x.title = "Remove attachment";
+      x.setAttribute("aria-label", "Remove " + a.name);
+      x.onclick = () => { pendingAttachments.splice(pendingAttachments.indexOf(a), 1); renderAttachChips(); };
+      chip.appendChild(name); chip.appendChild(x);
+      el.appendChild(chip);
+    });
   }
 }
 function fileToDataUrl(f) {
@@ -2239,43 +2271,136 @@ async function extractPdfText(f) {
   const pdfjs = await getPdfjs();
   const doc = await pdfjs.getDocument({ data: await f.arrayBuffer() }).promise;
   let text = "";
-  const pages = Math.min(doc.numPages, 6); // first 6 pages, capped at 3,000 chars
-  for (let p = 1; p <= pages && text.length < 3000; p++) {
+  const pages = Math.min(doc.numPages, ATTACH_PDF_PAGES);
+  for (let p = 1; p <= pages && text.length < ATTACH_PDF_CHARS; p++) {
     const page = await doc.getPage(p);
     const tc = await page.getTextContent();
     text += tc.items.map(it => it.str).join(" ").replace(/\s+/g, " ").trim() + "\n\n";
   }
-  return text.slice(0, 3000);
+  const truncated = doc.numPages > pages || text.length > ATTACH_PDF_CHARS;
+  return { text: text.slice(0, ATTACH_PDF_CHARS), truncated, note: truncated ? "[Truncated: first " + pages + " of " + doc.numPages + " pages, max " + ATTACH_PDF_CHARS + " chars]" : "" };
 }
-async function handleAttachFile(f) {
-  if (!f) return;
-  try {
-    if (/^image\/(png|jpeg|webp|gif)$/.test(f.type)) {
-      if (f.size > 10_000_000) { alert("Image too large (10MB max)"); return; }
-      pendingAttachment = { kind: "image", name: f.name || "pasted-image.png", dataUrl: await prepareImage(f) };
-    } else if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) {
-      const text = await extractPdfText(f);
-      if (!text.trim()) { alert("That PDF has no extractable text (likely a scan) — images of pages aren't supported yet"); return; }
-      pendingAttachment = { kind: "pdf", name: f.name, content: text };
-    } else {
-      if (f.size > 200_000) { alert("File too large (200KB max for text attachments)"); return; }
-      const text = await f.text();
-      if (!text.trim()) { alert("That file has no readable text"); return; }
-      pendingAttachment = { kind: "text", name: f.name, content: text.slice(0, 3000) };
-    }
-    renderAttachChips();
-  } catch (e) { alert("Could not read that file"); }
+// Minimal zip reader (central directory + DecompressionStream) for OOXML files.
+async function zipEntries(bytes, wanted) {
+  const u16 = (o) => bytes[o] | (bytes[o + 1] << 8);
+  const u32 = (o) => (bytes[o] | (bytes[o + 1] << 8) | (bytes[o + 2] << 16) | (bytes[o + 3] << 24)) >>> 0;
+  let e = bytes.length - 22; while (e >= 0 && u32(e) !== 0x06054b50) e--;
+  if (e < 0) throw new Error("Not a zip");
+  const n = u16(e + 10); let off = u32(e + 16);
+  const dec = new TextDecoder(), out = {}, jobs = [];
+  for (let k = 0; k < n; k++) {
+    const meth = u16(off + 10), csz = u32(off + 20), nl = u16(off + 28), xl = u16(off + 30), cl = u16(off + 32), lo = u32(off + 42);
+    const name = dec.decode(bytes.subarray(off + 46, off + 46 + nl)); off += 46 + nl + xl + cl;
+    if (!wanted.test(name)) continue;
+    const ds = lo + 30 + u16(lo + 26) + u16(lo + 28), raw = bytes.subarray(ds, ds + csz);
+    if (meth === 0) out[name] = dec.decode(raw);
+    else if (meth === 8) jobs.push(new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer().then(ab => { out[name] = dec.decode(ab); }));
+  }
+  await Promise.all(jobs);
+  return out;
 }
+function xmlTexts(xml, tagRe) { // concatenated text of matching tags
+  const out = []; let m; const re = new RegExp("<" + tagRe + "(?:\\s[^>]*)?>([^<]*)</" + tagRe + ">", "g");
+  while ((m = re.exec(xml))) out.push(m[1]);
+  return out.join("").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+}
+function xmlDecode(s) { return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&"); }
+async function extractDocx(f) {
+  const files = await zipEntries(new Uint8Array(await f.arrayBuffer()), /^word\/document\.xml$/);
+  const xml = files["word/document.xml"]; if (!xml) throw new Error("no document.xml");
+  const lines = [];
+  // table rows -> tab-separated cells; other paragraphs -> lines
+  const body = xml.replace(/<w:tbl>[\s\S]*?<\/w:tbl>/g, (tbl) => {
+    const rows = (tbl.match(/<w:tr[\s>][\s\S]*?<\/w:tr>/g) || []).map(tr =>
+      (tr.match(/<w:tc[\s>][\s\S]*?<\/w:tc>/g) || []).map(tc => (tc.match(/<w:p[\s>][\s\S]*?<\/w:p>/g) || []).map(p => xmlTexts(p, "w:t")).join(" ")).join("\t"));
+    return "<w:p><w:t>" + rows.map(r => r.replace(/&/g, "&amp;").replace(/</g, "&lt;")).join("\u0001") + "</w:t></w:p>";
+  });
+  for (const p of (body.match(/<w:p[\s>][\s\S]*?<\/w:p>/g) || [])) {
+    const t = xmlTexts(p.replace(/<w:tab\/>/g, "<w:t>\t</w:t>"), "w:t");
+    lines.push(t.replace(/\u0001/g, "\n"));
+  }
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+async function extractPptx(f) {
+  const files = await zipEntries(new Uint8Array(await f.arrayBuffer()), /^ppt\/slides\/slide\d+\.xml$/);
+  const names = Object.keys(files).sort((a, b) => parseInt(a.match(/(\d+)\.xml/)[1]) - parseInt(b.match(/(\d+)\.xml/)[1]));
+  return names.map((nm, i) => {
+    const paras = (files[nm].match(/<a:p[\s>][\s\S]*?<\/a:p>/g) || []).map(p => xmlTexts(p, "a:t")).filter(Boolean);
+    return "--- Slide " + (i + 1) + " ---\n" + paras.join("\n");
+  }).join("\n\n").trim();
+}
+let docsPanelP = null;
+async function getParseXlsx() {
+  if (!(window.ArtifactPanel && window.ArtifactPanel.parseXlsx)) {
+    if (!docsPanelP) docsPanelP = new Promise((res, rej) => { const s = document.createElement("script"); s.src = "modules/docs-panel.js"; s.onload = res; s.onerror = () => rej(new Error("docs-panel load failed")); document.head.appendChild(s); });
+    await docsPanelP;
+  }
+  if (!(window.ArtifactPanel && window.ArtifactPanel.parseXlsx)) throw new Error("xlsx parser unavailable");
+  return window.ArtifactPanel.parseXlsx;
+}
+async function extractXlsx(f) {
+  const parse = await getParseXlsx();
+  const sheets = await parse(new Uint8Array(await f.arrayBuffer()));
+  let trunc = false;
+  const text = sheets.map(sh => {
+    const rows = sh.rows || [];
+    if (rows.length > 60) trunc = true;
+    return "## Sheet: " + sh.name + "\n" + rows.slice(0, 60).map(r => (Array.isArray(r) ? r : Object.values(r)).map(c => c == null ? "" : String(c).replace(/[\t\r\n]+/g, " ")).join("\t")).join("\n") + (rows.length > 60 ? "\n[" + (rows.length - 60) + " more rows omitted]" : "");
+  }).join("\n\n").trim();
+  return { text, truncated: trunc };
+}
+function capText(text, cap) {
+  return text.length > cap ? { text: text.slice(0, cap), truncated: true } : { text, truncated: false };
+}
+async function readOneAttachment(f) {
+  const name = f.name || "pasted-image.png";
+  const ext = (name.split(".").pop() || "").toLowerCase();
+  if (f.size > ATTACH_MAX_BYTES) throw new Error(name + ": too large (10MB max)");
+  if (/^image\/(png|jpeg|webp|gif)$/.test(f.type)) return { kind: "image", name, dataUrl: await prepareImage(f) };
+  if (f.type === "application/pdf" || ext === "pdf") {
+    const r = await extractPdfText(f);
+    if (!r.text.trim()) throw new Error(name + ": no extractable text (likely a scan)");
+    return { kind: "pdf", name, content: r.text, note: r.truncated ? r.note : "" };
+  }
+  if (ext === "docx" || ext === "xlsx" || ext === "pptx") {
+    let raw, kind = ext, trunc = false;
+    if (ext === "docx") raw = await extractDocx(f);
+    else if (ext === "pptx") raw = await extractPptx(f);
+    else { const r = await extractXlsx(f); raw = r.text; trunc = r.truncated; }
+    if (!raw.trim()) throw new Error(name + ": no readable text");
+    const c = capText(raw, ATTACH_DOC_CAP);
+    return { kind, name, content: c.text, note: (trunc || c.truncated) ? "[Truncated: content limited]" : "" };
+  }
+  const isText = /^text\//.test(f.type) || /^(txt|md|markdown|csv|tsv|json|log|ts|js|py|sql|ya?ml|html?|css|xml|rtf)$/.test(ext) || f.type === "application/json";
+  if (!isText) return { kind: "unsupported", name, note: "unsupported type" };
+  const text = await f.text();
+  if (!text.trim()) throw new Error(name + ": no readable text");
+  const c = capText(text, ATTACH_TEXT_CAP);
+  return { kind: "text", name, content: c.text, note: c.truncated ? "[Truncated: first " + ATTACH_TEXT_CAP + " characters]" : "" };
+}
+async function handleAttachFiles(files) {
+  files = [...(files || [])].filter(Boolean);
+  if (!files.length) return;
+  const room = ATTACH_MAX_FILES - pendingAttachments.length;
+  if (files.length > room) attachNotice("Limit is " + ATTACH_MAX_FILES + " files — " + Math.max(0, files.length - room) + " not added.");
+  const results = await Promise.all(files.slice(0, Math.max(0, room)).map(f => readOneAttachment(f).then(a => ({ a }), e => ({ err: (e && e.message) || ((f.name || "file") + ": could not be read") }))));
+  for (const r of results) {
+    if (r.a) { pendingAttachments.push(r.a); if (r.a.kind === "unsupported") attachNotice(r.a.name + ": unsupported type — it will be listed but its contents can't be read."); }
+    else attachNotice(r.err);
+  }
+  renderAttachChips();
+}
+const handleAttachFile = (f) => handleAttachFiles(f ? [f] : []);
 fileInput.onchange = async () => {
-  const f = fileInput.files && fileInput.files[0];
+  const fs = [...(fileInput.files || [])];
   fileInput.value = "";
-  await handleAttachFile(f);
+  await handleAttachFiles(fs);
 };
 // v83 (C6): drag-and-drop anywhere + paste an image into any composer
 (function () {
   const ov = document.createElement("div");
   ov.className = "drop-overlay"; ov.id = "dropOverlay";
-  ov.innerHTML = "<div>Drop a file to attach it to your question</div>";
+  ov.innerHTML = "<div>Drop files to attach them to your question</div>";
   document.body.appendChild(ov);
   let depth = 0;
   const hasFiles = (e) => e.dataTransfer && [...(e.dataTransfer.types || [])].indexOf("Files") !== -1;
@@ -2288,18 +2413,17 @@ fileInput.onchange = async () => {
     depth = 0; ov.classList.remove("show");
     if (inModal(e)) return;
     e.preventDefault();
-    const f = e.dataTransfer.files && e.dataTransfer.files[0];
-    if (f) handleAttachFile(f);
+    const fl = e.dataTransfer.files ? [...e.dataTransfer.files] : [];
+    if (fl.length) handleAttachFiles(fl);
   });
   ["landingInput", "searchbarInput", "followupInput"].forEach((id) => {
     const el = document.getElementById(id); if (!el) return;
     el.addEventListener("paste", (e) => {
       const items = [...((e.clipboardData && e.clipboardData.items) || [])];
-      const it = items.find(x => x.kind === "file" && /^image\//.test(x.type));
-      const f = it ? it.getAsFile() : null;
-      if (!f) return; // plain text paste proceeds normally
+      const fl = items.filter(x => x.kind === "file" && /^image\//.test(x.type)).map(x => x.getAsFile()).filter(Boolean);
+      if (!fl.length) return; // plain text paste proceeds normally
       e.preventDefault();
-      handleAttachFile(f);
+      handleAttachFiles(fl);
     });
   });
 })();
@@ -2639,10 +2763,30 @@ function speakAnswer(text) {
   window.openShortcutsHelp = () => help.classList.add("open"); // v74: used by the account menu
 })();
 function takeAttachment() {
-  const att = pendingAttachment;
-  pendingAttachment = null;
+  const att = pendingAttachments;
+  pendingAttachments = [];
   renderAttachChips();
   return att;
+}
+// Small filename/thumbnail tags under a question header (never the file contents).
+function attachNamesOf(content) {
+  const out = []; const re = /\n\n?\[Attached (?:file|image): ([^\]\n]*)\]/g; let m;
+  while ((m = re.exec(String(content || "")))) out.push(m[1]);
+  return out;
+}
+function appendAttachTags(q, items) {
+  if (!items || !items.length) return;
+  const row = document.createElement("div");
+  row.className = "question-attachments";
+  row.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:12px;font-weight:400;color:var(--text-muted)";
+  for (const it of items) {
+    const tag = document.createElement("span");
+    tag.className = "attach-chip";
+    if (it.dataUrl) { const im = document.createElement("img"); im.src = it.dataUrl; im.alt = ""; im.className = "attach-thumb"; im.style.cssText = "width:24px;height:24px"; tag.appendChild(im); }
+    const t = document.createElement("span"); t.textContent = it.name; tag.appendChild(t);
+    row.appendChild(tag);
+  }
+  q.appendChild(row);
 }
 
 // ============ SIDEBAR ============
@@ -2915,7 +3059,7 @@ const authOverlay = document.getElementById("authOverlay");
 // Sign-out is local-first: it clears all local auth state even when the server session is already gone.
 const AuthGuard = (function () {
   const KEY_RE = /^sb-[a-z0-9]+-auth-token(?:-code-verifier|-user)?$/; // supabase-js keys; the extension bridge mirrors sb-<ref>-auth-token
-  const EXPIRED_MSG = "Your session expired — sign in again.";
+  const EXPIRED_MSG = "Sign in to continue.";
   const nativeFetch = window.fetch.bind(window);
   let expired = false, inflight = null, lastVerify = 0;
   const wait = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
@@ -2949,11 +3093,12 @@ const AuthGuard = (function () {
   function makeError() { const e = new Error(EXPIRED_MSG); e.authExpired = true; return e; }
   // flip the app to signed-out; idempotent, always (re)shows the gate
   function expire(msg) {
-    if (!expired) {
-      expired = true;
-      clearLocal();
-      try { wait(sb.auth.signOut({ scope: "local" }), 1500).catch(() => {}); } catch (e) {} // drop supabase-js' in-memory session (no server dependency)
-    }
+    // v158 (owner directive: GET RID OF AUTO-LOGOUT): this function used to wipe the local
+    // session and sign out on transient auth failures. It now NEVER destroys local state
+    // and NEVER signs out. It only shows the gate when the session is definitively dead
+    // (a refresh was explicitly rejected) — and even then the stored session survives, so
+    // a valid refresh token recovers silently on the next visit.
+    if (!expired) { expired = true; }
     showGate(msg || EXPIRED_MSG);
     return msg || EXPIRED_MSG;
   }
@@ -2988,6 +3133,8 @@ const AuthGuard = (function () {
     if (rd.dead) { expire(); return false; }
     return true;
   }
+  // v158: a dead-looking gate is RE-CHECKED before trusting it — recoverable sessions
+  // (refresh token still valid server-side) must silently sign back in on the next focus.
   const urlOf = (i) => typeof i === "string" ? i : (i && i.url) || String(i || "");
   window.fetch = async function (input, init) {
     const res = await nativeFetch(input, init);
@@ -3015,7 +3162,7 @@ const AuthGuard = (function () {
       if (currentUser && !expired && r && r.data && !r.data.session) {
         const err = r.error;
         const retryable = err && (err.name === "AuthRetryableFetchError" || /fetch|network/i.test(String(err.message)));
-        if (!retryable) expire();
+        if (!retryable) { const rd = await refreshOrDead(); if (rd.dead) expire(); } // v158: never on transient/unknown
       }
     } catch (e) {}
     return r;
@@ -3058,17 +3205,24 @@ window.AuthGuard = AuthGuard;
 // v91: the allowlist is now LIVE (org_allowlist table, managed from Settings → Team).
 // Invites update it instantly — no code deploy needed to admit someone.
 async function signinAllowed(email) {
-  try {
-    const { data } = await sb.rpc("is_signin_allowed", { p_email: String(email || "").toLowerCase() });
-    return data === true;
-  } catch (e) { return false; }
+  // v158 (owner directive: STOP AUTO-LOGOUTS): a network hiccup on this RPC used to read as
+  // "not on the allowlist" and the app force-signed the owner out. Unknown is NOT denied:
+  // return "unknown" on transient failure — callers only sign out on an explicit false.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const { data } = await sb.rpc("is_signin_allowed", { p_email: String(email || "").toLowerCase() });
+      return data === true;
+    } catch (e) { if (attempt) return null; await new Promise(r => setTimeout(r, 400)); }
+  }
+  return null;
 }
 async function checkAuth() {
   if (/[?&]share=/.test(location.search)) return true; // v79: public read-only share links bypass the login gate (ShareView owns the screen)
   const { data } = await sb.auth.getSession();
   if (data?.session?.user?.email) {
-    if (!(await signinAllowed(data.session.user.email))) {
-      // not on the allowlist — sign them out and keep the site blocked
+    const allowed = await signinAllowed(data.session.user.email);
+    if (allowed === false) {
+      // explicitly removed from the allowlist — sign them out and keep the site blocked
       await AuthGuard.localSignOut();
       const sub = document.querySelector(".auth-subtitle");
       if (sub) sub.textContent = "This site is private. Sign in with an authorized account.";
@@ -3215,10 +3369,11 @@ document.getElementById("authPasskeyBtn").onclick = async () => {
   const err = document.getElementById("authError");
   err.textContent = "";
   try {
-    if (typeof sb.auth.signInWithWebAuthn !== "function") {
+    const pk = sb.auth.signInWithPasskey || sb.auth.signInWithWebAuthn;
+    if (typeof pk !== "function") {
       return err.textContent = "Passkeys aren't supported in this browser yet — use password or email code.";
     }
-    const { data, error: pkErr } = await sb.auth.signInWithWebAuthn();
+    const { data, error: pkErr } = await pk.call(sb.auth);
     if (pkErr) return err.textContent = pkErr.message;
     if (data?.session?.user?.email && !(await signinAllowed(data.session.user.email))) {
       await AuthGuard.localSignOut();
@@ -3265,6 +3420,35 @@ document.getElementById("authVerify").onclick = async () => {
   authOverlay.style.display = "none";
   location.reload();
 };
+// v158: recovery-link landing — the user just clicked "set my password" in their email;
+// show the new-password form once a session exists (supabase-js exchanged the link code).
+(async function recoveryFlow() {
+  try {
+    if (!/[?&]recovery=1/.test(location.search)) return;
+    const s1 = document.getElementById("authStep1"), s3 = document.getElementById("authStep3");
+    s1.style.display = "none"; s3.style.display = "block";
+    const err = document.getElementById("authError");
+    // wait for the code exchange to produce a session (up to 10s)
+    for (let i = 0; i < 20 && !(await sb.auth.getSession()).data?.session; i++) await new Promise(r => setTimeout(r, 500));
+    document.getElementById("authSavePass").onclick = async () => {
+      const p1 = document.getElementById("authNewPass").value, p2 = document.getElementById("authNewPass2").value;
+      if (p1.length < 8) return err.textContent = "Password must be at least 8 characters.";
+      if (p1 !== p2) return err.textContent = "The two passwords don't match.";
+      const { error } = await sb.auth.updateUser({ password: p1 });
+      if (error) return err.textContent = String(error.message || error);
+      err.textContent = "Password saved — signing you in\u2026";
+      setTimeout(() => { authOverlay.style.display = "none"; history.replaceState(null, "", "/"); location.reload(); }, 900);
+    };
+  } catch (e) {}
+})();
+document.getElementById("authSetPass").onclick = async () => {
+  const err = document.getElementById("authError");
+  err.textContent = "";
+  const email = document.getElementById("authEmail").value.trim();
+  if (!email) return err.textContent = "Enter your email first, then press this.";
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/?recovery=1" });
+  err.textContent = error ? String(error.message || error) : "Sent — check your email for the set-password link (valid for one hour).";
+};
 document.getElementById("authBack").onclick = () => {
   document.getElementById("authStep1").style.display = "block";
   document.getElementById("authStep2").style.display = "none";
@@ -3290,6 +3474,7 @@ function renderPriorTurns(content, thread, showRelatedForLast) {
       const q = document.createElement("div");
       q.className = "question-header";
       q.textContent = cleanQuestionText(m.content);
+      appendAttachTags(q, attachNamesOf(m.content).map(name => ({ name })));
       content.appendChild(q);
     } else {
       const rel = (showRelatedForLast && i === lastAssistant) ? cleanRelated(m.related) : [];
@@ -3316,6 +3501,7 @@ function renderSearching(container, query) {
   const q = document.createElement("div");
   q.className = "question-header";
   q.textContent = query;
+  appendAttachTags(q, (typeof pendingAttachments !== "undefined" ? pendingAttachments : []).map(a => ({ name: a.name, dataUrl: a.kind === "image" ? a.dataUrl : null })));
   container.appendChild(q);
   const state = document.createElement("div");
   state.className = "searching-state";
@@ -4462,15 +4648,27 @@ async function performSearchInner(query) {
   // v63: text/PDF attachments splice into the outgoing message; image
   // attachments ride the request's `attachment` field to the gateway's
   // vision lane (never into the thread text or the message cap).
-  const att = takeAttachment();
+  const atts = takeAttachment();
   let fullQuery = query;
-  let attachmentBody = null;
-  if (att) {
-    if (att.kind === "image") {
-      fullQuery = query + "\n\n[Attached image: " + att.name + "]";
-      attachmentBody = { type: "image", data_url: att.dataUrl, name: att.name };
-    } else {
-      fullQuery = query + "\n\n[Attached file: " + att.name + "]\n\"\"\"\n" + att.content + "\n\"\"\"";
+  let attachmentBody = null, attachmentsBody = null;
+  if (atts.length) {
+    const imgs = atts.filter(a => a.kind === "image");
+    const blocks = [];
+    let budget = 600_000; // total spliced text across files (gateway body cap)
+    for (const a of atts) {
+      if (a.kind === "image") blocks.push("[Attached image: " + a.name + "]");
+      else if (a.kind === "unsupported") blocks.push("[Attached file: " + a.name + "]\n\"\"\"\n(Unsupported file type — contents could not be read.)\n\"\"\"");
+      else {
+        let c = a.content, note = a.note || "";
+        if (c.length > budget) { c = c.slice(0, Math.max(0, budget)); note = "[Truncated to fit the message size limit]"; }
+        budget -= c.length;
+        blocks.push("[Attached file: " + a.name + "]\n\"\"\"\n" + c + (note ? "\n" + note : "") + "\n\"\"\"");
+      }
+    }
+    fullQuery = query + "\n\n" + blocks.join("\n\n");
+    if (imgs.length) {
+      attachmentsBody = imgs.slice(0, 6).map(a => ({ type: "image", data_url: a.dataUrl, name: a.name }));
+      attachmentBody = attachmentsBody[0];
     }
   }
   // Send the full conversation history so follow-ups keep context
@@ -4601,7 +4799,7 @@ async function performSearchInner(query) {
       const drSubmitOnce = () => fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(incognitoOn || thread.incognito ? { incognito: true } : {}), personalization: persona(), ...getSourcesFilter(), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(incognitoOn || thread.incognito ? { incognito: true } : {}), personalization: persona(), ...getSourcesFilter(), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       // Upstream rate limit (HTTP 429, Retry-After): show "rate-limited — retrying" and retry instead of failing hard.
       let submit = await drSubmitOnce();
@@ -4649,7 +4847,7 @@ async function performSearchInner(query) {
       const res = await fetchRetry(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       if (res.authExpired) { AuthGuard.expire(); throw AuthGuard.makeError(); }
       if (res.status === 401) throw new Error("The gateway rejected this request as unauthenticated (HTTP 401) although your session is still valid. Retry; if it persists, sign out and back in.");
@@ -4890,7 +5088,7 @@ async function loadStatus(force) {
   window.addEventListener("offline", sync); window.addEventListener("online", sync); sync();
   // v156: visible build identity + stale-tab detector. The owner kept hitting "I refreshed and
   // nothing updated" — now the app says what build it IS, and checks the server for a newer one.
-  window.BUILD = "v157";
+  window.BUILD = "v158";
   console.log("[ai.spaincos] build " + window.BUILD);
   try { (function () {
     const acct = document.querySelector(".account, #accountBtn, .sidebar-footer");
@@ -4945,6 +5143,10 @@ async function loadStatus(force) {
   renderThreads();
   renderSpaces();
   positionComposerPills();
+  // v158 INSTANT GATE: if there is no cached session, show the login overlay NOW (synchronously)
+  // instead of after the getSession+allowlist round-trips — the screen appears in 0s, and the
+  // async checkAuth below hides it again if a valid session actually exists.
+  try { if (!localStorage.getItem("sb-bnxermyboeigvwonfrzx-auth-token") && !/[?&]share=/.test(location.search)) authOverlay.style.display = "flex"; } catch (e) {}
   const authP = checkAuth();
   // the module scripts are classic (blocking) scripts that patch renderAnswer etc.; wait for them (DOMContentLoaded)
   // before rendering a restored thread so it goes through the patched path — NOT for the network.
@@ -4957,7 +5159,7 @@ async function loadStatus(force) {
   } catch (e) {}
   try { if (!(/^\/t\/./.test(location.pathname) && !threadFromPath(location.pathname) && !currentThreadId)) window.__endPreBoot && window.__endPreBoot(); } catch (e) {} // else wait for server list / 3s timeout
   const authed = await authP;
-  if (authed && currentUser) {
+  if (authed && currentUser) { authOverlay.style.display = "none";
     document.getElementById("userEmail").textContent = currentUser.email;
     document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
     AuthGuard.verify(true); // background: a revoked/expired server session must not keep looking signed in

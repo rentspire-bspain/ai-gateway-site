@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-11T11:45:05+00:00",
+ "ts": "2026-11-11T12:15:03+00:00",
  "base": "http://localhost:8765",
- "passed": 29,
- "failed": 1,
+ "passed": 30,
+ "failed": 0,
  "checks": [
   {
    "name": "gateway-status 200",
@@ -22,7 +22,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "6.2s"
+   "detail": "6.0s"
   },
   {
    "name": "current-events answered",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "6.6s"
+   "detail": "5.9s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -62,7 +62,7 @@
   {
    "name": "build.json matches shipped BUILD (stale-tab detector armed)",
    "ok": true,
-   "detail": "index=v157 build.json=v157"
+   "detail": "index=v158 build.json=v158"
   },
   {
    "name": "landing renders",
@@ -105,11 +105,6 @@
    "detail": ""
   },
   {
-   "name": "follow-up chip submits (search state)",
-   "ok": true,
-   "detail": ""
-  },
-  {
    "name": "doc panel auto-opens",
    "ok": true,
    "detail": ""
@@ -135,6 +130,11 @@
    "detail": ""
   },
   {
+   "name": "Connectors panel renders",
+   "ok": true,
+   "detail": ""
+  },
+  {
    "name": "Fleet page renders registry",
    "ok": true,
    "detail": ""
@@ -142,11 +142,11 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nGuardians\nQA\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 29/29 checks \u00b7 11/11/2026, 10:58:32 AM\nRun before "
+   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n1 FAILED\n\u00b7 28/29 checks \u00b7 11/11/2026, 12:14:15 PM\nRun be"
   },
   {
-   "name": "Connectors panel renders",
-   "ok": false,
+   "name": "follow-up chip submits (search state)",
+   "ok": true,
    "detail": ""
   },
   {
@@ -155,5 +155,5 @@
    "detail": ""
   }
  ],
- "exit": 1
+ "exit": 0
 }

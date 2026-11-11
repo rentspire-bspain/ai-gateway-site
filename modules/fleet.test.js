@@ -5,3 +5,8 @@ assert.equal(t.length, 4);                       // a, plus the cycle pair and t
 assert.equal(t[0].children[0].children[0].row.id, "c");
 assert.deepEqual(f.countBy([{ kind: "a" }, { kind: "a" }, { kind: "b" }], "kind"), { a: 2, b: 1 });
 console.log("fleet tree ok");
+const tr = f.changeTrail({ status: "pr_opened", events: [] }).map((x) => x.state);
+assert.deepEqual(tr, ["done", "done", "done", "done", "active", "todo", "todo"]);
+assert.equal(f.changeTrail({ status: "merged" }).every((x) => x.state === "done"), true);
+assert.equal(f.changeTrail({ status: "needs_review" })[6].label, "Needs your review");
+console.log("changeTrail ok");

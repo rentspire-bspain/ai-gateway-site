@@ -70,6 +70,13 @@
     closeMenu(); add(it); input.focus();
   }
   function onKey(e) {
+    // "/change <description>" + Enter opens Fleet > Build with the text prefilled (owner self-update path); never sent as a search
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing && /^\/change(\s|$)/i.test(e.target.value || "")) {
+      e.preventDefault(); e.stopImmediatePropagation();
+      window.__fleetBuildDraft = e.target.value.replace(/^\/change\s*/i, ""); e.target.value = "";
+      var nav = document.getElementById("navFleet"); if (nav) nav.click();
+      return;
+    }
     if (!menu) return;
     if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); e.stopImmediatePropagation(); if (items.length) { sel = (sel + (e.key === "ArrowDown" ? 1 : items.length - 1)) % items.length; render(e.target, ""); /* re-render keeps query below */ rerender(e.target); } }
     else if ((e.key === "Enter" || e.key === "Tab") && items.length) { e.preventDefault(); e.stopImmediatePropagation(); pick(sel); }

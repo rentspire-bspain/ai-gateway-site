@@ -181,10 +181,6 @@ def frontend(base):
         chips = pg.locator(".related-item").count()
         check("follow-up chips render", chips >= 1, str(chips))
         check("Run-all button present", pg.locator(".related-runall").count() == 1)
-        if chips:
-            pg.locator(".related-item").first.click()
-            pg.wait_for_timeout(3000)
-            check("follow-up chip submits (search state)", pg.locator(".searching-state").count() >= 1 or pg.locator(".question-header").count() >= 2)
         # doc panel
         dp = pg.evaluate("() => ({open: document.body.classList.contains('dp-open'), h1: (h => h ? getComputedStyle(h).fontSize : 'x')(document.querySelector('.dp-panel .dp-md h1')), code: !!document.querySelector('.dp-panel .dp-codebar button'), mono: (c => c ? getComputedStyle(c).fontFamily.includes('monospace') : false)(document.querySelector('.dp-panel .dp-code pre code'))})")
         check("doc panel auto-opens", dp["open"])
@@ -193,6 +189,20 @@ def frontend(base):
         check("doc-chip collapses raw markdown", pg.locator(".doc-chip").count() >= 1)
         check("raw doc pre is hidden in chat",
               pg.evaluate("() => { const pres = [...document.querySelectorAll('.answer-content pre')]; const hit = pres.find(p => /Prelaunch Doc|Gate|Criterion/.test(p.innerText || '')); return hit ? getComputedStyle(hit).display === 'none' : pres.length === 0; }"))
+        # Settings > Connectors
+        pg.evaluate("() => { window.SettingsUI && window.SettingsUI.open(); }")
+        try:
+            pg.wait_for_selector("[role=dialog] button, .st-tab, .settings button", timeout=8000)
+        except Exception:
+            pass
+        pg.evaluate("() => { const t = [...document.querySelectorAll('button')].find(x => /connector/i.test(x.textContent || '')); if (t) t.click(); }")
+        conn_ok = False
+        for _ in range(6):  # panel content loads async (connector list fetch) — poll, don't race
+            pg.wait_for_timeout(800)
+            if pg.evaluate("() => document.body.innerText.toLowerCase().includes('google')"):
+                conn_ok = True; break
+        pg.screenshot(path=str(SHOTS / "connectors.png"))
+        check("Connectors panel renders", conn_ok)
         # Fleet page
         pg.evaluate("() => document.getElementById('navFleet') && document.getElementById('navFleet').click()")
         pg.wait_for_timeout(2500)
@@ -204,13 +214,16 @@ def frontend(base):
         qa_txt = pg.evaluate("() => { const w = document.querySelector('.fl-wrap'); return w ? w.innerText : ''; }")
         check("Fleet QA tab shows fleet report", "pre-launch regression fleet" in qa_txt.lower() and ("all green" in qa_txt.lower() or "failed" in qa_txt.lower()), qa_txt[:120])
         pg.screenshot(path=str(SHOTS / "fleet-qa.png"))
-        # Settings > Connectors
-        pg.evaluate("() => { window.SettingsUI && window.SettingsUI.open(); }")
-        pg.wait_for_timeout(800)
-        pg.evaluate("() => { const t = [...document.querySelectorAll('button')].find(x => /connector/i.test(x.textContent || '')); if (t) t.click(); }")
-        pg.wait_for_timeout(1200)
-        pg.screenshot(path=str(SHOTS / "connectors.png"))
-        check("Connectors panel renders", pg.evaluate("() => document.body.innerText.toLowerCase().includes('google')"))
+        if chips:
+            try:  # close any open overlays (Fleet panel, Settings modal) — they intercept clicks on the thread below
+                pg.evaluate("""() => { const x = document.querySelector('.fl-x'); if (x) x.click();
+                    const sm = document.querySelector('[role=dialog] .stg-x, .st-close, [aria-label=Close]');
+                    document.querySelectorAll('[role=dialog]').forEach(d => d.remove()); }""")
+                pg.wait_for_timeout(600)
+            except Exception: pass
+            pg.evaluate("() => { const c = document.querySelector('.related-item'); if (c) c.click(); }")  # DOM click — immune to overlay interception
+            pg.wait_for_timeout(3000)
+            check("follow-up chip submits (search state)", pg.locator(".searching-state").count() >= 1 or pg.locator(".question-header").count() >= 2)
         check("zero JS/CSP errors", len([e for e in errs if "404" not in e]) == 0, "; ".join(errs[:3]))
         b.close()
 
