@@ -307,8 +307,9 @@
   function lastQuery() { var q = document.querySelector('.question-header, .question-title, #queryText'); return q ? (q.textContent || '').trim().slice(0, 120) : ''; }
   function runHooks(ac, text) { (window.ArtifactsHooks || []).forEach(function (h) { try { h(ac, text); } catch (e) {} }); }
 
-  // v145: Perplexity parity — when the assistant produces a document or a web app, the side panel
-  // opens with it automatically (once per artifact), the way Perplexity opens a created artifact.
+  // v163 (owner directive): NO automatic artifact/document opening. Docs land at the end of the
+  // answer as optional click-to-open chips; if a doc is already open in the panel, never steal it.
+  // The panel opens ONLY on explicit user click.
   var autoOpened = {};
   // v97: a fenced DOCUMENT no longer dumps its full raw text in the chat stream — the block is
   // collapsed into a compact chip (like Perplexity's artifact preview) that opens the side panel.
@@ -354,12 +355,8 @@
     inline.forEach(function (a) { renderInline(row, a); });
     if (!inline.length) row.remove();
     arts.forEach(function (a) { collapseDocBlock(answerContent, a); });
-    arts.forEach(function (a) {
-      if ((a.kind === 'markdown' || a.kind === 'webapp' || a.kind === 'html') && !autoOpened[a.id]) {
-        autoOpened[a.id] = 1;
-        setTimeout(function () { try { open(a); } catch (e) {} }, 700);
-      }
-    });
+    // v163: NO auto-open — the doc-chip at the end of the answer is the only entry point.
+    // The panel opens only when the user clicks the chip. Never replaces an open doc.
     return arts.length;
   }
 
