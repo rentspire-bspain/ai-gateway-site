@@ -78,6 +78,29 @@ def backend():
     st, body, _ = http(f"{SB}/rest/v1/memory_items?select=id&limit=1", 15, headers={"apikey": ANON, "authorization": f"Bearer {tok}"})
     check("memory_items table reachable", st in (200, 400, 401), f"HTTP {st}")
 
+# ---------------- deploy integrity ----------------
+def integrity(base):
+    """Every module the deployed index.html loads must byte-match this checkout.
+    Catches: stale deploys, editing an orphaned file that nothing loads, missing files."""
+    print("DEPLOY INTEGRITY")
+    repo = Path(__file__).resolve().parent.parent
+    try:
+        html = http(base + "/index.html", 30)[1].decode("utf-8", "replace")
+    except Exception as e:
+        check("index.html fetches", False, str(e)[:100]); return
+    srcs = re.findall(r'(?:src|href)="(/(?:modules|js|css)/[^"?]+)', html)
+    if not check("index.html loads real modules", len(srcs) >= 5, f"{len(srcs)} refs"):
+        return
+    stale = []
+    for s in dict.fromkeys(srcs):
+        local = repo / s.lstrip("/")
+        if not local.exists():
+            stale.append(f"{s}: MISSING in repo"); continue
+        live = http(base + s, 30)[1]
+        if live != local.read_bytes():
+            stale.append(f"{s}: live != repo")
+    check("all deployed modules match repo", not stale, "; ".join(stale[:4]))
+
 # ---------------- frontend E2E ----------------
 def frontend(base):
     print("FRONTEND E2E")
@@ -130,9 +153,11 @@ def frontend(base):
         # doc panel
         dp = pg.evaluate("() => ({open: document.body.classList.contains('dp-open'), h1: (h => h ? getComputedStyle(h).fontSize : 'x')(document.querySelector('.dp-panel .dp-md h1')), code: !!document.querySelector('.dp-panel .dp-codebar button'), mono: (c => c ? getComputedStyle(c).fontFamily.includes('monospace') : false)(document.querySelector('.dp-panel .dp-code pre code'))})")
         check("doc panel auto-opens", dp["open"])
-        check("doc h1 heading scale (~22px)", dp["open"] and dp["h1"] != "x" and 18 <= float(dp["h1"]) <= 28, str(dp))
+        check("doc h1 heading scale (20-28px)", dp["open"] and dp["h1"] != "x" and 20 <= float(str(dp["h1"]).replace("px", "")) <= 28, str(dp))
         check("doc code monospace + copy", dp["code"] and dp["mono"])
         check("doc-chip collapses raw markdown", pg.locator(".doc-chip").count() >= 1)
+        check("raw doc pre is hidden in chat",
+              pg.evaluate("() => { const pres = [...document.querySelectorAll('.answer-content pre')]; const hit = pres.find(p => /Prelaunch Doc|Gate|Criterion/.test(p.innerText || '')); return hit ? getComputedStyle(hit).display === 'none' : pres.length === 0; }"))
         # Fleet page
         pg.evaluate("() => document.getElementById('navFleet') && document.getElementById('navFleet').click()")
         pg.wait_for_timeout(2500)
@@ -148,13 +173,20 @@ def frontend(base):
         check("zero JS/CSP errors", len([e for e in errs if "404" not in e]) == 0, "; ".join(errs[:3]))
         b.close()
 
+def _safe(fn, *a):
+    try:
+        fn(*a)
+    except Exception as e:  # a crashing stage is itself a FAIL — never a silent pass, never an abort
+        check(f"{fn.__name__} completed without crashing", False, f"{type(e).__name__}: {str(e)[:140]}")
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default=BASE)
     a = ap.parse_args()
     print(f"PRE-LAUNCH REGRESSION FLEET -> {a.base}")
-    backend()
-    frontend(a.base)
+    _safe(backend)
+    _safe(integrity, a.base)
+    _safe(frontend, a.base)
     fails = [r for r in RESULTS if not r[1]]
     print(f"\n{len(RESULTS) - len(fails)}/{len(RESULTS)} passed, {len(fails)} failed")
     for name, _, detail in fails:

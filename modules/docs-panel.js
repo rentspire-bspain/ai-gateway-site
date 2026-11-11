@@ -69,7 +69,7 @@
         var wrap = el('div', 'dp-tw'), tb = el('table'), th = el('thead'), tr = el('tr');
         cells(ln).forEach(function (c) { var h = el('th'); inline(h, c); tr.appendChild(h); }); th.appendChild(tr); tb.appendChild(th);
         var tbody = el('tbody'); i += 2;
-        while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { var r = el('tr'); cells(lines[i]).forEach(function (c) { var d = el('td'); inline(d, c); r.appendChild(d); }); tbody.appendChild(r); i++; }
+        while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { var r = el('tr'); cells(lines[i]).forEach(function (c) { var d = el('td'); if (/^[-+]?[\d,.]+%?$/.test(c.replace(/\s/g, ''))) d.style.textAlign = 'right'; inline(d, c); r.appendChild(d); }); tbody.appendChild(r); i++; }
         tb.appendChild(tbody); wrap.appendChild(tb); root.appendChild(wrap); continue;
       }
       if ((m = ln.match(/^(#{1,6})\s+(.*)$/))) { var h = el('h' + m[1].length); inline(h, m[2].replace(/\s+#+\s*$/, '')); root.appendChild(h); i++; continue; }

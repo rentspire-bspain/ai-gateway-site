@@ -318,7 +318,9 @@
     var pres = answerContent.querySelectorAll('pre');
     for (var i = 0; i < pres.length; i++) {
       var t = (pres[i].innerText || '').trim();
-      if (!t || t.length < 300) continue;
+      // v155: any fenced document — even a short one — is collapsed; the 300-char floor
+      // let short docs dump their full raw markdown into the chat stream.
+      if (t.length < 60) continue;
       var head = want.slice(0, 160);
       if (t.indexOf(head) !== 0 && want.indexOf(t.slice(0, 160)) !== 0) continue;
       var pre = pres[i];
@@ -346,7 +348,11 @@
     host.appendChild(row);
     var actions = host.querySelector(':scope > .answer-actions');
     if (actions) actions.after(row);
-    arts.forEach(function (a) { renderInline(row, a); });
+    // v155: a document renders ONE pill (the collapsed doc-chip above the hidden raw block),
+    // matching Perplexity — no second artifact-row card for the same doc.
+    var inline = arts.filter(function (a) { return a.kind !== 'markdown'; });
+    inline.forEach(function (a) { renderInline(row, a); });
+    if (!inline.length) row.remove();
     arts.forEach(function (a) { collapseDocBlock(answerContent, a); });
     arts.forEach(function (a) {
       if ((a.kind === 'markdown' || a.kind === 'webapp' || a.kind === 'html') && !autoOpened[a.id]) {
