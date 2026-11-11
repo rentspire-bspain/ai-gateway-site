@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-dyA+oCb16gDaIDgGUxXwegtpwym+3ywi5sfL8Fe9cxc=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-yPLoCpMLX1ATlZQPyPx7+eAlpt56M6VjuKWEtgWDnkg=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -281,7 +281,18 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .space-item:hover { background: var(--bg-elevated); color: var(--text); }
 .space-item.active { background: var(--accent-light); color: var(--text); }
 .space-item .space-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.space-item .space-gear, .thread-item .thread-move {
+.space-item .space-gear, .thread-item-snippet {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-faint, #9aa0a6);
+  margin-top: 1px;
+}
+.thread-item .thread-move {
   opacity: 0; background: none; border: none; color: var(--text-faint); cursor: pointer;
   padding: 2px; border-radius: 4px; display: flex; align-items: center; flex-shrink: 0;
 }
@@ -2064,7 +2075,7 @@ function setIncognito(on) {
 })();
 
 // ============ THREAD SEARCH (v62) ============
-document.getElementById("threadSearch").addEventListener("input", () => renderThreads());
+document.getElementById("threadSearch").addEventListener("input", (e) => { renderThreads(); historySearchServer(String(e.target.value || "").trim()); });
 
 // ============ SPACES / PROJECTS (v64) ============
 // Perplexity-Projects parity: threads group under a space; each space carries
@@ -2923,6 +2934,46 @@ function saveThreads() {
     pushThreadToServer(cur).then(() => pushThreadMessages(cur)).catch(() => {});
   }
 }
+let hsSeq = 0, hsTimer = null;
+function historySearchServer(q) {
+  // v165: history search parity — the local cache only holds the newest threads, so any
+  // search also hits the server (RLS-scoped: only the signed-in user's own threads+messages).
+  // Hits outside the local cache are injected as thread shells; loadThread() pulls their
+  // messages from the server on open. Stale responses are dropped via hsSeq.
+  clearTimeout(hsTimer);
+  if (!q || q.length < 2 || !currentUser) { window.__historyHits = null; return; }
+  const mySeq = ++hsSeq;
+  hsTimer = setTimeout(async () => {
+    try {
+      const term = q.replace(/[%,()*]/g, " ").trim();
+      if (!term) return;
+      const like = "*" + term + "*";
+      const [tRes, mRes] = await Promise.all([
+        sb.from("threads").select("id,title,slug,updated_at").ilike("title", like).limit(30),
+        sb.from("thread_messages").select("thread_id,content").ilike("content", like).order("created_at", { ascending: false }).limit(60)
+      ]);
+      if (mySeq !== hsSeq) return;
+      const ids = new Set();
+      (tRes.data || []).forEach(r => ids.add(r.id));
+      (mRes.data || []).forEach(r => ids.add(r.thread_id));
+      if (!ids.size) { window.__historyHits = null; renderThreads(); return; }
+      const missing = [...ids].filter(id => !threads.some(t => t.id === id));
+      if (missing.length) {
+        const { data: rows } = await sb.from("threads").select("id,title,slug,updated_at,space_id").in("id", missing);
+        (rows || []).forEach(r => threads.push({ id: r.id, title: r.title, slug: r.slug, spaceId: r.space_id, updatedAt: r.updated_at, messages: [] }));
+      }
+      const snippets = {};
+      (mRes.data || []).forEach(r => {
+        if (r.thread_id && !snippets[r.thread_id]) {
+          const c = String(r.content || ""), p = c.toLowerCase().indexOf(term.toLowerCase());
+          snippets[r.thread_id] = p > -1 ? c.slice(Math.max(0, p - 50), p + 90).replace(/\s+/g, " ") : c.slice(0, 140);
+        }
+      });
+      window.__historyHits = { q, ids: [...ids], snippets };
+      renderThreads();
+    } catch (e) { /* offline-tolerant: local search still works */ }
+  }, 220);
+}
 function renderThreads() {
   var arch = []; try { arch = JSON.parse(localStorage.ai_archived || "[]"); } catch (e) {}
   const container = document.getElementById("threadItems");
@@ -2932,7 +2983,10 @@ function renderThreads() {
   const q = (document.getElementById("threadSearch")?.value || "").trim().toLowerCase();
   // v64: space filter (clicking a space shows only its threads) + search
   const spaceVisible = activeSpaceId ? threads.filter(t => t.spaceId === activeSpaceId) : threads;
-  let visible = !q ? spaceVisible : spaceVisible.filter(t =>
+  const hits = q && window.__historyHits && window.__historyHits.q === q ? window.__historyHits : null;
+  // v165: with a query, search ALL history (server-backed hits included), not just the active space
+  let visible = !q ? spaceVisible : threads.filter(t =>
+    (hits && hits.ids.includes(t.id)) ||
     t.title.toLowerCase().includes(q) ||
     (t.messages || []).some(m => String(m.content || "").toLowerCase().includes(q))
   );
@@ -2946,6 +3000,13 @@ function renderThreads() {
     const span = document.createElement("span");
     span.textContent = t.title;
     div.appendChild(span);
+    // v165: server-history match snippet under the title (like Perplexity's history results)
+    if (hits && hits.snippets[t.id]) {
+      const sn = document.createElement("div");
+      sn.className = "thread-item-snippet";
+      sn.textContent = hits.snippets[t.id];
+      div.appendChild(sn);
+    }
     // v64: move-to-space button (visible on hover)
     const move = document.createElement("button");
     move.className = "thread-move";
@@ -5230,7 +5291,7 @@ function wireCodeCopy(scope) {
     pre.appendChild(btn);
   });
 }
-  window.BUILD = "v164";
+  window.BUILD = "v165";
   console.log("[ai.spaincos] build " + window.BUILD);
   try { (function () {
     const acct = document.querySelector(".account, #accountBtn, .sidebar-footer");

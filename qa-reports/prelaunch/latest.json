@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-11T18:22:22+00:00",
+ "ts": "2026-11-11T19:04:53+00:00",
  "base": "https://ai.spaincos.com",
- "passed": 11,
- "failed": 17,
+ "passed": 30,
+ "failed": 1,
  "checks": [
   {
    "name": "gateway-status 200",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "7.3s"
+   "detail": "22.7s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -51,72 +51,82 @@
   },
   {
    "name": "index.html loads real modules",
+   "ok": true,
+   "detail": "37 refs"
+  },
+  {
+   "name": "all deployed modules match repo",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
    "ok": false,
-   "detail": "0 refs"
+   "detail": "index=v164 build.json=v163"
   },
   {
    "name": "landing renders",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
    "name": "composer single-line",
-   "ok": null,
-   "detail": "None"
+   "ok": true,
+   "detail": "{'tag': 'TEXTAREA', 'rows': 1}"
   },
   {
    "name": "sidebar search bar present",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
    "name": "thread renders",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
    "name": "thread route loads all modules (no /t/ 404s)",
-   "ok": false,
-   "detail": "403 https://ai.spaincos.com/; 708 i.spaincos.com/.well-known/vercel/security/request-challenge; 403 https://ai.spaincos.com/t/prelaunch; 708 i.spaincos.com/.well-known/vercel/security/request-challenge"
+   "ok": true,
+   "detail": ""
   },
   {
    "name": "question/answer text parity (16px)",
-   "ok": null,
-   "detail": "None"
+   "ok": true,
+   "detail": "{'q': 16, 'a': 16}"
   },
   {
    "name": "follow-up chips render",
-   "ok": false,
-   "detail": "0"
+   "ok": true,
+   "detail": "2"
   },
   {
    "name": "Run-all button present",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
    "name": "doc chip present (no auto-open)",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
    "name": "doc panel opens on chip click",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
    "name": "doc h1 heading scale (20-28px)",
-   "ok": false,
-   "detail": "{'open': False, 'h1': 'x', 'code': False, 'mono': False}"
+   "ok": true,
+   "detail": "{'open': True, 'h1': '24.025px', 'code': True, 'mono': True}"
   },
   {
    "name": "doc code monospace + copy",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
    "name": "doc-chip collapses raw markdown",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
@@ -126,17 +136,22 @@
   },
   {
    "name": "Connectors panel renders",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
    "name": "Fleet page renders registry",
-   "ok": false,
+   "ok": true,
    "detail": ""
   },
   {
    "name": "Fleet QA tab shows fleet report",
-   "ok": false,
+   "ok": true,
+   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n17 FAILED\n\u00b7 11/28 checks \u00b7 11/11/2026, 6:22:22 PM\nRun be"
+  },
+  {
+   "name": "follow-up chip submits (search state)",
+   "ok": true,
    "detail": ""
   },
   {
