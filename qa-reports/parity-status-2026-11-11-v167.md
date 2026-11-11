@@ -709,5 +709,40 @@ Sources: [Perplexity Projects](https://www.perplexity.ai/help-center/en/articles
 
 **Perplexity-parity focus order (owner directive):** 1) close §28c storage/memory rows and billing; 2) fix D1/D2/D6; 3) wire remaining connector OAuth apps; 4) then the Muse/Instinct/Town/Wabi/Manus convergence phases (§19-21).
 
+## 30. Legal / ToS / privacy / security parity — every company (added v167)
+Sources: [Manus security](https://manus.im/security), [Manus terms](https://manus.im/terms), [Manus privacy](https://manus.im/privacy), [Manus content policy](https://manus.im/content-policy), [Manus trust FAQ](https://trust.manus.im/faq), [Manus MSA/DPA](https://manus.im/policies/services-agreement), [Manus terms analysis](https://jazz.security/dlp-explained/dlp-basics/is-manus-safe-for-company-data/), [Instinct research doc](https://github.com/mariagorskikh/open-instinct/blob/main/docs/research/INSTINCT.md), [ZDNet Muse privacy](https://www.zdnet.com/innovation/meta-muse-ai-agent-hands-on-test-privacy-concerns/), [Town review](https://hokai.io/hub/agents/town), Perplexity help center (privacy/security collections). **Perplexity first.**
+
+### 30a. Perplexity's legal stack (the bar)
+| Instrument | Status |
+|---|---|
+| Terms of Use + Usage Policy | published, updated with product changes |
+| Privacy Policy + Cookie Policy | published; CCPA/GDPR rights flows |
+| Security page | SOC 2 Type 2, enterprise security hub, SSO/SAML, audit logs, RBAC |
+| DPA + sub-processor list | available for Enterprise; retention controls |
+| Data policies | session files 7-day retention; projects retained until deleted; training opt-out; Enterprise "guaranteed no training" |
+| AI content policy | answer reporting, accuracy disclaimers |
+| Status page | status.perplexity.com |
+
+### 30b. The other five
+| Company | Legal/ToS posture | Privacy posture | Security/compliance |
+|---|---|---|---|
+| **Muse (Meta)** | Meta ToS + supplemental Muse terms; subscription tied to store (cancel maze — top complaint) | training ON by default (opt-out); 187k iMessages synced after declining access (incident); "Muse may still remember deleted info"; Reset Muse is the only full wipe | Secure VM per user + Sentinel patrol; confidential encrypted VM promised; macOS zero-day already found+patched; Amazon blocks it as unauthorized agent |
+| **Instinct** | Terms name user as appointing Instinct agent with authority to enter binding agreements; liability cap greater of $100 or 6 months fees; binding individual arbitration (30-day email opt-out); 18+, personal use | training ON by default, forward-only opt-out; Vault contractually excluded from training; disconnect ≠ delete (indexed copy retained); collects messages, passwords, health, audio, keystrokes, precise location | content firewalls + decoupled action monitor + hallucination detector (shipped after incidents); allowlist-only agent-to-agent; E2E-encrypted file transfer; no SOC 2 verified |
+| **Town** | per-tool + per-routine permission modes; approval records per person | no model training on connected data by default; memory inspectable/deletable (4 systems) | SOC 2 Type 2 audited; data encrypted in transit + at rest; prompt-injection blocking |
+| **Manus** | Singapore law; broad content license in terms §5.3 (non-exclusive, worldwide, transferable, sublicensable "to improve services"); training opt-out is a TEAM-PAID feature; agents' actions attributable to user; Spaces make the user the data controller for their end users | de-identified data may train models; DPO appointed; EU SCCs for transfers; customer data deleted on leaving | SOC 2 Type 1 + Type 2, ISO 27001:2022, ISO 27701:2019 (Prescient); AES-256 at rest, TLS in transit, admin MFA, per-user sandbox isolation, 72-hour breach notice; no HIPAA/PCI/FedRAMP |
+| **Wabi** | consumer app terms (Google Play data-safety labels) | health data read-only via Health Connect, opt-in; approval before important actions; disconnect anytime | opt-in connections; no SOC |
+
+### 30c. ai.spaincos required legal stack (build list, ranked)
+1. **Terms of Service** — including: 18+, credit terms (prepaid, non-refundable, expiring per policy, breakage), one-click cancel (learned from Muse's complaint ledger), refund policy honoring tool-failure auto-refunds (we already refund mechanically), agent-action authority clause ONLY if/when actions ship, liability cap, arbitration with opt-out.
+2. **Privacy Policy** — what we collect (threads, memories, connector data); our DIFFERENTIATORS in writing: training off by default (vs Muse/Instinct on-by-default), disconnect deletes stored credential immediately (vs Instinct's retained index), read-only connectors by default, per-action approval cards, no raw password storage.
+3. **DPA + sub-processor list** — Supabase, Vercel, Render, Groq/OpenRouter/Z.AI model routes; EU SCCs; needed for the Team/Enterprise tiers.
+4. **Security page** — encryption in transit/at rest (Supabase AES-256), RLS per-user isolation, default-deny egress, audit trail, status page (ops-health exists — publish it).
+5. **Content/AI safety policy** — 18+, illegal-content detection, EU AI Act transparency, AI-generated labeling, answer reporting.
+6. **Compliance roadmap** — SOC 2 Type 1 → Type 2 (table stakes: Perplexity/Town/Manus all have it; required for Enterprise tier revenue); ISO 27001 later if customers demand.
+7. **Retention schedule published** — we already beat them on mechanics (threads until deleted; memories deletable; session files need a policy decision — match Perplexity's 7-day for parity or beat with 30).
+
+### 30d. Trust positioning (marketing line)
+"Perplexity-grade security with better defaults: training off (theirs is on at Muse and Instinct), real deletion on disconnect (Instinct keeps an indexed copy), read-only connectors, and every write action behind an approval card." Their incidents (Instinct's unapproved sends, Muse's 187k-message sync, the August prompt-injection) are our checklist — section 22's counter-designs already close each one.
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
