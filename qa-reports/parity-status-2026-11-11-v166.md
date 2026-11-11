@@ -308,5 +308,72 @@ Muse/Instinct/Town/Wabi all converge on the same architecture: persistent agent 
 
 Sequencing: ship the quick wins first (proactive messaging, connector triggers, audit log, skills port, agent identity), then Goal Mode (P2) with the persistent VM (P1) and parallel research (P12) as the "Manus-grade" release, then zero-UI channels (P3) as the "Instinct-grade" release.
 
+## 20. Personal-agent documentation imports (added v166, deep-read)
+Full capability inventories imported from primary sources: [Muse design blog](https://muse.ai/blog/how-we-designed-muse), [Muse product pages](https://ai.meta.com/muse/), [open-instinct research doc](https://github.com/mariagorskikh/open-instinct/blob/main/docs/research/INSTINCT.md), [Town teardown](https://personalagentbench.com/agents/town/), [Town product docs](https://www.town.com/docs/getting-started), [Manus features](https://www.manus.im/features), [Manus 1.5](https://manus.im/blog/manus-1.5-release), [Wabi listings](https://play.google.com/store/apps/details?id=ai.wabi.android.app).
+
+### Instinct (deepest documented architecture)
+- Channels: iMessage/WhatsApp/SMS/email (own @mail.instinct.com address), phone calls both directions, voice notes (90% of some users' messages via iPhone Action Button), no app by design; web workspace for connectors/Vault/settings/training opt-out.
+- Trusted Person network: weighted trust graph, per-relationship permission scopes (spouse ~everything, colleague = work calendar only), explicit approval + revocable grants, 300k+ coordinations in week one; agent-to-agent negotiation (find common time, pick restaurant, book, write to each owner's calendar); end-to-end encrypted direct file transfer between agents.
+- Money: Stripe Link Agent Wallet (one-time virtual cards, Link Pay Tokens, 10-min approval windows, agent never sees the real card), Shopify Shop Pay via WebMCP; subscription audits ($300-500/yr savings typical), bill negotiation (Comcast $100-> $60).
+- Concierge: outbound AI voice calls for no-online-booking restaurants, dentist waitlists, billing disputes.
+- Safety stack (their incidents are our roadmap): content firewalls on all inbound text/media, decoupled action monitor that can pause/intercept any action, hallucination detector on ungrounded claims, allowlist-only agent-to-agent, per-action approval ("nothing sends without my yes"). Their August incidents (prompt injection via email, unapproved sends, silent 2FA retrieval) are exactly what our approval-gate + default-deny egress already prevents.
+- Task profile: 5-15 min silent work typical, median reply 20s, 50% of transaction volume is travel (fare monitoring, airline credits, seat retention, boarding passes 2h before flight, calendar sync, ride lining).
+- Memory: single continuous thread (/new resets), preferences persist (remembered "monitor box" for customs forms).
+- Files: interactive web pages on the fly (itineraries, guest lists, expense splits), shareable by link with non-users.
+- Business: $1B Series C at $10B valuation, 14 people, ~$1B annualized transaction volume; 40% of users share a credit card by week 3; users who share one sensitive item = 80% retention.
+
+### Muse (Meta)
+- Secure VM: persistent isolated Linux computer + full browser per user; user can intervene at any point; Sentinel AI patrols the VM; confidential encrypted VM planned.
+- Own computer + file system + terminal: writes its own code and builds tools that don't exist yet.
+- Goals: give a goal -> action plan -> progress tracking in a Goals tab; works on schedule + events while app closed; notifies only when meaningfully new.
+- Proactivity dial (off/down/up), Ideas tabs, memory files directly inspectable/editable, one long main conversation + side chats, chat bubbles (not turn-by-turn, interruptible, multi-task), artifacts (spending trackers, study guides, sleep dashboards, itineraries), custom avatar + name + voice, structured approval cards for irreversible actions (browsing allowed by default, hard stops on hard-to-undo), activity log under the avatar, connector revocation, WhatsApp/mobile/desktop/glasses. Free; $20/mo tokens beyond limits. 900k+ downloads, #1 free App Store.
+
+### Town (Townie)
+- Named agent with own @town.com email + phone; reachable by email, Slack, WhatsApp, Telegram, text, web, iOS, native Swift Mac app (messages, contacts, screen, mic — broadest local permission surface of the category).
+- 1,105-tool catalogue across 84 categories, ~177 callable by the main assistant, filtered by 4 gates (connected accounts, agent config, role, explicit allow-list); 33 specialized assistant records; background writers with 17-tool allow-lists.
+- Routines: schedule, incoming email, calendar entry, recording, manual Run; some routines are TypeScript programs, not model sessions.
+- Memory: 4 server-side systems — wiki (assembled background, refreshed nightly), memory store (global + per-routine facts), library (documents + routine output), people model (contacts + inter-assistant approvals). Personality is a separate editable document. Memory add/update/delete tools.
+- Approval: config-driven (run mode, account scope, tool list, approval mode), per-tool extra approval, approval records kept per person. Learns your voice/clients/deadlines from connected email — drafts sound like you.
+- Pricing: Free 30 msgs/mo; Starter $15 (1,250 credits); Pro $59/$49 annual (5,000 credits); Power $119/$99 (12,000); Power Plus $239/$199 (40,000, SLA).
+- Team: Townies collaborate assistant-to-assistant, external email/text to customers/partners, shared workflows update every member's Townie at once.
+
+### Manus
+- Autonomous execution: cloud Ubuntu VM sandbox (file system, shell, browser), works asynchronously, notifies when done; "Manus's Computer" live-viewable, intervene anytime.
+- Wide Research: parallel sub-agents on Manus 1.6 Max; free unlimited chat + one-click Agent Mode upgrade.
+- Full-stack build+deploy: backend servers, auth, persistent DB, embedded AI, event-driven notifications, visual point-to-edit on live preview, custom domains, built-in analytics, version control/rollback, permission control; browser-operator tests what it builds and fixes issues autonomously.
+- Outputs: web/mobile apps, games, video + video editor, slides (Nano Banana Pro), designs, PPTX/PDF/Excel/CSV, dashboards.
+- 80+ MCP connectors including Zapier (8,000+ apps), GitHub, Notion, Gmail/Drive/Sheets/Calendar, Slack, Linear, Tableau, HubSpot, Xero, Intercom, Instagram, Buffer, Neon, Wix, HeyGen, Miro, Google Ads, WordPress, Jotform, TikTok Ads, Calendly, Klaviyo, Square, Trello, Datadog, Amplitude, Snowflake, Runway, Netlify, Attio, Smartsheet, Gusto, Clay, Zoho, Ashby, Ramp, Typeform, PostHog, PagerDuty, Braze, Databricks, Instacart, Stripe, Supabase, Airtable, Canva, Atlassian, Asana, Sentry, ClickUp, monday, Todoist, Vercel, n8n, Firecrawl, Webflow, Cloudflare, Dropbox, Apify, PayPal.
+- Skills: SKILL.md, sandbox-native execution, community marketplace; Projects for shared knowledge; Mail Manus; Meta Ads reporting; SOC 2 II + ISO 27001/27701; $100M ARR in 8 months; acquired by Meta ~$2.5B.
+
+### Wabi
+- Multiplayer-first: group chats with partner/family/friends/coworkers where the agent participates; shared plans everyone can move forward.
+- "The right software appears": plan -> calendar, trip -> map + itinerary, decision -> vote, goal -> tracker, game -> generated in-conversation; agentic mini-apps connected to your context that proactively do things; home-screen widgets; remix each other's apps.
+- Proactive noticing: buried school form, changed bill, forgotten follow-up; location-aware arrival help (new city -> your plans, bookings, reminders); health data summaries (steps, sleep, HRV, weight via Health Connect, read-only); voice/video calls one-on-one or whole group; playful by design (GIFs, games, mascots).
+
+## 21. Convergence business plan (the answer to the strategy question)
+**The thesis: yes — the business plan IS the convergence, and the market has priced each slice separately.**
+
+| Company | What it is worth | For ONE mode |
+|---|---|---|
+| Perplexity | $20B confirmed, $30B+ Nvidia talks, ~$750M ARR | Answers/search |
+| Instinct | $10B, ~$1B transaction volume, 14 people | Texting errands |
+| Muse | Meta's entire consumer-AI bet | Always-on assistant |
+| Manus | $100M ARR in 8 months, ~$2.5B acquisition | Autonomous work |
+| Town | 5 paid tiers $15-239/mo | Work routines |
+| Wabi | venture-backed | Multiplayer life |
+
+Each company raised hundreds of millions to build ONE layer of the same stack: persistent agent + connectors + approval gates + proactive notifications + routines + VM. None of them owns all layers. ai.spaincos already owns the full infrastructure of all of them: auth, connectors, 219-agent fleet, automations, guardians, sandbox, browser automation, artifacts, session bridge, deploy pipeline, spain-runner (Fly.io, beats the Vercel 2-min ceiling), Comptrove data (588,746 properties / 30.9M observations — the vertical moat none of them have).
+
+**The plan:** converge all layers on one platform, one credit system, one agent identity —
+1. **Answer layer** (Perplexity parity): shipped and at v165 — search, citations, history, artifacts, modes.
+2. **Personal layer** (Instinct/Muse): zero-UI channels (WhatsApp/SMS/phone/email handle), proactive first-contact, Goals tab, Trusted-Person graph with per-relationship scopes, Concierge voice calls.
+3. **Work layer** (Town/Manus): routines with email/calendar triggers, learns your voice, full-stack build+deploy, Wide Research parallel fan-out, skills marketplace.
+4. **Life layer** (Wabi): multiplayer chats, generated mini-apps, playful artifacts.
+5. **Vertical layer** (ours alone): Comptrove rent reports, portfolio monitoring — priced per report, highest margin.
+
+Monetization stays as section 18 (undercut Perplexity 60-80% on every tier) because our marginal cost is open-weight. The convergence is not a pivot — it is the same build list as section 19, sequenced: quick wins (days) -> Manus-grade release -> Instinct-grade release -> multiplayer.
+
+**Why not copy their pricing?** Town charges $15-239/mo for work routines alone; Instinct will monetize transaction volume; Perplexity sells $200/mo tiers. We price the converged product at Perplexity's price points while containing all five modes — that is the "significantly superior for cheaper" position, and the Comptrove vertical layer is where margin compounds.
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
