@@ -220,6 +220,7 @@ Net: 6 of 17 Perplexity-linked services have a connector built; 2 of those block
 | D3 | 178s finish time on a complex query (DeepSeek V4.1 Flash) | same thread badge | parallel sub-question fan-out + streaming first token | 🔴 (tracked as speed) |
 | D4 | Landing composer pills row clips at right edge (scrollW 1057 > clientW 720) | visual-parity screenshot 2026-11-11 | wrap pills or horizontal scroll affordance | 🔴 |
 | D5 | Sidebar SPACES list renders blank titles — rows show icon + count badge but no name; bottom row clipped by the Import button | user screenshot 2026-11-11 | space rows missing name text or names empty after import; fix renderSpaces to fall back to "Untitled space" + fix bottom-row padding | 🔴 |
+| D6 | Simple-query first token 17.34s (threshold 8s) — automation 2026-11-11T20:00Z flagged SPEED FAIL; total 18.6s on "capital of France" | self-improvement cycle run | stream the first token before research completes (already tracked in speed item); also gateway-status Auto requested deepseek-v4.1-flash-1017 but got qwen3.8-27b — routing fallback to investigate | 🔴 |
 
 ## 16. Business plan — orchestrator for free/open-weight models (rolled in from owner doc, 2026-11-11)
 **Positioning:** sell answers and reports, never raw model access. Differentiation is data grounding (Comptrove: 588,746 properties, 30.9M observations, 5.5M-row hist tables), not model routing.
@@ -252,15 +253,16 @@ Our stack is open-weight models on cheap/free routes plus our own search lanes. 
 | Tier | Perplexity | ai.spaincos price | Undercut | Includes |
 |---|---|---|---|---|
 | Free | $0, 1 research query/mo | $0 | — | Unlimited quick answers (cheap route), 5 deep research/mo, auth-gated |
-| Core | Pro $20/mo ($200/yr) | **$8/mo ($80/yr)** | 60% | Unlimited answers, 500 credits/mo, all modes, exports |
-| Max-equivalent | Max $200/mo ($2,000/yr) | **$50/mo ($500/yr)** | 75% | 5,000 credits/mo, priority routes, Council, Labs, scheduled research |
+| Core | Pro $20/mo ($200/yr) | **$8/mo ($80/yr)** | 60% | Unlimited answers, 5,000 credits/mo (post-split), all modes, exports |
+| Max-equivalent | Max $200/mo ($2,000/yr) | **$50/mo ($500/yr)** | 75% | 50,000 credits/mo (post-split), priority routes, Council, Labs, scheduled research |
 | Team | (Teammate add-on) | **$20/seat** | — | Pooled credits, shared collections, admin usage report |
 | Enterprise | Ent Pro $40/seat, Ent Max $325/seat | **$15/seat Pro, $99/seat Max** | 62-70% | DPA, SSO, retention controls, invoicing, 1,500 credits/seat/mo |
 
 ### Credit economics (undercut the headline number)
-- **250 credits = $1** (vs their 100 = $1 — 2.5x more value per dollar, the simplest marketing line we have).
-- Quick answer: 5-15 credits ($0.02-0.06) vs their $0.15-0.70. Deep research run: 300-800 credits ($1.20-3.20) reserved up front, unused portion refunded.
-- Keep their proven mechanics: prepaid, non-refundable, expiring credits; monthly spend caps (default $50, up to $1,000); per-request cost visible to the user (they show usage.cost — we show credits spent per answer).
+- **2,500 credits = $1** after the 10:1 credit split (owner directive 2026-11-11). Same dollar economics, bigger numbers: 1 credit = $0.01. Versus Perplexity's 100 credits = $1, our headline is "25x more credits per dollar" — pure optics, but honest: the per-unit price is what it always was.
+- Split mechanics (stock-split style): all plan allowances, bonuses, and per-task costs multiply by 10; ledger stores dollars internally and displays credits at $0.01 each; existing balances convert 1:10 at launch. No economic change — display, pricing psychology, and marketing only.
+- Quick answer: 50-150 credits ($0.50-1.50 of nothing — visually 10x Perplexity's 15-70). Deep research run: 3,000-8,000 credits reserved up front, unused portion refunded.
+- Keep their proven mechanics: prepaid, non-refundable, expiring credits; monthly spend caps (default $50, up to $1,000); per-request cost visible to the user (we show credits spent per answer).
 - Price against worst-case cost, never average (deep research varies 10x); cost ledger logs actual per-call cost so margin is visible per user/model/route.
 
 ### API pricing (undercut per unit)
