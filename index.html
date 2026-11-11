@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-SfcXiIfr9VtqG5voWaInpaiBVXklMVS3XZa0v2Apc6I=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-rBEmj3nW1YPFnUmMJjhFfOlpRErmXP93VNyRq8TL+UI=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -380,9 +380,10 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--accent-light); color: var(--text);
   border: 1px solid var(--border); border-radius: 999px;
-  font-size: 12px; padding: 3px 10px; margin: 6px 0 0; max-width: 100%; overflow-wrap: anywhere;
+  font-size: 12px; padding: 3px 10px; margin: 6px 0 0; max-width: 100%; overflow-wrap: anywhere; overflow: hidden;
 }
 .attach-chip button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 0; line-height: 1; }
+.attach-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 7px; display: block; flex-shrink: 0; }
 .thread-item svg { flex-shrink: 0; opacity: 0.6; }
 .thread-item span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .thread-item { overflow: hidden; }
@@ -2187,9 +2188,15 @@ function renderAttachChips() {
     if (!pendingAttachment) continue;
     const chip = document.createElement("div");
     chip.className = "attach-chip";
+    // v158: Perplexity parity — image attachments show a real thumbnail chip, not text
+    if (pendingAttachment.kind === "image") {
+      const th = document.createElement("img");
+      th.src = pendingAttachment.dataUrl; th.alt = ""; th.className = "attach-thumb";
+      chip.appendChild(th);
+    }
     const name = document.createElement("span");
     name.textContent = pendingAttachment.kind === "image"
-      ? "🖼 " + pendingAttachment.name + " (image)"
+      ? pendingAttachment.name
       : pendingAttachment.name + " (" + pendingAttachment.content.length + " chars)";
     const x = document.createElement("button");
     x.textContent = "×";

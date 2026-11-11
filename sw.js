@@ -2,7 +2,7 @@
    - navigations: network-first, fall back to the cached shell (index.html) when offline
    - same-origin static assets (modules/, icons/, favicon): stale-while-revalidate
    - everything cross-origin (Supabase, gateway, CDNs) and all non-GET: untouched (never cached) */
-const VERSION = "v100-quota";
+const VERSION = "v101-icon";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./favicon.webp", "./icons/icon-192.png"]; // icon-512 (78 KB) is no longer precached: it only matters for install and is cached on first request by the stale-while-revalidate branch
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => Promise.all(SHELL.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
