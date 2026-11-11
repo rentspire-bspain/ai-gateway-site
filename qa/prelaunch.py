@@ -118,7 +118,7 @@ def frontend(base):
         pg.wait_for_timeout(2000)
         pg.screenshot(path=str(SHOTS / "thread.png"))
         check("thread renders", pg.locator(".question-header").count() >= 1)
-        fonts = pg.evaluate("() => { const q = document.querySelector('.question-header'); const a = document.querySelector('.answer-content p'); return (q && a) ? {q: +getComputedStyle(q).fontSize, a: +getComputedStyle(a).fontSize} : null; }")
+        fonts = pg.evaluate("() => { const q = document.querySelector('.question-header'); const a = document.querySelector('.answer-content p'); return (q && a) ? {q: parseFloat(getComputedStyle(q).fontSize), a: parseFloat(getComputedStyle(a).fontSize)} : null; }")
         check("question/answer text parity (16px)", fonts and abs(fonts["q"] - fonts["a"]) <= 2, str(fonts))
         chips = pg.locator(".related-item").count()
         check("follow-up chips render", chips >= 1, str(chips))
@@ -130,7 +130,7 @@ def frontend(base):
         # doc panel
         dp = pg.evaluate("() => ({open: document.body.classList.contains('dp-open'), h1: (h => h ? getComputedStyle(h).fontSize : 'x')(document.querySelector('.dp-panel .dp-md h1')), code: !!document.querySelector('.dp-panel .dp-codebar button'), mono: (c => c ? getComputedStyle(c).fontFamily.includes('monospace') : false)(document.querySelector('.dp-panel .dp-code pre code'))})")
         check("doc panel auto-opens", dp["open"])
-        check("doc h1 heading scale (~22px)", dp["open"] and dp["h1"] != "x" and 18 <= float(dp["h1"]) <= 28, str(dp))
+        check("doc h1 heading scale (~22px)", dp["open"] and dp["h1"] != "x" and 18 <= parseFloat(dp["h1"]) <= 28, str(dp))
         check("doc code monospace + copy", dp["code"] and dp["mono"])
         check("doc-chip collapses raw markdown", pg.locator(".doc-chip").count() >= 1)
         # Fleet page
