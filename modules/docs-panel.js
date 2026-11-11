@@ -33,9 +33,10 @@
   }
   var SEP = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
   function cells(l) { return l.trim().replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); }); }
-  function codeBlock(lines) {
+  function codeBlock(lines, lang) {
     var wrap = el('div', 'dp-code');
     var bar = el('div', 'dp-codebar');
+    bar.appendChild(el('span', 'dp-code-lang', lang || 'Code'));
     var cp = el('button', 'dp-btn', 'Copy'); cp.type = 'button';
     cp.onclick = function () { copyText(lines.join('\n')).then(function () { cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy'; }, 1500); }); };
     bar.appendChild(cp); wrap.appendChild(bar);
@@ -51,10 +52,10 @@
     var root = el('div', 'dp-md'), lines = String(text || '').replace(/\r/g, '').split('\n'), i = 0, m;
     while (i < lines.length) {
       var ln = lines[i];
-      if ((m = ln.match(/^\s*(`{3,}|~{3,})/))) {
+      if ((m = ln.match(/^\s*(`{3,}|~{3,})[ \t]*([\w+#-]*)/))) {
         var code = []; i++;
         while (i < lines.length && !new RegExp('^\\s*' + m[1][0] + '{' + m[1].length + ',}\\s*$').test(lines[i])) code.push(lines[i++]);
-        i++; root.appendChild(codeBlock(code)); continue;
+        i++; root.appendChild(codeBlock(code, m[2])); continue;
       }
       // v97: indented code blocks (4+ spaces) — previously rendered as body text
       if (/^ {4,}\S/.test(ln)) {
