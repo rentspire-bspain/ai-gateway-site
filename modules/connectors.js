@@ -29,10 +29,47 @@
     { id: "render", name: "Render", logo: "R", kind: "key", keyLabel: "Render API key", help: "Render dashboard > Account Settings > API Keys > Create API Key.", note: "Ask in chat: “what’s the deploy status of my Render services”." },
     { id: "supabase", name: "Supabase", logo: "B", kind: "key", keyLabel: "Supabase access token", help: "supabase.com/dashboard/account/tokens > Generate new token.", note: "Ask in chat: “list my Supabase projects”, “is my project healthy”." }
   ];
+  // ---------- Connection watch: detect accidental disconnects ----------
+  // Last-known-good connection map + deliberate-drop markers live in localStorage.
+  function watchGet(k, d) { try { return JSON.parse(localStorage.getItem(k) || "null") || d; } catch (e) { return d; } }
+  function watchSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function connectedMap() {
+    var m = {};
+    if (pstat.google && pstat.google.connected) m.google = 1;
+    PROVS.forEach(function (P) { if (pstat[P.id] && pstat[P.id].connected) m[P.id] = 1; });
+    return m;
+  }
+  function markDeliberate(ids) { var d = watchGet("ai_conn_deliberate", {}); ids.forEach(function (id) { d[id] = Date.now(); }); watchSet("ai_conn_deliberate", d); }
+  var activeDrop = null;
+  function checkWatch() {
+    var prev = watchGet("ai_conn_watch", {}), now = connectedMap(), deliberate = watchGet("ai_conn_deliberate", {}), alerted = watchGet("ai_conn_alerted", {});
+    var dropped = [], restored = false;
+    Object.keys(prev).forEach(function (id) { if (prev[id] && !now[id] && !(deliberate[id] && Date.now() - deliberate[id] < 60000) && !alerted[id]) dropped.push(id); });
+    Object.keys(alerted).forEach(function (id) { if (now[id]) { delete alerted[id]; delete deliberate[id]; restored = true; } });
+    watchSet("ai_conn_watch", now); watchSet("ai_conn_alerted", alerted); watchSet("ai_conn_deliberate", deliberate);
+    if (dropped.length) { dropped.forEach(function (id) { alerted[id] = 1; }); watchSet("ai_conn_alerted", alerted); activeDrop = dropped; }
+    else if (restored) activeDrop = null;
+    render();
+  }
+  function droppedAlert(ids) { activeDrop = ids; render(); }
+  function dropCard(ids) {
+    var c = el("div", "cn-card cn-drop");
+    c.setAttribute("role", "alert");
+    c.appendChild(el("div", "cn-title", "Connection lost"));
+    var names = ids.map(function (id) { return id === "google" ? "Google" : (PROVS.find(function (P) { return P.id === id; }) || {}).name || id; });
+    c.appendChild(el("div", "cn-sub", names.join(", ") + (ids.length > 1 ? " got" : " got") + " disconnected. Nothing you asked for was lost — reconnect below."));
+    var acts = el("div", "cn-actions");
+    var ok = el("button", "stg-btn", "Open Settings to reconnect");
+    ok.type = "button";
+    ok.addEventListener("click", function () { if (root.SettingsUI && root.SettingsUI.open) root.SettingsUI.open("connectors"); });
+    acts.appendChild(ok);
+    c.appendChild(acts);
+    return c;
+  }
   function loadAll() {
     return call("connectors", { action: "status", provider: "all" }).then(function (d) {
       if (d && d.providers) { pstat = d.providers; if (d.providers.google && !d.providers.google.error) status = d.providers.google; }
-      render(); notifyBadges();
+      render(); notifyBadges(); checkWatch();
     }).catch(function () { render(); notifyBadges(); });
   }
   function notifyBadges() { badges = badges.filter(function (b) { return b.node.isConnected; }); badges.forEach(function (b) { paintBadge(b); }); }
@@ -65,11 +102,19 @@
   function pdisconnect(P) {
     if (pbusy[P.id] || !root.confirm("Disconnect " + P.name + "? The stored credential is deleted.")) return;
     pbusy[P.id] = true; render();
-    pcall(P.id, { action: "disconnect" }).then(function (d) { pbusy[P.id] = false; if (!d.error) pstat[P.id] = d; pbanner[P.id] = { msg: d.error || P.name + " disconnected.", kind: d.error ? "err" : "ok" }; render(); notifyBadges(); }).catch(function (e) { pbusy[P.id] = false; pbanner[P.id] = { msg: e.message, kind: "err" }; render(); });
+    markDeliberate([P.id]);
+    pcall(P.id, { action: "disconnect" }).then(function (d) { pbusy[P.id] = false; if (!d.error) pstat[P.id] = d; pbanner[P.id] = { msg: d.error || P.name + " disconnected.", kind: d.error ? "err" : "ok" }; render(); notifyBadges(); checkWatch(); }).catch(function (e) { pbusy[P.id] = false; pbanner[P.id] = { msg: e.message, kind: "err" }; render(); });
   }
   function psetkey(P, key) {
     if (pbusy[P.id]) return; pbusy[P.id] = true; render();
     pcall(P.id, { action: "setkey", key: key }).then(function (d) { pbusy[P.id] = false; if (d.error) pbanner[P.id] = { msg: d.error, kind: "err" }; else { pstat[P.id] = d; pbanner[P.id] = { msg: P.name + " connected.", kind: "ok" }; } render(); notifyBadges(); }).catch(function (e) { pbusy[P.id] = false; pbanner[P.id] = { msg: e.message, kind: "err" }; render(); });
+  }
+  function toggle(checked, onChange, label) {
+    var wrap = el("label", "stg-switch"); wrap.title = label || "";
+    var input = el("input"); input.type = "checkbox"; input.setAttribute("role", "switch"); input.checked = !!checked;
+    input.addEventListener("change", function () { onChange(input.checked); });
+    wrap.appendChild(input); wrap.appendChild(el("span", "stg-track"));
+    return wrap;
   }
   function provCard(P) {
     var st = pstat[P.id] || null, connected = !!(st && st.connected), unconf = !!(st && st.configured === false), busyP = !!pbusy[P.id];
@@ -80,17 +125,26 @@
     var subEl = el("div", "cn-sub" + (connected ? " on" : ""), sub); subEl.setAttribute("role", "status"); t.appendChild(subEl);
     head.appendChild(logo); head.appendChild(t);
     var acts = el("div", "cn-actions");
+    // Toggle switch: ON = connected. Turning ON starts OAuth (or focuses the key box); turning OFF disconnects (with confirm).
+    var tg = toggle(connected, function (on) {
+      if (on) { if (P.kind === "oauth" && !unconf) pconnect(P); else if (keyInput) keyInput.focus(); }
+      else if (connected) pdisconnect(P);
+    }, "Connect / disconnect " + P.name);
+    if (!st || unconf) tg.style.opacity = "0.4";
+    acts.appendChild(tg);
     if (st && P.kind === "oauth" && !unconf) {
       var b = el("button", "stg-btn" + (connected ? " ghost" : ""), busyP ? "Working…" : connected ? "Reconnect" : "Connect " + P.name);
       b.type = "button"; b.disabled = busyP; b.addEventListener("click", function () { pconnect(P); }); acts.appendChild(b);
     }
     if (connected) { var d = el("button", "stg-btn ghost cn-danger", "Disconnect"); d.type = "button"; d.disabled = busyP; d.addEventListener("click", function () { pdisconnect(P); }); acts.appendChild(d); }
     head.appendChild(acts); c.appendChild(head);
+    var keyInput = null;
     if (st && P.keyLabel && !connected) {
       var row = el("div", "cn-act-btns"), inp = el("input", "stg-input"); inp.type = "password"; inp.autocomplete = "off"; inp.spellcheck = false;
       inp.placeholder = "Paste " + P.keyLabel; inp.setAttribute("aria-label", P.keyLabel);
       var sv = el("button", "stg-btn", busyP ? "Checking…" : (P.kind === "oauth" ? "Save token" : "Save key")); sv.type = "button"; sv.disabled = busyP;
       sv.addEventListener("click", function () { var v = inp.value.trim(); inp.value = ""; if (v) psetkey(P, v); });
+      keyInput = inp;
       row.appendChild(inp); row.appendChild(sv); c.appendChild(row); c.appendChild(el("div", "cn-note", P.help));
     }
     if (unconf && !P.keyLabel) c.appendChild(el("div", "cn-msg warn", "Not available yet: the " + P.name + " app credentials have not been added to the server."));
@@ -119,6 +173,7 @@
     if (busy) return;
     if (!root.confirm("Disconnect Google? The assistant will no longer be able to read your email or calendar, and the stored token is deleted and revoked.")) return;
     busy = true; render();
+    markDeliberate(["google"]);
     call("connectors", { action: "disconnect" }).then(function (d) { busy = false; status = d && !d.error ? d : status; say(d.error || "Google disconnected.", d.error ? "err" : "ok"); }).catch(function (e) { busy = false; say(e.message, "err"); });
   }
 
@@ -135,6 +190,8 @@
     head.appendChild(logo); head.appendChild(t);
     var acts = el("div", "cn-actions");
     if (status) {
+      var gt = toggle(connected, function (on) { if (on) connect(); else if (connected) disconnect(); }, "Connect / disconnect Google");
+      acts.appendChild(gt);
       var b = el("button", "stg-btn" + (connected ? " ghost" : ""), busy ? "Working…" : connected ? "Reconnect" : "Connect Google");
       b.type = "button"; b.disabled = busy; b.addEventListener("click", connect); acts.appendChild(b);
       if (connected) { var d = el("button", "stg-btn ghost cn-danger", "Disconnect"); d.type = "button"; d.disabled = busy; d.addEventListener("click", disconnect); acts.appendChild(d); }
@@ -154,7 +211,7 @@
     c.appendChild(el("p", "cn-note", "Ask in chat: “what’s on my calendar Friday”, “find the email from my landlord”, “find the lease spreadsheet in my Drive”. If you connected Google earlier, press Reconnect once to add Drive and Sheets. Emails and events are always shown as a preview and only sent or created after you press Approve. Your Google token is encrypted on the server and never sent to your browser."));
     return c;
   }
-  function render() { hosts = hosts.filter(function (h) { return h.isConnected; }); hosts.forEach(function (h) { h.textContent = ""; h.appendChild(build()); PROVS.forEach(function (P) { h.appendChild(provCard(P)); }); }); }
+  function render() { hosts = hosts.filter(function (h) { return h.isConnected; }); hosts.forEach(function (h) { h.textContent = ""; if (activeDrop) h.appendChild(dropCard(activeDrop)); h.appendChild(build()); PROVS.forEach(function (P) { h.appendChild(provCard(P)); }); }); }
   function card() {
     var h = el("div", "cn-host"); hosts.push(h); h.appendChild(build()); PROVS.forEach(function (P) { h.appendChild(provCard(P)); });
     loadStatus();
