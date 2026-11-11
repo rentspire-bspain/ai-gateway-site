@@ -1,6 +1,6 @@
 {
- "ts": "2026-11-11T09:27:40+00:00",
- "base": "https://ai.spaincos.com",
+ "ts": "2026-11-11T10:02:11+00:00",
+ "base": "http://localhost:8765",
  "passed": 29,
  "failed": 0,
  "checks": [
@@ -22,7 +22,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "7.1s"
+   "detail": "5.3s"
   },
   {
    "name": "current-events answered",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "6.3s"
+   "detail": "5.5s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -137,7 +137,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nGuardians\nQA\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 29/29 checks \u00b7 11/11/2026, 9:23:07 AM\nRun before e"
+   "detail": "Overview\nGuardians\nQA\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 29/29 checks \u00b7 11/11/2026, 9:27:40 AM\nRun before e"
   },
   {
    "name": "Connectors panel renders",

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-cbj8jXcFOZlYNl/Z+t577kPgAcSD/frvrJekYKTTIfU=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-eG5UrPwpVLx5He/TrSJremeUc98mq5CEc3sAxiZ2NHA=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1729,7 +1729,24 @@ window.addEventListener("popstate", () => {
   if (t) loadThread(t.id, true); else { setCurrentThread(null); showLanding(); renderThreads(); }
 });
 let isSearching = false;
+let searchDeadline = 0;   // v156 STUCK-SEARCH WATCHDOG: hard deadline for the current search
 let runAllState = { active: false, stop: false };   // v97: "Run all" follow-ups state
+// v156: a stalled gateway stream (connection open, no data, never closes) used to leave
+// isSearching true FOREVER — every later Enter queued "in perpetuity" and the composer
+// ate prompts with a blank canvas. This watchdog force-frees the lock after 5 minutes,
+// surfaces a retryable error, and auto-sends the queued follow-up so no typed text is lost.
+setInterval(() => {
+  if (!isSearching || !searchDeadline) return;
+  if (Date.now() < searchDeadline) return;
+  isSearching = false; searchDeadline = 0;
+  try {
+    const ct = document.getElementById("resultsContent");
+    const st = ct && ct.querySelector(".searching-state, .searching");
+    if (st) st.remove();
+    if (ct) renderAnswerError(ct, "This search stalled", "The gateway stopped responding after 5 minutes, so the search was cancelled to unblock the composer. Your follow-up is sending now.", "");
+  } catch (e) {}
+  drainQueue();
+}, 15000);   // v97: "Run all" follow-ups state
 let currentUser = null;
 // v76: one-time thread timestamp backfill (Library date groups / Usage counts)
 (function () {
@@ -4345,6 +4362,7 @@ async function performSearchInner(query) {
   if (isSearching || !query.trim()) return;
   try { window.EntityCards && window.EntityCards.questionHint && window.EntityCards.questionHint(query); } catch (e) {}
   isSearching = true;
+  searchDeadline = Date.now() + 300000; // v156 watchdog: no search may hold the composer hostage for more than 5 minutes
   stopSpeaking();
   // v83 (G8): offline — show a retryable error card instead of starting a request that cannot succeed
   if (navigator.onLine === false) {
@@ -4639,6 +4657,7 @@ async function performSearchInner(query) {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
+          searchDeadline = Date.now() + 300000; // v156: stream progress resets the watchdog
           buf += dec.decode(value, { stream: true });
           const lines = buf.split("\n");
           buf = lines.pop() || ""; // keep the trailing partial line for the next chunk
@@ -4703,6 +4722,7 @@ async function performSearchInner(query) {
   } finally {
     if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
     isSearching = false;
+    searchDeadline = 0;
   }
 }
 
