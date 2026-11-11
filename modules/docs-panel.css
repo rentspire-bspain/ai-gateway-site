@@ -59,4 +59,6 @@ body.dp-open .main{margin-right:var(--dp-w)}
 .dp-codebar{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 12px;border-bottom:1px solid var(--border-light);background:var(--bg-surface)}
 .dp-codebar .dp-code-lang{font-size:11px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em}
 .dp-code pre{margin:0;border:0;border-radius:0;background:none;padding:13px 16px}
+/* v155: syntax coloring in doc-panel code blocks (same palette as the code overlay) */
+.dp-code .tk-k{color:#C678DD}.dp-code .tk-s{color:#7FB77E}.dp-code .tk-c{color:var(--text-faint);font-style:italic}.dp-code .tk-n{color:#D19A66}.dp-code .tk-f{color:var(--citation-text,#2e7d8f)}
 .dp-code pre{margin:0;border:0;border-radius:0}

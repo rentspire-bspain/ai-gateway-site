@@ -1,0 +1,154 @@
+{
+ "ts": "2026-11-11T09:23:07+00:00",
+ "base": "http://localhost:8765",
+ "passed": 29,
+ "failed": 0,
+ "checks": [
+  {
+   "name": "gateway-status 200",
+   "ok": true,
+   "detail": "HTTP 200"
+  },
+  {
+   "name": "token mint",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "simple query answers (Paris)",
+   "ok": true,
+   "detail": "HTTP 200"
+  },
+  {
+   "name": "simple query < 30s",
+   "ok": true,
+   "detail": "4.8s"
+  },
+  {
+   "name": "current-events answered",
+   "ok": true,
+   "detail": "HTTP 200"
+  },
+  {
+   "name": "current-events fast path (loop skipped)",
+   "ok": true,
+   "detail": "skipped=research_sufficient"
+  },
+  {
+   "name": "current-events < 35s",
+   "ok": true,
+   "detail": "5.5s"
+  },
+  {
+   "name": "guardian-runner lists guardians",
+   "ok": true,
+   "detail": "HTTP 200"
+  },
+  {
+   "name": "memory_items table reachable",
+   "ok": true,
+   "detail": "HTTP 200"
+  },
+  {
+   "name": "index.html loads real modules",
+   "ok": true,
+   "detail": "37 refs"
+  },
+  {
+   "name": "all deployed modules match repo",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "landing renders",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "composer single-line",
+   "ok": true,
+   "detail": "{'tag': 'TEXTAREA', 'rows': 1}"
+  },
+  {
+   "name": "sidebar search bar present",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "thread renders",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "thread route loads all modules (no /t/ 404s)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "question/answer text parity (16px)",
+   "ok": true,
+   "detail": "{'q': 16, 'a': 16}"
+  },
+  {
+   "name": "follow-up chips render",
+   "ok": true,
+   "detail": "2"
+  },
+  {
+   "name": "Run-all button present",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "follow-up chip submits (search state)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "doc panel auto-opens",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "doc h1 heading scale (20-28px)",
+   "ok": true,
+   "detail": "{'open': True, 'h1': '24.025px', 'code': True, 'mono': True}"
+  },
+  {
+   "name": "doc code monospace + copy",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "doc-chip collapses raw markdown",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "raw doc pre is hidden in chat",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "Fleet page renders registry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "Fleet QA tab shows fleet report",
+   "ok": true,
+   "detail": "Overview\nGuardians\nQA\nPRE-LAUNCH REGRESSION FLEET Refresh\n1 FAILED\n\u00b7 28/29 checks \u00b7 11/11/2026, 9:22:21 AM\nRun before ev"
+  },
+  {
+   "name": "Connectors panel renders",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "zero JS/CSP errors",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "exit": 0
+}

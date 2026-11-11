@@ -12,7 +12,7 @@ freshness, and backend smoke (gateway health, mode smoke, guardian-runner).
 
 Exit code 0 = all green (launch). Non-zero = red (fix first).
 """
-import argparse, json, re, sys, time, urllib.request, urllib.error
+import argparse, json, os, re, sys, time, urllib.request, urllib.error
 from pathlib import Path
 
 BASE = "https://ai.spaincos.com"
@@ -27,6 +27,21 @@ def check(name, ok, detail=""):
     print(f"  {'PASS' if ok else 'FAIL'}  {name}" + (f"  [{detail}]" if detail and not ok else ""))
     return ok
 
+def write_report(base):
+    """Machine-readable run record: qa-reports/prelaunch/latest.json — consumed by the
+    Fleet page (QA tab) and the scheduled prelaunch guardian. History in history.jsonl."""
+    import datetime
+    SHOTS.mkdir(parents=True, exist_ok=True)
+    rec = {"ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+           "base": base, "passed": sum(1 for _, ok, _ in RESULTS if ok),
+           "failed": sum(1 for _, ok, _ in RESULTS if not ok),
+           "checks": [{"name": n, "ok": ok, "detail": d} for n, ok, d in RESULTS],
+           "exit": 1 if any(not ok for _, ok, _ in RESULTS) else 0}
+    (SHOTS / "latest.json").write_text(json.dumps(rec, indent=1))
+    with open(SHOTS / "history.jsonl", "a") as f:
+        f.write(json.dumps({"ts": rec["ts"], "passed": rec["passed"], "failed": rec["failed"], "exit": rec["exit"]}) + "\n")
+    return rec
+
 def http(url, timeout=20, data=None, headers=None):
     req = urllib.request.Request(url, data=data, headers=headers or {}, method="POST" if data else "GET")
     t0 = time.time()
@@ -40,14 +55,18 @@ def mint():
     st, body, _ = http(f"{SB}/auth/v1/token?grant_type=password", 20,
         json.dumps({"email": EVAL_EMAIL, "password": EVAL_PASS}).encode(),
         {"apikey": ANON, "content-type": "application/json"})
-    return json.loads(body).get("access_token") if st == 200 else None
+    return json.loads(body) if st == 200 else None
+
+def mint_token():
+    return (mint() or {}).get("access_token")
 
 # ---------------- backend smoke ----------------
 def backend():
     print("BACKEND")
     st, body, dt = http(f"{SB}/functions/v1/gateway-status", 20)
     check("gateway-status 200", st == 200, f"HTTP {st}")
-    tok = mint()
+    m = mint()
+    tok = m and m.get("access_token")
     check("token mint", bool(tok))
     if not tok:
         return
@@ -111,6 +130,8 @@ def frontend(base):
         pg = ctx.new_page()
         errs = []
         pg.on("pageerror", lambda e: errs.append(f"pageerror: {str(e)[:120]}"))
+        http404 = []
+        pg.on("response", lambda r: http404.append(f"{r.status} {r.url[-60:]}") if r.status >= 400 else None)
         pg.on("console", lambda m: errs.append(f"csp: {m.text[:120]}") if (m.type == "error" and "Content Security Policy" in m.text) else None)
         pg.goto(base, wait_until="networkidle", timeout=45000)
         SHOTS.mkdir(parents=True, exist_ok=True)
@@ -128,10 +149,14 @@ def frontend(base):
             empty = pg.evaluate("() => document.getElementById('resultsContent') === null || true")
             sb.first.fill("")
         # authed thread view + follow-ups + doc panel
-        tok = mint()
+        m = mint()
+        tok = m and m.get("access_token")
         if tok:
-            sess = {"access_token": tok, "token_type": "bearer", "expires_at": int(time.time()) + 3600}
-            pg.evaluate("s => localStorage.setItem('sb-bnxermyboeigvwonfrzx-auth-token', JSON.stringify({currentSession: s, user: {email: 'eval-bot@spaincos.com'}}))", sess)
+            # supabase-js v2 storage format: the session object directly (v1's {currentSession:...} wrapper is ignored)
+            sess = {"access_token": m.get("access_token"), "refresh_token": m.get("refresh_token"),
+                    "expires_in": m.get("expires_in", 3600), "expires_at": m.get("expires_at") or int(time.time()) + 3600,
+                    "token_type": m.get("token_type", "bearer"), "user": m.get("user")}
+            pg.evaluate("s => localStorage.setItem('sb-bnxermyboeigvwonfrzx-auth-token', JSON.stringify(s))", sess)
         thread = {"id": f"pre{int(time.time())}", "slug": "prelaunch", "title": "Prelaunch", "incognito": False,
                   "messages": [{"role": "user", "content": "master doc please"},
                                {"role": "assistant", "content": "Here:\n\n```markdown\n# Prelaunch Doc\n\n## Section\n\n    git clone https://example.com/repo.git\n    pip install -r requirements.txt\n\n| Gate | Criterion |\n|---|---|\n| G0 | Runs cleanly |\n\nBody text here.\n```",
@@ -141,6 +166,9 @@ def frontend(base):
         pg.wait_for_timeout(2000)
         pg.screenshot(path=str(SHOTS / "thread.png"))
         check("thread renders", pg.locator(".question-header").count() >= 1)
+        # the owner-reported killer: on /t/<slug> routes every lazily-loaded module resolved
+        # to /t/modules/... and 404'd — composer/follow-ups/search silently died there.
+        check("thread route loads all modules (no /t/ 404s)", not http404, "; ".join(http404[:4]))
         fonts = pg.evaluate("() => { const q = document.querySelector('.question-header'); const a = document.querySelector('.answer-content p'); return (q && a) ? {q: parseFloat(getComputedStyle(q).fontSize), a: parseFloat(getComputedStyle(a).fontSize)} : null; }")
         check("question/answer text parity (16px)", fonts and abs(fonts["q"] - fonts["a"]) <= 2, str(fonts))
         chips = pg.locator(".related-item").count()
@@ -162,7 +190,13 @@ def frontend(base):
         pg.evaluate("() => document.getElementById('navFleet') && document.getElementById('navFleet').click()")
         pg.wait_for_timeout(2500)
         pg.screenshot(path=str(SHOTS / "fleet.png"))
-        check("Fleet page renders registry", pg.evaluate("() => document.body.innerText.length") > 500)
+        check("Fleet page renders registry", pg.evaluate("() => !!document.querySelector('.fl-card, .fl-msg')"))
+        # QA tab: the pre-launch fleet's report must load inside the product
+        pg.evaluate("() => { const t = [...document.querySelectorAll('.fl-tab')].find(x => x.textContent.trim() === 'QA'); if (t) t.click(); }")
+        pg.wait_for_timeout(1500)
+        qa_txt = pg.evaluate("() => { const w = document.querySelector('.fl-wrap'); return w ? w.innerText : ''; }")
+        check("Fleet QA tab shows fleet report", "pre-launch regression fleet" in qa_txt.lower() and ("all green" in qa_txt.lower() or "failed" in qa_txt.lower()), qa_txt[:120])
+        pg.screenshot(path=str(SHOTS / "fleet-qa.png"))
         # Settings > Connectors
         pg.evaluate("() => { window.SettingsUI && window.SettingsUI.open(); }")
         pg.wait_for_timeout(800)
@@ -185,10 +219,12 @@ if __name__ == "__main__":
     a = ap.parse_args()
     print(f"PRE-LAUNCH REGRESSION FLEET -> {a.base}")
     _safe(backend)
-    _safe(integrity, a.base)
+    if os.environ.get("PRELAUNCH_SKIP_INTEGRITY") != "1": _safe(integrity, a.base)
     _safe(frontend, a.base)
     fails = [r for r in RESULTS if not r[1]]
+    rec = write_report(a.base)
     print(f"\n{len(RESULTS) - len(fails)}/{len(RESULTS)} passed, {len(fails)} failed")
+    print(f"report: {SHOTS / 'latest.json'}")
     for name, _, detail in fails:
         print(f"  FAIL: {name} [{detail}]")
     sys.exit(1 if fails else 0)

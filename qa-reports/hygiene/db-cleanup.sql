@@ -1,0 +1,28 @@
+-- ai-gateway cleanup. NOT EXECUTED. Run each block in a transaction and check the count first.
+-- ===== A. SAFE =====
+-- A2: delete disabled QA smoke tasks. Expected: 2
+-- DELETE FROM scheduled_tasks WHERE enabled=false AND title LIKE 'QA smoke task%';
+-- A3: purge revoked share copies. Expected: 71
+-- DELETE FROM shared_threads WHERE revoked_at IS NOT NULL;
+-- ===== B. REVIEW FIRST =====
+-- B1: empty duplicate threads (a newer same-user+title thread exists, no messages). Expected: 19
+-- DELETE FROM threads t WHERE NOT EXISTS (SELECT 1 FROM thread_messages m WHERE m.thread_id=t.id)
+--  AND EXISTS (SELECT 1 FROM threads t2 WHERE t2.user_id=t.user_id AND t2.title=t.title AND t2.id<>t.id AND (t2.created_at,t2.id)>(t.created_at,t.id));
+-- (fleet_dispatch has FK to threads; confirm none reference these first.)
+-- B2: dead space "Spain Companies — Standing Rules". Expected: 1
+-- DELETE FROM spaces WHERE id='0d32132f-cd1e-504a-aea0-3e523264f970' AND NOT EXISTS (SELECT 1 FROM threads WHERE space_id=spaces.id);
+-- B3: stale tahlequah text in registry. Expected: 1
+-- UPDATE fleet_registry SET description=regexp_replace(description,'tahlequahapartments\.com down \(502\); ','') WHERE id='guardian:ahapartments';
+-- B4: stop guardian probing retired domain (confirm its checks first). Expected: 1
+-- UPDATE guardians SET enabled=false WHERE slug='ahapartments';
+-- B5: duplicate build lane (keep the non-v82 id; confirm no children via parent FK). Expected: 1
+-- DELETE FROM fleet_registry WHERE id='lane:frontend-sweep-2026-11-09-v82' AND NOT EXISTS (SELECT 1 FROM fleet_registry c WHERE c.parent=fleet_registry.id);
+-- ===== C. RETENTION / INDEXES =====
+-- C1: Expected: 0 now (data <14d); future-proofing
+-- DELETE FROM ops_health_runs WHERE ran_at < now()-interval '14 days';
+-- C2: Expected: up to 2469 (trim older than 7 days)
+-- DELETE FROM cron.job_run_details WHERE end_time < now()-interval '7 days';
+-- C3: optional
+-- CREATE INDEX CONCURRENTLY IF NOT EXISTS threads_user_updated_idx ON threads(user_id, updated_at DESC);
+-- C4: optional
+-- CREATE INDEX CONCURRENTLY IF NOT EXISTS memory_items_user_text_idx ON memory_items(user_id, md5(text));

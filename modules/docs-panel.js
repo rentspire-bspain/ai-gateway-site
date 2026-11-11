@@ -40,7 +40,14 @@
     var cp = el('button', 'dp-btn', 'Copy'); cp.type = 'button';
     cp.onclick = function () { copyText(lines.join('\n')).then(function () { cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy'; }, 1500); }); };
     bar.appendChild(cp); wrap.appendChild(bar);
-    var pre = el('pre'); pre.appendChild(el('code', '', lines.join('\n'))); wrap.appendChild(pre);
+    var pre = el('pre'), code = el('code');
+    // v155: syntax coloring via the artifacts highlighter (escapes content internally);
+    // falls back to plain textContent so a missing highlighter never breaks rendering.
+    try {
+      if (window.Artifacts && window.Artifacts.highlight) code.innerHTML = window.Artifacts.highlight(lines.join('\n'), lang);
+      else code.textContent = lines.join('\n');
+    } catch (e) { code.textContent = lines.join('\n'); }
+    pre.appendChild(code); wrap.appendChild(pre);
     return wrap;
   }
   function copyText(t) {

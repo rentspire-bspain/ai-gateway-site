@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-gFkZY1CbLDmpZp0S6pCM9ySSnjFvrJtEbYCfPlKKFeQ=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-cbj8jXcFOZlYNl/Z+t577kPgAcSD/frvrJekYKTTIfU=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -4842,21 +4842,20 @@ async function loadStatus(force) {
     window.addEventListener("load", () => {
       // v98 STALE-BROWSER ESCAPE HATCH (owner report 2026-11-11): browsers controlled by the old
       // stale-while-revalidate worker kept serving pre-v97 modules no matter how many times we
-      // deployed. One-time (per browser): unregister ALL workers, wipe ALL caches, reload once so
-      // the fresh network-first worker takes over. Guarded by a localStorage flag — no reload loop.
+      // deployed. One-time (per browser, v99): AWAIT unregister + cache wipe, then reload once so
+      // the fresh network-first worker takes over — no register/unregister race, no reload loop.
       try {
-        const KEY = "ai_sw_reset_98";
+        const KEY = "ai_sw_reset_99";
         if (!localStorage.getItem(KEY)) {
           localStorage.setItem(KEY, "1");
-          navigator.serviceWorker.getRegistrations().then((regs) => {
-            let had = false;
-            regs.forEach((r) => { had = true; return r.unregister(); });
-            if (window.caches) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k)));
-            if (had) setTimeout(() => location.reload(), 300); // reload re-registers the fresh worker
+          navigator.serviceWorker.getRegistrations().then(async (regs) => {
+            await Promise.all(regs.map((r) => r.unregister()));
+            if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.map((k) => caches.delete(k))); }
+            if (regs.length) { location.reload(); return; } // reload re-registers the fresh worker
           }).catch(() => {});
         }
       } catch (e) {}
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
+      if (localStorage.getItem("ai_sw_reset_99")) navigator.serviceWorker.register("/sw.js").catch(() => {});
     });
   }
   let deferred = null;
@@ -4949,7 +4948,7 @@ async function loadStatus(force) {
   var loaded = {};
   function cssLink(n) {
     if (document.querySelector('link[href*="modules/' + n + '.css"]')) return null;
-    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "modules/" + n + ".css"; document.head.appendChild(l);
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "/modules/" + n + ".css"; document.head.appendChild(l);
     return l;
   }
   window.loadModule = function (name) {
@@ -4960,7 +4959,7 @@ async function loadStatus(force) {
         var l = cssLink(n);
         if (l) waits.push(new Promise(function (r) { l.onload = l.onerror = r; setTimeout(r, 3000); }));
       });
-      var s = document.createElement("script"); s.src = "modules/" + name + ".js";
+      var s = document.createElement("script"); s.src = "/modules/" + name + ".js";
       waits.push(new Promise(function (r) { s.onload = r; s.onerror = function () { delete loaded[name]; r(); }; }));
       document.head.appendChild(s);
       Promise.all(waits).then(resolve);
@@ -4976,7 +4975,7 @@ async function loadStatus(force) {
     IDLE_CSS.forEach(cssLink);
     // warm the HTTP/SW cache for the on-demand modules so the first click does not wait on the network
     Object.keys(MODS).forEach(function (n) {
-      var l = document.createElement("link"); l.rel = "prefetch"; l.as = "script"; l.href = "modules/" + n + ".js"; document.head.appendChild(l);
+      var l = document.createElement("link"); l.rel = "prefetch"; l.as = "script"; l.href = "/modules/" + n + ".js"; document.head.appendChild(l);
     });
   }
   var idle = function () { (window.requestIdleCallback || function (f) { setTimeout(f, 300); })(attachIdle, { timeout: 2000 }); };

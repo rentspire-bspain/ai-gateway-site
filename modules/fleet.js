@@ -94,16 +94,51 @@
     gcall(body).then(function (j) { var n = j.guardian; if (n) guards = guards.map(function (x) { return x.id === id ? n : x; }); })
       .catch(function (e) { alert(e.message); }).then(function () { delete gst.busy[id]; render(); });
   }
+  // ---- QA tab: the pre-launch regression fleet's latest report (qa-reports/prelaunch/latest.json, deployed with the site) ----
+  var qa = { loaded: false, rec: null, error: "" };
+  function loadQa() {
+    return fetch("/qa-reports/prelaunch/latest.json", { cache: "no-store" }).then(function (r) { return r.json(); })
+      .then(function (j) { qa.rec = j; qa.error = ""; }).catch(function (e) { qa.error = "No QA report found — run ./qa/run.sh and deploy."; })
+      .then(function () { qa.loaded = true; render(); });
+  }
+  function qaHtml() {
+    if (!qa.loaded) return '<p class="fl-msg">Loading pre-launch QA report…</p>';
+    if (qa.error && !qa.rec) return '<p class="fl-msg">' + esc(qa.error) + '</p>';
+    var r = qa.rec, red = (r.failed || 0) > 0, checks = r.checks || [], fails = checks.filter(function (c) { return !c.ok; });
+    return '<h3 class="fl-h">Pre-launch regression fleet <button class="fl-qrf" type="button">Refresh</button></h3>' +
+      '<div class="fl-card"><div class="fl-ct"><span class="fl-dot fl-s-' + (red ? "paused" : "live") + '"></span><b>' +
+      (red ? r.failed + " FAILED" : "ALL GREEN") + "</b> · " + r.passed + "/" + (r.passed + r.failed) + " checks · " + esc(fmt(r.ts)) + "</div>" +
+      '<div class="fl-m">Run before every push and after every deploy: <code>./qa/run.sh</code> — backend smoke, deploy integrity (live modules must match the repo), frontend E2E (composer, threads, follow-ups, doc panel, Fleet, Connectors), CSP and JS errors. ' + (r.base ? "Last run: " + esc(r.base) : "") + "</div>" +
+      (fails.length ? '<div class="fl-m" style="margin-top:8px"><b>Regressions — fix before launch:</b><ol style="margin:6px 0 0 16px;padding:0">' +
+        fails.map(function (c) { return "<li><b>" + esc(c.name) + "</b>" + (c.detail ? " — " + esc(c.detail) : "") + "</li>"; }).join("") + "</ol></div>" : "") +
+      '<details style="margin-top:8px"><summary>' + (checks.length - fails.length) + " passing checks</summary><ol style=\"margin:6px 0 0 16px;padding:0\">" +
+      checks.filter(function (c) { return c.ok; }).map(function (c) { return "<li>" + esc(c.name) + "</li>"; }).join("") + "</ol></details></div>";
+  }
   function card(r) {
     return '<div class="fl-card"><div class="fl-ct"><span class="fl-dot fl-s-' + esc(r.status) + '"></span><b>' + esc(r.name) + '</b></div><div class="fl-m">' +
       esc(r.status.replace("_", " ")) + (r.schedule ? " · " + esc(r.schedule) : "") + (r.domain ? " · " + esc(r.domain) : "") + (r.project_ref ? " · " + esc(r.project_ref.slice(0, 8)) : "") + "</div></div>";
   }
+  // v155 FIX: restored — treeHtml was dropped from fleet.js in 7e7e678, so render() threw a
+  // ReferenceError and the Overview tab stayed stuck on "Loading fleet registry…" for everyone.
+  function treeHtml(nodes, top) {
+    return '<ul class="fl-tree' + (top ? " fl-top" : "") + '">' + nodes.map(function (n) {
+      var r = n.row, leaf = r.kind !== "org", inner = "";
+      if (!leaf) {
+        var kids = n.children, kinds = countBy(kids.map(function (k) { return k.row; }), "kind");
+        inner = treeHtml(n.children.filter(function (k) { return k.row.kind === "org"; }), false) +
+          '<div class="fl-sum">' + Object.keys(kinds).filter(function (k) { return k !== "org"; }).map(function (k) { return esc(kinds[k] + " " + k.replace("_", " ") + "s"); }).join(" · ") + "</div>";
+      }
+      return '<li><div class="fl-node fl-k-' + esc(r.kind) + '"><b>' + esc(r.name) + "</b>" + (r.description && !leaf ? '<span class="fl-d">' + esc(r.description) + "</span>" : "") + "</div>" + inner + "</li>";
+    }).join("") + "</ul>";
+  }
+
   function section(title, list) { return list.length ? '<h3 class="fl-h">' + esc(title) + " (" + list.length + ')</h3><div class="fl-grid">' + list.map(card).join("") + "</div>" : ""; }
   function render() {
     if (!el) return;
     var body = el.querySelector(".fl-body");
-    var tabs = '<div class="fl-tabs" style="display:flex;gap:8px;margin:0 0 12px"><button type="button" class="fl-tab" data-tab="overview"' + (tab === "overview" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Overview</button><button type="button" class="fl-tab" data-tab="guardians"' + (tab === "guardians" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Guardians</button></div>';
+    var tabs = '<div class="fl-tabs" style="display:flex;gap:8px;margin:0 0 12px"><button type="button" class="fl-tab" data-tab="overview"' + (tab === "overview" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Overview</button><button type="button" class="fl-tab" data-tab="guardians"' + (tab === "guardians" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Guardians</button><button type="button" class="fl-tab" data-tab="qa"' + (tab === "qa" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>QA</button></div>';
     if (tab === "guardians") { body.innerHTML = '<div class="fl-wrap">' + tabs + guardHtml() + "</div>"; return; }
+    if (tab === "qa") { body.innerHTML = '<div class="fl-wrap">' + tabs + qaHtml() + "</div>"; return; }
     if (st.loading) { body.innerHTML = '<p class="fl-msg">Loading fleet registry…</p>'; return; }
     if (st.error) { body.innerHTML = '<p class="fl-msg">' + esc(st.error) + "</p>"; return; }
     var by = function (k) { return rows.filter(function (r) { return r.kind === k; }); };
@@ -124,8 +159,9 @@
     el.addEventListener("click", function (e) {
       if (e.target.classList.contains("fl-x")) close();
       var t = e.target, gc = t.closest && t.closest("[data-gid]");
-      if (t.classList.contains("fl-tab")) { tab = t.getAttribute("data-tab"); render(); if (tab === "guardians" && !gst.loaded) loadGuards(); return; }
+      if (t.classList.contains("fl-tab")) { tab = t.getAttribute("data-tab"); render(); if (tab === "guardians" && !gst.loaded) loadGuards(); if (tab === "qa" && !qa.loaded) loadQa(); return; }
       if (t.classList.contains("fl-grf")) { gst.loaded = false; render(); loadGuards(); return; }
+      if (t.classList.contains("fl-qrf")) { qa.loaded = false; render(); loadQa(); return; }
       if (t.classList.contains("fl-grun") && gc) { gAct(gc.getAttribute("data-gid"), { action: "run_now", id: gc.getAttribute("data-gid") }); return; }
       if (t.classList.contains("fl-gen") && gc) { gAct(gc.getAttribute("data-gid"), { action: "update", id: gc.getAttribute("data-gid"), enabled: t.checked }); return; }
       if (e.target.classList.contains("fl-rf")) loadDisp().then(render);
