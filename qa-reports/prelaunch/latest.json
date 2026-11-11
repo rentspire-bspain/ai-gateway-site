@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-11T10:30:23+00:00",
+ "ts": "2026-11-11T10:56:42+00:00",
  "base": "http://localhost:8765",
  "passed": 29,
  "failed": 0,
@@ -22,7 +22,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "5.7s"
+   "detail": "4.8s"
   },
   {
    "name": "current-events answered",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "11.2s"
+   "detail": "7.3s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -137,7 +137,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nGuardians\nQA\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 29/29 checks \u00b7 11/11/2026, 10:06:31 AM\nRun before "
+   "detail": "Overview\nGuardians\nQA\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 29/29 checks \u00b7 11/11/2026, 10:30:23 AM\nRun before "
   },
   {
    "name": "Connectors panel renders",

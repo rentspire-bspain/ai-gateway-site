@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-/brjiD9DbQXRZaGI2K8AItseedmeYGkSFCjvvWWrzk0=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-LLYwHl4FPG9sSHRjzlu9OUlJ36Fr15uYwxvU92f6lx4=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2734,7 +2734,18 @@ async function syncThreadsFromServer() {
   } catch (e) { window.__endPreBoot && window.__endPreBoot(); /* offline-tolerant */ }
 }
 function saveThreads() {
-  localStorage.setItem("ai_threads", JSON.stringify(threads.filter(t => !t.incognito)));
+  // v157 QUOTA FIX: the owner's 5,647 imported threads (with messages) exceed the ~5MB
+  // localStorage cap. The QuotaExceededError used to escape this function and kill
+  // performSearch with isSearching stuck true (perpetual queue, eaten prompts) and leave
+  // the sidebar list stale. Never throw: on quota failure, keep the 300 most recent
+  // threads with their last 4 messages each (full history lives server-side).
+  const keep = threads.filter(t => !t.incognito);
+  try { localStorage.setItem("ai_threads", JSON.stringify(keep)); }
+  catch (e) {
+    try {
+      localStorage.setItem("ai_threads", JSON.stringify(keep.slice(-300).map(t => ({ ...t, messages: (t.messages || []).slice(-4) }))));
+    } catch (e2) {}
+  }
   try { localStorage.setItem("ai_incognito_threads", JSON.stringify(threads.filter(t => t.incognito && t.expiresAt > Date.now()))); } catch (e) {}
   // v61: mirror the current thread to the server (best-effort, non-blocking) — never for incognito
   const cur = threads.find(t => t.id === currentThreadId);
@@ -4364,6 +4375,8 @@ async function performSearchInner(query) {
   isSearching = true;
   searchDeadline = Date.now() + 300000; // v156 watchdog: no search may hold the composer hostage for more than 5 minutes
   stopSpeaking();
+  try { // v157: this try now covers the WHOLE search — a throw in thread setup or the
+        // (quota-throwing) saveThreads used to escape and leave isSearching stuck true.
   // v83 (G8): offline — show a retryable error card instead of starting a request that cannot succeed
   if (navigator.onLine === false) {
     showResults();
@@ -4723,6 +4736,16 @@ async function performSearchInner(query) {
     if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
     isSearching = false;
     searchDeadline = 0;
+  }
+  } catch (e) {
+    // v157: pre-search failures (thread setup, the quota-throwing saveThreads) used to
+    // escape entirely — isSearching stayed true and the composer ate every prompt.
+    isSearching = false; searchDeadline = 0;
+    try {
+      const ctc = document.getElementById("resultsContent");
+      const thc = threads.find(t => t.id === currentThreadId);
+      if (ctc) { renderPriorTurns(ctc, thc, false); const qe = document.createElement("div"); qe.className = "question-header"; qe.textContent = query; ctc.appendChild(qe); renderAnswerError(ctc, "Search failed to start", String(e && e.message ? e.message : e), query); }
+    } catch (e2) {}
   }
 }
 
