@@ -241,5 +241,42 @@ Net: 6 of 17 Perplexity-linked services have a connector built; 2 of those block
 - Free Qwen route fleet: 16 parallel audit agents verified working (109.8s for 16 substantive audits); 8/8 trivial probe in 9.4s. Extreme parallelism available on request.
 - fleet_dispatch: 8 jobs queued; 1 (connector toggles) closed by direct orchestrator work (v164) — row update blocked by RLS (needs FLEET_DISPATCH_KEY executor); 7 remain (tool audit e047acee now done via §11, ask_user cards 21f4af91, browser_step 241629b2, cross-session Recovery tab 0c18f500 half-done, TOTP/passkey UI 071c7d1e, OAuth checklist 8dbc702d, Agent-API doc f45f0434 done via §9).
 
+## 18. Commercial pricing — undercut strategy (added v166)
+Perplexity reference prices (verified 2026-11-11): Pro $20/mo or $200/yr; Max $200/mo or $2,000/yr; Enterprise Pro $40/seat/mo ($400/yr, pricing hub shows $34/seat annual); Enterprise Max $325/seat/mo ($3,250/yr). Credits: 100 = $1; a quick answer costs 15-70 credits ($0.15-0.70); Pro gets weekly Computer usage + 4,000 one-time credits; Max 10,000/mo + 35,000 bonus; Enterprise Pro 500/seat/mo; Enterprise Max 15,000/seat/mo; Max spend cap $200-$5,000. API: web search $5/1k requests, fast search $1/1k; web_search tool $2.50/1k, fetch_url $0.50/1k, people/finance search $5/1k, sandbox $0.03/session; a full agent answer runs $0.0022-$0.0059; embeddings $0.004-$0.05/1M tokens ([pricing](https://www.perplexity.ai/hub/pricing), [credits](https://www.perplexity.ai/help-center/en/articles/13838041-how-credits-work-on-perplexity), [API pricing](https://docs.perplexity.ai/docs/getting-started/pricing), [enterprise](https://www.perplexity.ai/help-center/en/articles/10352986)).
+
+### Why we can undercut: cost asymmetry
+Our stack is open-weight models on cheap/free routes plus our own search lanes. Marginal cost of a standard cited answer is roughly $0.01-$0.05 (model tokens + retrieval), versus Perplexity's consumer price of $0.15-$0.70 per quick answer and their real cost of frontier-model tokens + $5/1k search. That is a 5-30x cost advantage per unit; we can price at 60-80% below them and still hold 70%+ gross margin. The moat is Comptrove data grounding, not model access (per the business plan, section 16).
+
+### Consumer plans (undercut table)
+| Tier | Perplexity | ai.spaincos price | Undercut | Includes |
+|---|---|---|---|---|
+| Free | $0, 1 research query/mo | $0 | — | Unlimited quick answers (cheap route), 5 deep research/mo, auth-gated |
+| Core | Pro $20/mo ($200/yr) | **$8/mo ($80/yr)** | 60% | Unlimited answers, 500 credits/mo, all modes, exports |
+| Max-equivalent | Max $200/mo ($2,000/yr) | **$50/mo ($500/yr)** | 75% | 5,000 credits/mo, priority routes, Council, Labs, scheduled research |
+| Team | (Teammate add-on) | **$20/seat** | — | Pooled credits, shared collections, admin usage report |
+| Enterprise | Ent Pro $40/seat, Ent Max $325/seat | **$15/seat Pro, $99/seat Max** | 62-70% | DPA, SSO, retention controls, invoicing, 1,500 credits/seat/mo |
+
+### Credit economics (undercut the headline number)
+- **250 credits = $1** (vs their 100 = $1 — 2.5x more value per dollar, the simplest marketing line we have).
+- Quick answer: 5-15 credits ($0.02-0.06) vs their $0.15-0.70. Deep research run: 300-800 credits ($1.20-3.20) reserved up front, unused portion refunded.
+- Keep their proven mechanics: prepaid, non-refundable, expiring credits; monthly spend caps (default $50, up to $1,000); per-request cost visible to the user (they show usage.cost — we show credits spent per answer).
+- Price against worst-case cost, never average (deep research varies 10x); cost ledger logs actual per-call cost so margin is visible per user/model/route.
+
+### API pricing (undercut per unit)
+| Product | Perplexity | ai.spaincos | Undercut |
+|---|---|---|---|
+| Web search | $5.00/1k req | **$1.00/1k** | 80% |
+| Fast search | $1.00/1k req | **$0.20/1k** | 80% |
+| Agent answer (all-in) | ~$0.0022-0.0059 | **$0.0009** flat | 60-85% |
+| Embeddings | $0.004-0.05/1M | **$0.002/1M** | 50%+ |
+| Vertical report (Comptrove rent analysis) | no equivalent | **$0.50-2.00/report** | new category — our margin engine |
+
+### Rollout sequence
+1. Ship credit ledger + reservation logic in gateway (business-plan build order).
+2. Publish the pricing page with the undercut table above; anchor every tier against Perplexity's live price.
+3. Launch offer: 1,000 free credits (one-time, 30-day expiry — mirrors their bonus mechanics).
+4. Guardrails: auth-gated free tier, cheap-route-only for free, premium routes gated to paid, spend caps on by default, abuse monitoring via the ops fleet.
+5. Positioning line: "Perplexity-grade answers at 60-80% less — grounded in 588,746 properties of rental data they don't have."
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
