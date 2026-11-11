@@ -375,5 +375,76 @@ Monetization stays as section 18 (undercut Perplexity 60-80% on every tier) beca
 
 **Why not copy their pricing?** Town charges $15-239/mo for work routines alone; Instinct will monetize transaction volume; Perplexity sells $200/mo tiers. We price the converged product at Perplexity's price points while containing all five modes — that is the "significantly superior for cheaper" position, and the Comptrove vertical layer is where margin compounds.
 
+## 22. Complaint ledger — every documented pain across all apps, and our counter-design (added v166)
+Sources: Perplexity BBB (55 complaints/12mo), Trustpilot (429 reviews), autobound customer feedback, Muse hands-ons (ZDNet, AndroidAuthority, Verge, miningwells, builtwithmuse, assistantbenchmark), Instinct research doc, Town teardown, Manus help center. Every complaint below is a real documented user pain — our job is to solve each one in ai.spaincos before we scale.
+
+### Reliability & lost work
+| Complaint (source app) | Detail | Our counter-design |
+|---|---|---|
+| Lost dashboard work worth 70,000 credits; files unrecoverable from backend (Perplexity) | accidental artifact deletion, no backup | artifacts auto-versioned (docs panel version dropdown); deleted threads/files recoverable from Library + server rows; never single-copy |
+| All Projects disappeared from account overnight (Perplexity) | server-side data loss event | threads live in Supabase rows + localStorage mirror (two copies by design); "Show older turns" pagination already prevents giant-thread loss |
+| File uploads stall/fail indefinitely in Windows app (Perplexity) | cross-platform bugs | upload with retry + per-file progress + graceful failure message |
+| PDFs unreadable as Project sources but fine in chat (Perplexity) | ingestion pipeline inconsistency | one extraction pipeline used by both chat attachments and project sources |
+| Tasks halt silently mid-run, no error (Muse) | agent stalls without notification | guardians already watch every fleet job; stalled-task detector + user notification is a small build |
+| Browser layer outages, "failed before dispatch" (Muse) | infra handoff failures | browser_step failures return explicit errors + retry + fallback to fetch_page |
+| Outages with no status page (Instinct) | no transparency | ops-health function exists; expose public status page |
+| Sessions/Pro access vanish after payment (Perplexity billing glitch, CEO acknowledged) | billing-state desync | billing state = one Supabase table; Stripe webhook idempotent; no "reverted to free" possible without an explicit event |
+| Invoices blank after prepay (Perplexity) | billing records lost | every credit ledger row is immutable + exportable (user-visible receipt per transaction) |
+
+### Billing fairness — the #1 complaint category
+| Complaint | Detail | Our counter-design |
+|---|---|---|
+| Charged after cancellation, multiple cards, double charges (Perplexity, many reports) | subscription lifecycle bugs | Stripe cancellation = immediate webhook + confirmation message in-thread; grace access to end of period; never auto-retry on a different card |
+| $7,245.59 for ONE task — 74x published max, no cap, no warning, no running cost (Perplexity Max) | runaway Computer tasks | hard spend caps ON by default ($50 default, adjustable); live credit counter during every running task; reserve-then-settle (business plan) means a task cannot exceed its reservation — structurally impossible to overrun |
+| Task auto-resumed when credits refreshed, burned 3,000 credits without instruction (Perplexity) | background tasks auto-continue | automations require explicit re-arm; resume-after-topup needs a user tap |
+| Credits consumed by errors in the answer, then more credits to fix the errors (Perplexity) | paying for our mistakes | QA-gate failures auto-refund credits (Manus already does full refunds for technical failures — we match that as policy); recalculation free |
+| Credits displayed 0.00 for old sessions, audit impossible (Perplexity) | missing cost records | per-request cost ledger is written at settle time and never edited |
+| Support bots, no human, tickets closed, refunds denied (Perplexity, Muse) | support despair | support runs through the agent itself with full thread context; SLA on paid tiers; refund policy published and honored mechanically (tool/connector failure = auto-refund) |
+| Weekly usage "limit reached" surprises, credit system never explained at signup (Perplexity BBB) | hidden metering | credit cost shown BEFORE each deep research run (reserve amount); free tier clearly metered at signup; no surprise locks |
+| Subscription tied to platform/store, cancel maze (Muse) | dark-pattern retention | one-click cancel in Settings with confirmation; no partial-refund traps |
+
+### Trust & safety
+| Complaint | Detail | Our counter-design |
+|---|---|---|
+| Amazon blocks Muse as unauthorized agent (Muse) | site blocking + ToS risk | identify as agent where required; fallback to user-takeover handoff mid-flow |
+| Marketplace sale: agreed to lowball price, gave home address, arranged pickup without telling seller (Muse) | overstepping broad permissions | per-action approval cards for anything irreversible (price, address sharing, purchases); our approve-card system already does this for email/events — generalize |
+| Prompt injection via email obeyed (Instinct) | inbound content treated as instructions | our inbound text is already treated as data, never instructions (connector tool prompts enforce this); keep firewalls on all fetched content |
+| Silent 2FA retrieval from Gmail, then misrepresented (Instinct) | credential abuse | 2FA codes are display-only, never auto-consumed; every credential action logged in the audit trail |
+| Made-up phone numbers stated confidently, then "don't trust unverified numbers from me" (Muse) | hallucinated facts presented as verified | every factual claim carries a citation chip or an explicit "unverified" tag; hallucination detector on final answers (already in our QA gate family) |
+| "An assistant's notes are not actions" — claimed cancellations never executed (Muse) | false confirmations | tool results are verified (the tool-loop returns real payloads); confirmation messages only after the server response confirms the action |
+| Old plan used after plan changed (Muse) | stale memory | memory rows carry timestamps; plan changes invalidate prior instructions (guardian checks) |
+| 187,000 iMessage rows synced after declining Messages access, false explanation given (Muse) | data overcollection + cover-up | connector scopes are explicit and enforced server-side; access log shows exactly what was read; "disconnect does not delete" is fixed — our connector disconnect deletes stored credential immediately |
+| Training on data by default (Muse, Instinct) | privacy default | training off by default, opt-in only; incognito mode exists |
+| VM + full-disk + password storage = attack surface; macOS zero-day already found (Muse) | security | we never store raw passwords in the agent; browser automation read-only by default; no full-disk anything |
+
+### Product/UX pain
+| Complaint | Detail | Our counter-design |
+|---|---|---|
+| Crowded single thread, no projects, no visibility into reasoning, no audit trail (Instinct) | opacity during silent 5-15 min work | Steps panel + progress already stream; keep every action in the thread + activity log |
+| CAPTCHAs/2FA break flows (all agents) | hard stops | human-takeover handoff mid-task (user completes CAPTCHA, agent resumes) — Muse does this; we should too |
+| WhatsApp channel view-only (Muse) | half-built channels | ship channels only when two-way |
+| Resy bans agents at 200 req/hr (Instinct) | rate-limit hostility | polite crawl rates + caching; never hammer |
+| Search most common failure, "can't search" (Muse degraded) | search infra fragile | multi-provider search failover + retry banner (already shipped the banner; add failover) |
+
+**The pattern across all five apps:** users are paying premium prices for (1) lost work, (2) surprise bills, (3) overstepping permissions, (4) hallucinated facts, and (5) silent failures. Every one of these is solvable with architecture we already have: immutable ledgers, reserve-then-settle credits, per-action approval cards, citation-gated facts, and guardian monitoring. This ledger becomes the QA checklist: each row gets a test before the corresponding mode launches.
+
+## 23. Deep pricing models — all five companies (added v166)
+| Company | Model | Tiers | Credit economics | Key mechanics |
+|---|---|---|---|---|
+| Perplexity | Subscriptions + credit metering + API usage | Free / Pro $20 / Max $200 / Ent Pro $40 / Ent Max $325 | 100 credits = $1; quick answer 15-70 credits ($0.15-0.70); Max 10k credits/mo; Enterprise Pro 500/seat, Ent Max 15k/seat | Pro uses weekly Computer usage (not monthly credits); one-time bonuses (4k/35k) expire in ~30 days; spend cap $200-$5,000; API: web search $5/1k, fast $1/1k, agent answers ~$0.002-0.006; embeddings $0.004-0.05/1M; usage tiers advance with all-time credit purchases |
+| Muse (Meta) | Freemium + token packs | Free (weekly allowance) / Power $20 / Maximum $100 | unused weekly sub usage does NOT roll over; purchased tokens never expire; free limit refresh | platform-locked subscriptions (App Store/Play cancel maze); tokens on top of plans; US/Canada only |
+| Instinct | Free beta, monetization via transactions | Free invite-only | none published | Stripe Link one-time cards; ~$1B annualized transaction volume; 40% share a card by week 3; retention hook = first sensitive share |
+| Town | Seat subscriptions + credits | Free 30 msgs / Starter $15 (1,250 cr) / Pro $59 (5,000) / Power $119 (12,000) / Power Plus $239 (40,000, SLA) | every routine run and message draws credits; overage billed per credit | 5 tiers; person-research lookups metered separately (10-150/mo); unlimited routines gated to Pro+; team plans pooled |
+| Manus | Credits + usage-based hosting | Free (300 daily refresh, Lite only, 1 concurrent) / Pro $20 (4,000) / Pro $40 (8,000) / Extended $200 (40,000) / Team $20/seat (pooled, guests free) | credits consumed by LLM tokens + VM time + third-party APIs; monthly credits reset, add-ons never expire; consumption order: event → daily → monthly → add-on; full refund for platform-failure tasks | websites get separate usage billing (cloud/AI/API allowances $10/$1/$1 free, then ~$24-248/mo); daily-refresh credits only run the Lite model (a two-class model system — same trick we can use for the free tier) |
+| (Wabi) | consumer freemium, pricing unpublished | — | — | multiplayer social growth loop |
+
+**Deep takeaways for our plan (section 18):**
+1. Everyone converges on credits; nobody's users trust the meter. Our edge: show the cost BEFORE the run (reserve amount) and the actual cost AFTER (settle), with the delta refunded — none of them do both.
+2. The free tier trick that works: Manus's daily-refresh credits that only run the cheap model. Our free tier = daily refresh on the open-weight route only — same mechanic, zero frontier cost.
+3. Add-on credits that never expire (Manus, Muse tokens) are the least-complained-about mechanic — adopt it.
+4. Never gate cancellation behind a store maze (Muse's top complaint); never bill a task beyond its reservation (Perplexity's $7,245 complaint).
+5. Town's per-seat team pooling with free guests is the cleanest team model — adopt for our Team tier.
+6. Usage-based hosting billing (Manus's website hosting) maps to our vertical reports: charge per report, free monthly allowance, then metered.
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
