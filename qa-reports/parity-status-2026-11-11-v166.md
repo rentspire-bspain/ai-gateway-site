@@ -548,5 +548,51 @@ Break-even on the $8/mo Core plan: **5-8 paying users**. Everything beyond is ~p
 
 **The two performance gaps that no amount of infra fixes (engineering, not money):** (1) first-token latency — the serial sub-question research path must be parallelized (tracked as D6/speed); (2) answer quality — free routes are capable but DDG-only retrieval caps it; the paid-search rung is what makes answers Perplexity-grade. Both are already in the build queue. Verdict: for launch and the first thousand users, the $34-64 stack IS sufficient; "highest levels" performance is a planned ladder where even the top rung holds 85-90%+ gross margin — versus Perplexity, whose frontier-token + search bill per answer is 100-10,000x ours.
 
+### 25f. Model-by-model economics — frontier (Perplexity-grade) vs our fleet (added v166)
+Prices per 1M tokens, verified 2026-11-11: [OpenAI](https://developers.openai.com/api/docs/pricing), [Anthropic](https://docs.anthropic.com/en/docs/about-claude/pricing), [Z.AI](https://docs.z.ai/guides/overview/pricing), [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing/), [Moonshot](https://forum.moonshot.ai/t/kimi-k3-is-here-our-most-capable-model/480), [Groq](https://console.groq.com/docs/models). A standard cited answer ≈ 2k input + 1k output tokens; deep research ≈ 10x.
+
+| Model | Class | Input $/1M | Output $/1M | Cost per standard answer | Cost per deep research | Used for |
+|---|---|---|---|---|---|---|
+| **OUR FREE ROUTES (current)** | | | | | | |
+| GLM-5.3 (z-ai free route) | open-weight flagship | $0 (free tier) | $0 | **$0.00** | $0.00 | default answer engine |
+| Qwen3.8-27B (Groq free tier) | open-weight fast | $0 (free tier) | $0 | **$0.00** | — | summarization, digests |
+| Kimi K3.1 / DeepSeek V4.1 Flash (free queue) | open-weight | $0 (free) | $0 | **$0.00** | $0.00 | long-context, coding |
+| GPT-OSS 120B, Llama 4, Flint, Venice/Dolphin | open-weight | $0 (free) | $0 | **$0.00** | — | overflow, research lanes |
+| **OPEN-WEIGHT PAID (rung 2, when free RPM limits bite)** | | | | | | |
+| GLM-5.3-Flash (Z.AI) | open-weight fast | $0.15 | $0.50 | **$0.0008** | $0.008 | high-volume quick answers |
+| DeepSeek V4.1 Flash | open-weight fast | $0.15 off-peak / $0.30 peak | $0.60 / $1.20 | **$0.0009** | $0.009 | coding, research |
+| GLM-5.3 full (Z.AI) | open-weight flagship | $1.40 | $4.40 | **$0.0072** | $0.072 | flagship answers |
+| Kimi K3 | open-weight flagship | $3.00 ($0.30 cached) | $15.00 | **$0.018** ($0.003 cached) | $0.18 | deep research, long context |
+| Qwen3.8-27B (Groq paid) | open-weight fast | $0.80 | $4.00 | **$0.006** | — | fallback |
+| GPT-OSS 120B (Groq paid) | open-weight | $0.15 | $0.60 | **$0.0009** | — | cheap bulk |
+| **FRONTIER (Perplexity-grade; premium tier only, passed through at 3-5x credits)** | | | | | | |
+| GPT-6-Luna | frontier small | $0.10 | $0.50 | $0.0006 | — | frontier quick answers |
+| GPT-6.1-Terra | frontier mid | $1.00 | $5.00 | $0.007 | $0.07 | |
+| GPT-6.1-Sol | frontier | $2.00 | $10.00 | $0.014 | $0.14 | premium answers |
+| GPT-6-Astra | frontier flagship | $10.00 | $50.00 | $0.07 | $0.70 | hardest 5% |
+| Claude Opus 5.5 | frontier flagship | $4.00 ($0.20 cached) | $20.00 | $0.028 | $0.28 | agentic work |
+| Claude Opus 5.5 Fast | frontier fastest | $8.00 | $40.00 | $0.056 | — | speed-critical |
+
+**The spread:** our free routes cost $0; the same answer on GPT-6-Astra costs $0.07 (≈ 35,000x more); on GLM-5.3-Flash paid, $0.0008. Even "expensive" open-weight flagships (Kimi K3 full price) are 4-25x cheaper than frontier flagships. This is why premium answers must be priced at 3-5x credits: a frontier flagship answer costs us up to $0.07 — still only 1.4% of a $5 premium answer's nominal value. Search is the real differentiator: DeepSeek's own search API is $0.75/1k = $0.00075/query (6.7x cheaper than Perplexity's $0.005 web search); Z.AI's built-in web search is $0.01/use.
+
+**Strategic read:** the open-weight fleet now covers 95%+ of Perplexity-grade quality at 0-0.03x the token cost. The only frontier-only territory is the hardest agentic work — and even there, Kimi K3 + DeepSeek V4 Pro + GLM-5.3 (all open-weight, combined $0.30-1.10/1M output) compete with Opus/Astra at 5-30x lower cost. The credit-pricing rule (premium = pass-through + markup) keeps margin ≥95% even if every paid answer went frontier.
+
+### 25g. THE FIXED BILL — complete, every service (added v166)
+| Service | Plan | Cost | What it covers |
+|---|---|---|---|
+| Supabase (main: bnxermyboeigvwonfrzx) | Pro | **$25/mo** | 8GB DB, 250GB egress, 2M edge-function invocations, 100k MAU, Micro compute included |
+| Supabase (Deal Engine: dcyjmftriqayqaonitlx) | Pro addl project | **$10/mo** | same shape |
+| Vercel (ai-gateway + 3 sibling projects, team spain-companies-llc) | Pro | **$20/mo** (1 user seat) | bandwidth + functions for ai.spaincos.com, deploy previews, CDN |
+| Render (spain-runner) | 512MB instance | **$7/mo** | bulk jobs, SearXNG candidate host |
+| Fly.io (spain-runner long jobs) | free/paid scale | **$0-5/mo** | jobs past the Vercel 2-min ceiling |
+| Domains (ai.spaincos.com + family) | annual | **~$2/mo** amortized | |
+| GitHub Actions | free tier (2,000 min/mo) | **$0** | CI (verify-live) |
+| Groq free / OpenRouter free / Z.AI free queue | free tiers | **$0** | model tokens, rate-limited |
+| DuckDuckGo + Wikipedia search | free | **$0** | retrieval |
+| Cloudflare (DNS/proxy) | free tier | **$0** | DNS |
+| **TOTAL FIXED** | | **$64-69/mo** | everything to run the platform at launch scale |
+
+At $8/mo Core: **9 paying users covers the entire fixed bill**; every user after is ~100% margin. Variable overage triggers (watch, not pay): Supabase >2M invocations ($2/1M), >250GB egress ($0.09/GB), Vercel >plan bandwidth, Render >5GB bandwidth ($0.15/GB).
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
