@@ -533,5 +533,20 @@ Break-even on the $8/mo Core plan: **5-8 paying users**. Everything beyond is ~p
 - Breakage: credits expire per policy (30 days on bonuses, plan credits monthly) — at 20% breakage, effective realized revenue per delivered credit is 1.25x nominal.
 - Positioning line: "Our gross margin is ~100% because our costs are nearly zero; theirs is ~70-80% because they pay for frontier tokens and search per answer." That is the structural reason we can undercut 60-80% and stay profitable at $8/mo while Perplexity needs $20.
 
+### 25e. Egress, explained + the scale ladder — is the free stack enough for top-tier performance?
+**Egress** = data leaving the provider's network to reach users. Every answer we send (HTML, JSON, streamed tokens) is egress. Supabase Pro includes 250 GB/month — one answer is ~10-50 KB, so 250 GB ≈ 5-10 million answers; that is why egress is a rounding error at launch. It only matters for media-heavy traffic (images, video, big file downloads).
+
+**Honest answer on "highest levels": the launch stack is NOT sufficient for Perplexity-grade performance at scale — it is sufficient through ~1,000 daily active users, and every upgrade rung is cheap and pre-planned:**
+
+| Users (DAU) | What breaks first | Fix | Added cost/mo | Margin after |
+|---|---|---|---|---|
+| 0-100 | Nothing — current stack (Supabase Pro, Render $7, Vercel, free models) runs with headroom | — | $34-64 base | ~100% |
+| 100-1,000 | Free-model RPM limits (Groq/OpenRouter free tiers cap requests-per-minute) → 429s at peak; DDG search shallowness hurts answer quality | paid open-weight tokens (DeepSeek/GLM-class ~$0.001-0.005/answer), result caching, SearXNG on Render | ~$50-200 | 98-99% |
+| 1,000-10,000 | Search quality gap vs Perplexity becomes the product gap; Supabase Micro compute + edge-function concurrency; first-token latency (serial research path) | paid search API (Brave/Exa ~$0.002-0.005/query), Supabase Small compute ($15), streaming-first-token + parallel sub-questions, Render 2GB ($25) | ~$500-2,000 | 95-98% |
+| 10,000-100,000 | Frontier-model users (Council/Deep modes), multi-region latency, log retention needs | frontier tokens reserved for premium (passed through at 3-5x credits), CDN in front (already Vercel), Supabase Medium ($60) + read replicas | ~$5,000-20,000 | 90-95% |
+| 100,000+ | Everything is metered now; this is Perplexity's cost structure | scale-negotiated rates, self-hosted inference on spot GPUs | revenue-proportional | 85-90% (still far above most SaaS) |
+
+**The two performance gaps that no amount of infra fixes (engineering, not money):** (1) first-token latency — the serial sub-question research path must be parallelized (tracked as D6/speed); (2) answer quality — free routes are capable but DDG-only retrieval caps it; the paid-search rung is what makes answers Perplexity-grade. Both are already in the build queue. Verdict: for launch and the first thousand users, the $34-64 stack IS sufficient; "highest levels" performance is a planned ladder where even the top rung holds 85-90%+ gross margin — versus Perplexity, whose frontier-token + search bill per answer is 100-10,000x ours.
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
