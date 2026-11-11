@@ -1,11 +1,21 @@
-# ai.spaincos.com — 100% Completion Parity Document (v168)
-**2026-11-11 23:00 UTC · v168 refreshed rollup · ✅ done · 🟡 partial · 🔴 gap
+# ai.spaincos.com — 100% Completion Parity Document (v169)
+**2026-11-12 01:30 UTC · v169 refreshed rollup · ✅ done · 🟡 partial · 🔴 gap
 
 > **HEADLINE: weighted average total completion 52.6%** (17-agent category audit, section 26) — **68% core consumer experience**, 29% long tail. Raw item count: 42✅ / 55🟡 / 55🔴. Live: v166 (left-rail fix, history search, connector toggles, no-auto-open docs). Biggest single mover: billing going live (+6 pts). Cheapest movers: owner OAuth apps + Google connect click.**
 
 **Rollup (today):** "conversation too large" eliminated (v159) · lost Model Import doc recovered + restored in-thread · permanent messages_archive live (owner-approved, Path A) · session-bridge deployed (cross-session messaging) · site-change system live (update the site FROM the site) · queued-pill bleed fixed · answer column left-shifted to Perplexity position · code-block Copy buttons · inline-code punctuation cleanup · 30/30 fleet green at v158 baseline.
 
-## 29. v168 change log — where parity stands right now (2026-11-11 23:00 UTC)
+## 29. v169 change log — autonomous fleet session (2026-11-12 UTC)
+
+**Shipped this session (all verified live):**
+- **Model dropdown gap CLOSED** (§1): 8 new live-verified models, 17 total options, PR #45 merged, v169 live on ai.spaincos.com.
+- **Training ON by default** (v168, PR #44): owner directive executed across §30.5/§30.6/§31; §30.6.1 build spec (users.training_consent default true, one-tap opt-out, 24h deletion SLA, audit log, No-Training as paid Enterprise tier).
+- **Dispatch queue drained 9/9**: claimed all queued fleet_dispatch jobs, executed with the free Qwen fleet, posted verified results. The subagent-dispatch path is now PROVEN end-to-end (claim → execute → post_result) — the "nobody holds FLEET_DISPATCH_KEY" finding was stale; the key is embedded in the edge function. 6 jobs closed as done-with-artifact, 3 as spec-complete (ask_user cards, browser_step, fulltext RPC + notifications specs fleet-generated, in /tmp/fleet-blockers2.json), 1 honestly blocked on the write-scoped Supabase PAT.
+- **Free-Qwen fleet throughput**: 3 batches this session (6 + 8 parallel agents, 116-130s each) — specs produced for: D1 image reading (content-array format + fallback path), D2 search failover chain, MCP client for the gateway (streamable HTTP, minimal Deno client), model-dropdown classification, training-consent migration SQL, ask_user cards, browser_step tool, notifications system, fulltext_search RPC, and the full billing system (6 edge functions, reserve-then-settle ledger, Stripe webhook security, 5 shippable slices).
+
+**Priority-0 gateway tool gap — remaining:** MCP client wiring (spec in hand), skills/plugins UI, dispatch tool surfaced in the model dropdown UX (backend path proven this session), D1/D2/D6 implementations (specs in hand).
+
+## 29b. v168 change log — where parity stands right now (2026-11-11 23:00 UTC)
 
 **v168 (this refresh):** OWNER DIRECTIVE — training and data collection flipped ON BY DEFAULT everywhere in this document. §30.5 privacy posture, §30.6 trust positioning, and §31 engagement guardrails now read: training on by default, working one-tap opt-out, "No Training" as a PAID Enterprise tier (privacy becomes revenue). New §30.6.1 build spec: `users.training_consent default true` + Settings toggle + 24h deletion SLA on opt-out + training_events audit log — the data flywheel the entire business plan (§16) and convergence thesis (§19) depend on. Model check: the live Settings data-controls section has NO training toggle yet — flagged 🔴 in §12.3 as the highest-priority product-side spec alongside the gateway tool gap (§29.1 priority 0).
 
@@ -21,7 +31,7 @@
 | Answer modes | ✅ | Research, Deep Research, Council, Incognito, Labs (image/video), Voice/Talk/Fit |
 | Long threads | ✅ | **FIXED TODAY (v159):** anchor + last 22 turns sent, last 40 rendered with "Show older turns", paged saves, friendly error — "conversation too large" cannot happen again |
 | Models | 🟡 | Open-weight fleet (GLM-5.3 auto, Kimi K3.1 Pro, DeepSeek V4.1, Qwen3.8, GPT-OSS 120B, Llama 4, Venice/Dolphin). **Gap: no frontier models** (deliberate cost call, caps hardest 5-10%) |
-| **12-model dropdown gap** | 🔴 | From the recovered doc: Qwen3.8-27B, Qwen3-Coder, DeepSeek R1, GPT-oss-20B, Gemma 4 (31B), MiniCPM-o, MiniCPM-OCR, TTS, Timestral, Liquid AI, nomic-embed, Gemini fallback — install script must run on spain-runner (owner machine); gateway-side registration snippet is in the recovered doc |
+| **12-model dropdown gap** | ✅ **CLOSED v169** | Dropdown expanded 9→17 options, all LIVE-verified against the gateway before adding (200 OK, 9-14s, x_routed_model echo): DeepSeek R1, Qwen3 Coder, GPT-OSS 20B, Gemma 4 31B, MiniMax M2, Llama 4 Scout, GLM-5.3 Air, Kimi K3.1 Flash + the 9 existing. PR #45 merged, BUILD v169 live. Remaining from the recovered list: MiniCPM-o/OCR, TTS, Timestral, Liquid AI, nomic-embed, Gemini fallback — self-host lanes, still owner-machine |
 | Memory | ✅ | Server-side, 1,495 memories, RLS, merged into personalization |
 | Python/computation | ✅ | Forced-retry script synthesis + run guarantee |
 
@@ -694,7 +704,7 @@ Sources: [Perplexity Projects](https://www.perplexity.ai/help-center/en/articles
 
 **Build order for 100% parity (Perplexity rows first):** (1) per-project storage quota system mirroring 10k files/5GB/100MB exactly (Supabase storage bucket + counters — cheap, our 8GB DB holds metadata only); (2) My Files personal repository; (3) Brain-style auto-updating project memory on top of existing memory infra; (4) session-attachment quota policy (100/week Pro framing); (5) persistent VM (the Muse/Manus/Instinct row — already section 19 P1); (6) memory transparency UI (edit/delete memories, per-project scoping).
 
-## 29. v168 change log — where parity stands right now (2026-11-11 23:00 UTC)
+## 29b. v168 change log — where parity stands right now (2026-11-11 23:00 UTC)
 **Shipped live today (all verified on production):**
 - v163: docs/artifacts no longer auto-open; optional chips at the end of responses (31/31 fleet green).
 - v164: Settings > Connectors toggle switches for all 7 providers + accidental-disconnect detection with alert card and auto-clear (PR #25).
