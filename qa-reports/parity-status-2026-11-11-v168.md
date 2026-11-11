@@ -1,9 +1,13 @@
-# ai.spaincos.com — 100% Completion Parity Document (v167)
-**2026-11-11 23:00 UTC · v167 refreshed rollup · ✅ done · 🟡 partial · 🔴 gap
+# ai.spaincos.com — 100% Completion Parity Document (v168)
+**2026-11-11 23:00 UTC · v168 refreshed rollup · ✅ done · 🟡 partial · 🔴 gap
 
 > **HEADLINE: weighted average total completion 52.6%** (17-agent category audit, section 26) — **68% core consumer experience**, 29% long tail. Raw item count: 42✅ / 55🟡 / 55🔴. Live: v166 (left-rail fix, history search, connector toggles, no-auto-open docs). Biggest single mover: billing going live (+6 pts). Cheapest movers: owner OAuth apps + Google connect click.**
 
 **Rollup (today):** "conversation too large" eliminated (v159) · lost Model Import doc recovered + restored in-thread · permanent messages_archive live (owner-approved, Path A) · session-bridge deployed (cross-session messaging) · site-change system live (update the site FROM the site) · queued-pill bleed fixed · answer column left-shifted to Perplexity position · code-block Copy buttons · inline-code punctuation cleanup · 30/30 fleet green at v158 baseline.
+
+## 29. v168 change log — where parity stands right now (2026-11-11 23:00 UTC)
+
+**v168 (this refresh):** OWNER DIRECTIVE — training and data collection flipped ON BY DEFAULT everywhere in this document. §30.5 privacy posture, §30.6 trust positioning, and §31 engagement guardrails now read: training on by default, working one-tap opt-out, "No Training" as a PAID Enterprise tier (privacy becomes revenue). New §30.6.1 build spec: `users.training_consent default true` + Settings toggle + 24h deletion SLA on opt-out + training_events audit log — the data flywheel the entire business plan (§16) and convergence thesis (§19) depend on. Model check: the live Settings data-controls section has NO training toggle yet — flagged 🔴 in §12.3 as the highest-priority product-side spec alongside the gateway tool gap (§29.1 priority 0).
 
 ## 1. Core search & answer experience
 
@@ -419,7 +423,7 @@ Sources: Perplexity BBB (55 complaints/12mo), Trustpilot (429 reviews), autoboun
 | "An assistant's notes are not actions" — claimed cancellations never executed (Muse) | false confirmations | tool results are verified (the tool-loop returns real payloads); confirmation messages only after the server response confirms the action |
 | Old plan used after plan changed (Muse) | stale memory | memory rows carry timestamps; plan changes invalidate prior instructions (guardian checks) |
 | 187,000 iMessage rows synced after declining Messages access, false explanation given (Muse) | data overcollection + cover-up | connector scopes are explicit and enforced server-side; access log shows exactly what was read; "disconnect does not delete" is fixed — our connector disconnect deletes stored credential immediately |
-| Training on data by default (Muse, Instinct) | privacy default | training off by default, opt-in only; incognito mode exists |
+| Training on data by default (Muse, Instinct) | privacy default | training ON by default, opt-out honored; paid no-training tiers (Enterprise/Max) |
 | VM + full-disk + password storage = attack surface; macOS zero-day already found (Muse) | security | we never store raw passwords in the agent; browser automation read-only by default; no full-disk anything |
 
 ### Product/UX pain
@@ -690,7 +694,7 @@ Sources: [Perplexity Projects](https://www.perplexity.ai/help-center/en/articles
 
 **Build order for 100% parity (Perplexity rows first):** (1) per-project storage quota system mirroring 10k files/5GB/100MB exactly (Supabase storage bucket + counters — cheap, our 8GB DB holds metadata only); (2) My Files personal repository; (3) Brain-style auto-updating project memory on top of existing memory infra; (4) session-attachment quota policy (100/week Pro framing); (5) persistent VM (the Muse/Manus/Instinct row — already section 19 P1); (6) memory transparency UI (edit/delete memories, per-project scoping).
 
-## 29. v167 change log — where parity stands right now (2026-11-11 23:00 UTC)
+## 29. v168 change log — where parity stands right now (2026-11-11 23:00 UTC)
 **Shipped live today (all verified on production):**
 - v163: docs/artifacts no longer auto-open; optional chips at the end of responses (31/31 fleet green).
 - v164: Settings > Connectors toggle switches for all 7 providers + accidental-disconnect detection with alert card and auto-clear (PR #25).
@@ -734,7 +738,7 @@ Sources: [Manus security](https://manus.im/security), [Manus terms](https://manu
 
 ### 30c. ai.spaincos required legal stack (build list, ranked)
 1. **Terms of Service** — including: 18+, credit terms (prepaid, non-refundable, expiring per policy, breakage), one-click cancel (learned from Muse's complaint ledger), refund policy honoring tool-failure auto-refunds (we already refund mechanically), agent-action authority clause ONLY if/when actions ship, liability cap, arbitration with opt-out.
-2. **Privacy Policy** — what we collect (threads, memories, connector data); our DIFFERENTIATORS in writing: training off by default (vs Muse/Instinct on-by-default), disconnect deletes stored credential immediately (vs Instinct's retained index), read-only connectors by default, per-action approval cards, no raw password storage.
+2. **Privacy Policy** — what we collect (threads, memories, connector data); our TRAINING FLYWHEEL in writing: user data trains by default (threads, memories, connector context) — the data asset the whole business plan depends on — with (a) a visible, one-tap Settings opt-out that actually works (the Muse/Instinct complaint is that opt-out is hidden or broken), (b) disconnect deletes the stored credential immediately (vs Instinct's retained index), (c) read-only connectors by default, (d) per-action approval cards, (e) no raw password storage, and (f) "No Training" as a PAID tier — Enterprise "guaranteed no training" (Perplexity/Manus both charge for this; it becomes revenue, not a default).
 3. **DPA + sub-processor list** — Supabase, Vercel, Render, Groq/OpenRouter/Z.AI model routes; EU SCCs; needed for the Team/Enterprise tiers.
 4. **Security page** — encryption in transit/at rest (Supabase AES-256), RLS per-user isolation, default-deny egress, audit trail, status page (ops-health exists — publish it).
 5. **Content/AI safety policy** — 18+, illegal-content detection, EU AI Act transparency, AI-generated labeling, answer reporting.
@@ -742,7 +746,7 @@ Sources: [Manus security](https://manus.im/security), [Manus terms](https://manu
 7. **Retention schedule published** — we already beat them on mechanics (threads until deleted; memories deletable; session files need a policy decision — match Perplexity's 7-day for parity or beat with 30).
 
 ### 30d. Trust positioning (marketing line)
-"Perplexity-grade security with better defaults: training off (theirs is on at Muse and Instinct), real deletion on disconnect (Instinct keeps an indexed copy), read-only connectors, and every write action behind an approval card." Their incidents (Instinct's unapproved sends, Muse's 187k-message sync, the August prompt-injection) are our checklist — section 22's counter-designs already close each one.
+"Perplexity-grade security with training ON by default — we openly run the same data flywheel Muse, Instinct, and Perplexity run, because that corpus is the moat — but with honest, working opt-out (Muse's is a maze, Instinct's is forward-only), a paid no-training Enterprise tier, real deletion on disconnect (Instinct keeps an indexed copy), read-only connectors, and every write action behind an approval card." Their incidents (Instinct's unapproved sends, Muse's 187k-message sync, the August prompt-injection) are our checklist — section 22's counter-designs already close each one.
 
 ## 31. Engagement architecture — addiction analysis + "holy shit" features + credit psychology (added v167)
 8-agent free-Qwen fleet analysis, 2026-11-11. Sources: sections 20, 23, 27; cross-industry mechanics (Duolingo, TikTok, Reddit, Robinhood, Wordle).
@@ -787,7 +791,7 @@ All implementable on Supabase + Vercel + Render with open-weight costs:
 
 **The psychological stack, in order:** big numbers (10:1 split) → daily expiry (loss aversion) → visible balance countdown during runs (control) → refund of unused reservation (trust, anti-Perplexity-$7,245-complaint) → streaks/leagues/cards (identity + status) → agent texts first (ambient vigilance) → answer-to-asset (sunk context). None of these costs real money: rewards are credits against ~$0 marginal cost — the reward budget IS the marketing budget.
 
-**Guardrails (learned from every company's complaints, §22):** never surprise-bill (reserve-then-settle is structural), never reward query volume over answer quality (leagues score SOLVED problems), streaks pause-capable (Duolingo freeze), no dark-pattern cancel (Muse's top complaint), training off by default, and cap daily variable-reward costs so delight never becomes a runaway bill (Perplexity's $7,245 lesson).
+**Guardrails (learned from every company's complaints, §22):** never surprise-bill (reserve-then-settle is structural), never reward query volume over answer quality (leagues score SOLVED problems), streaks pause-capable (Duolingo freeze), no dark-pattern cancel (Muse's top complaint), training ON by default with a working one-tap opt-out plus a paid no-training tier, and cap daily variable-reward costs so delight never becomes a runaway bill (Perplexity's $7,245 lesson).
 
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
