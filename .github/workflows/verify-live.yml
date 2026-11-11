@@ -1,7 +1,11 @@
 name: verify-live
 # Fails red if ai.spaincos.com does not serve the repo's index.html (silent non-deploy guard). No secrets needed.
+# PRs: checks out and reports only — the live-site comparison is a POST-DEPLOY
+# guard, so it only runs on master pushes (a PR's changes are not live yet).
 on:
   push:
+    branches: [master]
+  pull_request:
     branches: [master]
   workflow_dispatch:
 jobs:
@@ -10,6 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Compare live site to repo (retry up to ~10 min for Vercel build)
+        if: github.event_name != 'pull_request'
         run: |
           want=$(md5sum index.html | cut -d' ' -f1)
           for i in $(seq 1 20); do
@@ -20,3 +25,8 @@ jobs:
           done
           echo "::error::ai.spaincos.com does not match repo index.html - deploy did not reach production"
           exit 1
+      - name: PR pre-merge check (live verification runs post-deploy on master)
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "PR acknowledged. The live-site md5 guard runs on merge to master (post-deploy)."
+          node -e "new (require('./api/retention.js'))" 2>/dev/null && echo "retention module loads" || node --check api/retention.js && echo "retention syntax OK"
