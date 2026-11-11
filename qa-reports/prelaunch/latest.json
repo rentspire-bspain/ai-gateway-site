@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-11T12:15:03+00:00",
+ "ts": "2026-11-11T13:38:25+00:00",
  "base": "http://localhost:8765",
  "passed": 30,
  "failed": 0,
@@ -22,7 +22,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "6.0s"
+   "detail": "5.3s"
   },
   {
    "name": "current-events answered",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "5.9s"
+   "detail": "7.8s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -62,7 +62,7 @@
   {
    "name": "build.json matches shipped BUILD (stale-tab detector armed)",
    "ok": true,
-   "detail": "index=v158 build.json=v158"
+   "detail": "index=v159 build.json=v159"
   },
   {
    "name": "landing renders",
@@ -142,7 +142,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n1 FAILED\n\u00b7 28/29 checks \u00b7 11/11/2026, 12:14:15 PM\nRun be"
+   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 30/30 checks \u00b7 11/11/2026, 12:15:03 PM\nRun b"
   },
   {
    "name": "follow-up chip submits (search state)",

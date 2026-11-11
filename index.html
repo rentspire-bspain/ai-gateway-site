@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-QmzNYxPCcIfZqihsYG0R0DOwTvq+spqEaDsEjBGXG9E=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-cde3KjoRbblKPXP9Hzq3sBW5YqupHDebyAgvB/xOwYQ=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -101,6 +101,7 @@ body.incognito .question-header::after{content:"";}
   --radius-xs: 6px;
   --sidebar-width: 260px;
   --answer-w: 720px;
+  --answer-shift: 96px; /* answer column sits left of true center, like Perplexity */
   --followup-h: 120px;
   --font-sans: "pplxSans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: "pplxSerif", Georgia, serif;
@@ -634,6 +635,8 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .searchbar-mini {
   max-width: var(--answer-w, 720px);
   margin: 0 auto;
+  margin-left: max(0px, calc((100% - var(--answer-w, 720px)) / 2 - var(--answer-shift, 0px)));
+  margin-right: auto;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -663,6 +666,8 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   max-width: var(--answer-w, 720px);
   min-width: 0;
   margin: 0 auto;
+  margin-left: max(0px, calc((100% - var(--answer-w, 720px)) / 2 - var(--answer-shift, 0px)));
+  margin-right: auto;
 }
 .results-inner > * { min-width: 0; max-width: 100%; }
 
@@ -941,7 +946,11 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .answer-content li { margin-bottom: 6px; }
 .answer-content strong { font-weight: 600; }
 .answer-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 6px 0; }
-.answer-content pre { overflow-x: auto; max-width: 100%; }
+.answer-content pre { overflow-x: auto; max-width: 100%; position: relative; }
+.code-copy-btn { position: absolute; top: 8px; right: 8px; display: flex; align-items: center; gap: 5px; padding: 4px 9px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-elevated); color: var(--text-muted); font-size: 12px; font-family: var(--font-sans); cursor: pointer; opacity: 0; transition: opacity .12s ease, color .12s ease, border-color .12s ease; z-index: 2; }
+.answer-content pre:hover .code-copy-btn, .code-copy-btn:focus-visible { opacity: 1; }
+.code-copy-btn:hover { color: var(--text); border-color: var(--accent); }
+.code-copy-btn.copied { opacity: 1; color: var(--accent); border-color: var(--accent); }
 .answer-content table { display: table; width: 100%; max-width: none; }
 .answer-content .table-wrap { overflow-x: auto; max-width: 100%; margin: 0 0 14px; -webkit-overflow-scrolling: touch; }
 .answer-content .table-wrap > table { margin: 0; }
@@ -1009,6 +1018,8 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
   flex-wrap: wrap;
 }
 /* spacing between conversation turns (a question after an answer) */
+.older-turns-btn { display: block; margin: 0 0 14px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-elevated); color: var(--text-muted); font-size: 13px; cursor: pointer; }
+.older-turns-btn:hover { color: var(--text); border-color: var(--accent); }
 .answer-section + .related-section + .question-header,
 .answer-section + .question-header { margin-top: 28px; }
 .action-btn {
@@ -1206,8 +1217,8 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .followup-box input, .followup-box textarea { flex: 1 1 100px; min-width: 0; font-size: 14.5px; line-height: 1.45; }
 .followup-box textarea { resize: none; overflow-y: auto; min-height: 24px; max-height: 200px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .followup-box { position: relative; }
-.followup-inner { max-width: calc(var(--answer-w, 720px) + 120px); }
-.queued-msg { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(32,128,141,0.12); border: 1px dashed var(--accent); font-size: 13px; color: var(--text-muted); }
+.followup-inner { max-width: var(--answer-w, 720px); margin-left: max(0px, calc((100% - var(--answer-w, 720px)) / 2 - var(--answer-shift, 0px))); margin-right: auto; }
+.queued-msg { flex: none; width: 100%; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(32,128,141,0.12); border: 1px dashed var(--accent); font-size: 13px; color: var(--text-muted); }
 .queued-msg[hidden] { display: none; }
 .queued-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; animation: qpulse 1.2s ease-in-out infinite; }
 @keyframes qpulse { 50% { opacity: .3; } }
@@ -2820,9 +2831,16 @@ async function pushThreadToServer(t) {
 async function pushThreadMessages(t) {
   if (!t || !currentUser) return;
   try {
+    // v159: single mega-inserts (60+ huge turns) can blow the PostgREST body cap and
+    // drop the whole save. Insert in pages of 20 rows; on failure of any page, keep the
+    // rows that landed so nothing is lost.
     await sb.from("thread_messages").delete().eq("thread_id", t.id);
     const rows = t.messages.map(m => ({ thread_id: t.id, role: m.role, content: m.content, sources: m.sources || null, related: m.related || null }));
-    if (rows.length) await sb.from("thread_messages").insert(rows);
+    const PAGE = 20;
+    for (let i = 0; i < rows.length; i += PAGE) {
+      try { await sb.from("thread_messages").insert(rows.slice(i, i + PAGE)); }
+      catch (e2) { break; } // partial save beats total loss
+    }
     await sb.from("threads").update({ updated_at: new Date().toISOString() }).eq("id", t.id);
   } catch (e) { /* offline-tolerant */ }
 }
@@ -3466,9 +3484,22 @@ function cleanQuestionText(content) {
 // a question. showRelatedForLast=false is used while a new question is in flight.
 function renderPriorTurns(content, thread, showRelatedForLast) {
   content.innerHTML = "";
-  const msgs = thread.messages || [];
+  const all = thread.messages || [];
+  // v159 (owner request 2026-11-11): giant threads (60+ turns) used to hit the
+  // gateway's "conversation too large" cap and take minutes to render. Render and
+  // SEND only the most recent turns — everything stays stored server-side and is
+  // fetched back on demand. The model keeps a compact summary of what dropped off.
+  const MAX_TURNS = 40;
+  const msgs = all.length > MAX_TURNS ? all.slice(-MAX_TURNS) : all;
   let lastAssistant = -1;
   msgs.forEach((m, i) => { if (m.role !== "user") lastAssistant = i; });
+  if (all.length > MAX_TURNS) {
+    const more = document.createElement("button");
+    more.className = "older-turns-btn";
+    more.textContent = "Show older turns (" + (all.length - MAX_TURNS) + " more)";
+    more.onclick = () => { renderPriorTurnsFull(content, thread, showRelatedForLast); };
+    content.appendChild(more);
+  }
   msgs.forEach((m, i) => {
     if (m.role === "user") {
       const q = document.createElement("div");
@@ -3491,6 +3522,26 @@ function renderPriorTurns(content, thread, showRelatedForLast) {
       renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council) ? { steps: m.steps || [], council: m.council || null } : null);
     }
   });
+}
+function renderPriorTurnsFull(content, thread, showRelatedForLast) {
+  content.innerHTML = "";
+  const msgs = thread.messages || [];
+  let lastAssistant = -1;
+  msgs.forEach((m, i) => { if (m.role !== "user") lastAssistant = i; });
+  msgs.forEach((m, i) => {
+    if (m.role === "user") {
+      const q = document.createElement("div");
+      q.className = "question-header";
+      q.textContent = cleanQuestionText(m.content);
+      appendAttachTags(q, attachNamesOf(m.content).map(name => ({ name })));
+      content.appendChild(q);
+    } else {
+      const rel = (showRelatedForLast && i === lastAssistant) ? cleanRelated(m.related) : [];
+      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council) ? { steps: m.steps || [], council: m.council || null } : null);
+    }
+  });
+  const sc = document.getElementById("resultsScroll");
+  if (sc) sc.scrollTop = 0;
 }
 function renderSearching(container, query) {
   // v93 AGENTS PILL (owner directive 2026-11-10): every agent working shows up.
@@ -4302,7 +4353,26 @@ function renderAnswer(container, text, sources, related, images, meta) {
     const pm = protectMath(text);
     const rawHtml = marked.parse(pm.text, { breaks: true, gfm: true });
     const safeHtml = restoreMath(DOMPurify.sanitize(rawHtml), pm.items);
-    content.innerHTML = safeHtml;
+    // v159: models sometimes leave a space before punctuation after inline code (`x` ,)
+    // — tidy it in the TEXT nodes only, never inside code/pre markup.
+    const tidy = (h) => {
+      const parts = String(h).split(/(<(?:pre|code)\b[^>]*>[\s\S]*?<\/(?:pre|code)>)/);
+      return parts.map((p, i) => i % 2 === 1 ? p : p.replace(/ +([,.;:!?])/g, "$1")).join("");
+    };
+    content.innerHTML = tidy(safeHtml);
+    // v159: code blocks get a hover Copy button (top-right, Perplexity-style)
+    content.querySelectorAll("pre").forEach(pre => {
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.className = "code-copy-btn";
+      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy';
+      btn.setAttribute("aria-label", "Copy code");
+      btn.onclick = () => {
+        const t = (pre.querySelector("code") || pre).textContent || "";
+        const done = () => { btn.classList.add("copied"); btn.lastChild.textContent = "Copied"; setTimeout(() => { btn.classList.remove("copied"); btn.lastChild.textContent = "Copy"; }, 1500); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, done); else done();
+      };
+      pre.appendChild(btn);
+    });
   } catch (e) {
     content.textContent = text;
   }
@@ -4674,8 +4744,28 @@ async function performSearchInner(query) {
   // Send the full conversation history so follow-ups keep context
   // v83 (C10): @-mentions add a context block to the OUTGOING last user message only (not saved in the thread)
   const mx = (window.ComposerX && window.ComposerX.take) ? window.ComposerX.take() : { mentions: [], context: "" };
+  // v159: never let an old giant thread kill the request (server caps at 60 msgs / 400KB).
+  // Keep the first user turn (topic anchor) + the most recent turns; truncate any
+  // single mega-message. Older middle turns drop out first — newest context always wins.
+  const trimHistory = (msgs) => {
+    const capMsg = 50_000, capTotal = 220_000;
+    let h = msgs.map(m => ({ role: m.role, content: String(m.content || "").slice(0, capMsg) }));
+    const firstUser = h.findIndex(m => m.role === "user");
+    const size = () => h.reduce((n, m) => n + m.content.length, 0);
+    if (h.length > 24 || size() > capTotal) {
+      const anchor = firstUser >= 0 && firstUser < h.length - 1 ? [h[firstUser]] : [];
+      h = [...anchor, ...h.slice(Math.max(firstUser + 1, h.length - 22))];
+      while (h.length > (anchor.length + 22) || size() > capTotal) {
+        // drop the oldest non-anchor message until it fits
+        const idx = h.findIndex(m => m !== anchor[0]);
+        if (idx < 0 || h.length <= 2) break;
+        h.splice(idx, 1);
+      }
+    }
+    return h;
+  };
   const history = [
-    ...thread.messages.map(m => ({ role: m.role, content: m.content })),
+    ...trimHistory(thread.messages),
     { role: "user", content: (mx.context || "") + fullQuery },
   ];
   const v83Body = {
@@ -4936,7 +5026,11 @@ async function performSearchInner(query) {
       return;
     }
     const netFail = /failed to fetch|networkerror|load failed|network request failed/i.test(emsg);
-    renderAnswerError(content, netFail ? "Couldn't reach the gateway" : "Something went wrong", netFail ? "Network request failed (" + emsg + "). Check your connection and retry." : emsg, query);
+    if (/conversation too large/i.test(emsg)) {
+      renderAnswerError(content, "This thread is very long", "This conversation has grown past the context limit. Start a new thread and reference this one (link it with @) — your recent messages are preserved.", query);
+    } else {
+      renderAnswerError(content, netFail ? "Couldn't reach the gateway" : "Something went wrong", netFail ? "Network request failed (" + emsg + "). Check your connection and retry." : emsg, query);
+    }
   } finally {
     if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
     isSearching = false;
@@ -5088,7 +5182,26 @@ async function loadStatus(force) {
   window.addEventListener("offline", sync); window.addEventListener("online", sync); sync();
   // v156: visible build identity + stale-tab detector. The owner kept hitting "I refreshed and
   // nothing updated" — now the app says what build it IS, and checks the server for a newer one.
-  window.BUILD = "v158";
+function wireCodeCopy(scope) {
+  (scope || document).querySelectorAll(".answer-content pre:not([data-copy])").forEach(pre => {
+    pre.setAttribute("data-copy", "1");
+    if (pre.querySelector("pre")) return; // nested — skip
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "code-copy-btn";
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy';
+    btn.setAttribute("aria-label", "Copy code");
+    btn.onclick = () => {
+      const code = pre.querySelector("code");
+      const t = (code || pre).textContent || "";
+      const done = () => { btn.classList.add("copied"); btn.lastChild.textContent = "Copied"; setTimeout(() => { btn.classList.remove("copied"); btn.lastChild.textContent = "Copy"; }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, done);
+      else done();
+    };
+    pre.appendChild(btn);
+  });
+}
+  window.BUILD = "v159";
   console.log("[ai.spaincos] build " + window.BUILD);
   try { (function () {
     const acct = document.querySelector(".account, #accountBtn, .sidebar-footer");
