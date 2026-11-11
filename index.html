@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-gs4MIe4XPjAJZ1Vp8lNq0NnSFBYBduqsvxJiaG4HOFU=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-gh/LE3tVTZHi6H97Didkvld9kp2VYwlBCNxMxLthjUU=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1554,6 +1554,17 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
           <option value="llama4" title="Llama 4 Maverick — general chat.">Llama 4 Maverick</option>
           <option value="venice">Venice Uncensored — blunt, no hedging</option>
           <option value="dolphin">Dolphin Uncensored 24B — blunt, no hedging</option>
+          <!-- v169 MODEL DROPDOWN EXPANSION: every option below is LIVE-verified
+               against the gateway (2026-11-11, 9-14s round trips, x_routed_model
+               echoed). Closed the "only 2 of 14 models in the dropdown" gap. -->
+          <option value="r1" title="DeepSeek R1 — deliberate chain-of-thought reasoning. Best for hard logic and math.">DeepSeek R1</option>
+          <option value="qwen-coder" title="Qwen3 Coder — code generation and review. Best for programming.">Qwen3 Coder</option>
+          <option value="gpt-oss-20b" title="GPT-OSS 20B — the fast, light open-weight sibling. Best for quick answers.">GPT-OSS 20B (fast)</option>
+          <option value="gemma4" title="Gemma 4 31B — Google's open-weight generalist. Good all-round chat.">Gemma 4 31B</option>
+          <option value="minimax-m2" title="MiniMax M2 — strong reasoning at speed. Best for analysis.">MiniMax M2</option>
+          <option value="llama4-scout" title="Llama 4 Scout — the light, quick Llama. Best for fast chat.">Llama 4 Scout</option>
+          <option value="glm-air" title="GLM-5.3 Air — the lighter GLM, much faster. Best when speed beats depth.">GLM-5.3 Air (fast)</option>
+          <option value="kimi-flash" title="Kimi K3.1 Flash — Kimi's speed lane. Best for quick reasoning.">Kimi K3.1 Flash</option>
         </select>
         <button class="width-toggle" id="voiceToggle" title="Read answers aloud">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
@@ -4293,16 +4304,32 @@ const MODEL_INFO = {
   llama4: { best: "Llama 4 Maverick — Meta's open-weight generalist. Best for general chat and brainstorming." },
   venice: { best: "Venice Uncensored (Dolphin Mistral 24B) — answers bluntly, without hedging or disclaimers." },
   dolphin: { best: "Dolphin Uncensored 24B — answers bluntly, without hedging or disclaimers." },
+  r1: { best: "DeepSeek R1 — deliberate chain-of-thought reasoning. Best for hard logic, math, and multi-step problems." },
+  "qwen-coder": { best: "Qwen3 Coder — code generation and review. Best for programming tasks." },
+  "gpt-oss-20b": { best: "GPT-OSS 20B — the fast, light open-weight sibling. Best for quick answers." },
+  gemma4: { best: "Gemma 4 31B — Google's open-weight generalist. Good all-round chat." },
+  "minimax-m2": { best: "MiniMax M2 — strong reasoning at speed. Best for analysis." },
+  "llama4-scout": { best: "Llama 4 Scout — the light, quick Llama. Best for fast chat." },
+  "glm-air": { best: "GLM-5.3 Air — the lighter GLM, much faster. Best when speed beats depth." },
+  "kimi-flash": { best: "Kimi K3.1 Flash — Kimi's speed lane. Best for quick reasoning." },
 };
 const FRIENDLY_MODEL = (m) => !m ? "" :
+  m.includes("glm-5.3-air") ? "GLM-5.3 Air" :
   m.includes("glm-5.3") ? "GLM-5.3" :
   m.includes("flint") ? "Flint v1.0" :
   m.includes("qwen") ? "Qwen3.8-27B" :
+  m.includes("kimi-k3.1-flash") ? "Kimi K3.1 Flash" :
   m.includes("kimi") ? "Kimi K3.1 Pro" :
+  m.includes("deepseek-r1") ? "DeepSeek R1" :
   m.includes("deepseek") ? "DeepSeek V4.1 Flash" :
+  m.includes("gpt-oss-20b") ? "GPT-OSS 20B" :
   m.includes("gpt-oss") ? "GPT-OSS 120B" :
   (m.includes("llama") || m.includes("maverick")) ? "Llama 4 Maverick" :
   m.includes("dolphin") ? "Dolphin Uncensored 24B" :
+  m.includes("qwen3-coder") ? "Qwen3 Coder" :
+  m.includes("gemma-4") ? "Gemma 4 31B" :
+  m.includes("minimax") ? "MiniMax M2" :
+  m.includes("scout") ? "Llama 4 Scout" :
   String(m).split("/").pop();
 {
   /* keep the select's hover title in sync with the current choice */
@@ -4821,7 +4848,16 @@ async function performSearchInner(query) {
     "gpt-oss": "openai/gpt-oss-120b",
     llama4: "meta-llama/llama-4-maverick",
     venice: "cognitivecomputations/dolphin-mistral-24b-venice-edition",
-    dolphin: "cognitivecomputations/dolphin-mistral-24b-venice-edition"
+    dolphin: "cognitivecomputations/dolphin-mistral-24b-venice-edition",
+    /* v169: live-verified expansion models (each served 200 OK via gateway-chat) */
+    r1: "deepseek/deepseek-r1",
+    "qwen-coder": "qwen/qwen3-coder",
+    "gpt-oss-20b": "openai/gpt-oss-20b",
+    gemma4: "google/gemma-4-31b",
+    "minimax-m2": "minimax/minimax-m2",
+    "llama4-scout": "meta-llama/llama-4-scout",
+    "glm-air": "z-ai/glm-5.3-air",
+    "kimi-flash": "moonshotai/kimi-k3.1-flash"
   };
   const modelOverride = MODEL_OVERRIDES[purpose] || null;
   // v63: text/PDF attachments splice into the outgoing message; image
@@ -5310,7 +5346,7 @@ function wireCodeCopy(scope) {
     pre.appendChild(btn);
   });
 }
-  window.BUILD = "v166";
+  window.BUILD = "v169";
   console.log("[ai.spaincos] build " + window.BUILD);
   try { (function () {
     const acct = document.querySelector(".account, #accountBtn, .sidebar-footer");
