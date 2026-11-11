@@ -219,6 +219,7 @@ Net: 6 of 17 Perplexity-linked services have a connector built; 2 of those block
 | D2 | Live search failed mid-request — degraded answer with warning banner "Live search unavailable (search service failed)" | same thread | search provider failover + retry; banner already good UX | 🔴 |
 | D3 | 178s finish time on a complex query (DeepSeek V4.1 Flash) | same thread badge | parallel sub-question fan-out + streaming first token | 🔴 (tracked as speed) |
 | D4 | Landing composer pills row clips at right edge (scrollW 1057 > clientW 720) | visual-parity screenshot 2026-11-11 | wrap pills or horizontal scroll affordance | 🔴 |
+| D5 | Sidebar SPACES list renders blank titles — rows show icon + count badge but no name; bottom row clipped by the Import button | user screenshot 2026-11-11 | space rows missing name text or names empty after import; fix renderSpaces to fall back to "Untitled space" + fix bottom-row padding | 🔴 |
 
 ## 16. Business plan — orchestrator for free/open-weight models (rolled in from owner doc, 2026-11-11)
 **Positioning:** sell answers and reports, never raw model access. Differentiation is data grounding (Comptrove: 588,746 properties, 30.9M observations, 5.5M-row hist tables), not model routing.
@@ -445,6 +446,49 @@ Sources: Perplexity BBB (55 complaints/12mo), Trustpilot (429 reviews), autoboun
 4. Never gate cancellation behind a store maze (Muse's top complaint); never bill a task beyond its reservation (Perplexity's $7,245 complaint).
 5. Town's per-seat team pooling with free guests is the cleanest team model — adopt for our Team tier.
 6. Usage-based hosting billing (Manus's website hosting) maps to our vertical reports: charge per report, free monthly allowance, then metered.
+
+## 24. Complete connector parity — every Perplexity connector + our additions (added v166)
+**Positioning correction (owner directive 2026-11-11):** ai.spaincos is GENERALIST AI first. Comptrove is one vertical wedge, not the center of the business plan. The platform competes with Perplexity head-on as a general answer engine; verticals (rent/real-estate, and later others) are monetization layers on top, not the identity.
+
+### 24a. Owner recipes — create the three OAuth apps (10 minutes total)
+The redirect URL for all three is the connectors function: `https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/connectors`
+
+**Slack (3 min):** [api.slack.com/apps](https://api.slack.com/apps) → Create New App → From scratch → name it "ai.spaincos" → pick your workspace → OAuth & Permissions → Redirect URLs → add the URL above → add User Token Scopes: `chat:write`, `search:read`, `channels:history`, `channels:read`, `groups:history`, `groups:read` → Install to Workspace → copy the Client ID and Client Secret.
+
+**GitHub (3 min):** [github.com/settings/developers](https://github.com/settings/developers) → OAuth Apps → New OAuth App → Application name "ai.spaincos" → Homepage `https://ai.spaincos.com` → Authorization callback URL: the redirect URL above → Register → copy Client ID → Generate a new client secret. (Scopes `repo read:user` are requested by our code automatically.)
+
+**Dropbox (4 min):** [dropbox.com/developers/apps](https://www.dropbox.com/developers/apps) → Create app → Dropbox API → Scoped access → Full Dropbox → name "ai.spaincos" → Permissions tab → enable `files.metadata.read`, `files.content.read`, `account_info.read` → OAuth 2 → Redirect URIs → add the redirect URL above → copy App key + App secret.
+
+Then paste each Client ID + Secret into the server secrets (needs the write-capable Supabase token, or give them to me through the secure form and I will set them), and click Connect in Settings > Connectors.
+
+### 24b. Full Perplexity connector catalog (60+) mapped to ai.spaincos
+| Category | Perplexity connectors | ai.spaincos | Build |
+|---|---|---|---|
+| Email/calendar | Gmail + Calendar, Outlook | Gmail/Calendar ✅ (owner click) | Outlook: build |
+| File storage | Google Drive, Dropbox, Box, OneDrive, SharePoint | Drive ✅, Dropbox (owner app) | Box, OneDrive, SharePoint: build |
+| Collab/productivity | Notion, Asana, Jira, Confluence, Trello, Linear, ClickUp, Monday, Smartsheet, Airtable, Todoist, Evernote, Whimsical, Lucid, Figma, Canva Enterprise, Miro | none | build (Notion + Linear first — developer-heavy user base) |
+| Chat/comm | Slack, Microsoft Teams, Zoom Admin, Intercom, X (Twitter), SMSTools, Z-API (WhatsApp) | Slack (owner app) | Teams, Zoom, Intercom, X: build; WhatsApp via channels (section 20 P3) |
+| Dev/infra | GitHub, Datadog, Snowflake, Databricks, Supabase, Neon, Prisma Postgres, Vercel, Stytch, Jam | GitHub (owner app), Supabase (owner key), Render ✅ (bonus beyond Perplexity) | Vercel (token exists — quick), Datadog, Snowflake, Databricks, Neon: build |
+| CRM/marketing | HubSpot, Salesforce, Rings AI, Apollo.io, Mailchimp, Shopify | none | build (HubSpot first) |
+| Finance | Finary, Aries, QuantWheel, Webull, Coinbase, Base, Stripe/Link | none | Stripe first (needed for our own billing anyway — double duty) |
+| Creative | Twitch, Vimeo, DocuGenerate, BioRender | none | low priority |
+| Premium data (licensed) | FactSet, Morningstar, Daloopa, Carbon Arc, Zacks, Wisesheets, AlphaCreek, Canary, MT Newswires, Quartr, Stocktwits, IBISWorld, IBKR, Guidepoint, Crunchbase, Grata, D&B, Chronograph, AngelList, Flanks, Octus, Papermark, OpenSea, Allium + included: Wiley, Statista, PitchBook, CB Insights, Midpage | none | long-term; licensed-partner model (bring your own subscription) — copy Perplexity's structure exactly |
+| Platform | local/remote MCP servers, custom connectors, connector proposals, RBAC per connector | MCP planned | MCP = force multiplier: one build unlocks the long tail |
+
+### 24c. Connectors we should add BEYOND Perplexity (differentiators)
+| Connector | Why |
+|---|---|
+| Vercel | we hold the token; deploys + logs — powers agent-driven shipping (P13) |
+| Cloudflare | DNS/Workers/R2 — pairs with our infra |
+| Stripe | our own billing + users' business questions |
+| WhatsApp / Telegram / iMessage | the Instinct-grade channels (P3) — Perplexity has no messaging-channel connectors |
+| Reddit, YouTube, X, LinkedIn | research depth Perplexity lacks (X is Computer-only there) |
+| Plaid, QuickBooks | SMB back-office (Manus/Town territory) |
+| Notion, Linear | developer-first adoption |
+| Zillow / public-records feeds | the real-estate wedge — as ONE vertical, not the identity |
+
+### 24d. Build mechanics
+Every connector follows the existing pattern (providers.ts entry + tool defs in connector-tools.ts + Settings card auto-generated). The MCP-server build (P17/24b platform row) is the priority multiplier: it converts "build 50 connectors" into "support the MCP standard" and matches Perplexity's own long-tail strategy.
 
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
