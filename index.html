@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-cde3KjoRbblKPXP9Hzq3sBW5YqupHDebyAgvB/xOwYQ=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-QUVCkdFQGFXBTvw+83LDVCcuLWPRonrJV5TfKaoTKYc=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2901,6 +2901,7 @@ async function syncThreadsFromServer() {
     if (dl && currentThreadId !== dl.id) loadThread(dl.id, true);
     window.__endPreBoot && window.__endPreBoot();
   } catch (e) { window.__endPreBoot && window.__endPreBoot(); /* offline-tolerant */ }
+  try { if (currentUser) wireLiveThreads(); } catch (e) {}
 }
 function saveThreads() {
   // v157 QUOTA FIX: the owner's 5,647 imported threads (with messages) exceed the ~5MB
@@ -3522,6 +3523,34 @@ function renderPriorTurns(content, thread, showRelatedForLast) {
       renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council) ? { steps: m.steps || [], council: m.council || null } : null);
     }
   });
+}
+// v160 (owner request 2026-11-11): ACTIVE THREADS — bridge messages and any new
+// messages appear live (no refresh), with an unread badge on the sidebar thread.
+let __liveSub = null;
+function wireLiveThreads() {
+  if (__liveSub || !window.sb || !sb.channel) return;
+  try {
+    __liveSub = sb.channel("live-threads-" + (currentUser?.id || "anon"))
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "thread_messages" }, (payload) => {
+        const row = payload.new || {}; if (!row.thread_id) return;
+        const t = threads.find(x => x.id === row.thread_id); if (!t) return;
+        t.updatedAt = Date.parse(row.created_at) || Date.now();
+        t._unread = (t._unread || 0) + 1; t._live = true;
+        renderThreads();
+        // if the owner has this thread open, render the new message into it live
+        if (currentThreadId === t.id) {
+          const ct = document.getElementById("resultsContent");
+          if (ct && row.role) {
+            const wrap = document.createElement("div");
+            if (row.role === "user") { const q = document.createElement("div"); q.className = "question-header"; q.textContent = String(row.content || "").slice(0, 500); wrap.appendChild(q); }
+            else renderAnswer(ct, String(row.content || ""), [], [], [], null);
+            const sc = document.getElementById("resultsScroll"); if (sc) sc.scrollTop = sc.scrollHeight;
+          }
+          t._unread = 0;
+        }
+      })
+      .subscribe();
+  } catch (e) { /* realtime optional — never break the app */ }
 }
 function renderPriorTurnsFull(content, thread, showRelatedForLast) {
   content.innerHTML = "";
@@ -5201,7 +5230,7 @@ function wireCodeCopy(scope) {
     pre.appendChild(btn);
   });
 }
-  window.BUILD = "v159";
+  window.BUILD = "v160";
   console.log("[ai.spaincos] build " + window.BUILD);
   try { (function () {
     const acct = document.querySelector(".account, #accountBtn, .sidebar-footer");

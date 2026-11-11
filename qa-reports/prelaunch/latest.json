@@ -1,7 +1,7 @@
 {
- "ts": "2026-11-11T13:38:25+00:00",
- "base": "http://localhost:8765",
- "passed": 30,
+ "ts": "2026-11-11T14:12:27+00:00",
+ "base": "https://ai.spaincos.com",
+ "passed": 27,
  "failed": 0,
  "checks": [
   {
@@ -22,7 +22,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "5.3s"
+   "detail": "5.2s"
   },
   {
    "name": "current-events answered",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "7.8s"
+   "detail": "8.7s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -48,21 +48,6 @@
    "name": "memory_items table reachable",
    "ok": true,
    "detail": "HTTP 200"
-  },
-  {
-   "name": "index.html loads real modules",
-   "ok": true,
-   "detail": "37 refs"
-  },
-  {
-   "name": "all deployed modules match repo",
-   "ok": true,
-   "detail": ""
-  },
-  {
-   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
-   "ok": true,
-   "detail": "index=v159 build.json=v159"
   },
   {
    "name": "landing renders",
