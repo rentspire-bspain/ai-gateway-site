@@ -594,5 +594,40 @@ Prices per 1M tokens, verified 2026-11-11: [OpenAI](https://developers.openai.co
 
 At $8/mo Core: **9 paying users covers the entire fixed bill**; every user after is ~100% margin. Variable overage triggers (watch, not pay): Supabase >2M invocations ($2/1M), >250GB egress ($0.09/GB), Vercel >plan bandwidth, Render >5GB bandwidth ($0.15/GB).
 
+## 26. Weighted average total completion (added v166 — 17-agent free-Qwen fleet audit, 2026-11-11)
+Each Perplexity help-center category scored 0-100 by an independent free-route agent against the live feature set (17 agents fired in parallel, 125.8s total). Raw doc-emoji count is 45.7% (42✅ / 55🟡 / 55🔴 across all tracked items); the category-weighted average below is the honest headline number.
+
+| Category | Weight | Score | Weighted |
+|---|---:|---:|---:|
+| Features (modes, Labs, Council, projects) | 14 | 84 | 11.8 |
+| Computer (agentic: fleet, artifacts, automations, skills) | 8 | 79 | 6.3 |
+| API (gateway, tool-loop, keys vs Agent API suite) | 10 | 72 | 7.2 |
+| Troubleshooting & support | 4 | 72 | 2.9 |
+| Voice/Talk | 4 | 65 | 2.6 |
+| Account & sign-in | 6 | 58 | 3.5 |
+| Models & routing | 8 | 55 | 4.4 |
+| Connectors & integrations | 12 | 48 | 5.8 |
+| Privacy & data | 6 | 46 | 2.8 |
+| Comet (agentic browser) | 3 | 40 | 1.2 |
+| Premium data sources | 2 | 42 | 0.8 |
+| Enterprise (SSO, admin, controls) | 3 | 35 | 1.1 |
+| Getting started / onboarding | 5 | 25 | 1.3 |
+| Desktop apps | 3 | 21 | 0.6 |
+| Billing & subscriptions | 6 | 0 | 0.0 |
+| Mobile apps | 3 | 0 | 0.0 |
+| Teammates (shared threads, mentions) | 1 | 0 | 0.0 |
+| **WEIGHTED AVERAGE TOTAL COMPLETION** | **96** | | **52.6%** |
+
+Promotions category excluded (not core parity). Core consumer experience (features, computer, API, account, voice, connectors, getting-started) ≈ **68%**; the long tail (enterprise, desktop, comet, mobile, premium data, billing, teammates) ≈ **29%** is what drags the total.
+
+### Fastest movers — what raises the score most per hour of work
+1. **Billing (0 → live)** = +6 pts on its own: Stripe + credit ledger + pricing page. The plan (sections 18, 23, 25) is fully specified; the build is the blocker.
+2. **Connectors (48)** — owner OAuth apps (10 min) + Google Connect click → immediate jump; Outlook/Box/Notion/Vercel builds next.
+3. **Getting-started (25)** — polish work: better empty states, example prompts, first-run tour. Cheapest points on the board.
+4. **Account (58)** — passkeys/2FA blocked on Supabase config write; email limit lift same blocker.
+5. **API (72)** — Agent-API-style /api endpoints on existing tool-loop (search, embeddings) = biggest strategic multiplier.
+6. **Models (55)** — close the 12-model dropdown gap with registry entries.
+7. **Enterprise/desktop/comet/mobile** — deliberate later phases; they are 12 pts of the 47.4 remaining but cost the most per point.
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
