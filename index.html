@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-8wMcLbH3vKGr+TOnLn/gtkWyF7CB+fwW3sKMSy6KuW8=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-gFkZY1CbLDmpZp0S6pCM9ySSnjFvrJtEbYCfPlKKFeQ=' 'sha256-x7mo/kGln/DkohRSHI8ExYx18GXZdsyR3IpMjSiJSww=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -4839,7 +4839,25 @@ async function loadStatus(force) {
   const sync = () => bar.classList.toggle("show", navigator.onLine === false);
   window.addEventListener("offline", sync); window.addEventListener("online", sync); sync();
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
-    window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(() => {}); });
+    window.addEventListener("load", () => {
+      // v98 STALE-BROWSER ESCAPE HATCH (owner report 2026-11-11): browsers controlled by the old
+      // stale-while-revalidate worker kept serving pre-v97 modules no matter how many times we
+      // deployed. One-time (per browser): unregister ALL workers, wipe ALL caches, reload once so
+      // the fresh network-first worker takes over. Guarded by a localStorage flag — no reload loop.
+      try {
+        const KEY = "ai_sw_reset_98";
+        if (!localStorage.getItem(KEY)) {
+          localStorage.setItem(KEY, "1");
+          navigator.serviceWorker.getRegistrations().then((regs) => {
+            let had = false;
+            regs.forEach((r) => { had = true; return r.unregister(); });
+            if (window.caches) caches.keys().then((ks) => ks.forEach((k) => caches.delete(k)));
+            if (had) setTimeout(() => location.reload(), 300); // reload re-registers the fresh worker
+          }).catch(() => {});
+        }
+      } catch (e) {}
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    });
   }
   let deferred = null;
   const btn = document.getElementById("installAppBtn");
