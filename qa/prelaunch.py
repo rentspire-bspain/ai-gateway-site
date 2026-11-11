@@ -119,6 +119,13 @@ def integrity(base):
         if live != local.read_bytes():
             stale.append(f"{s}: live != repo")
     check("all deployed modules match repo", not stale, "; ".join(stale[:4]))
+    # stale-tab detector contract: /build.json must equal the BUILD constant shipped in index.html
+    try:
+        bj = json.loads(http(base + "/build.json", 20)[1]).get("build")
+        mb = re.search(r'window\.BUILD = "([^"]+)"', html)
+        check("build.json matches shipped BUILD (stale-tab detector armed)", bool(mb) and mb.group(1) == bj, f"index={mb and mb.group(1)} build.json={bj}")
+    except Exception as e:
+        check("build.json matches shipped BUILD (stale-tab detector armed)", False, str(e)[:100])
 
 # ---------------- frontend E2E ----------------
 def frontend(base):
