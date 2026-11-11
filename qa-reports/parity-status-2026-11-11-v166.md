@@ -492,5 +492,46 @@ Then paste each Client ID + Secret into the server secrets (needs the write-capa
 ### 24d. Build mechanics
 Every connector follows the existing pattern (providers.ts entry + tool defs in connector-tools.ts + Settings card auto-generated). The MCP-server build (P17/24b platform row) is the priority multiplier: it converts "build 50 connectors" into "support the MCP standard" and matches Perplexity's own long-tail strategy.
 
+## 25. Unit economics — bottom-up to industry-best gross margin (added v166)
+Verified stack prices 2026-11-11: Supabase Pro $25/mo per project (first instance free, 2M edge-function invocations included, then $2/1M; 250 GB egress included, then $0.09/GB; 8 GB DB then $0.125/GB; 100k MAU then $0.00325/MAU) ([Supabase](https://supabase.com/pricing)); Render 512MB instance $7/mo, 1 CPU/2GB $25/mo, bandwidth $0.15/GB beyond included ([Render](https://render.com/pricing)); Vercel Pro $20/user/mo; models $0 on free routes (Groq/OpenRouter free tiers — GLM-5.3, Qwen3.8-27B, Kimi, DeepSeek); search $0 (DuckDuckGo Instant Answers + Wikipedia, no API key).
+
+### 25a. Marginal cost per answer (what one more answer costs)
+| Line | Cost | Notes |
+|---|---|---|
+| Model tokens (free route) | **$0.0000** | free tiers have RPM limits, not dollar costs |
+| Search (DDG + Wikipedia) | **$0.0000** | no API key; rate-limit-friendly |
+| Edge-function invocations | **$0.0000** | gateway-chat + tools = 1-5 invocations/answer; 2M/mo included = ~400k-1M answers before any charge |
+| Database reads/writes | **$0.0000** | within Pro quota; 8 GB DB ≈ years of threads |
+| Egress | **~$0.000002** | ~10-50 KB/answer; 250 GB included ≈ 5M+ answers |
+| **Marginal cost per quick answer** | **≈ $0.000002** | effectively zero — a dollar covers ~500,000 answers |
+| Deep research run (10-40 calls) | **≈ $0.00001-0.0001** | still free-route; bounded by rate limits, not dollars |
+
+**Gross margin on credits is ~100.0% by construction.** Marginal COGS per credit is under a hundredth of a cent. Even if we later add a paid search API at Perplexity's rates ($5/1k web searches = $0.005/search), a quick answer at 50-150 credits ($0.50-1.50) would still carry 99%+ margin. True >100% "margin" comes from two levers that are standard practice: (1) **breakage** — prepaid, expiring, non-refundable credits mean 5-30% of sold credits are never redeemed (industry range), so recognized revenue per delivered answer exceeds nominal; (2) **fixed costs booked as opex, not COGS** — infra is a flat monthly bill, not per-unit.
+
+### 25b. Fixed monthly base (the whole bill at launch)
+| Item | Cost |
+|---|---|
+| Supabase Pro (main project) | $25/mo |
+| Supabase additional project (Deal Engine) | $10/mo (or keep on free tier: $0) |
+| Render paid instance (spain-runner) | $7/mo (512 MB) — fits bulk jobs |
+| Vercel | $0 Hobby → $20/mo Pro when custom domains/SSO needed |
+| Domain + misc | ~$2/mo |
+| **Total** | **$34-64/mo all-in** |
+
+Break-even on the $8/mo Core plan: **5-8 paying users**. Everything beyond is ~pure margin.
+
+### 25c. Where costs could eventually bite (watch list)
+1. **Free-route rate limits** — the real constraint. Groq/OpenRouter free tiers cap requests-per-minute; at ~1k+ concurrent answers/day, add cheap paid open-weight tokens (DeepSeek-class at ~$0.001-0.005/answer) — margin stays 98%+.
+2. **Search quality** — DDG Instant Answers is free but shallow (root of the live-search-failure and quality gaps). First real COGS when we add a paid search lane; mitigate with aggressive result caching, SearXNG self-hosted on the $7 Render box, Brave free tier (2k queries/mo).
+3. **Supabase invocations beyond 2M/mo** — $2/1M = still negligible ($0.000004/answer).
+4. **Frontier models** — the only line that can hurt margin; rule stays: paid frontier only on paid tiers, priced at 3-5x credits per answer (premium answers), so premium COGS is passed through with markup.
+
+### 25d. Bottom-up price build (justifying higher than 100% effective margin)
+- Quick answer: 50-150 credits = $0.50-1.50 nominal. Marginal cost ~$0.000002. Contribution ≈ price.
+- Deep research: 3,000-8,000 credits = $30-80 nominal... **too high for the market** — cap at 1,500-4,000 credits ($15-40) for Max-tier users; still ~100% margin.
+- Premium (frontier) answer: 450 credits = $4.50 vs ~$0.01-0.03 token cost → 99%+ margin with the premium visible.
+- Breakage: credits expire per policy (30 days on bonuses, plan credits monthly) — at 20% breakage, effective realized revenue per delivered credit is 1.25x nominal.
+- Positioning line: "Our gross margin is ~100% because our costs are nearly zero; theirs is ~70-80% because they pay for frontier tokens and search per answer." That is the structural reason we can undercut 60-80% and stay profitable at $8/mo while Perplexity needs $20.
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
