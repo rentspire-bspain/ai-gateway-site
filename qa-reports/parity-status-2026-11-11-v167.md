@@ -707,7 +707,7 @@ Sources: [Perplexity Projects](https://www.perplexity.ai/help-center/en/articles
 
 **Fleet status:** 219 agents registered (98 live), 14 guardians ran within the last 2h, free-Qwen route verified at 16-18 parallel agents (83-126s per batch), 8 build-spec agents produced implementation specs for the top defects and connectors. Fleet-dispatch: 8 jobs queued, 1 closed by direct work; executor needs FLEET_DISPATCH_KEY (not held by anyone).
 
-**Perplexity-parity focus order (owner directive):** 1) close §28c storage/memory rows and billing; 2) fix D1/D2/D6; 3) wire remaining connector OAuth apps; 4) then the Muse/Instinct/Town/Wabi/Manus convergence phases (§19-21).
+**Perplexity-parity focus order (owner directive, updated 2026-11-11 after gateway-session gap review):** 0) **GATEWAY TOOL GAP (new top priority — confirmed by ai.spaincos session's own honest audit): skills/plugins, MCP/connected apps, and subagent dispatch exist in the 219-agent fleet but are NOT callable inside ai.spaincos.com's gateway — only 2 of 14 models are in the production dropdown. Wire the fleet's tools INTO the gateway (skills marketplace UI, MCP client, dispatch tool already exists server-side), and register the 12-model dropdown.** 1) close §28c storage/memory rows and billing; 2) fix D1/D2/D6; 3) wire remaining connector OAuth apps; 4) then the Muse/Instinct/Town/Wabi/Manus convergence phases (§19-21) and the engagement architecture (§31).
 
 ## 30. Legal / ToS / privacy / security parity — every company (added v167)
 Sources: [Manus security](https://manus.im/security), [Manus terms](https://manus.im/terms), [Manus privacy](https://manus.im/privacy), [Manus content policy](https://manus.im/content-policy), [Manus trust FAQ](https://trust.manus.im/faq), [Manus MSA/DPA](https://manus.im/policies/services-agreement), [Manus terms analysis](https://jazz.security/dlp-explained/dlp-basics/is-manus-safe-for-company-data/), [Instinct research doc](https://github.com/mariagorskikh/open-instinct/blob/main/docs/research/INSTINCT.md), [ZDNet Muse privacy](https://www.zdnet.com/innovation/meta-muse-ai-agent-hands-on-test-privacy-concerns/), [Town review](https://hokai.io/hub/agents/town), Perplexity help center (privacy/security collections). **Perplexity first.**
@@ -743,6 +743,51 @@ Sources: [Manus security](https://manus.im/security), [Manus terms](https://manu
 
 ### 30d. Trust positioning (marketing line)
 "Perplexity-grade security with better defaults: training off (theirs is on at Muse and Instinct), real deletion on disconnect (Instinct keeps an indexed copy), read-only connectors, and every write action behind an approval card." Their incidents (Instinct's unapproved sends, Muse's 187k-message sync, the August prompt-injection) are our checklist — section 22's counter-designs already close each one.
+
+## 31. Engagement architecture — addiction analysis + "holy shit" features + credit psychology (added v167)
+8-agent free-Qwen fleet analysis, 2026-11-11. Sources: sections 20, 23, 27; cross-industry mechanics (Duolingo, TikTok, Reddit, Robinhood, Wordle).
+
+### 31a. The addiction mechanics per company (what actually compels users)
+| Company | Core loop | The variable reward | The switching cost |
+|---|---|---|---|
+| Perplexity | quotas reset weekly (Pro Searches); credits expire (30-day bonuses) — loss aversion + allowance ritual | Discover feed novelty; Labs generations; Model Council differences | projects/files/Brain stored (5GB per project) |
+| Muse | the agent texts YOU first — unpredictable inbound pings, hardest notification pattern to mute | background work completing while closed (return to find surprises) | one never-ending conversation + named avatar + memory (emotional bond + sunk context) |
+| Instinct | urgency spikes: flight changes, expiring reservations — the agent as ambient vigilance | visible money saved ($100->$60 bills, refunds found) = dopamine with a number on it | single continuous thread (all context) + Vault (passwords/cards) + Trusted Person network (your people) |
+| Town | parasocial: a named Townie with its own email; routines ping on schedule | nightly-refreshed wiki (fresh every morning); meeting briefings before calls | wiki deepens nightly; team adoption pressure |
+| Manus | 300 daily-refresh credits — log in or lose them (structural, not incidental) | watching "Manus's Computer" work live — the process IS the entertainment; shareable replays | skills + Cloud Computer apps + task history |
+| Wabi | social obligation: family group chat expects responses | "the right software appears" moments (plan→calendar, joke→game) | the group's shared brain; generated mascots/games |
+
+**The pattern:** every one of them sells the same three-drug cocktail — (1) LOSS AVERSION (expiring credits, streaks, quotas), (2) VARIABLE REWARDS (unpredictable inbound, surprises on return, live process-watching), (3) SUNK CONTEXT (memory that makes leaving costly). Nobody combines all three with an answer engine.
+
+### 31b. The 10 "holy shit" features for ai.spaincos (fleet-ranked by DAU impact × implementability)
+All implementable on Supabase + Vercel + Render with open-weight costs:
+1. **Daily Wisdom Streak** (10/10) — complete 3 meaningful tasks daily; streaks table + trigger on existing conversation/automation events; small credit boosts + badges. Pure Supabase, zero model cost.
+2. **The Agent League** (10/10) — Elo leagues (Bronze/Gold/Apex) scored on SOLVED problems (completed automations, verified answers), pseudonymous by default, standings computed nightly by a Render job (same pattern as existing guardians). We have a 219-agent roster nobody else has — league "seasons" over it.
+3. **Agent Mastery Tiers / The Pantheon** (9/10) — users level up agents through real use (Tier 1 → Arch-AI), unlocking advanced routing; a user who runs the Deal Engine lane 50 times gets "Comptrove Cartographer" + early access to new agents. Status mapped to real capability.
+4. **Daily Briefing ritual** (9/9) — one-tap "What should I do with AI today?" → 3 tailored prompts from memory + projects. Cached template; cheap.
+5. **Discovery Drop** (8/10) — daily wildcard draw from the 219-agent roster: an agent, prompt, or connector tip. Cost shown before execution; capped.
+6. **Agent Discovery Cards** (8/10) — collectible cards over the fleet's domain tags (comptrove, pha, osint, housing). Collect by USING.
+7. **Answer-to-Asset** (8/9) — after a strong answer, one-tap: Save as memory / Make an automation / Add to collection → "Builder" level. Engagement literally builds the workspace = compounding retention.
+8. **Questboard** (7/10) — rotating quests rewarding only value-creating actions (connect a source and ask it something; turn an answer into an automation).
+9. **Personal AI Field Guide** (7/10) — an evolving collectible map of skills actually used; publishable public version = every guide is free acquisition (the Wordle share-grid mechanic).
+10. **Community Recipes** (7/10) — publish/remix agent+automation recipes with creator badges; recipes are metadata executed in the user's own budget — zero platform compute for sharing.
+
+**How it stays cheap:** streaks/quests/leagues/cards are Supabase rows; Render cron rotates quests and computes standings (existing guardian pattern); rewards are credits (our marginal cost ≈ $0 — gamification that costs nothing is the whole trick of our margin structure).
+
+### 31c. Credit psychology — the 10:1 split offer, what the user actually feels (owner directive, in the doc)
+**The mechanics after the 10:1 split (1 credit = $0.01):**
+| Offering | Face value | What the user feels |
+|---|---|---|
+| Free tier daily refresh | 300 credits/day (= Manus's exact number, 10x'd feel: "3,000 credits/day" if we split free-tier units) | log in or lose it — the Manus retention loop, structural |
+| Launch bonus | 10,000 credits one-time, 30-day expiry | reads 2.5x Perplexity's Max bonus (4,000 for Pro); urgency via expiry |
+| Quick answer | 50-150 credits | feels like pennies against a big balance |
+| Deep research | 1,500-4,000 reserved, unused refunded | "reserve-then-refund" — the trust mechanic nobody else has (§23) |
+| Streak reward | +100 credits/day streak bonus | loss aversion compounding |
+| Quest rewards | 200-500 credits | variable reward cadence |
+
+**The psychological stack, in order:** big numbers (10:1 split) → daily expiry (loss aversion) → visible balance countdown during runs (control) → refund of unused reservation (trust, anti-Perplexity-$7,245-complaint) → streaks/leagues/cards (identity + status) → agent texts first (ambient vigilance) → answer-to-asset (sunk context). None of these costs real money: rewards are credits against ~$0 marginal cost — the reward budget IS the marketing budget.
+
+**Guardrails (learned from every company's complaints, §22):** never surprise-bill (reserve-then-settle is structural), never reward query volume over answer quality (leagues score SOLVED problems), streaks pause-capable (Duolingo freeze), no dark-pattern cancel (Muse's top complaint), training off by default, and cap daily variable-reward costs so delight never becomes a runaway bill (Perplexity's $7,245 lesson).
 
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
