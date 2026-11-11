@@ -278,5 +278,35 @@ Our stack is open-weight models on cheap/free routes plus our own search lanes. 
 4. Guardrails: auth-gated free tier, cheap-route-only for free, premium routes gated to paid, spend caps on by default, abuse monitoring via the ops fleet.
 5. Positioning line: "Perplexity-grade answers at 60-80% less — grounded in 588,746 properties of rental data they don't have."
 
+## 19. Personal-agent supercharge — Muse + Instinct + Town + Wabi + Manus combo (added v166)
+Reverse-engineered from each product's live documentation 2026-11-11: [Muse](https://ai.meta.com/muse/) (Meta personal agent), [Instinct](https://instinct.com/) (zero-UI text/call assistant), [Town](https://www.town.com/product) (Townie work assistant), [Wabi](https://wabi.ai/) (multiplayer family assistant), [Manus](https://www.manus.im/features) (autonomous general agent). Goal: combine ALL of their signature capabilities into ai.spaincos — one agent that searches like Perplexity, works like Manus, texts like Instinct, runs routines like Town, and goes multiplayer like Wabi.
+
+### Capability matrix — theirs vs ours
+| # | Capability (source) | ai.spaincos today | Build item | Effort |
+|---|---|---|---|---|
+| P1 | Secure VM per user — persistent Linux computer + browser (Muse, Manus) | run_python sandbox only (ephemeral) | Upgrade sandbox to persistent per-user VM on spain-runner with browser; user can watch/intervene | M |
+| P2 | Goal → action plan → autonomous background execution + notify when done (Muse, Manus) | automations + guardians exist but prompt-driven, not goal-driven | Goal mode: give a goal, agent decomposes, runs fleet jobs, reports back into thread | M |
+| P3 | Zero-UI channels: iMessage/WhatsApp/SMS/phone, own phone number + email address (Instinct, Town) | none | Twilio number + email handle per agent; session-bridge already links external threads to sessions | M |
+| P4 | Proactive first contact — texts you first when something needs attention (Instinct, Wabi, Muse) | push module + automations fire but don't initiate threads | Guardian triggers → agent-authored message into user's thread/inbox | S |
+| P5 | Routines: scheduled + event-triggered (incoming email, calendar event, webhook) (Town) | automations have cron; no email/calendar triggers | Add connector-event triggers to automations engine | S |
+| P6 | Learns your voice/contacts/priorities from connected email + calendar (Town, Muse) | personalization from memory + threads | Connector-derived voice/style profile + editable wiki page (memory UI exists) | M |
+| P7 | Approval modes: ask-first / safe-actions / allow-all, per tool and per routine (Town, Muse) | approve cards for send_email/create_event only | Generalize approval queue to every write tool with per-tool modes | M |
+| P8 | Full activity log + revoke any connector anytime (Muse, Town) | toggle switches + deliberate-disconnect markers shipped v164 | Per-action audit log viewable in Settings | S |
+| P9 | Agent-to-agent network — your agent talks to teammates' agents with per-person permissions (Instinct Trusted Person, Town Townies) | session-bridge links threads but no permissions model | Fleet-level: agent cards with scoped permissions (org/team tables exist) | L |
+| P10 | Multiplayer/group chats — bring family/coworkers into the agent chat (Wabi) | single-user threads | Shared threads (org members exist); group plan tier | L |
+| P11 | Generated mini-apps in chat — plan/tracker/map/vote/game appears when needed (Wabi, Muse artifacts) | docs/webapp artifacts exist | Context-triggered artifact generation (plan → tracker, trip → map) | M |
+| P12 | Wide Research — parallel sub-agents synthesizing a report (Manus) | research lane is serial sub-questions | Fan-out parallel sub-question execution (also fixes the 70s first-token gap, section 11 speed) | M |
+| P13 | Full-stack app build + deploy with auth/DB/domains/versioning (Manus) | repo-pr + site-change + Vercel token exist | Agent-driven deploy pipeline: build → PR → verify → merge → poll (I already run this manually) | M |
+| P14 | Live view of the agent's computer — watch it work, intervene anytime (Manus, Muse) | progress steps UI exists | Stream browser_step/sandbox activity into the steps panel | M |
+| P15 | Shopping/errands — price tracking, purchases with approval (Muse, Instinct Stripe Link) | none | Commerce connectors + approval-gated purchase card | L |
+| P16 | Health/fitness coaching from connected data (Muse, Wabi) | none | Health Connect / WHOOP connector | L |
+| P17 | Skills marketplace — SKILL.md, community skills (Manus) | skills + plugins modules exist | Port SKILL.md conventions; community publish flow | S |
+| P18 | Custom avatar, name, voice — personalize the agent (Muse) | model picker only | Agent identity: name + avatar + TTS voice choice | S |
+
+### The combo thesis
+Muse/Instinct/Town/Wabi all converge on the same architecture: persistent agent + connectors + approval gates + proactive notifications + routines. Manus converges on autonomous execution with a VM. ai.spaincos already owns every hard infrastructure piece they each had to build (auth, connectors, fleet, automations, guardians, sandbox, artifacts, bridge, deploy pipeline). The build is assembly, not invention: P4, P5, P8, P17, P18 are quick wins (days); P1-P3, P7, P11-P14 are the differentiation core (weeks); P9, P10, P15, P16 extend the platform (later).
+
+Sequencing: ship the quick wins first (proactive messaging, connector triggers, audit log, skills port, agent identity), then Goal Mode (P2) with the persistent VM (P1) and parallel research (P12) as the "Manus-grade" release, then zero-UI channels (P3) as the "Instinct-grade" release.
+
 ## Bottom line
 Search, answers, citations, artifacts, memory, spaces, permanence (new), self-update (new), and the QA fleet are at or past parity. The completion frontier is: **agentic browsing (Comet), live active threads + ranked-choice cards, connector breadth, the 12-model dropdown (owner machine), research latency, and visual sign-off (needs your screenshots).** Everything in this doc is either ✅ shipped, 🟡 scoped, or 🔴 blocked on an owner action listed above.
