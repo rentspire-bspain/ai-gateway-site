@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-11T10:58:32+00:00",
- "base": "https://ai.spaincos.com",
+ "ts": "2026-11-11T11:45:05+00:00",
+ "base": "http://localhost:8765",
  "passed": 29,
- "failed": 0,
+ "failed": 1,
  "checks": [
   {
    "name": "gateway-status 200",
@@ -22,7 +22,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "5.7s"
+   "detail": "6.2s"
   },
   {
    "name": "current-events answered",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "9.6s"
+   "detail": "6.6s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -58,6 +58,11 @@
    "name": "all deployed modules match repo",
    "ok": true,
    "detail": ""
+  },
+  {
+   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
+   "ok": true,
+   "detail": "index=v157 build.json=v157"
   },
   {
    "name": "landing renders",
@@ -137,11 +142,11 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nGuardians\nQA\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 29/29 checks \u00b7 11/11/2026, 10:56:42 AM\nRun before "
+   "detail": "Overview\nGuardians\nQA\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 29/29 checks \u00b7 11/11/2026, 10:58:32 AM\nRun before "
   },
   {
    "name": "Connectors panel renders",
-   "ok": true,
+   "ok": false,
    "detail": ""
   },
   {
@@ -150,5 +155,5 @@
    "detail": ""
   }
  ],
- "exit": 0
+ "exit": 1
 }
