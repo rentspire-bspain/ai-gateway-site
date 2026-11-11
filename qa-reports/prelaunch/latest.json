@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-11T19:04:53+00:00",
+ "ts": "2026-11-11T20:37:22+00:00",
  "base": "https://ai.spaincos.com",
  "passed": 30,
  "failed": 1,
@@ -22,7 +22,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "5.9s"
+   "detail": "6.0s"
   },
   {
    "name": "current-events answered",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "22.7s"
+   "detail": "11.2s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -62,7 +62,7 @@
   {
    "name": "build.json matches shipped BUILD (stale-tab detector armed)",
    "ok": false,
-   "detail": "index=v164 build.json=v163"
+   "detail": "index=v165 build.json=v163"
   },
   {
    "name": "landing renders",
@@ -147,7 +147,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n17 FAILED\n\u00b7 11/28 checks \u00b7 11/11/2026, 6:22:22 PM\nRun be"
+   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n1 FAILED\n\u00b7 30/31 checks \u00b7 11/11/2026, 7:04:53 PM\nRun bef"
   },
   {
    "name": "follow-up chip submits (search state)",

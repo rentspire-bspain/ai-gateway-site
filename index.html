@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-yPLoCpMLX1ATlZQPyPx7+eAlpt56M6VjuKWEtgWDnkg=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-gs4MIe4XPjAJZ1Vp8lNq0NnSFBYBduqsvxJiaG4HOFU=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -268,6 +268,8 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   overflow-x: hidden;
   padding: 0 12px;
 }
+.spaces-head { cursor: pointer; }
+#spaceItems { padding-bottom: 8px; }
 .spaces-head { display: flex; align-items: center; }
 .space-add-btn {
   background: none; border: none; color: var(--text-faint); cursor: pointer;
@@ -1498,15 +1500,16 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
     </div>
     <div class="threads-list" id="threadsList">
       <input class="thread-search" id="threadSearch" placeholder="Search threads..." autocomplete="off">
-      <div class="spaces-head">
+      <div class="threads-label" id="recentLabel">Recent</div>
+      <div id="threadItems"></div>
+      <div class="spaces-head" id="spacesHead" title="Show spaces">
         <div class="threads-label" style="flex:1">Spaces</div>
+        <svg id="spacesChevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transform:rotate(-90deg)"><path d="M6 9l6 6 6-6"/></svg>
         <button class="space-add-btn" id="newSpaceBtn" title="New space">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         </button>
       </div>
       <div id="spaceItems"></div>
-      <div class="threads-label" id="recentLabel">Recent</div>
-      <div id="threadItems"></div>
     </div>
     <div class="sidebar-footer">
       <button class="import-history-btn" id="importHistoryBtn" title="Import your Perplexity history as searchable context">
@@ -2103,9 +2106,17 @@ async function syncSpacesFromServer() {
     renderThreads();
   } catch (e) { /* offline-tolerant */ }
 }
+function applySpacesCollapsed() {
+  const c = document.getElementById("spaceItems"), h = document.getElementById("spacesHead"), ch = document.getElementById("spacesChevron");
+  const collapsed = localStorage.getItem("ai_spaces_collapsed") !== "0";   // default: collapsed (owner directive 2026-11-11)
+  if (c) c.style.display = collapsed ? "none" : "";
+  if (h) h.title = collapsed ? "Show spaces" : "Hide spaces";
+  if (ch) ch.style.transform = collapsed ? "rotate(-90deg)" : "rotate(0deg)";
+}
 function renderSpaces() {
   const container = document.getElementById("spaceItems");
   if (!container) return;
+  applySpacesCollapsed();
   container.innerHTML = "";
   for (const s of spaces) {
     const div = document.createElement("div");
@@ -2113,7 +2124,7 @@ function renderSpaces() {
     div.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
     const name = document.createElement("span");
     name.className = "space-name";
-    name.textContent = s.name;
+    name.textContent = s.name && s.name.trim() ? s.name.trim() : "Untitled space";
     name.title = s.instructions ? s.instructions.slice(0, 200) : "No custom instructions";
     const badge = document.createElement("span");
     badge.className = "space-badge";
@@ -3092,6 +3103,14 @@ async function loadThread(id, fromNav) {
   }));
 }
 document.getElementById("newThreadBtn").onclick = newThread;
+(function () {
+  const h = document.getElementById("spacesHead");
+  if (h) h.addEventListener("click", function (e) {
+    if (e.target.closest("#newSpaceBtn")) return;   // + button keeps its own behavior
+    localStorage.setItem("ai_spaces_collapsed", localStorage.getItem("ai_spaces_collapsed") === "0" ? "1" : "0");
+    applySpacesCollapsed();
+  });
+})();
 document.getElementById("newThreadIcon").onclick = newThread;
 
 // ============ VIEW SWITCHING ============
@@ -5291,7 +5310,7 @@ function wireCodeCopy(scope) {
     pre.appendChild(btn);
   });
 }
-  window.BUILD = "v165";
+  window.BUILD = "v166";
   console.log("[ai.spaincos] build " + window.BUILD);
   try { (function () {
     const acct = document.querySelector(".account, #accountBtn, .sidebar-footer");
