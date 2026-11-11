@@ -190,7 +190,7 @@
   }
 
   /* ---------- panel ---------- */
-  function width() { var w = parseInt(localStorage.getItem(KEY), 10); return Math.max(360, Math.min(w || Math.round(window.innerWidth * 0.45), Math.round(window.innerWidth * 0.75))); }
+  function width() { var w = parseInt(localStorage.getItem(KEY), 10); return Math.max(360, Math.min(w || Math.round(window.innerWidth * 0.62), Math.round(window.innerWidth * 0.85))); }
   function setW(w) { document.documentElement.style.setProperty('--dp-w', w + 'px'); }
   function build() {
     if (panel) return;
