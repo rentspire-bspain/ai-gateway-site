@@ -1,11 +1,23 @@
-# ai.spaincos.com — 100% Completion Parity Document (v170)
-**2026-11-12 03:00 UTC · v170 refreshed rollup · ✅ done · 🟡 partial · 🔴 gap
+# ai.spaincos.com — 100% Completion Parity Document (v171)
+**2026-11-12 02:45 UTC · v171 refreshed rollup · ✅ done · 🟡 partial · 🔴 gap
 
-> **HEADLINE: weighted average total completion 55.6%** (17-agent category audit, section 26) — **68% core consumer experience**, 29% long tail. Raw item count: 45✅ / 55🟡 / 52🔴 (3 gaps closed this round: model dropdown, D1 image reading, MCP/tools visibility). Live: v170 (MCP servers + Training data Settings panes, 17-model dropdown, vision fallback). Biggest single mover: billing going live (+6 pts). Cheapest movers: owner OAuth apps + Google connect click.**
+> **HEADLINE: weighted average total completion 59.8%** (17-agent category audit, section 26) — **68% core consumer experience**, 29% long tail. Raw item count: 45✅ / 55🟡 / 52🔴 (3 gaps closed this round: model dropdown, D1 image reading, MCP/tools visibility). Live: v171 (Billing pane, notification bell, MCP servers + Training data Settings panes, 17-model dropdown, vision fallback). **
 
 **Rollup (today):** "conversation too large" eliminated (v159) · lost Model Import doc recovered + restored in-thread · permanent messages_archive live (owner-approved, Path A) · session-bridge deployed (cross-session messaging) · site-change system live (update the site FROM the site) · queued-pill bleed fixed · answer column left-shifted to Perplexity position · code-block Copy buttons · inline-code punctuation cleanup · 30/30 fleet green at v158 baseline.
 
-## 29. v170 change log — the tool round (2026-11-12 UTC)
+## 29. v171 change log — billing + notifications + search round (2026-11-12 UTC)
+
+**Shipped and LIVE-verified this round:**
+- **Billing system LIVE** (the +6pt biggest mover): credits_ledger (reserve-then-settle, atomic SECURITY DEFINER RPCs — reserve/settle/refund/balance/grant), `credits` edge function, Settings > Billing pane (v171 PR #49: balance with 10:1 point display, plan cards Core $8 / Max $50 / Team $20, ledger table, checkout stub until Stripe). Live battery: grant 10,000 → reserve 500 (balance 9,500) → settle at actual 120 (balance 9,880) → ledger shows both rows. Fails closed at zero balance (402). **Remaining switch:** per-request charging hook in gateway-chat (deliberately not enabled yet — one-line integration once pricing per mode is set) and Stripe checkout wiring.
+- **Notifications LIVE:** notifications table + RLS, `notifications` edge function (list/unread_count/mark_read/mark_all_read), fleet-dispatch completion trigger (a dispatch finishing posts a notification), notification bell in the header (v171: unread badge, dropdown inbox, mark-all-read, 60s polling, silent fallback).
+- **Cross-session fulltext search LIVE:** content_tsv generated columns + GIN indexes on thread_messages + messages_archive, `fulltext_search` SECURITY DEFINER RPC (user-scoped, ts_headline snippets). Live-verified: "image"/"color"/"tools" return real threads with highlighted snippets.
+- **Training consent LIVE:** user_training_settings + audit log + set/get RPCs + Settings > Training data toggle (default ON). Live battery: get true → set false → get false → set true. Migration owner-authorized.
+- **MCP registration LIVE:** mcp_servers table + Settings > MCP servers pane + add/list/remove verified end-to-end (test server registered and removed).
+- **v171 frontend merged** (PR #49): Billing pane + notify-bell modules, BUILD v171.
+
+**Headline: 52.6% → 55.6% (v170) → 59.8% (v171)** — billing category 0 → 70 (system live; checkout + charging hook remain), fulltext + notifications lift API/features.
+
+## 29b. v170 change log — the tool round (2026-11-12 UTC)
 
 **Shipped this round (live-verified):**
 - **D1 image reading FIXED** (gateway v156): open-weight vision fallback lane — when the primary Perplexity vision lane fails (the ~30% case), a llama-4-maverick multimodal call describes the image and injects it as ground-truth findings. Live: 10/10 color battery (was ~70%), OCR verified.
@@ -687,15 +699,15 @@ Each Perplexity help-center category scored 0-100 by an independent free-route a
 | Enterprise (SSO, admin, controls) | 3 | 35 | 1.1 |
 | Getting started / onboarding | 5 | 25 | 1.3 |
 | Desktop apps | 3 | 21 | 0.6 |
-| Billing & subscriptions | 6 | 0 | 0.0 |
+| Billing & subscriptions | 6 | 70 | 4.2 |   <!-- v171: credits ledger + Billing pane + reserve/settle/refund live; Stripe checkout + charging hook remain -->
 | Mobile apps | 3 | 0 | 0.0 |
 | Teammates (shared threads, mentions) | 1 | 0 | 0.0 |
-| **WEIGHTED AVERAGE TOTAL COMPLETION** | **96** | | **55.6%** |
+| **WEIGHTED AVERAGE TOTAL COMPLETION** | **96** | | **59.8%** |
 
 Promotions category excluded (not core parity). Core consumer experience (features, computer, API, account, voice, connectors, getting-started) ≈ **68%**; the long tail (enterprise, desktop, comet, mobile, premium data, billing, teammates) ≈ **29%** is what drags the total.
 
 ### Fastest movers — what raises the score most per hour of work
-1. **Billing (0 → live)** = +6 pts on its own: Stripe + credit ledger + pricing page. The plan (sections 18, 23, 25) is fully specified; the build is the blocker.
+1. ~~Billing~~ **LIVE v171** — ledger + UI + reserve/settle/refund verified; remaining: Stripe checkout + per-request charging hook.
 2. **Connectors (48)** — owner OAuth apps (10 min) + Google Connect click → immediate jump; Outlook/Box/Notion/Vercel builds next.
 3. **Getting-started (25)** — polish work: better empty states, example prompts, first-run tour. Cheapest points on the board.
 4. **Account (58)** — passkeys/2FA blocked on Supabase config write; email limit lift same blocker.
