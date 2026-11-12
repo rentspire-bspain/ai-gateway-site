@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-dYGA3kJb2QHq6SDYJkrG55ggbAcBN6ORGawGvoQjUzs=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-yzTv/nL44GtgmUAO4JsovNEyNm0MSejBFdPsHtsrgic=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -5461,6 +5461,51 @@ async function loadStatus(force) {
 })();
 
 // ===== v83 (G6/G8): offline banner, service worker, install prompt =====
+// v179 (owner request 2026-11-12): URLs must open directly in a new window —
+// Copy stays for long text, but any code block containing a URL also gets "Open".
+window.wireCodeOpen = function wireCodeOpen(pre) {
+  if (pre.querySelector(".code-open-btn")) return;
+  const t = (pre.querySelector("code") || pre).textContent || "";
+  const m = t.trim().match(/^https?:\/\/[^\s"'<>]+$/i) || t.match(/https?:\/\/[^\s"'<>]+/i);
+  if (!m) return;
+  const ob = document.createElement("button");
+  ob.type = "button"; ob.className = "code-copy-btn code-open-btn";
+  ob.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>Open';
+  ob.setAttribute("aria-label", "Open URL in a new tab");
+  ob.onclick = () => window.open(m[0], "_blank", "noopener,noreferrer");
+  pre.appendChild(ob);
+}
+// v179: bare http(s) URLs left as plain text by the markdown renderer become
+// real anchors that open in a new tab. Walks TEXT nodes only — never touches
+// code blocks, existing links, or attribute values.
+window.autolinkAnswer = function autolinkAnswer(root) {
+  const URL_RE = /https?:\/\/[^\s"'<>)\]]+[^\s"'<>).\],;:!?]/g;
+  const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => {
+      const p = n.parentElement;
+      if (!p || /^(a|pre|code|script|style|button|textarea)$/i.test(p.tagName)) return NodeFilter.FILTER_REJECT;
+      URL_RE.lastIndex = 0;
+      return URL_RE.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  const hits = [];
+  let n; while ((n = walk.nextNode())) hits.push(n);
+  hits.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    let lastIdx = 0, s = node.nodeValue, mm;
+    URL_RE.lastIndex = 0;
+    while ((mm = URL_RE.exec(s))) {
+      if (mm.index > lastIdx) frag.appendChild(document.createTextNode(s.slice(lastIdx, mm.index)));
+      const a = document.createElement("a");
+      a.href = mm[0]; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.textContent = mm[0];
+      frag.appendChild(a);
+      lastIdx = mm.index + mm[0].length;
+    }
+    if (lastIdx < s.length) frag.appendChild(document.createTextNode(s.slice(lastIdx)));
+    node.parentNode.replaceChild(frag, node);
+  });
+};
 (function () {
   const bar = document.createElement("div");
   bar.className = "offline-bar"; bar.id = "offlineBar"; bar.setAttribute("role", "status");
@@ -5488,51 +5533,6 @@ function wireCodeCopy(scope) {
     };
     pre.appendChild(btn);
     wireCodeOpen(pre);   // v179: URLs also get an "Open" button (new tab)
-  });
-}
-// v179 (owner request 2026-11-12): URLs must open directly in a new window —
-// Copy stays for long text, but any code block containing a URL also gets "Open".
-function wireCodeOpen(pre) {
-  if (pre.querySelector(".code-open-btn")) return;
-  const t = (pre.querySelector("code") || pre).textContent || "";
-  const m = t.trim().match(/^https?:\/\/[^\s"'<>]+$/i) || t.match(/https?:\/\/[^\s"'<>]+/i);
-  if (!m) return;
-  const ob = document.createElement("button");
-  ob.type = "button"; ob.className = "code-copy-btn code-open-btn";
-  ob.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>Open';
-  ob.setAttribute("aria-label", "Open URL in a new tab");
-  ob.onclick = () => window.open(m[0], "_blank", "noopener,noreferrer");
-  pre.appendChild(ob);
-}
-// v179: bare http(s) URLs left as plain text by the markdown renderer become
-// real anchors that open in a new tab. Walks TEXT nodes only — never touches
-// code blocks, existing links, or attribute values.
-function autolinkAnswer(root) {
-  const URL_RE = /https?:\/\/[^\s"'<>)\]]+[^\s"'<>).\],;:!?]/g;
-  const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-    acceptNode: (n) => {
-      const p = n.parentElement;
-      if (!p || /^(a|pre|code|script|style|button|textarea)$/i.test(p.tagName)) return NodeFilter.FILTER_REJECT;
-      URL_RE.lastIndex = 0;
-      return URL_RE.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-    }
-  });
-  const hits = [];
-  let n; while ((n = walk.nextNode())) hits.push(n);
-  hits.forEach((node) => {
-    const frag = document.createDocumentFragment();
-    let lastIdx = 0, s = node.nodeValue, mm;
-    URL_RE.lastIndex = 0;
-    while ((mm = URL_RE.exec(s))) {
-      if (mm.index > lastIdx) frag.appendChild(document.createTextNode(s.slice(lastIdx, mm.index)));
-      const a = document.createElement("a");
-      a.href = mm[0]; a.target = "_blank"; a.rel = "noopener noreferrer";
-      a.textContent = mm[0];
-      frag.appendChild(a);
-      lastIdx = mm.index + mm[0].length;
-    }
-    if (lastIdx < s.length) frag.appendChild(document.createTextNode(s.slice(lastIdx)));
-    node.parentNode.replaceChild(frag, node);
   });
 }
   window.BUILD = "v180";
