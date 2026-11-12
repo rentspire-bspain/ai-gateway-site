@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-t4dWBFLuZolfz0vRTTwFQZIK6oweAFlQDO+YJABdPDk=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-QAdhbYet59kXOeiYNs/vV8PbvM5ZA/baNne81+ZwuiY=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@ html.pre-boot #landing{display:none!important}
 html.pre-boot body::before{content:"";position:fixed;top:72px;left:50%;transform:translateX(-50%);width:min(720px,86vw);height:60vh;border-radius:12px;z-index:5;background:linear-gradient(90deg,rgba(128,128,128,.10) 25%,rgba(128,128,128,.22) 50%,rgba(128,128,128,.10) 75%);background-size:200% 100%;animation:preBootShimmer 1.2s linear infinite}
 @keyframes preBootShimmer{to{background-position:-200% 0}}
 </style>
-<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" type="image/png" href="/favicon.png?v=177">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#14646B">
 <meta name="app-version" content="v84">
@@ -1474,7 +1474,7 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo">
-        <img src="/spaincos-logo-white.png" alt="Spain Companies" style="height:26px;width:auto;display:block;max-width:150px;object-fit:contain" />
+        <img src="/spaincos-icon.svg?v=177" alt="Spain Companies" style="height:28px;width:auto;display:block" /><span style="font-weight:700;letter-spacing:.02em">ai.spaincos</span>
       </div>
       <div class="sidebar-actions">
         <button class="icon-btn" id="newThreadIcon" title="New thread">
@@ -1664,7 +1664,7 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 <div class="auth-overlay" id="authOverlay" style="display:none">
   <div class="auth-modal">
     <div class="auth-logo">
-      <img src="/spaincos-logo-white.png" alt="Spain Companies" style="height:34px;width:auto;display:block" />
+      <img src="/spaincos-icon.svg?v=177" alt="Spain Companies" style="height:40px;width:auto;display:block" />
     </div>
     <h2 class="auth-title">Welcome to ai.spaincos</h2>
     <p class="auth-subtitle">Sign in to start searching</p>
@@ -5358,13 +5358,19 @@ function wireCodeCopy(scope) {
   })(); } catch (e) {}
   function checkFresh() {
     fetch("/build.json", { cache: "no-store" }).then(r => r.json()).then(j => {
-      if (j && j.build && j.build !== window.BUILD && !document.getElementById("staleBar")) {
+      const num = (v) => parseInt(String(v || "").replace(/[^0-9]/g, ""), 10) || 0;
+      const pageB = num(window.BUILD), srvB = num(j && j.build);
+      // v177 bugfix: the bar showed forever because build.json had drifted (v163) while the
+      // page was current. Show ONLY when the page is genuinely behind, and always REMOVE
+      // the bar when the page is current — clicking reload now clears it.
+      if (srvB && pageB && srvB > pageB && !document.getElementById("staleBar")) {
         const bar = document.createElement("div"); bar.id = "staleBar";
         bar.textContent = "A newer version is available \u2014 reload to update.";
         bar.style.cssText = "position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:8px 16px;background:var(--accent,#1a6b5a);color:#fff;font:600 13px/1 var(--font-sans,sans-serif);text-align:center;cursor:pointer";
-        bar.onclick = () => location.reload(true);
+        bar.onclick = () => { try { localStorage.setItem("staleBarReload", String(Date.now())); } catch (e) {} location.reload(); };
         document.body.appendChild(bar);
       }
+      if (document.getElementById("staleBar") && !(srvB && pageB && srvB > pageB)) document.getElementById("staleBar").remove();
     }).catch(() => {});
   }
   window.addEventListener("load", () => { checkFresh(); setInterval(checkFresh, 60000); });
