@@ -62,9 +62,18 @@
       }).join("");
     }).catch(function () { ledger.innerHTML = '<p class="muted">Ledger unavailable.</p>'; });
 
-    root.querySelector("#plans").addEventListener("click", function (ev) {
+    root.querySelector("#plans").addEventListener("click", async function (ev) {
       var b = ev.target.closest("button[data-plan]"); if (!b) return;
-      note.textContent = "Checkout for " + b.dataset.plan + " launches with the Stripe wiring — the ledger and balance engine are live.";
+      if (b.dataset.plan === "team") { note.textContent = "Team seats launch with the Stripe wiring — email bspain@spaincos.com to be first in line."; return; }
+      note.textContent = "Starting checkout…";
+      try {
+        var h = await authHeaders();
+        var res = await fetch("https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/checkout", { method: "POST", headers: h, body: JSON.stringify({ plan: b.dataset.plan }) });
+        var d = await res.json();
+        if (d && d.url) { note.textContent = "Redirecting to secure checkout (30-day free trial)…"; location.href = d.url; return; }
+        if (d && d.not_configured) { note.textContent = "Checkout is one secret away: add STRIPE_SECRET_KEY in the project settings and this button goes live. Everything else (ledger, balance, plans) is already running."; return; }
+        note.textContent = "Checkout unavailable: " + String((d && d.error) || ("HTTP " + res.status));
+      } catch (e) { note.textContent = "Checkout error: " + String(e.message || e).slice(0, 120); }
     });
     return root;
   }

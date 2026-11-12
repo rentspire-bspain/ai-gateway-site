@@ -278,8 +278,36 @@
   function renderActions(container, actions) {
     if (!container || !Array.isArray(actions) || !actions.length) return;
     var wrap = el("div", "cn-acts");
-    actions.slice(0, 5).forEach(function (a) { if (a && (a.kind === "send_email" || a.kind === "create_event") && a.approval_token) wrap.appendChild(actionCard(a)); });
+    actions.slice(0, 5).forEach(function (a) {
+      if (!a) return;
+      if ((a.kind === "send_email" || a.kind === "create_event") && a.approval_token) wrap.appendChild(actionCard(a));
+      else if (a.kind === "ask_user") wrap.appendChild(askCard(a));   // v172: choose-one cards
+    });
     if (wrap.childNodes.length) container.appendChild(wrap);
+  }
+
+  // v172 ask_user card: clickable options; clicking submits the chosen value as the
+  // next user message. Typing free text (any composer) works too — the card dismisses
+  // on the next turn render, and the free text simply wins.
+  function askCard(a) {
+    var card = el("div", "cn-act");
+    card.style.cssText = "background:var(--bg-elevated,#212121);border:1px solid var(--border,#333);border-radius:12px;padding:12px 14px;margin:8px 0";
+    var q = el("div", null, a.question || "");
+    q.style.cssText = "font-weight:600;font-size:13px;margin-bottom:8px";
+    card.appendChild(q);
+    (a.options || []).forEach(function (opt) {
+      var b = el("button", "sk-btn", opt.label);
+      b.style.cssText = "display:block;width:100%;text-align:left;margin:6px 0;font:inherit;font-size:13px";
+      b.addEventListener("click", function () {
+        card.remove();
+        try { submitQuery(opt.value); } catch (e) { /* composer unavailable: leave the text visible */ }
+      });
+      card.appendChild(b);
+    });
+    var hint = el("div", null, "Pick one — or just type your own answer.");
+    hint.style.cssText = "font-size:11px;opacity:.6;margin-top:6px";
+    card.appendChild(hint);
+    return card;
   }
 
   root.ConnectorsUI = { card: card, badge: badge, renderActions: renderActions, refresh: loadStatus, _handleReturn: handleReturn };
