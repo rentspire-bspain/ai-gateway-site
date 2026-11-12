@@ -44,11 +44,11 @@
       '<div class="muted">Your code:</div><code id="refCode" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:15px">…</code>' +
       '<button class="sk-btn" id="refCopy">Copy invite link</button>' +
       '<span class="muted" id="refStats"></span></div>' +
-      '<div class="muted" style="margin-top:6px;max-width:60ch">Share your link — when a friend signs up and claims your code, you both get 500 credits instantly (5,000 pts displayed). One claim per account; referrers cap at 40,000 credits.</div>' +
+      '<div class="muted" style="margin-top:6px;max-width:60ch">Share your link — when a friend signs up and claims your code, you both get 1,000 credits instantly (10,000 pts displayed). One claim per account. No lifetime cap — refer as many friends as you like.</div>' +
       '<div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">' +
       '<div class="muted">Have a code?</div>' +
       '<input id="refInput" placeholder="e.g. 3b4cc9a3" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:inherit;font-size:13px;width:140px" />' +
-      '<button class="sk-btn" id="refClaim">Claim 500 credits</button>' +
+      '<button class="sk-btn" id="refClaim">Claim 1,000 credits</button>' +
       '<span class="muted" id="refMsg"></span></div>' +
       '<h3 style="margin-top:22px">Recent activity</h3>' +
       '<div id="ledger" style="margin-top:8px"></div>' +
@@ -98,7 +98,7 @@
     }).catch(function () {});
     try { // v173: prefill from an invite link (?ref=CODE captured at page load)
       var pend = localStorage.getItem("pendingRef");
-      if (pend && root.querySelector("#refInput")) { root.querySelector("#refInput").value = pend; refMsg.textContent = "Invite code detected — claim it for 500 free credits."; }
+      if (pend && root.querySelector("#refInput")) { root.querySelector("#refInput").value = pend; refMsg.textContent = "Invite code detected — claim it for 1,000 free credits."; }
     } catch (e) {}
     root.querySelector("#refClaim").addEventListener("click", async function () {
       var codeEl = root.querySelector("#refInput");
@@ -110,7 +110,7 @@
         h.apikey = (typeof SUPABASE_ANON !== "undefined") ? SUPABASE_ANON : ((typeof sb !== "undefined" && sb.supabaseKey) ? sb.supabaseKey : "");
         var res = await fetch(SB_URL + "/rest/v1/rpc/referral_claim", { method: "POST", headers: h, body: JSON.stringify({ p_code: code }) });
         var d = null; try { d = await res.json(); } catch (e) {}
-        if (res.ok && d && d.ok) { refMsg.textContent = "Claimed — 500 credits (5,000 pts) added."; try { localStorage.removeItem("pendingRef"); } catch (e) {} credits("balance").then(function (b) { balVal.textContent = fmt(Number(b.balance || 0) * 10) + " pts"; }); }
+        if (res.ok && d && d.ok) { refMsg.textContent = "Claimed — 1,000 credits (10,000 pts) added."; try { localStorage.removeItem("pendingRef"); } catch (e) {} credits("balance").then(function (b) { balVal.textContent = fmt(Number(b.balance || 0) * 10) + " pts"; }); }
         else { refMsg.textContent = "Could not claim (" + String((d && (d.message || d.error)) || "invalid or already-used code") + ")."; }
       } catch (e) { refMsg.textContent = "Error: " + String(e.message || e).slice(0, 100); }
     });
