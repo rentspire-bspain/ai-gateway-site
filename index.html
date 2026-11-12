@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-yzTv/nL44GtgmUAO4JsovNEyNm0MSejBFdPsHtsrgic=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-8zf1i4CN0jgT3scjERBnh4HQUNu5pNIPzPPho1W4cuU=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -92,6 +92,8 @@ body.incognito .question-header::after{content:"";}
   --accent-hover: #56ABAB;
   --accent-btn: #2B7A7A;
   --accent-btn-hover: #246C6C;
+  --send-btn-bg: #E8EDF2;   /* v181: Perplexity-style high-contrast send button (light circle, dark icon) */
+  --send-btn-fg: #0D1117;
   --accent-light: rgba(61, 149, 149, 0.14);
   --citation-bg: rgba(219, 222, 227, 0.06);
   --citation-text: #6BB8B8;
@@ -121,6 +123,8 @@ body.incognito .question-header::after{content:"";}
   --accent-hover: #0F4F55;
   --accent-btn: #14646B;
   --accent-btn-hover: #0F4F55;
+  --send-btn-bg: #1B1F24;   /* v181: light mode = dark circle, white icon */
+  --send-btn-fg: #FFFFFF;
   --accent-light: rgba(61, 149, 149, 0.1);
   --citation-bg: rgba(11, 40, 51, 0.05);
   --citation-text: #14646B;
@@ -617,13 +621,14 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--accent-btn);
-  color: white;
+  background: var(--send-btn-bg);
+  color: var(--send-btn-fg);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: background 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,.28);
 }
 .search-submit:hover { background: var(--accent-btn-hover); transform: scale(1.05); }
 .search-submit:disabled { opacity: 0.5; cursor: wait; }
@@ -1281,19 +1286,23 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .queued-cancel:hover { color: var(--text); }
 .followup-box input::placeholder { color: var(--text-faint); }
 .followup-send {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: var(--accent-btn);
-  color: white;
+  background: var(--send-btn-bg);
+  color: var(--send-btn-fg);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: background 0.15s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,.28);
 }
 .followup-send:hover { background: var(--accent-btn-hover); }
 .followup-send:disabled { opacity: 0.5; cursor: wait; }
+/* v181: the send button becomes a filled STOP square while a response streams —
+   the user always knows whether pressing it sends or stops. */
+.search-submit.searching, .followup-send.searching { background: var(--send-btn-bg); color: var(--send-btn-fg); cursor: pointer; }
 
 /* Model selector */
 .model-select {
@@ -4841,10 +4850,33 @@ async function performSearch(query) {
   if (isSearching) return;
   try { await performSearchInner(query); } finally { drainQueue(); }
 }
+// v181 (owner request 2026-11-12): Perplexity-style send/stop button. The arrow
+// button is high-contrast in both themes, and while a response streams it becomes
+// a filled STOP square that really aborts the request — the user always knows
+// whether pressing it sends or stops.
+let searchAbort = null;
+function stopSearch() { if (searchAbort) { try { searchAbort.abort(); } catch (e) {} } }
+function syncSendButtons() {
+  const busy = !!isSearching;
+  document.querySelectorAll("#landingSubmit, #followupSend").forEach(btn => {
+    if (!btn) return;
+    const changed = btn.classList.contains("searching") !== busy;
+    btn.classList.toggle("searching", busy);
+    if (changed) {
+      btn.innerHTML = busy
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>';
+      btn.title = busy ? "Stop generating" : "Send";
+      btn.setAttribute("aria-label", busy ? "Stop generating" : "Send");
+    }
+  });
+}
+setInterval(syncSendButtons, 400); syncSendButtons();
 async function performSearchInner(query) {
   if (isSearching || !query.trim()) return;
   try { window.EntityCards && window.EntityCards.questionHint && window.EntityCards.questionHint(query); } catch (e) {}
   isSearching = true;
+  searchAbort = new AbortController();   // v181: the STOP button aborts this search
   searchDeadline = Date.now() + 300000; // v156 watchdog: no search may hold the composer hostage for more than 5 minutes
   stopSpeaking();
   try { // v157: this try now covers the WHOLE search — a throw in thread setup or the
@@ -5154,6 +5186,7 @@ async function performSearchInner(query) {
       // whenever the response is not an SSE stream.
       const res = await fetchRetry(GATEWAY + "/gateway-chat", {
         method: "POST",
+        signal: searchAbort ? searchAbort.signal : undefined,   // v181: STOP button
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
         body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
@@ -5247,11 +5280,17 @@ async function performSearchInner(query) {
     if (/conversation too large/i.test(emsg)) {
       renderAnswerError(content, "This thread is very long", "This conversation has grown past the context limit. Start a new thread and reference this one (link it with @) — your recent messages are preserved.", query);
     } else {
-      renderAnswerError(content, netFail ? "Couldn't reach the gateway" : "Something went wrong", netFail ? "Network request failed (" + emsg + "). Check your connection and retry." : emsg, query);
+      if (searchAbort && searchAbort.signal.aborted) {
+        // v181: the user pressed STOP — a quiet, non-alarming card, not an error
+        renderAnswerError(content, "Response stopped", "You stopped this response. The partial answer (if any) is preserved above — press the retry icon or ask again to continue.", query);
+      } else {
+        renderAnswerError(content, netFail ? "Couldn't reach the gateway" : "Something went wrong", netFail ? "Network request failed (" + emsg + "). Check your connection and retry." : emsg, query);
+      }
     }
   } finally {
     if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
     isSearching = false;
+    searchAbort = null;   // v181: clear the STOP controller so the next search gets a fresh one
     searchDeadline = 0;
   }
   } catch (e) {
@@ -5344,6 +5383,25 @@ function submitQuery(query) {
   if (window.ResearchMode && window.ResearchMode.intercept && window.ResearchMode.intercept(query)) return;
   performSearch(query);
 }
+// v181 (owner request 2026-11-12): Perplexity-style DRAFTS — composer text
+// survives reloads and thread switches. Saved per thread (landing when no thread),
+// cleared automatically once sent. Restored on focus so the draft reappears when
+// the user returns to the thread.
+function draftKey() { return "ai_draft_" + (currentThreadId || "landing"); }
+function saveDraft() {
+  const el = document.getElementById("followupInput") || document.getElementById("landingInput");
+  if (!el) return;
+  try { if (el.value.trim()) localStorage.setItem(draftKey(), el.value); else localStorage.removeItem(draftKey()); } catch (e) {}
+}
+function loadDraft() {
+  const el = document.getElementById("followupInput") || document.getElementById("landingInput");
+  if (!el || el.value) return;
+  try { const v = localStorage.getItem(draftKey()); if (v) { el.value = v; autosize(el); } } catch (e) {}
+}
+["followupInput", "landingInput"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) { el.addEventListener("input", saveDraft); el.addEventListener("focus", loadDraft); }
+});
 // Composer: auto-growing textarea, Enter sends / Shift+Enter newline, busy => message is queued (not dropped)
 function autosize(el) { el.style.height = "auto"; const sh = el.scrollHeight; if (sh > 8) el.style.height = Math.min(sh, parseFloat(getComputedStyle(el).maxHeight) || 220) + "px"; }
 function wireComposer(inputId, sendId) {
@@ -5353,7 +5411,8 @@ function wireComposer(inputId, sendId) {
   el.addEventListener("keydown", e => {
     if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); }
   });
-  btn.onclick = send;
+  // v181: the round button STOPS while a response streams (Enter still queues)
+  btn.onclick = () => { if (isSearching) { stopSearch(); return; } send(); };
   autosize(el);
 }
 wireComposer("landingInput", "landingSubmit");
@@ -5535,7 +5594,7 @@ function wireCodeCopy(scope) {
     wireCodeOpen(pre);   // v179: URLs also get an "Open" button (new tab)
   });
 }
-  window.BUILD = "v180";
+  window.BUILD = "v181";
   console.log("[ai.spaincos] build " + window.BUILD);
   try { (function () {
     const acct = document.querySelector(".account, #accountBtn, .sidebar-footer");

@@ -1,7 +1,7 @@
 {
- "ts": "2026-11-12T10:35:36+00:00",
- "base": "http://localhost:8765",
- "passed": 30,
+ "ts": "2026-11-12T10:52:38+00:00",
+ "base": "https://ai.spaincos.com",
+ "passed": 27,
  "failed": 1,
  "checks": [
   {
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "6.4s"
+   "detail": "9.9s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -48,21 +48,6 @@
    "name": "memory_items table reachable",
    "ok": true,
    "detail": "HTTP 200"
-  },
-  {
-   "name": "index.html loads real modules",
-   "ok": true,
-   "detail": "41 refs"
-  },
-  {
-   "name": "all deployed modules match repo",
-   "ok": true,
-   "detail": ""
-  },
-  {
-   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
-   "ok": true,
-   "detail": "index=v180 build.json=v180"
   },
   {
    "name": "landing renders",
@@ -87,7 +72,7 @@
   {
    "name": "thread route loads all modules (no /t/ 404s)",
    "ok": false,
-   "detail": "403 d_messages?thread_id=eq.7dc2c4ad-e52a-4fdd-9c06-45df37175ce4"
+   "detail": "403 d_messages?thread_id=eq.9ddfaff8-1541-4e1c-9a1d-3ac6118b40e0"
   },
   {
    "name": "question/answer text parity (16px)",
@@ -147,7 +132,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n7 FAILED\n\u00b7 21/28 checks \u00b7 11/12/2026, 10:25:05 AM\nRun be"
+   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n1 FAILED\n\u00b7 30/31 checks \u00b7 11/12/2026, 10:35:36 AM\nRun be"
   },
   {
    "name": "follow-up chip submits (search state)",
