@@ -85,7 +85,7 @@
       '<button class="sk-btn primary" id="nrnClaim">Claim daily drop</button>' +
       '<span class="muted" id="nrnStreak" style="align-self:center"></span></div>' +
       '</div></div>' +
-      '<h3 style="margin-top:22px">Spend your Neurons</h3>' +
+      '<h3 style="margin-top:22px">Put your Neurons to work</h3>' +
       '<div id="nrnShop" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:8px"></div>' +
       '<div id="nrnMsg" class="muted" style="margin-top:10px;max-width:60ch"></div>';
 
@@ -156,6 +156,35 @@
     });
 
     refresh();
+
+    // ---- live earn nodes (geospatial layer): nodes_nearby via PostgREST with the caller's JWT ----
+    var nodesBox = document.createElement("div");
+    nodesBox.innerHTML = '<h3 style="margin-top:22px">Nodes near you</h3>' +
+      '<div class="muted" style="font-size:13px;margin-bottom:8px">Spark a node on the map to earn Neurons. Location is only read when you spark.</div>' +
+      '<div id="nrnNodes" class="muted" style="font-size:13px">Loading nearby nodes…</div>';
+    root.appendChild(nodesBox);
+    var nodesList = nodesBox.querySelector("#nrnNodes");
+    authHeaders().then(function (h) {
+      if (!h) { nodesList.textContent = "Sign in to see nodes near you."; return; }
+      return fetch("https://bnxermyboeigvwonfrzx.supabase.co/rest/v1/rpc/nodes_nearby", {
+        method: "POST",
+        headers: { "Authorization": h["Authorization"], "apikey": "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb", "Content-Type": "application/json" },
+        body: JSON.stringify({ p_lat: null, p_long: null, p_radius_m: 25000 })
+      });
+    }).then(function (res) { return res ? res.json() : []; })
+      .then(function (rows) {
+        if (!Array.isArray(rows) || !rows.length) { nodesList.textContent = "No nodes nearby yet — new ones appear on the map."; return; }
+        nodesList.innerHTML = rows.slice(0, 6).map(function (n) {
+          return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border, rgba(255,255,255,0.06))">' +
+            '<span style="font-weight:600">' + esc(n.name) + '</span>' +
+            '<span class="muted" style="font-size:12px">' + esc(n.kind) + (n.distance_m != null ? ' · ' + Math.round(n.distance_m / 1609.34 * 10) / 10 + ' mi' : '') + '</span>' +
+            '<span style="margin-left:auto;font-weight:700;color:#e8482b">+' + esc(n.award_base + (n.discovery_bonus || 0)) + ' N</span>' +
+            (n.sparked_today ? '<span class="muted" style="font-size:11px">sparked</span>' : '') + '</div>';
+        }).join("");
+      }).catch(function () {
+        nodesList.textContent = "Nodes are rolling out in your area soon.";
+      });
+
     return root;
   }
 
