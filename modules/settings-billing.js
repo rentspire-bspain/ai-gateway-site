@@ -39,6 +39,17 @@
       '<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative"><div style="font-weight:700">Max</div><div class="muted">$50 / month</div><div style="margin-top:8px">250,000 pts/day</div><div style="margin-top:8px">Deep Research included</div><button class="sk-btn primary" data-plan="max" style="margin-top:10px;width:100%">Subscribe</button></div>' +
       '<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:14px"><div style="font-weight:700">Team</div><div class="muted">$20 / seat / month</div><div style="margin-top:8px">Shared spaces + roles</div><button class="sk-btn" data-plan="team" style="margin-top:10px;width:100%">Contact</button></div>' +
       '</div>' +
+      '<h3 style="margin-top:22px">Invite friends — free credits for both of you</h3>' +
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px">' +
+      '<div class="muted">Your code:</div><code id="refCode" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:15px">…</code>' +
+      '<button class="sk-btn" id="refCopy">Copy invite link</button>' +
+      '<span class="muted" id="refStats"></span></div>' +
+      '<div class="muted" style="margin-top:6px;max-width:60ch">Share your link — when a friend signs up and claims your code, you both get 500 credits instantly (5,000 pts displayed). One claim per account; referrers cap at 40,000 credits.</div>' +
+      '<div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">' +
+      '<div class="muted">Have a code?</div>' +
+      '<input id="refInput" placeholder="e.g. 3b4cc9a3" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:inherit;font-size:13px;width:140px" />' +
+      '<button class="sk-btn" id="refClaim">Claim 500 credits</button>' +
+      '<span class="muted" id="refMsg"></span></div>' +
       '<h3 style="margin-top:22px">Recent activity</h3>' +
       '<div id="ledger" style="margin-top:8px"></div>' +
       '<div id="billNote" class="muted" style="margin-top:10px;max-width:60ch"></div>';
@@ -61,6 +72,48 @@
           '<span style="font-variant-numeric:tabular-nums">' + fmt(Number(r.delta) * 10) + ' pts</span></div>';
       }).join("");
     }).catch(function () { ledger.innerHTML = '<p class="muted">Ledger unavailable.</p>'; });
+
+    // v173: referral program — free credits for both sides
+    var refCodeEl = root.querySelector("#refCode"), refStats = root.querySelector("#refStats"), refMsg = root.querySelector("#refMsg");
+    var SB_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
+    authHeaders().then(function (h) {
+      if (!h) { refCodeEl.textContent = "sign in"; return; }
+      h.apikey = (typeof SUPABASE_ANON !== "undefined") ? SUPABASE_ANON : ((typeof sb !== "undefined" && sb.supabaseKey) ? sb.supabaseKey : "");
+      fetch(SB_URL + "/auth/v1/user", { headers: h }).then(function (r) { return r.json(); }).then(function (u) {
+        return fetch(SB_URL + "/rest/v1/rpc/referral_ensure_code", { method: "POST", headers: h, body: JSON.stringify({ p_user: u.id }) });
+      }).then(function (r) { return r.text(); }).then(function (code) {
+        code = code.replace(/"/g, "");
+        refCodeEl.textContent = code;
+        root.querySelector("#refCopy").addEventListener("click", function () {
+          var link = "https://ai.spaincos.com/?ref=" + code;
+          if (navigator.clipboard) navigator.clipboard.writeText(link);
+          refMsg.textContent = "Invite link copied: " + link;
+        });
+      }).catch(function () { refCodeEl.textContent = "—"; });
+    });
+    credits("ledger", { limit: 100 }).then(function (d) {
+      var rows = (d && d.rows) || [];
+      var inv = rows.filter(function (r) { return r.reason === "referral_invite"; }).length;
+      if (refStats) refStats.textContent = inv ? (inv + " invite" + (inv > 1 ? "s" : "") + " claimed") : "";
+    }).catch(function () {});
+    try { // v173: prefill from an invite link (?ref=CODE captured at page load)
+      var pend = localStorage.getItem("pendingRef");
+      if (pend && root.querySelector("#refInput")) { root.querySelector("#refInput").value = pend; refMsg.textContent = "Invite code detected — claim it for 500 free credits."; }
+    } catch (e) {}
+    root.querySelector("#refClaim").addEventListener("click", async function () {
+      var codeEl = root.querySelector("#refInput");
+      var code = (codeEl.value || "").trim();
+      if (!code) { refMsg.textContent = "Enter a code first."; return; }
+      refMsg.textContent = "Claiming…";
+      try {
+        var h = await authHeaders(); if (!h) throw new Error("sign in");
+        h.apikey = (typeof SUPABASE_ANON !== "undefined") ? SUPABASE_ANON : ((typeof sb !== "undefined" && sb.supabaseKey) ? sb.supabaseKey : "");
+        var res = await fetch(SB_URL + "/rest/v1/rpc/referral_claim", { method: "POST", headers: h, body: JSON.stringify({ p_code: code }) });
+        var d = null; try { d = await res.json(); } catch (e) {}
+        if (res.ok && d && d.ok) { refMsg.textContent = "Claimed — 500 credits (5,000 pts) added."; try { localStorage.removeItem("pendingRef"); } catch (e) {} credits("balance").then(function (b) { balVal.textContent = fmt(Number(b.balance || 0) * 10) + " pts"; }); }
+        else { refMsg.textContent = "Could not claim (" + String((d && (d.message || d.error)) || "invalid or already-used code") + ")."; }
+      } catch (e) { refMsg.textContent = "Error: " + String(e.message || e).slice(0, 100); }
+    });
 
     root.querySelector("#plans").addEventListener("click", async function (ev) {
       var b = ev.target.closest("button[data-plan]"); if (!b) return;
