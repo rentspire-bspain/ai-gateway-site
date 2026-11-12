@@ -5,6 +5,27 @@
    Design: Neurons v4 (Fraunces display accents, warm coral, activity rings). */
 (function () {
   "use strict";
+  /* Inject pane styles once (theme-aware via site CSS variables). */
+  if (!document.getElementById("nrn-pane-styles")) {
+    var st = document.createElement("style");
+    st.id = "nrn-pane-styles";
+    st.textContent = [
+      ".nrn-hero{display:flex;align-items:center;gap:18px;padding:18px;border:1px solid var(--border-light);border-radius:var(--radius);background:var(--bg-elevated);margin-bottom:14px;}",
+      ".nrn-bal{font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-0.02em;}",
+      ".nrn-bal small{font-size:13px;font-weight:500;color:var(--text-muted);margin-left:4px;}",
+      ".nrn-status{margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}",
+      ".nrn-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}",
+      ".nrn-shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;}",
+      ".nrn-card{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;background:var(--bg-surface);}",
+      ".nrn-card-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}",
+      ".nrn-name{font-weight:600;}",
+      ".nrn-cost{color:var(--text-muted);font-size:12px;white-space:nowrap;}",
+      ".nrn-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;}",
+      ".nrn-earn{font-size:11px;color:var(--text-faint);}",
+      ".nrn-footerr{font-size:12px;color:var(--text-muted);margin:10px 0 0;}"
+    ].join("\n");
+    document.head.appendChild(st);
+  }
   function client() { return (typeof sb !== "undefined") ? sb : null; }
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
   var URL_ = "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/neurons-claim";
