@@ -1829,7 +1829,7 @@ window.addEventListener("popstate", () => {
 let isSearching = false;
 window.__isSearching = () => isSearching;
 let searchDeadline = 0;   // v156 STUCK-SEARCH WATCHDOG: hard deadline for the current search
-let runAllState = { active: false, stop: false };   // v97: "Run all" follow-ups state
+let runAllState = { active: false, stop: false, runId: 0 };   // v97: "Run all" follow-ups state
 // v156: a stalled gateway stream (connection open, no data, never closes) used to leave
 // isSearching true FOREVER — every later Enter queued "in perpetuity" and the composer
 // ate prompts with a blank canvas. This watchdog force-frees the lock after 5 minutes,
@@ -4784,9 +4784,12 @@ function renderAnswer(container, text, sources, related, images, meta) {
     // cards flip from spinner to answer as they land. Stop aborts pending cards.
     runBtn.onclick = async () => {
       if (runAllState.active) { runAllState.stop = true; paint(); return; }
+      // v183: each run owns a unique id; the stop flag is only honoured by the run that is current
+      const myRun = ++runAllState.runId;
       runAllState.active = true; runAllState.stop = false; paint();
-      try { await runAllParallel(related.slice(), () => runAllState.stop); } catch (e) {}
-      runAllState.active = false; paint();
+      try { await runAllParallel(related.slice(), () => runAllState.stop && runAllState.runId === myRun); } catch (e) {}
+      if (runAllState.runId === myRun) { runAllState.active = false; runAllState.stop = false; }
+      paint();
     };
     paint();
     related.forEach(r => {
@@ -5334,7 +5337,7 @@ async function runAllParallel(queries, shouldStop) {
     wrap.appendChild(card);
     const body = card.querySelector(".parallel-body");
     const ctl = new AbortController();
-    const stopPoll = setInterval(() => { if (shouldStop && shouldStop()) ctl.abort(); }, 300);
+    const stopPoll = setInterval(() => { if (shouldStop && shouldStop() === true) { try { ctl.abort(new DOMException('Stopped by user', 'AbortError')); } catch (e) { ctl.abort(); } } }, 300);
     try {
       const res = await fetchRetry(GATEWAY + "/gateway-chat", {
         method: "POST",
@@ -5369,7 +5372,8 @@ async function runAllParallel(queries, shouldStop) {
       body.innerHTML = "";
       const err = document.createElement("div");
       err.className = "parallel-err";
-      err.textContent = (ctl.signal.aborted ? "Stopped" : "Failed: ") + (e && e.message ? e.message : "");
+      const wasStopped = ctl.signal.aborted || (e && e.name === "AbortError");
+      err.textContent = wasStopped ? "Stopped — press Run all to run this step again." : "Failed: " + (e && e.message ? e.message : "unknown error");
       body.appendChild(err);
       card.classList.add("failed");
     } finally { clearInterval(stopPoll); }
