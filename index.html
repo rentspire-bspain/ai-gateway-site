@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-SVOX3bipTk0uQnqWxl+lK0FOra04vV1ZlHeMeFLhihY=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-XFp6QKmgpY/Qr48dkMkoIeLdmFahSq2kxeSjDjEf7Uc=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2921,7 +2921,7 @@ async function pushThreadMessages(t) {
     const rows = t.messages.map(m => ({ thread_id: t.id, role: m.role, content: m.content, sources: m.sources || null, related: m.related || null }));
     const PAGE = 20;
     for (let i = 0; i < rows.length; i += PAGE) {
-      try { await sb.from("thread_messages").insert(rows.slice(i, i + PAGE)); }
+      try { await sb.from("thread_messages").upsert(rows.slice(i, i + PAGE), { onConflict: "thread_id,role,turn_hash" }); } // v190: upsert — server-side turn persistence may have already landed these rows
       catch (e2) { break; } // partial save beats total loss
     }
     await sb.from("threads").update({ updated_at: new Date().toISOString() }).eq("id", t.id);
@@ -5192,7 +5192,7 @@ async function performSearchInner(query) {
         method: "POST",
         signal: searchAbort ? searchAbort.signal : undefined,   // v181: STOP button
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...(currentThreadId ? { thread_id: currentThreadId } : {}), ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       if (res.authExpired) { AuthGuard.expire(); throw AuthGuard.makeError(); }
       if (res.status === 401) throw new Error("The gateway rejected this request as unauthenticated (HTTP 401) although your session is still valid. Retry; if it persists, sign out and back in.");
