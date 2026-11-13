@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
             await db("POST", "shared_threads", { id, user_id: userId, title, messages }, "return=minimal");
             logAnalyticsEvent("share", {
               thread_id: typeof b.thread_id === "string" ? b.thread_id : null,
-              card_variant: ["answer", "streak", "ring", "nodedex"].includes(b.card_variant) ? b.card_variant : null
+              card_variant: ["standard", "flash", "node"].includes(b.card_variant) ? b.card_variant : null
             }, null, 0);
             return json({ id });
           } catch (e) { if (!/23505|duplicate/.test(String((e as Error).message)) || i === 2) throw e; }
