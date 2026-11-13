@@ -1,1 +1,1 @@
-{"crons": [{"path": "/api/retention?execute=1", "schedule": "0 9 * * *"}]}
+{"crons": [{"path": "/api/retention?execute=1", "schedule": "0 9 * * *"}], "rewrites": [{"source": "/verify", "destination": "/verify.html"}, {"source": "/verify/", "destination": "/verify.html"}]}
