@@ -20,15 +20,11 @@
 // ============================================================================
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { corsFor, preflight } from "../_shared/cors.js";
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  const CORS = corsFor(req);
+  if (req.method === "OPTIONS") return preflight(req, CORS);
 
   // 1. Auth — same JWT discipline as gateway-chat / neurons-claim
   const authHeader = req.headers.get("Authorization") ?? "";
@@ -62,15 +58,23 @@ Deno.serve(async (req) => {
     { p_email: email },
   );
 
-  // 5. Analytics first (fire-and-forget, fail-open) so failures still count
+  // 5. Analytics first (fire-and-forget, fail-open) so failures still count.
+  //    Live schema (parity-verified): analytics_events(id, user_id, event_type,
+  //    payload jsonb, model, credits_delta, created_at)
   const institution = rpc?.institution ?? null;
+  let callerUid: string | null = null;
+  try {
+    callerUid = JSON.parse(atob(userJwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).sub ?? null;
+  } catch { /* analytics attribution only — never fatal */ }
   admin.from("analytics_events").insert({
-    event: "student_verify_requested",
-    props: {
+    user_id: callerUid,
+    event_type: "student_verify_requested",
+    payload: {
       domain: email.split("@")[1] ?? null,
       institution,
       outcome: rpcError ? "rpc_error" : rpc?.ok ? "ok" : rpc?.error,
     },
+    credits_delta: 0,
   }).then(() => {}, () => {}); // never block on analytics
 
   // 6. RPC outcomes — error shapes are returned to the client for UX copy,
