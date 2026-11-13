@@ -74,3 +74,15 @@ test("replayed/failed grants, missing user and invalid signatures produce no pur
 test("analytics network and HTTP failures never break webhook acknowledgement", async () => {
   for (const analyticsFailure of ["throw", "http"]) assert.equal((await run({}, { analyticsFailure })).response.status, 200);
 });
+test("renewal invoices with no own metadata resolve uid from the subscription metadata snapshot", async () => {
+  // Real renewal shape: invoice.paid where the invoice's own metadata is empty and the
+  // uid/plan live in parent.subscription_details.metadata (copied from subscription_data.metadata at checkout).
+  const renewal = await run({ metadata: {}, parent: { subscription_details: { metadata: { user_id: "renewal-user", plan: "max" } } }, amount_paid: 5000 });
+  assert.equal(renewal.events.length, 1);
+  assert.equal(renewal.events[0].body.user_id, "renewal-user");
+  assert.equal(renewal.events[0].body.credits_delta, 25000);
+  assert.equal(renewal.calls.find((c) => c.url.endsWith("/credits_ledger")).body.user_id, "renewal-user");
+  // Existing behavior preserved: own metadata still wins when present.
+  const own = await run({ metadata: { user_id: "user-test" } });
+  assert.equal(own.events[0].body.user_id, "user-test");
+});

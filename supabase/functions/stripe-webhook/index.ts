@@ -73,8 +73,13 @@ Deno.serve(async (req) => {
   try {
     if (type === "checkout.session.completed" || type === "invoice.paid") {
       const obj = evt?.data?.object || {};
-      const uid = String(obj?.client_reference_id || obj?.metadata?.user_id || "");
-      const plan = String(obj?.metadata?.plan || (obj?.amount_total === 5000 ? "max" : "core"));
+      // Subscription-generated invoices snapshot the subscription's metadata at
+      // parent.subscription_details.metadata (Stripe copies subscription_data.metadata
+      // from Checkout onto the Subscription, then onto every invoice it creates) —
+      // that snapshot is the only uid source on invoice.paid renewals.
+      const subMeta = obj?.parent?.subscription_details?.metadata || {};
+      const uid = String(obj?.client_reference_id || obj?.metadata?.user_id || subMeta?.user_id || "");
+      const plan = String(obj?.metadata?.plan || subMeta?.plan || (obj?.amount_total === 5000 ? "max" : "core"));
       const credits = PLANS[plan] || 2500;
       if (uid && eventId) {
         const granted = await grant(uid, credits, `stripe-${eventId}`, type === "invoice.paid" ? "purchase" : "purchase");
