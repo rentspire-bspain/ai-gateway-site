@@ -136,7 +136,10 @@ def frontend(base):
     print("FRONTEND E2E")
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
-        b = p.chromium.launch()
+        # localhost QA runs must bypass the sandbox HTTP proxy (chromium would ERR_FAILED on 127.0.0.1)
+        import urllib.parse as _up
+        _local = _up.urlparse(BASE).hostname in ("localhost", "127.0.0.1")
+        b = p.chromium.launch(args=(["--no-proxy-server"] if _local else []))
         ctx = b.new_context(viewport={"width": 1440, "height": 900})
         pg = ctx.new_page()
         errs = []
