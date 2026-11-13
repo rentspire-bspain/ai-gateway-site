@@ -5738,6 +5738,7 @@ function wireCodeCopy(scope) {
 <script src="/modules/settings-mcp.js"></script>
 <script src="/modules/settings-billing.js"></script>
 <script src="/modules/settings-neurons.js"></script>
+<script src="/modules/student-verify.js"></script>
 <script src="/modules/favicon-live.js"></script>
 <script src="/modules/notify-bell.js"></script>
 <script src="/modules/settings-security.js"></script>
@@ -5805,6 +5806,29 @@ document.getElementById("navDiscover").onclick = function () { openModule("disco
 document.getElementById("navFleet").onclick = function () { openModule("fleet", "FleetUI", "open"); };
 document.getElementById("navHubs").onclick = function () { openModule("hubs", "LiveHubs", "open", "finance"); };
 document.getElementById("navPlugins").onclick = function () { window.PluginsUI && window.PluginsUI.open(); };
+/* Student verification wiring (modules/student-verify.js): register the Settings pane,
+   open it when the banner fires stv:open-settings, boot the banner for signed-in users. */
+(function () {
+  function wireStudentVerify() {
+    if (window.SettingsUI && window.StudentVerifyPane && typeof window.SettingsUI.registerPane === "function") {
+      window.SettingsUI.registerPane({
+        id: "student",
+        label: "Student",
+        icon: '<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>',
+        render: function () { var root = document.createElement("div"); root.className = "stg-pane"; window.StudentVerifyPane(root); return root; },
+        after: "neurons"
+      });
+    }
+    if (window.StudentVerifyBanner) {
+      document.addEventListener("stv:open-settings", function () {
+        if (window.SettingsUI) window.SettingsUI.open("student");
+      });
+      window.StudentVerifyBanner();
+    }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wireStudentVerify);
+  else wireStudentVerify();
+})();
 </script>
 <script>document.addEventListener("visibilitychange",function(){document.body.classList.toggle("pplx-hidden",document.hidden)});</script>
 <script>try { var m = location.search.match(/[?&]ref=([a-z0-9]{4,16})/i); if (m && !localStorage.getItem("refClaimed")) localStorage.setItem("pendingRef", m[1]); } catch (e) {}</script>
