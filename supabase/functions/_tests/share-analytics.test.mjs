@@ -32,7 +32,7 @@ async function run(payload, { analyticsFailure, insertFailure, authorized = true
 }
 
 test("share emits once after insert with authenticated user, source thread, and each card variant", async () => {
-  for (const card_variant of ["answer", "streak", "ring", "nodedex"]) {
+  for (const card_variant of ["standard", "flash", "node"]) {
     const result = await run({ thread_id: "thread-test", card_variant });
     assert.equal(result.response.status, 200);
     assert.equal(result.events.length, 1);
@@ -43,7 +43,7 @@ test("share emits once after insert with authenticated user, source thread, and 
   }
 });
 test("missing or unsupported optional fields are null", async () => {
-  for (const payload of [{}, { card_variant: "invalid", thread_id: 42 }]) {
+  for (const payload of [{}, { card_variant: "invalid", thread_id: 42 }, ...["answer", "streak", "ring", "nodedex"].map((card_variant) => ({ card_variant }))]) {
     assert.deepEqual((await run(payload)).events[0].body.payload, { thread_id: null, card_variant: null });
   }
 });
