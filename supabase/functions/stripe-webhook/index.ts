@@ -89,7 +89,11 @@ Deno.serve(async (req) => {
           const product = ["pack", "signal_pass_monthly", "signal_pass_annual"].includes(metadataProduct)
             ? metadataProduct
             : obj.mode === "payment" ? "pack" : interval === "year" ? "signal_pass_annual" : "signal_pass_monthly";
-          logAnalyticsEvent(uid, "purchase", { amount_usd: amount / 100, product }, null, 0);
+          const stripeSessionId = type === "checkout.session.completed" ? obj.id : obj?.metadata?.stripe_session_id;
+          logAnalyticsEvent(uid, "purchase", {
+            amount_usd: amount / 100, product,
+            ...(typeof stripeSessionId === "string" && stripeSessionId ? { stripe_session_id: stripeSessionId } : {})
+          }, null, credits);
         }
         // notification for the buyer
         await fetch(`${SB_URL}/rest/v1/notifications`, {

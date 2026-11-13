@@ -36,7 +36,7 @@ test("paid invoice emits monthly amount in dollars through service role and wait
   assert.equal(result.response.status, 200);
   assert.equal(result.events.length, 1);
   assert.equal(result.jobs.length, 1);
-  assert.deepEqual(result.events[0].body, { user_id: "user-test", event_type: "purchase", payload: { amount_usd: 8, product: "signal_pass_monthly" }, model: null, credits_delta: 0 });
+  assert.deepEqual(result.events[0].body, { user_id: "user-test", event_type: "purchase", payload: { amount_usd: 8, product: "signal_pass_monthly" }, model: null, credits_delta: 2500 });
   assert.equal(result.events[0].headers.Authorization, "Bearer test-service");
 });
 test("explicit product metadata is preserved for all supported products", async () => {
@@ -44,6 +44,15 @@ test("explicit product metadata is preserved for all supported products", async 
     const result = await run({ metadata: { user_id: "user-test", product }, amount_paid: 1234 });
     assert.deepEqual(result.events[0].body.payload, { amount_usd: 12.34, product });
   }
+});
+test("credits_delta matches actual granted credits and optional Stripe session ID is retained", async () => {
+  const max = await run({ metadata: { user_id: "user-test", plan: "max", stripe_session_id: "cs_fixture_invoice" } });
+  assert.equal(max.events[0].body.credits_delta, 25000);
+  assert.equal(max.calls.find((c) => c.url.endsWith("/credits_ledger")).body.delta, max.events[0].body.credits_delta);
+  assert.equal(max.events[0].body.payload.stripe_session_id, "cs_fixture_invoice");
+  const pack = await run({ id: "cs_fixture_pack", mode: "payment", payment_status: "paid", amount_total: 999, client_reference_id: "pack-user" }, { type: "checkout.session.completed" });
+  assert.equal(pack.events[0].body.payload.stripe_session_id, "cs_fixture_pack");
+  assert.equal(pack.events[0].body.credits_delta, 2500);
 });
 test("annual invoice and one-time checkout infer supported product names", async () => {
   assert.equal((await run({ lines: { data: [{ price: { recurring: { interval: "year" } } }] } })).events[0].body.payload.product, "signal_pass_annual");
