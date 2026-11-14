@@ -36,6 +36,7 @@ html.pre-boot body::before{content:"";position:fixed;top:72px;left:50%;transform
 <link rel="stylesheet" href="/modules/docs-panel.css">
 <link rel="stylesheet" href="/modules/voice-convo.css">
 <link rel="stylesheet" href="/modules/tool-chips.css">
+<link rel="stylesheet" href="/modules/onboarding.css">
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
 @font-face { font-family: "pplxSans"; src: url("https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
@@ -5782,6 +5783,7 @@ function wireCodeCopy(scope) {
 <script src="/modules/export.js"></script>
 <script src="/modules/tabstatus.js"></script>
 <script src="/modules/tool-chips.js"></script>
+<script src="/modules/onboarding.js"></script>
 <script>
 // perf: on-demand modules + non-blocking stylesheets. These five overlays are only reachable through a click, so
 // their JS (and CSS) is fetched the first time they are opened — and prefetched at idle so the click is instant.
