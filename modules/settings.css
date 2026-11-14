@@ -56,7 +56,9 @@
 .stg-close:hover { background: var(--bg-elevated); color: var(--text); }
 
 /* ---- body: nav + content ---- */
-.stg-body { flex: 1; display: flex; min-height: 0; }
+.stg-body { flex: 1; display: flex; min-height: 0; position: relative; }
+/* v210: bottom fade marks the scroll edge as intentional (visual-parity guardian finding: cards read as "clipped") */
+.stg-body::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34px; background: linear-gradient(transparent, var(--bg-surface)); pointer-events: none; }
 
 .stg-nav {
   width: 212px;

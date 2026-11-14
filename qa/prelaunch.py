@@ -207,7 +207,11 @@ def frontend(base):
         check("doc chip present (no auto-open)", chip_ok)
         if chip_ok:
             chip.click()
-            pg.wait_for_timeout(700)
+            # deterministic open wait (v209: fixed 700ms raced with re-renders)
+            try:
+                pg.wait_for_function("() => document.body.classList.contains('dp-open')", timeout=8000)
+            except Exception:
+                pass
         dp = pg.evaluate("() => ({open: document.body.classList.contains('dp-open'), h1: (h => h ? getComputedStyle(h).fontSize : 'x')(document.querySelector('.dp-panel .dp-md h1')), code: !!document.querySelector('.dp-panel .dp-codebar button'), mono: (c => c ? getComputedStyle(c).fontFamily.includes('monospace') : false)(document.querySelector('.dp-panel .dp-code pre code'))})")
         check("doc panel opens on chip click", dp["open"])
         check("doc h1 heading scale (20-28px)", dp["open"] and dp["h1"] != "x" and 20 <= float(str(dp["h1"]).replace("px", "")) <= 28, str(dp))
