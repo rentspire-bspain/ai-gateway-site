@@ -1,0 +1,84 @@
+/* mobile-375.css — 375px responsive pass (parity §26e item 1 / 34b mobile).
+   A single additive stylesheet: no existing selectors are redefined, only scoped
+   mobile overrides inside one max-width media query. Loaded alongside the app CSS;
+   safe to ship even while the sidebar toggle is a follow-up (the drawer needs the
+   hamburger button in modules/mobile-375.js). */
+
+/* ---- off-canvas drawer + hamburger (max-width: 420px) ---- */
+@media (max-width: 420px) {
+  /* body text floor: nothing below 14px on phones */
+  body, input, textarea, select, button { font-size: 14px !important; }
+  .stg-desc, .sec-device-meta, .stg-pane-sub { font-size: 14px !important; }
+
+  /* sidebar becomes an off-canvas drawer, revealed by the .m375-open body class
+     the hamburger button toggles */
+  #sidebar, .sidebar, nav.sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: min(84vw, 320px);
+    z-index: 60;
+    transform: translateX(-102%);
+    transition: transform 180ms ease;
+    overflow-y: auto;
+    box-shadow: none;
+  }
+  body.m375-open #sidebar, body.m375-open .sidebar, body.m375-open nav.sidebar {
+    transform: translateX(0);
+    box-shadow: 0 0 40vw rgba(0,0,0,.45);
+  }
+  body.m375-open::after { /* scrim — tap to close */
+    content: "";
+    position: fixed; inset: 0; z-index: 59;
+    background: rgba(0,0,0,.35);
+  }
+
+  /* hamburger button (injected by modules/mobile-375.js) */
+  .m375-burger {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 40px; height: 40px;
+    border: 1px solid var(--border, #ccc);
+    border-radius: 8px;
+    background: var(--bg, #fff);
+    cursor: pointer;
+    z-index: 61;
+  }
+  .m375-burger span, .m375-burger span::before, .m375-burger span::after {
+    content: ""; display: block;
+    width: 16px; height: 2px;
+    background: var(--fg, #333);
+    margin: 2px auto;
+    border-radius: 1px;
+  }
+
+  /* main content: full width, 12px gutters */
+  main, #main, .thread-pane, .composer, #composer {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+    box-sizing: border-box;
+  }
+  .thread-content, .answer, .msg-content { padding-left: 0; padding-right: 0; }
+
+  /* top bar stacks: search on its own row, profile below */
+  #topbar, .topbar, header.topbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 8px 12px;
+  }
+  #topbar .search, .topbar .search { width: 100%; }
+
+  /* tables inside thread answers scroll horizontally instead of breaking layout */
+  .thread-content table, .answer table, .msg-content table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* doc/artifact panels take the full screen on phones */
+  #docs-panel, .doc-panel, #artifact-library { width: 100vw !important; max-width: 100vw !important; }
+}
