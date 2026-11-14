@@ -372,3 +372,85 @@ test("clicking an example prompt chip fills #landingInput, closes open tour, and
   assert.equal(env.localStorage.getItem("pplx-onboarded"), "1");
   assert.equal(env.api.getState().emptyPromptsVisible, false);
 });
+
+// ---- v212 §26e item 3: checklist self-check-off states ----
+test("CHECKLIST exposes 6 self-check-off items and a checklistState() summary", () => {
+  const { api } = makeEnv({ initialStorage: { "pplx-onboarded": "1" } });
+  assert.ok(Array.isArray(api.CHECKLIST));
+  assert.equal(api.CHECKLIST.length, 6);
+  const ids = new Set();
+  for (const it of api.CHECKLIST) {
+    assert.ok(typeof it.id === "string" && it.id.length > 0);
+    assert.ok(typeof it.label === "string" && it.label.length > 0);
+    ids.add(it.id);
+  }
+  const st = api.checklistState();
+  assert.equal(st.total, 6);
+  assert.equal(st.done, 0);
+  assert.ok(st.items.every((x) => x.checked === false));
+});
+
+test("checklistState() auto-detects threads, artifacts, and model choice", () => {
+  const { api } = makeEnv({
+    threads: [{ id: "t1" }],
+    initialStorage: {
+      "pplx-onboarded": "1",
+      "ai_artifacts": JSON.stringify([{ id: "a1" }]),
+      "pplx-model": "kimi-pro"
+    }
+  });
+  const st = api.checklistState();
+  assert.ok(st.done >= 3, "expected at least 3 auto-detected items, got " + st.done);
+  const byId = Object.fromEntries(st.items.map((x) => [x.id, x]));
+  assert.equal(byId["first-question"].checked, true);
+  assert.equal(byId["first-question"].auto, true);
+  assert.equal(byId["make-artifact"].checked, true);
+  assert.equal(byId["pick-model"].checked, true);
+  assert.equal(byId["connect-source"].checked, false);
+});
+
+test("manual self-check-off toggles rows via localStorage and survives re-read", () => {
+  const env1 = makeEnv({ initialStorage: { "pplx-onboarded": "1" } });
+  const api1 = env1.api;
+  api1.toggleChecklistRow("automate");
+  let st = api1.checklistState();
+  let byId = Object.fromEntries(st.items.map((x) => [x.id, x]));
+  assert.equal(byId["automate"].checked, true);
+  assert.equal(byId["automate"].manual, true);
+  // re-mount from the persisted storage (env1's live localStorage): still checked
+  const persisted = Object.fromEntries(Array.from({ length: env1.localStorage.length }, (_, i) =>
+    [env1.localStorage.key(i), env1.localStorage.getItem(env1.localStorage.key(i))]
+  ));
+  const env2 = makeEnv({ initialStorage: persisted });
+  st = env2.api.checklistState();
+  const again = Object.fromEntries(st.items.map((x) => [x.id, x]));
+  assert.equal(again["automate"].checked, true);
+  assert.equal(again["automate"].manual, true);
+  // toggling again turns it off
+  env2.api.toggleChecklistRow("automate");
+  st = env2.api.checklistState();
+  const off = Object.fromEntries(st.items.map((x) => [x.id, x]));
+  assert.equal(off["automate"].checked, false);
+});
+
+test("checklistCardHtml renders rows, progress bar, and all-done state", () => {
+  const { api } = makeEnv({
+    threads: [{ id: "t1" }],
+    initialStorage: {
+      "pplx-onboarded": "1",
+      "ai_artifacts": JSON.stringify([{ id: "a1" }]),
+      "pplx-model": "kimi-pro"
+    }
+  });
+  // manually check every remaining item
+  ["connect-source", "save-skill", "automate"].forEach((id) => api.toggleChecklistRow(id));
+  const st = api.checklistState();
+  assert.equal(st.done, 6);
+  const html = api.checklistCardHtml(st);
+  assert.ok(html.includes('data-ob-checklist'));
+  assert.ok(html.includes('role="progressbar"'));
+  assert.ok(html.includes('width:100%'));
+  assert.ok(html.includes('aria-checked="true"'));
+  assert.ok(html.includes('ob-cl-auto'));
+  assert.ok(html.includes('All set'));
+});

@@ -79,6 +79,141 @@
     emptyPromptsVisible: false
   };
 
+
+  /* ---- v212 §26e item 3: Getting-started checklist with self-check-off states ----
+     Auto-detected items check themselves off from live app state (threads,
+     connectors, artifacts, skills, model choice); the user can also click any
+     item to check it off manually (auto-flags win over manual only when true).
+     Persisted in localStorage 'ai_checklist' as { manual: {id: ts} }. */
+  var CHECKLIST_KEY = "ai_checklist";
+
+  var CHECKLIST = [
+    { id: "first-question", label: "Ask your first question", hint: "Any query \u2014 live web research with citations." },
+    { id: "connect-source",  label: "Connect a data source", hint: "Slack, Dropbox, Google Drive, or Comptrove in Settings \u2192 Connectors." },
+    { id: "make-artifact",   label: "Create a doc, table, or file", hint: "Ask for a memo, rent-comp table, or Word/Excel/PDF export." },
+    { id: "save-skill",      label: "Save a custom skill", hint: "Settings \u2192 Skills \u2014 reusable prompt + tool recipes." },
+    { id: "pick-model",      label: "Try a model or Research mode", hint: "Auto for everyday, R1/Kimi Pro for hard reasoning, Research for depth." },
+    { id: "automate",        label: "Set up an automation or fleet task", hint: "Schedule recurring jobs in Tasks & Automations, or dispatch the fleet." }
+  ];
+
+  function manualMap() {
+    try {
+      var raw = JSON.parse(lsGet(CHECKLIST_KEY) || "{}");
+      return raw && typeof raw.manual === "object" && raw.manual ? raw.manual : {};
+    } catch (e) { return {}; }
+  }
+
+  function setManual(id, on) {
+    var m = manualMap();
+    if (on) m[id] = Date.now(); else delete m[id];
+    lsSet(CHECKLIST_KEY, JSON.stringify({ manual: m }));
+  }
+
+  function detectChecklistAuto() {
+    var auto = {};
+    try {
+      if (getThreadCount() > 0) auto["first-question"] = 1;
+    } catch (e) {}
+    try {
+      var conns = {};
+      try { conns = JSON.parse(lsGet("ai_conn_watch") || "{}") || {}; } catch (e2) {}
+      var connected = Object.keys(conns).filter(function (k) { return conns[k]; }).length > 0;
+      if (!connected && window.ConnectorUI && typeof window.ConnectorUI.connectedCount === "function") {
+        connected = (window.ConnectorUI.connectedCount() || 0) > 0;
+      }
+      if (connected) auto["connect-source"] = 1;
+    } catch (e) {}
+    try {
+      var arts = [];
+      try { arts = JSON.parse(lsGet("ai_artifacts") || "[]") || []; } catch (e2) {}
+      if (Array.isArray(arts) && arts.length > 0) auto["make-artifact"] = 1;
+    } catch (e) {}
+    try {
+      if (window.SkillsUI && typeof window.SkillsUI.cachedItems === "function") {
+        var skills = window.SkillsUI.cachedItems() || [];
+        if (skills.length > 0) auto["save-skill"] = 1;
+      }
+    } catch (e) {}
+    try {
+      var model = lsGet("pplx-model");
+      if (model && model !== "auto") auto["pick-model"] = 1;
+    } catch (e) {}
+    return auto;
+  }
+
+  function checklistState() {
+    var manual = manualMap();
+    var auto = detectChecklistAuto();
+    var done = 0;
+    var items = CHECKLIST.map(function (it) {
+      var isAuto = !!auto[it.id];
+      var isManual = !!manual[it.id];
+      var checked = isAuto || isManual;
+      if (checked) done += 1;
+      return { id: it.id, label: it.label, hint: it.hint, checked: checked, auto: isAuto, manual: isManual };
+    });
+    return { total: CHECKLIST.length, done: done, items: items };
+  }
+
+  function checklistCardHtml(st) {
+    var pct = st.total ? Math.round((st.done / st.total) * 100) : 0;
+    var rows = st.items.map(function (it) {
+      return '<li class="ob-cl-row' + (it.checked ? " done" : "") + '" data-cl-id="' + esc(it.id) + '" role="checkbox" tabindex="0" aria-checked="' + (it.checked ? "true" : "false") + '">' +
+        '<span class="ob-cl-box" aria-hidden="true">' +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' +
+        "</span>" +
+        '<span class="ob-cl-copy"><span class="ob-cl-label">' + esc(it.label) + "</span>" +
+        '<span class="ob-cl-hint">' + esc(it.hint) + "</span></span>" +
+        (it.auto ? '<span class="ob-cl-auto" title="Completed automatically from your activity">auto</span>' : "") +
+      "</li>";
+    }).join("");
+    return '<div class="ob-cl-card" data-ob-checklist="1">' +
+      '<div class="ob-cl-head"><span class="ob-cl-title">Getting-started checklist</span>' +
+      '<span class="ob-cl-count">' + st.done + " of " + st.total + "</span></div>" +
+      '<div class="ob-cl-bar" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100"><span style="width:' + pct + '%"></span></div>' +
+      '<ul class="ob-cl-list">' + rows + "</ul>" +
+      (st.done === st.total ? '<div class="ob-cl-done">All set \u2014 ai.spaincos.com is fully yours. Click any item to uncheck it.</div>' : "") +
+      "</div>";
+  }
+
+  function mountChecklist() {
+    var host = document.getElementById("suggestions");
+    if (!host) return null;
+    var card = host.querySelector('[data-ob-checklist]');
+    if (!card) {
+      card = document.createElement("div");
+      card.setAttribute("data-ob-checklist", "1");
+      // insert after the example grid (both live inside #suggestions)
+      var grid = host.querySelector(".ob-example-grid");
+      if (grid && grid.nextSibling) host.insertBefore(card, grid.nextSibling);
+      else host.appendChild(card);
+      host.addEventListener("click", function (e) {
+        var row = e.target && e.target.closest ? e.target.closest("[data-cl-id]") : null;
+        if (!row) return;
+        e.preventDefault();
+        toggleChecklistRow(row.getAttribute("data-cl-id"));
+      });
+      host.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        var row = e.target && e.target.closest ? e.target.closest("[data-cl-id]") : null;
+        if (!row) return;
+        e.preventDefault();
+        toggleChecklistRow(row.getAttribute("data-cl-id"));
+      });
+    }
+    card.innerHTML = checklistCardHtml(checklistState());
+    return card;
+  }
+
+  function toggleChecklistRow(id) {
+    var st = checklistState();
+    var it = st.items.filter(function (x) { return x.id === id; })[0];
+    if (!it) return;
+    // auto-detected items toggle a manual override OFF; unchecked items self-check-off
+    setManual(id, !it.checked);
+    mountChecklist();
+  }
+
   var tourEl = null;
 
   function esc(s) {
@@ -436,6 +571,7 @@
 
   function syncEmptyState() {
     var box = mountExamplePrompts();
+    mountChecklist();
     var show = shouldShowEmptyPrompts(getComposerValue(), getThreadCount());
     state.emptyPromptsVisible = show;
     if (box) {
@@ -542,7 +678,11 @@
     goToStep: goToStep,
     getState: getState,
     runExample: runExample,
-    syncEmptyState: syncEmptyState
+    syncEmptyState: syncEmptyState,
+    CHECKLIST: CHECKLIST,
+    checklistState: checklistState,
+    checklistCardHtml: checklistCardHtml,
+    toggleChecklistRow: toggleChecklistRow
   };
 
   if (document.readyState === "loading") {
