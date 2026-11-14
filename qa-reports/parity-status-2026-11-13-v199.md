@@ -1495,7 +1495,7 @@ The owner's directive: catalog EVERY missing item — bugs, capabilities, logic,
 ### 34b. Responses, follow-ups, UX
 - ✅ LIVE-FIXED (v195): per-turn command visibility work log + Command-narration prompt rule.
 - ✅ LIVE-FIXED (v193): continuation directives no longer dead-end as ack_turn.
-- 🟡 Suggested follow-ups are static text; no one-tap "run this follow-up" chips that execute as commands (competitors ship clickable actions).
+- ✅ FIXED (feat/followup-run): one-tap runnable follow-up chips — every "Suggested Follow-ups" item renders as a chip whose tap submits the FULL imperative command to the thread (previous defect: commands >110 chars were truncated with "…" before being stored, so a tap ran a broken command; the label is tidied for display, the executed payload is never truncated; Run-all runs the same full commands).
 - 🟡 Streaming tool chips: the site renders phases (x_phases) but not a live per-tool-call chip stream with expandable command text (the Muse/Instinct-style transparency the owner screenshotted from this very session).
 - 🔴 Response versioning: no way to see what changed between two answers in the same thread (diff view).
 
