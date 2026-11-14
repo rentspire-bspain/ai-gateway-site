@@ -1,5 +1,5 @@
 {
- "version": "v208",
+ "version": "v209",
  "generated_at": "2026-11-14T07:00:00Z",
  "note": "The single source of truth for the parity headline. Update scores per batch (with evidence in the doc's change log), then run: python3 qa/generate-parity-headline.py \u2014 the headline is computed, never hand-summed (the v204 classifier incident makes hand arithmetic permanently out of policy).",
  "categories": [
@@ -41,7 +41,7 @@
   {
    "name": "Connectors",
    "weight": 12,
-   "score": 58
+   "score": 70
   },
   {
    "name": "Privacy",

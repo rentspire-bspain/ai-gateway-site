@@ -182,7 +182,14 @@ def frontend(base):
                                 "related": ["First follow-up about the registry lanes", "Second question about schedules"]}]}
         pg.evaluate("t => localStorage.setItem('ai_threads', JSON.stringify([t]))", thread)
         pg.goto(f"{base}/t/{slug}", wait_until="networkidle", timeout=45000)
-        pg.wait_for_timeout(2000)
+        # wait for the render instead of a fixed sleep: the eval account's thread list
+        # keeps growing (one per run), so server-sync + render time creeps upward —
+        # a fixed 2s wait races near the boundary (v209 finding; the unique-slug fix
+        # removed the rename loop but not the render race)
+        try:
+            pg.wait_for_selector(".question-header", timeout=15000)
+        except Exception:
+            pass
         pg.screenshot(path=str(SHOTS / "thread.png"))
         check("thread renders", pg.locator(".question-header").count() >= 1)
         # the owner-reported killer: on /t/<slug> routes every lazily-loaded module resolved
