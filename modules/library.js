@@ -175,7 +175,8 @@
     sheet: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>',
     webapp: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/></svg>',
     open: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>',
-    regen: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>'
+    regen: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>',
+    history: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>'
   };
 
   /* ---- Artifact Library (34d: gateway-assets/artifacts/<userId>/<filename>) ---- */
@@ -697,6 +698,40 @@
     });
   }
 
+  // v212 §26f item 6: artifact version-history drawer (expandable under the card)
+  function toggleArtifactHistory(cardEl, art) {
+    var existing = cardEl.querySelector(".lib-art-hist");
+    if (existing) { existing.remove(); return; }
+    var box = document.createElement("div");
+    box.className = "lib-art-hist";
+    var vers = (art.versions && art.versions.length) ? art.versions.slice(0, 10) : [];
+    if (!vers.length) vers = [art];
+    var head = document.createElement("div");
+    head.className = "lib-art-hist-head";
+    head.textContent = vers.length + (vers.length === 1 ? " version on record" : " versions on record") + " \u00b7 click a row to open that version";
+    box.appendChild(head);
+    vers.forEach(function (v, i) {
+      var row = document.createElement("button");
+      row.type = "button";
+      row.className = "lib-art-hist-row" + (i === 0 ? " latest" : "");
+      row.setAttribute("data-ver-idx", String(i));
+      var when = document.createElement("span");
+      when.className = "lib-art-hist-when";
+      when.textContent = v.updatedIso ? String(v.updatedIso).slice(0, 16).replace("T", " ") : "unknown date";
+      var meta = document.createElement("span");
+      meta.className = "lib-art-hist-meta";
+      meta.textContent = (v.size ? fmtBytes(v.size) : "") + (v.version ? " \u00b7 " + String(v.version).slice(0, 12) : "");
+      var tag = document.createElement("span");
+      tag.className = "lib-art-hist-tag";
+      tag.textContent = i === 0 ? "latest" : ("v" + (vers.length - i));
+      row.appendChild(when);
+      row.appendChild(meta);
+      row.appendChild(tag);
+      box.appendChild(row);
+    });
+    cardEl.appendChild(box);
+  }
+
   function artifactIcon(kind) {
     if (kind === "xlsx" || kind === "csv") return ICON.sheet;
     if (kind === "webapp") return ICON.webapp;
@@ -739,6 +774,7 @@
       '<div class="lib-art-actions">' +
         '<button type="button" class="lib-art-btn open-btn" data-act="open">' + ICON.open + '<span>' + (state.artOpening === art.filename ? "Opening\u2026" : "Open") + '</span></button>' +
         '<button type="button" class="lib-art-btn regen-btn" data-act="regen" title="Send regenerate prompt to current thread">' + ICON.regen + '<span>Regenerate</span></button>' +
+        '<button type="button" class="lib-art-btn hist-btn" data-act="hist" title="Version history">' + ICON.history + '<span>History</span></button>' +
       '</div>';
 
     el.addEventListener("click", function (e) {
@@ -746,6 +782,22 @@
       if (regenBtn) {
         e.stopPropagation();
         regenerateArtifact(art);
+        return;
+      }
+      var histBtn = e.target.closest("[data-act=hist]");
+      if (histBtn) {
+        e.stopPropagation();
+        toggleArtifactHistory(el, art);
+        return;
+      }
+      var verRow = e.target.closest("[data-ver-idx]");
+      if (verRow) {
+        e.stopPropagation();
+        var vi = Number(verRow.getAttribute("data-ver-idx"));
+        var vers = (art.versions && art.versions.length) ? art.versions : [art];
+        var target = Number.isFinite(vi) && vers[vi] ? vers[vi] : art;
+        closeOverlaysForArtifact();
+        openArtifact(target).catch(function () {});
         return;
       }
       var thBtn = e.target.closest("[data-tid]");
