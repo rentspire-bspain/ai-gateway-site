@@ -302,3 +302,9 @@
     gap: 2px;
   }
 }
+
+/* ---- v212 §26f item 5: command row + copy button ---- */
+.tc-detail-cmd { align-items: center; gap: 8px; }
+.tc-detail-cmd code.tc-v { flex: 1 1 auto; min-width: 0; overflow-x: auto; white-space: nowrap; }
+.tc-copy-btn { flex: 0 0 auto; background: var(--bg-elevated, #1C1E23); border: 1px solid var(--border, rgba(219,222,227,.14)); border-radius: 6px; color: inherit; font-size: 11px; font-weight: 500; padding: 3px 8px; cursor: pointer; min-height: 24px; }
+.tc-copy-btn:hover { border-color: var(--accent, #3D9595); }

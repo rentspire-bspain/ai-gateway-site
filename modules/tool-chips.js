@@ -984,6 +984,20 @@
 
   /* ---------------- DOM Rendering ---------------- */
 
+  // v212: reconstruct a single readable command line for a chip, e.g.
+  // "web_search(query=\"...\"", round 2)" - falls back to "tool" alone.
+  function buildCommandText(chip, index) {
+    var tool = String((chip && chip.tool) || "").trim();
+    if (!tool) return "";
+    var bits = [];
+    if (chip && chip.args != null && String(chip.args).trim()) {
+      bits.push("query=" + String(chip.args).replace(/\s+/g, " ").trim().slice(0, 160));
+    }
+    if (chip && chip.round != null && Number(chip.round) > 0) bits.push("round " + Number(chip.round));
+    var head = "#" + (index + 1) + " " + tool;
+    return bits.length ? head + "(" + bits.join(", ") + ")" : head;
+  }
+
   function buildDetailPanel(doc, chip, index, panelId, isOpen) {
     var isErr = chip.status === "failed" || chip.ok === false;
     var isRun = chip.status === "running";
@@ -1012,7 +1026,40 @@
     head.appendChild(metaEl);
     panel.appendChild(head);
 
-    var hasRich = false;
+    // v212 §26f item 5: explicit runnable command line + copy button
+    var cmdText = buildCommandText(chip, index);
+    if (cmdText) {
+      var rCmd = doc.createElement("div");
+      rCmd.className = "tc-detail-row tc-detail-cmd";
+      var kCmd = doc.createElement("span");
+      kCmd.className = "tc-k";
+      kCmd.textContent = "Command";
+      var vCmd = doc.createElement("code");
+      vCmd.className = "tc-v";
+      vCmd.textContent = cmdText;
+      var copyCmd = doc.createElement("button");
+      copyCmd.type = "button";
+      copyCmd.className = "tc-copy-btn";
+      copyCmd.textContent = "Copy";
+      copyCmd.setAttribute("data-copy", cmdText);
+      copyCmd.addEventListener("click", function () {
+        var done = function () {
+          copyCmd.textContent = "Copied";
+          setTimeout(function () { copyCmd.textContent = "Copy"; }, 1400);
+        };
+        try {
+          if (root.navigator && root.navigator.clipboard && root.navigator.clipboard.writeText) {
+            root.navigator.clipboard.writeText(cmdText).then(done, done);
+          } else { done(); }
+        } catch (_e) { done(); }
+      });
+      rCmd.appendChild(kCmd);
+      rCmd.appendChild(vCmd);
+      rCmd.appendChild(copyCmd);
+      panel.appendChild(rCmd);
+    }
+
+    var hasRich = Boolean(cmdText);
     if (chip.args) {
       hasRich = true;
       var rArgs = doc.createElement("div");
