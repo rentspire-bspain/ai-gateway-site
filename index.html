@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-2JR1dzzIXfaT8zx0Tk/EuEqiIhFbcBiwlDR+jkuGNvo=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-SvUFht7DpnV5U4WHuzTjf1gSO6xQdTGKNYBPv9iWWQc=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,6 +35,7 @@ html.pre-boot body::before{content:"";position:fixed;top:72px;left:50%;transform
 <link rel="stylesheet" href="/modules/export.css">
 <link rel="stylesheet" href="/modules/docs-panel.css">
 <link rel="stylesheet" href="/modules/voice-convo.css">
+<link rel="stylesheet" href="/modules/tool-chips.css">
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
 @font-face { font-family: "pplxSans"; src: url("https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
@@ -3661,7 +3662,7 @@ function renderPriorTurns(content, thread, showRelatedForLast) {
         st.appendChild(mb);
         content.appendChild(st);
       }
-      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council) ? { steps: m.steps || [], council: m.council || null } : null);
+      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council || m.toolChips) ? { steps: m.steps || [], council: m.council || null, toolChips: m.toolChips || null } : null);
     }
   });
 }
@@ -3707,7 +3708,7 @@ function renderPriorTurnsFull(content, thread, showRelatedForLast) {
       content.appendChild(q);
     } else {
       const rel = (showRelatedForLast && i === lastAssistant) ? cleanRelated(m.related) : [];
-      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council) ? { steps: m.steps || [], council: m.council || null } : null);
+      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council || m.toolChips) ? { steps: m.steps || [], council: m.council || null, toolChips: m.toolChips || null } : null);
     }
   });
   const sc = document.getElementById("resultsScroll");
@@ -4446,7 +4447,8 @@ function councilFromPhases(phases, x) {
 }
 function renderMeta(container, meta) {
   const steps = ((meta && meta.steps) || []).map(publicPhase);
-  if (!meta || (!steps.length && !meta.council)) return null;
+  const hasChips = !!(window.ToolChips && window.ToolChips.hasChips(meta));
+  if (!meta || (!steps.length && !meta.council && !hasChips)) return null;
   const wrap = document.createElement("div");
   wrap.className = "answer-meta";
   if (meta.council) {
@@ -4471,6 +4473,7 @@ function renderMeta(container, meta) {
       b.addEventListener("click", () => { row.hidden = !row.hidden; b.setAttribute("aria-expanded", String(!row.hidden)); });
     }
   }
+  if (hasChips) window.ToolChips.renderInto(wrap, meta);
   if (steps.length) {
     const d = document.createElement("details"); d.className = "steps-list";
     const sm = document.createElement("summary"); sm.textContent = "Steps · " + steps.length; d.appendChild(sm);
@@ -5051,6 +5054,7 @@ async function performSearchInner(query) {
     let revisedText = ""; // v80 (I7 pass-2): full replacement text from a `revision` SSE event
     let servedModel = null;  // v129: the model that ACTUALLY served this response (the gateway's x-model header / x_model body field — the orchestrator's real pick, budget fallbacks included)
     let budgetFallback = false; // v129: the paid cap was hit — a free model took over
+    const toolStream = window.ToolChips ? window.ToolChips.createStream() : null;
     const renderFinal = (answer, revised) => {
       if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
       const answerClean = splitFollowups(answer).body;
@@ -5088,12 +5092,13 @@ async function performSearchInner(query) {
       const related = generateRelated(query, answer);
       const councilInfo = councilOn ? councilFromPhases(lastPhases, councilX) : null;
       const stepsC = compactSteps(withCanonPhase(lastPhases, lastCanon));
-      renderAnswer(content, answerClean, sources, related, imageResults, { steps: stepsC, council: councilInfo });
+      const toolChips = toolStream ? toolStream.finalize({ phases: lastPhases, sources }) : [];
+      renderAnswer(content, answerClean, sources, related, imageResults, { steps: stepsC, council: councilInfo, toolChips, toolStream });
       if (pendingActions.length && window.ConnectorsUI) { try { window.ConnectorsUI.renderActions(content, pendingActions); } catch (_e) {} pendingActions = []; }
       speakAnswer(answerClean);
       thread.messages.push({ role: "user", content: fullQuery });
       thread.updatedAt = Date.now();
-      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(servedModel ? { servedModel } : {}), ...(budgetFallback ? { budgetFallback: true } : {}), ...(revised ? { revised: true } : {}), ...(imageResults.length ? { images: imageResults } : {}), ...(stepsC.length ? { steps: stepsC } : {}), ...(councilInfo ? { council: councilInfo } : {}) });
+      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(servedModel ? { servedModel } : {}), ...(budgetFallback ? { budgetFallback: true } : {}), ...(revised ? { revised: true } : {}), ...(imageResults.length ? { images: imageResults } : {}), ...(stepsC.length ? { steps: stepsC } : {}), ...(councilInfo ? { council: councilInfo } : {}), ...(toolChips.length ? { toolChips } : {}) });
       saveThreads();
       renderThreads();
       // v74: stay where the reader is — jump to the bottom ONLY if they were
@@ -5126,7 +5131,7 @@ async function performSearchInner(query) {
         content.appendChild(liveAnswerEl);
       }
       liveAnswerEl.innerHTML = "";
-      renderAnswer(liveAnswerEl, partial, unifiedSources(lastPhases, lastCanon, partial), [], []);
+      renderAnswer(liveAnswerEl, partial, unifiedSources(lastPhases, lastCanon, partial), [], [], toolStream ? { toolStream } : null);
       if (revisedText) {
         const rv = document.createElement("div");
         rv.className = "search-timer";
@@ -5182,7 +5187,7 @@ async function performSearchInner(query) {
           if (++pollFails >= 4) throw new Error("Lost contact with the research job (" + (pe && pe.message ? pe.message : pe) + "). It may still be running server-side.");
           continue; // transient network blip: keep polling
         }
-        if (p.status === "completed" && p.answer) { renderFinal(p.answer); break; }
+        if (p.status === "completed" && p.answer) { if (toolStream) toolStream.ingestJSON(p); renderFinal(p.answer); break; }
         if (p.error) throw new Error(p.error);
         if (Date.now() - started > 15 * 60 * 1000) throw new Error("Deep research timed out after 15 minutes");
       }
@@ -5233,6 +5238,7 @@ async function performSearchInner(query) {
             if (payload === "[DONE]") continue;
             try {
               const evt = JSON.parse(payload);
+              if (toolStream) toolStream.ingestSSE(evt, state);
               if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); degradedPhases = evt.phases.filter(isDegradedPhase); lastPhases = evt.phases; }
               if (Array.isArray(evt?.phases)) { const si = sourcesFromPhases(evt.phases).filter(x => x.canon); if (si.length) lastCanon = si; }
               if (Array.isArray(evt?.sources)) { const si = sourcesFromPhases([{ kind: "search", items: evt.sources }]); if (si.length) lastCanon = si; }
@@ -5258,6 +5264,7 @@ async function performSearchInner(query) {
         renderFinal(revisedText || full, !!revisedText);
       } else {
         const data = await res.json();
+        if (toolStream) toolStream.ingestJSON(data);
         if (typeof data?.x_model === "string" && data.x_model) servedModel = data.x_model; // v129: the non-streaming path carries the served model in the body
         if (data?.x_budget_exceeded === true || data?.x_budget_exceeded === "1") budgetFallback = true;
         if (Array.isArray(data?.images)) imageResults = data.images;
@@ -5352,6 +5359,7 @@ async function runAllParallel(queries, shouldStop) {
       const reader = res.body.getReader();
       const dec = new TextDecoder();
       let buf = "", full = "";
+      const pStream = window.ToolChips ? window.ToolChips.createStream() : null;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -5363,13 +5371,14 @@ async function runAllParallel(queries, shouldStop) {
           if (payload === "[DONE]") continue;
           try {
             const evt = JSON.parse(payload);
+            if (pStream) pStream.ingestSSE(evt, body);
             const d = evt && evt.choices && evt.choices[0] && evt.choices[0].delta && evt.choices[0].delta.content;
             if (typeof d === "string") full += d;
           } catch (e) {}
         }
       }
       body.innerHTML = "";
-      renderAnswer(body, splitFollowups(full).body || "_(no answer returned)_", [], [], []);
+      renderAnswer(body, splitFollowups(full).body || "_(no answer returned)_", [], [], [], pStream ? { toolChips: pStream.finalize(), toolStream: pStream } : null);
       card.classList.add("done");
     } catch (e) {
       body.innerHTML = "";
@@ -5755,6 +5764,7 @@ function wireCodeCopy(scope) {
 <script src="/modules/media.js"></script>
 <script src="/modules/export.js"></script>
 <script src="/modules/tabstatus.js"></script>
+<script src="/modules/tool-chips.js"></script>
 <script>
 // perf: on-demand modules + non-blocking stylesheets. These five overlays are only reachable through a click, so
 // their JS (and CSS) is fetched the first time they are opened — and prefetched at idle so the click is instant.
