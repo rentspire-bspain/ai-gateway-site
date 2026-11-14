@@ -36,6 +36,7 @@
   .m375-burger {
     display: inline-flex;
     align-items: center; justify-content: center;
+    position: relative; /* stay above the scrim (z-index below) so the burger can close the drawer too */
     width: 40px; height: 40px;
     border: 1px solid var(--border, #ccc);
     border-radius: 8px;
