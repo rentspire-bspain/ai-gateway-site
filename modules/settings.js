@@ -816,7 +816,10 @@
     preferences: panePreferences, personalize: panePersonalize, memory: paneMemory,
     instructions: paneInstructions, notifications: paneNotifications,
     connectors: paneConnectors,
-    usage: paneUsage, data: paneData, about: paneAbout
+    // usage: modules/usage.js (§34b) replaces the local-only pane when loaded; the
+    // localStorage fallback stays for the rare case that module fails to load.
+    usage: function () { return (window.UsagePane && typeof window.UsagePane.render === "function") ? window.UsagePane.render() : paneUsage(); },
+    data: paneData, about: paneAbout
   };
 
   // ---------- pane registration (other settings*.js modules) ----------
