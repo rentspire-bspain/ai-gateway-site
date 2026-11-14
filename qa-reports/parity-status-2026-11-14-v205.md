@@ -326,6 +326,11 @@ The full chain, each link live-verified this round:
 
 ## 29au. v205 change log: §34 closure round (2026-11-14 night UTC)
 
+- **Runner nightly rails — root cause found (owner merge pending):** the nightly jobs never fired because (a) the 04:41 UTC "Deploy Spain Runner" workflow run was a DRY RUN (the workflow's dry_run input defaults to true — it printed the config and changed nothing), and (b) the real 07:23 UTC deploy failed with Fly Machines API HTTP 400 "request body too large": the per-file base64 bake reached 1.06MB (the three parity jobs pushed it past Fly's ~1MB limit). Fix ready: SHMT PR #3877 (bake ONE gzip tarball, ~230KB, config drops to 306KB with 5x headroom; locally verified — 216 members, all three parity jobs, node_modules, extraction sim clean). **Owner action:** merge https://github.com/rentspire-bspain/SHMT/pull/3877 — the re-deploy (dry_run=false) follows immediately.
+- **Gateway v205 deployed** (function version counter 205, matches this doc): PARITY_STATE baseline refreshed (the session prompt was still announcing v199), GATEWAY_VERSION=205. Live-verified: research turn with citations in 6.4s.
+- **Pre-launch QA: 31/31 against production** (after gateway v205; one transient mid-deploy window re-ran clean).
+
+
 - gateway-chat v204 (BUILD MODE → Kimi routing), call-model v48 (tools passthrough — the root cause), github-ops v5 (default-branch fix): all deployed and live-verified. Source: governed-sql PR #6 (merged).
 - Six fleet/probe turns run tonight, every one honest under the claim guard; the chain now fails only on the owner's PAT scope (403, exact error relayed).
 - §34 shipped frontend items live-verified in production HTML.
