@@ -385,7 +385,9 @@
 .ob-cl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .ob-cl-row { display: flex; align-items: center; gap: 10px; padding: 7px 6px; border-radius: 8px; cursor: pointer; user-select: none; }
 .ob-cl-row:hover { background: var(--hover, rgba(255,255,255,.04)); }
-.ob-cl-box { flex: 0 0 auto; width: 18px; height: 18px; border-radius: 6px; border: 1.5px solid var(--line); display: grid; place-items: center; color: transparent; transition: all .15s ease; margin-top: 1px; }
+.ob-cl-box { flex: 0 0 auto; width: 18px; height: 18px; border-radius: 6px; border: 1.5px solid var(--line); display: inline-grid; place-items: center; color: transparent; transition: all .15s ease; margin-top: 1px; background: transparent; box-sizing: border-box; }
+.ob-cl-row .ob-cl-box > svg { display: none; }
+.ob-cl-row.done .ob-cl-box > svg { display: block; }
 .ob-cl-row.done .ob-cl-box { background: var(--accent, #20845b); border-color: var(--accent, #20845b); color: #fff; }
 .ob-cl-copy { flex: 1 1 auto; display: grid; gap: 1px; min-width: 0; }
 .ob-cl-label { font-size: 13px; color: var(--text); line-height: 1.35; }
