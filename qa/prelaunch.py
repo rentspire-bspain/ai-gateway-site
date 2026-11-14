@@ -171,12 +171,17 @@ def frontend(base):
                     "expires_in": m.get("expires_in", 3600), "expires_at": m.get("expires_at") or int(time.time()) + 3600,
                     "token_type": m.get("token_type", "bearer"), "user": m.get("user")}
             pg.evaluate("s => localStorage.setItem('sb-bnxermyboeigvwonfrzx-auth-token', JSON.stringify(s))", sess)
-        thread = {"id": f"pre{int(time.time())}", "slug": "prelaunch", "title": "Prelaunch", "incognito": False,
+        # unique slug per run: reusing a fixed slug accumulated ~50 duplicate
+        # "Prelaunch" threads on the eval account and the app's slug-dedup resync
+        # (rename loop prelaunch-1..-N + redirect) grew slower than this suite's
+        # render wait — a test-hygiene leak, not a prod regression (v208 finding)
+        slug = f"prelaunch-{int(time.time())}"
+        thread = {"id": f"pre{int(time.time())}", "slug": slug, "title": "Prelaunch", "incognito": False,
                   "messages": [{"role": "user", "content": "master doc please"},
                                {"role": "assistant", "content": "Here:\n\n```markdown\n# Prelaunch Doc\n\n## Section\n\n    git clone https://example.com/repo.git\n    pip install -r requirements.txt\n\n| Gate | Criterion |\n|---|---|\n| G0 | Runs cleanly |\n\nBody text here.\n```",
                                 "related": ["First follow-up about the registry lanes", "Second question about schedules"]}]}
         pg.evaluate("t => localStorage.setItem('ai_threads', JSON.stringify([t]))", thread)
-        pg.goto(f"{base}/t/prelaunch", wait_until="networkidle", timeout=45000)
+        pg.goto(f"{base}/t/{slug}", wait_until="networkidle", timeout=45000)
         pg.wait_for_timeout(2000)
         pg.screenshot(path=str(SHOTS / "thread.png"))
         check("thread renders", pg.locator(".question-header").count() >= 1)
