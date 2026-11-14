@@ -1,13 +1,21 @@
-/* LibraryUI — full-screen Library (threads, collections, pins, filters).
+/* LibraryUI — full-screen Library (threads, collections, pins, filters + Artifact Library 34d).
    Uses app globals when present: threads, saveThreads, renderThreads, renderSpaces,
-   loadThread, newThread, pushThreadToServer, sb, currentUser, currentThreadId, showLanding.
-   Own storage: ai_collections, ai_pins, ai_library_seen (first-seen timestamps; threads carry no dates). */
+   loadThread, newThread, pushThreadToServer, sb, currentUser, currentThreadId, showLanding, submitQuery.
+   Own storage: ai_collections, ai_pins, ai_library_seen, ai_artifact_revs. */
 (function () {
   "use strict";
   var LS = window.localStorage;
+  var DEFAULT_SUPABASE_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
+  var BUCKET = "gateway-assets";
+
   function jget(k, d) { try { var v = JSON.parse(LS.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
   function jset(k, v) { try { LS.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  function g(name) { try { return window.__appGlobals ? window.__appGlobals[name] : undefined; } catch (e) { return undefined; } }
+  function g(name) {
+    try {
+      if (window.__appGlobals && window.__appGlobals[name] !== undefined) return window.__appGlobals[name];
+      return window[name];
+    } catch (e) { return undefined; }
+  }
   function call(name) { var f = g(name); if (typeof f === "function") { try { return f.apply(null, [].slice.call(arguments, 1)); } catch (e) { console.warn(name, e); } } }
   function getThreads() { var t = g("threads"); return Array.isArray(t) ? t : jget("ai_threads", []); }
   function removeThread(id) {
@@ -22,7 +30,29 @@
     call("saveThreads"); call("renderSpaces"); call("renderThreads");
   }
 
-  var state = { q: "", pinOnly: false, sources: false, archived: false, model: "", col: "", root: null, menu: null, renaming: null, selecting: false, sel: {}, ext: null, extQ: "" };
+  var state = {
+    tab: "threads",
+    q: "",
+    pinOnly: false,
+    sources: false,
+    archived: false,
+    model: "",
+    col: "",
+    root: null,
+    menu: null,
+    renaming: null,
+    selecting: false,
+    sel: {},
+    ext: null,
+    extQ: "",
+    artKind: "",
+    artThreadOnly: false,
+    artLoading: false,
+    artLoaded: false,
+    artError: "",
+    artItems: [],
+    artOpening: ""
+  };
   var seen = jget("ai_library_seen", {});
 
   function stamp(t) {
@@ -48,11 +78,7 @@
   }
   function spaces() { var s = g("spaces"); return Array.isArray(s) ? s : jget("ai_spaces", []); }
 
-  /* ---- Search: keyword (substring) + local semantic-lite ranking ----
-     Semantic-lite = stemmed TF-IDF cosine with fuzzy prefix/trigram term matching, built in-browser
-     from the thread text. No thread vectors exist client-side (the server index covers imported context
-     only), so an optional hook window.LibrarySemanticSearch(query) -> Promise<[{id,score}]> can plug in
-     server embeddings; its hits are merged in when it resolves. */
+  /* ---- Search: keyword (substring) + local semantic-lite ranking ---- */
   var STOP = {}; "the a an and or of to in on for is are was were be it this that with as at by from how what why do does i you we my me can about".split(" ").forEach(function (w) { STOP[w] = 1; });
   function stem(w) { return w.length > 4 ? w.replace(/(ingly|ing|edly|ed|ies|es|ly|s)$/, function (m) { return m === "ies" ? "y" : ""; }) : w; }
   function tok(str) { return String(str || "").toLowerCase().split(/[^a-z0-9]+/).filter(function (w) { return w.length > 1 && !STOP[w]; }).map(stem); }
@@ -118,13 +144,401 @@
   }
   var ORDER = ["Today", "Yesterday", "Previous 7 days", "Previous 30 days", "Older"];
   function fmt(ts) { return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+  function fmtDateTime(ts) {
+    if (!ts) return "Unknown date";
+    return new Date(ts).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+  function relAge(ts) {
+    if (!ts) return "";
+    var diff = Math.max(0, Date.now() - ts);
+    if (diff < 60000) return "just now";
+    if (diff < 3600000) return Math.floor(diff / 60000) + "m ago";
+    if (diff < 86400000) return Math.floor(diff / 3600000) + "h ago";
+    if (diff < 172800000) return "Yesterday";
+    if (diff < 2592000000) return Math.floor(diff / 86400000) + "d ago";
+    return "";
+  }
+  function fmtBytes(n) {
+    n = Number(n) || 0;
+    if (!n) return "";
+    if (n < 1024) return n + " B";
+    if (n < 1048576) return (n / 1024).toFixed(n < 10240 ? 1 : 0) + " KB";
+    return (n / 1048576).toFixed(1) + " MB";
+  }
 
   var ICON = {
     search: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
     close: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>',
     more: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
-    pin: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16 3l5 5-2 1-3 3v4l-2 2-4-4-5 5-1-1 5-5-4-4 2-2h4l3-3z"/></svg>'
+    pin: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16 3l5 5-2 1-3 3v4l-2 2-4-4-5 5-1-1 5-5-4-4 2-2h4l3-3z"/></svg>',
+    doc: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg>',
+    sheet: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>',
+    webapp: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/><path d="M10 13l-2 2 2 2M14 13l2 2-2 2"/></svg>',
+    open: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>',
+    regen: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>'
   };
+
+  /* ---- Artifact Library (34d: gateway-assets/artifacts/<userId>/<filename>) ---- */
+  var EXT_KIND = {
+    md: "md", markdown: "md",
+    csv: "csv",
+    xlsx: "xlsx",
+    docx: "docx",
+    pdf: "pdf",
+    html: "webapp", htm: "webapp",
+    txt: "txt", json: "txt", log: "txt", tsv: "txt", yaml: "txt", yml: "txt", sql: "txt", xml: "txt"
+  };
+  var KIND_LABEL = {
+    md: "Markdown",
+    csv: "CSV",
+    txt: "Text",
+    xlsx: "Spreadsheet",
+    docx: "Word",
+    pdf: "PDF",
+    webapp: "Web app"
+  };
+
+  function kindOfFile(filename, mimetype) {
+    var m = /\.([a-z0-9]+)$/i.exec(String(filename || ""));
+    var ext = m ? m[1].toLowerCase() : "";
+    if (EXT_KIND[ext]) return EXT_KIND[ext];
+    var mt = String(mimetype || "").toLowerCase();
+    if (mt.indexOf("spreadsheetml") > -1) return "xlsx";
+    if (mt.indexOf("wordprocessingml") > -1) return "docx";
+    if (mt.indexOf("pdf") > -1) return "pdf";
+    if (mt.indexOf("csv") > -1) return "csv";
+    if (mt.indexOf("html") > -1) return "webapp";
+    if (mt.indexOf("markdown") > -1) return "md";
+    return "txt";
+  }
+
+  function isTextKind(kind) {
+    return kind === "md" || kind === "csv" || kind === "txt" || kind === "webapp";
+  }
+
+  function titleFromFilename(filename) {
+    var base = String(filename || "").replace(/\.[^.]+$/, "").trim();
+    return base || String(filename || "Document");
+  }
+
+  function encodeStoragePath(path) {
+    return String(path || "").split("/").map(function (seg) { return encodeURIComponent(seg); }).join("/");
+  }
+
+  function getStorageAuth() {
+    var sbClient = g("sb");
+    var url = g("SUPABASE_URL") || (sbClient && sbClient.supabaseUrl) || DEFAULT_SUPABASE_URL;
+    var anon = g("SUPABASE_ANON") || (sbClient && sbClient.supabaseKey) || "";
+    var curUser = g("currentUser");
+    var pSession = (sbClient && sbClient.auth && typeof sbClient.auth.getSession === "function")
+      ? Promise.resolve(sbClient.auth.getSession()).catch(function () { return null; })
+      : Promise.resolve(null);
+    return pSession.then(function (res) {
+      var sess = res && res.data && res.data.session;
+      var token = sess && sess.access_token;
+      var userId = (sess && sess.user && sess.user.id) || (curUser && curUser.id) || "";
+      if (!token) {
+        try {
+          for (var i = 0; i < LS.length; i++) {
+            var k = LS.key(i);
+            if (k && /^sb-.*-auth-token$/.test(k)) {
+              var parsed = JSON.parse(LS.getItem(k) || "null");
+              if (parsed && parsed.access_token) {
+                token = parsed.access_token;
+                if (!userId && parsed.user && parsed.user.id) userId = parsed.user.id;
+                break;
+              }
+            }
+          }
+        } catch (e) {}
+      }
+      return { ok: Boolean(token && userId), url: String(url).replace(/\/+$/, ""), anon: anon, token: token || "", userId: userId };
+    });
+  }
+
+  function recordAndMergeRevs(userId, filename, version, updatedAt, size) {
+    if (!userId || !filename || !updatedAt) return 1;
+    var key = "ai_artifact_revs";
+    var store = jget(key, {});
+    var uMap = store[userId] || {};
+    var fk = filename.toLowerCase();
+    var arr = Array.isArray(uMap[fk]) ? uMap[fk] : [];
+    var sig = (version || "") + ":" + updatedAt;
+    var exists = arr.some(function (r) { return r && ((r.version || "") + ":" + r.updatedAt) === sig; });
+    if (!exists) {
+      arr.unshift({ version: version || "", updatedAt: updatedAt, size: size || 0 });
+      arr.sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
+      if (arr.length > 10) arr = arr.slice(0, 10);
+      uMap[fk] = arr;
+      store[userId] = uMap;
+      jset(key, store);
+    }
+    return arr.length || 1;
+  }
+
+  function matchThreadsForArtifact(filename, allThreads) {
+    var out = [], seenIds = {}, seenTitles = {};
+    if (!filename || !Array.isArray(allThreads) || !allThreads.length) return out;
+    var needle = filename.toLowerCase();
+    var encNeedle = encodeURIComponent(filename).toLowerCase();
+    for (var i = 0; i < allThreads.length; i++) {
+      var t = allThreads[i];
+      if (!t || !t.id || seenIds[t.id]) continue;
+      var ms = msgs(t);
+      var hit = false;
+      for (var j = 0; j < ms.length; j++) {
+        var c = String(ms[j] && ms[j].content || "").toLowerCase();
+        if (c && (c.indexOf(needle) > -1 || c.indexOf(encNeedle) > -1)) { hit = true; break; }
+      }
+      if (hit) {
+        var ttl = (t.title || "Untitled thread").trim();
+        var tKey = ttl.toLowerCase();
+        seenIds[t.id] = 1;
+        if (seenTitles[tKey]) continue;
+        seenTitles[tKey] = 1;
+        out.push({ id: t.id, title: ttl });
+      }
+      if (out.length >= 2) break;
+    }
+    return out;
+  }
+
+  function groupArtifacts(rawItems, userId, allThreads) {
+    var prefix = userId ? ("artifacts/" + userId + "/") : "";
+    var byName = {};
+    (Array.isArray(rawItems) ? rawItems : []).forEach(function (obj) {
+      if (!obj || !obj.name) return;
+      var rawName = String(obj.name).replace(/^\/+/, "");
+      if (!rawName || rawName === ".emptyFolderPlaceholder" || rawName.slice(-1) === "/") return;
+      if (obj.is_delete_marker) return;
+      if (obj.id == null && obj.metadata == null && !obj.updated_at && !obj.created_at) return;
+      var relPath = prefix && rawName.indexOf(prefix) === 0 ? rawName.slice(prefix.length) : rawName;
+      var parts = relPath.split("/");
+      var filename = parts[parts.length - 1] || relPath;
+      if (!filename || filename === ".emptyFolderPlaceholder") return;
+      var meta = obj.metadata || {};
+      var modIso = obj.updated_at || meta.lastModified || obj.created_at || "";
+      var creIso = obj.created_at || modIso;
+      var updatedAt = modIso ? (Date.parse(modIso) || 0) : 0;
+      var createdAt = creIso ? (Date.parse(creIso) || updatedAt) : updatedAt;
+      var size = Number(meta.size != null ? meta.size : (meta.contentLength != null ? meta.contentLength : 0)) || 0;
+      var mimetype = meta.mimetype || "";
+      var kind = kindOfFile(filename, mimetype);
+      var storagePath = userId ? ("artifacts/" + userId + "/" + relPath) : relPath;
+      var verEntry = {
+        filename: filename,
+        relPath: relPath,
+        storagePath: storagePath,
+        version: obj.version || meta.eTag || obj.id || "",
+        updatedAt: updatedAt,
+        updatedIso: modIso,
+        createdAt: createdAt,
+        createdIso: creIso,
+        size: size,
+        mimetype: mimetype,
+        kind: kind,
+        kindLabel: KIND_LABEL[kind] || "File"
+      };
+      var key = filename.toLowerCase();
+      if (!byName[key]) {
+        byName[key] = { key: key, versions: [verEntry] };
+      } else {
+        byName[key].versions.push(verEntry);
+      }
+    });
+
+    var threadsList = Array.isArray(allThreads) ? allThreads : getThreads();
+    var groups = Object.keys(byName).map(function (k) {
+      var vers = byName[k].versions.slice().sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
+      var latest = vers[0];
+      var earliestCreated = vers.reduce(function (acc, v) { return v.createdAt && (!acc || v.createdAt < acc) ? v.createdAt : acc; }, latest.createdAt);
+      var seenRevs = recordAndMergeRevs(userId, latest.filename, latest.version, latest.updatedAt, latest.size);
+      var versionCount = Math.max(vers.length, seenRevs);
+      var wasUpdated = versionCount > 1 || (latest.updatedAt && earliestCreated && (latest.updatedAt - earliestCreated > 2000));
+      return {
+        filename: latest.filename,
+        relPath: latest.relPath,
+        storagePath: latest.storagePath,
+        version: latest.version,
+        updatedAt: latest.updatedAt,
+        updatedIso: latest.updatedIso,
+        createdAt: earliestCreated,
+        size: latest.size,
+        mimetype: latest.mimetype,
+        kind: latest.kind,
+        kindLabel: latest.kindLabel,
+        versions: vers,
+        versionCount: versionCount,
+        wasUpdated: Boolean(wasUpdated),
+        threads: matchThreadsForArtifact(latest.filename, threadsList)
+      };
+    });
+
+    groups.sort(function (a, b) {
+      return ((b.updatedAt || 0) - (a.updatedAt || 0)) || a.filename.localeCompare(b.filename);
+    });
+    return groups;
+  }
+
+  function fetchListPage(auth, prefix, offset, limit) {
+    var headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + auth.token
+    };
+    if (auth.anon) headers.apikey = auth.anon;
+    return fetch(auth.url + "/storage/v1/object/list/" + BUCKET, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        prefix: prefix,
+        limit: limit,
+        offset: offset,
+        sortBy: { column: "updated_at", order: "desc" }
+      })
+    }).then(function (r) {
+      if (!r.ok) throw new Error("Storage list failed (HTTP " + r.status + ")");
+      return r.json();
+    });
+  }
+
+  function listArtifacts() {
+    return getStorageAuth().then(function (auth) {
+      if (!auth.ok) {
+        var err = new Error("Sign in to view your generated artifacts.");
+        err.code = "UNAUTHENTICATED";
+        throw err;
+      }
+      var prefix = "artifacts/" + auth.userId + "/";
+      var limit = 200;
+      return fetchListPage(auth, prefix, 0, limit).then(function (first) {
+        var arr = Array.isArray(first) ? first : [];
+        if (arr.length < limit) return groupArtifacts(arr, auth.userId, getThreads());
+        return fetchListPage(auth, prefix, limit, limit).then(function (second) {
+          return groupArtifacts(arr.concat(Array.isArray(second) ? second : []), auth.userId, getThreads());
+        }, function () {
+          return groupArtifacts(arr, auth.userId, getThreads());
+        });
+      });
+    });
+  }
+
+  function loadArtifacts(force) {
+    if (state.artLoading) return Promise.resolve(state.artItems);
+    if (state.artLoaded && !force) return Promise.resolve(state.artItems);
+    state.artLoading = true;
+    state.artError = "";
+    if (state.tab === "artifacts") renderBody();
+    return listArtifacts().then(function (items) {
+      state.artItems = items;
+      state.artLoaded = true;
+      state.artLoading = false;
+      state.artError = "";
+      updateTabCounts();
+      if (state.tab === "artifacts") renderBody();
+      return items;
+    }, function (err) {
+      state.artLoading = false;
+      state.artLoaded = true;
+      state.artError = (err && err.message) ? err.message : "Could not load artifacts.";
+      if (err && err.code === "UNAUTHENTICATED") state.artItems = [];
+      updateTabCounts();
+      if (state.tab === "artifacts") renderBody();
+      return state.artItems;
+    });
+  }
+
+  function fetchArtifactBytes(auth, storagePath) {
+    var encPath = encodeStoragePath(storagePath);
+    var headers = { "Authorization": "Bearer " + auth.token };
+    if (auth.anon) headers.apikey = auth.anon;
+    return fetch(auth.url + "/storage/v1/object/" + BUCKET + "/" + encPath, { headers: headers }).then(function (r) {
+      if (r.ok) return r.arrayBuffer();
+      var signHeaders = { "Content-Type": "application/json", "Authorization": "Bearer " + auth.token };
+      if (auth.anon) signHeaders.apikey = auth.anon;
+      return fetch(auth.url + "/storage/v1/object/sign/" + BUCKET + "/" + encPath, {
+        method: "POST",
+        headers: signHeaders,
+        body: JSON.stringify({ expiresIn: 300 })
+      }).then(function (sr) {
+        if (!sr.ok) throw new Error("Could not download artifact (HTTP " + r.status + ")");
+        return sr.json();
+      }).then(function (sj) {
+        var rel = sj && (sj.signedURL || sj.signedUrl);
+        if (!rel) throw new Error("Missing signed URL for artifact");
+        var fullUrl = /^https?:/i.test(rel) ? rel : (auth.url + "/storage/v1" + (rel.charAt(0) === "/" ? "" : "/") + rel);
+        return fetch(fullUrl).then(function (fr) {
+          if (!fr.ok) throw new Error("Signed download failed (HTTP " + fr.status + ")");
+          return fr.arrayBuffer();
+        });
+      });
+    });
+  }
+
+  function closeOverlaysForArtifact() {
+    close();
+    try {
+      if (window.SettingsUI && typeof window.SettingsUI.close === "function") window.SettingsUI.close();
+    } catch (e) {}
+  }
+
+  function openArtifact(art) {
+    if (!art || !art.storagePath) return Promise.reject(new Error("Invalid artifact"));
+    state.artOpening = art.filename;
+    if (state.tab === "artifacts") renderBody();
+    return getStorageAuth().then(function (auth) {
+      if (!auth.ok) throw new Error("Sign in to open artifacts.");
+      return fetchArtifactBytes(auth, art.storagePath);
+    }).then(function (buf) {
+      state.artOpening = "";
+      var bytes = new Uint8Array(buf);
+      var kind = art.kind || kindOfFile(art.filename, art.mimetype);
+      var item = {
+        name: art.filename,
+        title: titleFromFilename(art.filename),
+        kind: kind,
+        size: bytes.byteLength || art.size || 0,
+        bytes: bytes
+      };
+      if (isTextKind(kind)) {
+        item.text = new TextDecoder("utf-8").decode(bytes);
+      }
+      closeOverlaysForArtifact();
+      if (window.ArtifactPanel && typeof window.ArtifactPanel.open === "function") {
+        window.ArtifactPanel.open(item);
+      }
+      return item;
+    }).catch(function (err) {
+      state.artOpening = "";
+      state.artError = (err && err.message) ? err.message : "Could not open " + art.filename;
+      if (state.tab === "artifacts") renderBody();
+      throw err;
+    });
+  }
+
+  function regenerateArtifact(art) {
+    var filename = typeof art === "string" ? art : (art && art.filename ? art.filename : "");
+    if (!filename) return "";
+    var promptText = "Regenerate " + filename + " with the latest data";
+    closeOverlaysForArtifact();
+    var submitFn = g("submitQuery");
+    if (typeof submitFn === "function") {
+      submitFn(promptText);
+      return promptText;
+    }
+    var searchFn = g("performSearch");
+    if (typeof searchFn === "function") {
+      searchFn(promptText);
+      return promptText;
+    }
+    var inp = document.getElementById("followupInput") || document.getElementById("landingInput") || document.getElementById("searchInput");
+    if (inp) {
+      inp.value = promptText;
+      inp.dispatchEvent(new Event("input", { bubbles: true }));
+      var btn = document.getElementById("followupBtn") || document.getElementById("landingBtn") || document.getElementById("searchSubmit");
+      if (btn) btn.click();
+    }
+    return promptText;
+  }
 
   function ensureRoot() {
     if (state.root) return state.root;
@@ -137,15 +551,62 @@
   }
   function closeMenu() { if (state.menu) { state.menu.remove(); state.menu = null; } var o = document.querySelector(".lib-more.on"); if (o) o.classList.remove("on"); }
 
+  function updateTabCounts() {
+    if (!state.root) return;
+    var tc = state.root.querySelector("#libTabThreadsCount");
+    var ac = state.root.querySelector("#libTabArtifactsCount");
+    if (tc) {
+      var n = getThreads().length;
+      tc.textContent = n ? String(n) : "";
+    }
+    if (ac) {
+      var m = state.artItems.length;
+      ac.textContent = state.artLoaded && m ? String(m) : "";
+    }
+    var q = state.root.querySelector("#libQ");
+    if (q) {
+      q.placeholder = state.tab === "artifacts" ? "Search artifacts by filename" : "Search threads and messages";
+    }
+    var tabs = state.root.querySelectorAll(".lib-tab[data-tab]");
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].setAttribute("aria-selected", tabs[i].dataset.tab === state.tab ? "true" : "false");
+    }
+  }
+
+  function switchTab(tab) {
+    if (tab !== "threads" && tab !== "artifacts") return;
+    if (state.tab === tab) return;
+    state.tab = tab;
+    state.selecting = false;
+    state.sel = {};
+    updateTabCounts();
+    renderBody();
+    if (tab === "artifacts" && !state.artLoaded) loadArtifacts(true);
+  }
+
   function shell() {
     var r = ensureRoot();
     r.innerHTML = '<div class="lib-header"><div class="lib-top"><h1 class="lib-title">Library</h1>' +
-      '<label class="lib-search">' + ICON.search + '<input id="libQ" type="search" placeholder="Search threads and messages" autocomplete="off"></label>' +
+      '<div class="lib-tabs" role="tablist" aria-label="Library sections">' +
+      '<button type="button" class="lib-tab" role="tab" data-tab="threads" aria-selected="' + (state.tab === "threads" ? "true" : "false") + '">Threads <span class="lib-tab-count" id="libTabThreadsCount"></span></button>' +
+      '<button type="button" class="lib-tab" role="tab" data-tab="artifacts" aria-selected="' + (state.tab === "artifacts" ? "true" : "false") + '">Artifacts <span class="lib-tab-count" id="libTabArtifactsCount"></span></button>' +
+      '</div>' +
+      '<label class="lib-search">' + ICON.search + '<input id="libQ" type="search" placeholder="' + (state.tab === "artifacts" ? "Search artifacts by filename" : "Search threads and messages") + '" autocomplete="off"></label>' +
       '<span class="lib-spacer"></span><button class="lib-icon-btn" id="libClose" aria-label="Close library" title="Close (Esc)">' + ICON.close + '</button></div>' +
       '<div class="lib-chips" id="libChips"></div></div><div class="lib-body" id="libBody"></div>';
     var q = r.querySelector("#libQ"); q.value = state.q;
-    q.addEventListener("input", function () { state.q = q.value; state.ext = null; renderBody(); runExternal(state.q); });
+    q.addEventListener("input", function () {
+      state.q = q.value;
+      state.ext = null;
+      renderBody();
+      if (state.tab === "threads") runExternal(state.q);
+    });
+    r.querySelector(".lib-tabs").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-tab]");
+      if (b) switchTab(b.dataset.tab);
+    });
     r.querySelector("#libClose").onclick = close;
+    updateTabCounts();
   }
 
   function renderChips(all) {
@@ -163,7 +624,6 @@
     cols.forEach(function (c) {
       h += '<button class="lib-chip' + (state.col === c.id ? " active" : "") + '" data-a="col" data-v="' + esc(c.id) + '">' + esc(c.name) + ' <span class="x">' + (c.threadIds || []).length + '</span></button>';
     });
-    if (state.col === "none") { }
     h += '<button class="lib-chip' + (state.col === "none" ? " active" : "") + '" data-a="col" data-v="none">Uncollected</button>';
     h += '<button class="lib-chip" data-a="newcol">+ New collection</button>';
     if (state.col && state.col !== "none") h += '<button class="lib-chip" data-a="rencol">Rename</button><button class="lib-chip" data-a="delcol">Delete collection</button>';
@@ -181,6 +641,188 @@
       else if (a === "delcol") { if (confirm("Delete this collection? Threads are kept.")) { saveCols(collections().filter(function (x) { return x.id !== state.col; })); state.col = ""; } }
       renderBody();
     };
+  }
+
+  function renderArtifactChips() {
+    var el = document.getElementById("libChips"); if (!el) return;
+    var curTid = g("currentThreadId");
+    var kinds = [
+      { k: "", lbl: "All files" },
+      { k: "md", lbl: "Markdown" },
+      { k: "docx", lbl: "Word" },
+      { k: "xlsx", lbl: "Spreadsheet" },
+      { k: "csv", lbl: "CSV" },
+      { k: "pdf", lbl: "PDF" },
+      { k: "webapp", lbl: "Web app" }
+    ];
+    var h = "";
+    kinds.forEach(function (it) {
+      var cnt = it.k ? state.artItems.filter(function (a) { return a.kind === it.k; }).length : state.artItems.length;
+      if (it.k && !cnt && state.artKind !== it.k) return;
+      h += '<button type="button" class="lib-chip' + (state.artKind === it.k ? " active" : "") + '" data-ak="' + esc(it.k) + '">' +
+        esc(it.lbl) + (state.artLoaded && cnt ? ' <span class="x">' + cnt + '</span>' : '') + '</button>';
+    });
+    if (curTid) {
+      h += '<span class="lib-sep"></span>';
+      h += '<button type="button" class="lib-chip' + (state.artThreadOnly ? " active" : "") + '" data-athread="1">Current thread</button>';
+    }
+    h += '<span class="lib-sep"></span>';
+    h += '<button type="button" class="lib-chip" data-arefresh="1">' + (state.artLoading ? "Refreshing\u2026" : "Refresh") + '</button>';
+    el.innerHTML = h;
+    el.onclick = function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.arefresh) { loadArtifacts(true); return; }
+      if (b.dataset.athread) { state.artThreadOnly = !state.artThreadOnly; renderBody(); return; }
+      if (b.dataset.ak !== undefined) {
+        state.artKind = (state.artKind === b.dataset.ak && b.dataset.ak !== "") ? "" : b.dataset.ak;
+        renderBody();
+      }
+    };
+  }
+
+  function filteredArtifacts() {
+    var q = state.q.trim().toLowerCase();
+    var curTid = g("currentThreadId");
+    return state.artItems.filter(function (a) {
+      if (state.artKind && a.kind !== state.artKind) return false;
+      if (state.artThreadOnly && curTid) {
+        var inCur = (a.threads || []).some(function (t) { return t.id === curTid; });
+        if (!inCur) return false;
+      }
+      if (q) {
+        var hay = (a.filename + " " + a.kindLabel + " " + (a.threads || []).map(function (t) { return t.title; }).join(" ")).toLowerCase();
+        if (hay.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+  }
+
+  function artifactIcon(kind) {
+    if (kind === "xlsx" || kind === "csv") return ICON.sheet;
+    if (kind === "webapp") return ICON.webapp;
+    return ICON.doc;
+  }
+
+  function artifactCard(art) {
+    var el = document.createElement("div");
+    el.className = "lib-art-card";
+    el.tabIndex = 0;
+    el.dataset.filename = art.filename;
+    if (state.artOpening === art.filename) el.setAttribute("aria-busy", "true");
+    var sizeTxt = fmtBytes(art.size);
+    var modTxt = fmtDateTime(art.updatedAt);
+    var ageTxt = relAge(art.updatedAt);
+    var revBadge = "";
+    if (art.versionCount > 1) revBadge = '<span class="lib-art-updated">' + art.versionCount + ' versions</span>';
+    else if (art.wasUpdated) revBadge = '<span class="lib-art-updated">Updated</span>';
+    var threadsHtml = "";
+    if (art.threads && art.threads.length) {
+      threadsHtml = '<div class="lib-art-threads">' + art.threads.map(function (t) {
+        return '<button type="button" class="lib-art-thread" data-tid="' + esc(t.id) + '" title="Open thread: ' + esc(t.title) + '">' + esc(t.title) + '</button>';
+      }).join("") + '</div>';
+    }
+    el.innerHTML =
+      '<div class="lib-art-head">' +
+        '<div class="lib-art-ico">' + artifactIcon(art.kind) + '</div>' +
+        '<div class="lib-art-head-txt">' +
+          '<div class="lib-art-name" title="' + esc(art.filename) + '">' + esc(art.filename) + '</div>' +
+          '<div class="lib-art-sub"><span class="lib-art-kind">' + esc(art.kindLabel) + '</span>' +
+            (sizeTxt ? '<span>\u00b7 ' + esc(sizeTxt) + '</span>' : '') + revBadge +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="lib-art-modified" data-ts="' + esc(art.updatedAt || 0) + '" title="' + esc(art.updatedIso || modTxt) + '">' +
+        '<span>Last modified ' + esc(modTxt) + '</span>' +
+        (ageTxt ? '<span>\u00b7 ' + esc(ageTxt) + '</span>' : '') +
+      '</div>' +
+      threadsHtml +
+      '<div class="lib-art-actions">' +
+        '<button type="button" class="lib-art-btn open-btn" data-act="open">' + ICON.open + '<span>' + (state.artOpening === art.filename ? "Opening\u2026" : "Open") + '</span></button>' +
+        '<button type="button" class="lib-art-btn regen-btn" data-act="regen" title="Send regenerate prompt to current thread">' + ICON.regen + '<span>Regenerate</span></button>' +
+      '</div>';
+
+    el.addEventListener("click", function (e) {
+      var regenBtn = e.target.closest("[data-act=regen]");
+      if (regenBtn) {
+        e.stopPropagation();
+        regenerateArtifact(art);
+        return;
+      }
+      var thBtn = e.target.closest("[data-tid]");
+      if (thBtn) {
+        e.stopPropagation();
+        var tid = thBtn.dataset.tid;
+        close();
+        call("loadThread", tid);
+        return;
+      }
+      var openBtn = e.target.closest("[data-act=open]");
+      if (openBtn) e.stopPropagation();
+      openArtifact(art).catch(function () {});
+    });
+    el.addEventListener("keydown", function (e) {
+      if ((e.key === "Enter" || e.key === " ") && e.target === el) {
+        e.preventDefault();
+        openArtifact(art).catch(function () {});
+      }
+    });
+    return el;
+  }
+
+  function renderArtifactsBody(body) {
+    renderArtifactChips();
+    var bb = document.getElementById("libBulk"); if (bb) bb.remove();
+    state.root.classList.remove("selecting");
+
+    if (state.artLoading && !state.artItems.length) {
+      body.innerHTML =
+        '<div class="lib-art-bar"><span>Loading your artifacts\u2026</span></div>' +
+        '<div class="lib-art-grid"><div class="lib-art-skel"></div><div class="lib-art-skel"></div><div class="lib-art-skel"></div></div>';
+      return;
+    }
+
+    var list = filteredArtifacts();
+    body.innerHTML = "";
+
+    if (state.artError) {
+      var errBox = document.createElement("div");
+      errBox.className = "lib-art-err";
+      errBox.innerHTML = '<span>' + esc(state.artError) + '</span><button type="button" class="lib-btn">Retry</button>';
+      errBox.querySelector("button").onclick = function () { loadArtifacts(true); };
+      body.appendChild(errBox);
+    }
+
+    if (!list.length) {
+      var empty = document.createElement("div");
+      empty.className = "lib-empty";
+      var hasAny = state.artItems.length > 0;
+      empty.innerHTML =
+        '<h2>' + (hasAny ? "No matching artifacts" : "No generated artifacts yet") + '</h2>' +
+        '<p>' + (hasAny
+          ? "Try a different filename search or clear a format filter."
+          : "Documents, spreadsheets, PDFs, and web apps generated in chat are saved to your library automatically and updated in place when regenerated.") + '</p>' +
+        (hasAny
+          ? '<button type="button" class="lib-btn" id="libArtClear">Clear filters</button>'
+          : '<button type="button" class="lib-btn primary" id="libArtAsk">Ask in chat</button>');
+      body.appendChild(empty);
+      var clr = empty.querySelector("#libArtClear");
+      if (clr) clr.onclick = function () { state.q = ""; state.artKind = ""; state.artThreadOnly = false; var q = document.getElementById("libQ"); if (q) q.value = ""; renderBody(); };
+      var ask = empty.querySelector("#libArtAsk");
+      if (ask) ask.onclick = function () { close(); var inp = document.getElementById("followupInput") || document.getElementById("landingInput"); if (inp) inp.focus(); };
+      return;
+    }
+
+    var bar = document.createElement("div");
+    bar.className = "lib-art-bar";
+    bar.innerHTML =
+      '<span>' + list.length + ' artifact' + (list.length === 1 ? "" : "s") + ' \u00b7 grouped by filename</span>' +
+      '<span>Sorted by last modified</span>';
+    body.appendChild(bar);
+
+    var grid = document.createElement("div");
+    grid.className = "lib-art-grid";
+    list.forEach(function (art) { grid.appendChild(artifactCard(art)); });
+    body.appendChild(grid);
   }
 
   function filtered(all) {
@@ -202,6 +844,11 @@
   function renderBody() {
     var body = document.getElementById("libBody"); if (!body) return;
     closeMenu();
+    updateTabCounts();
+    if (state.tab === "artifacts") {
+      renderArtifactsBody(body);
+      return;
+    }
     var all = getThreads();
     renderChips(all);
     var list = filtered(all), p = pins();
@@ -355,8 +1002,17 @@
 
   function onKey(e) { if (e.key === "Escape" && state.root && state.root.classList.contains("open") && !state.renaming) { if (state.menu) closeMenu(); else close(); } }
 
-  function open() {
-    ensureRoot(); shell(); state.root.classList.add("open"); renderBody();
+  function open(arg) {
+    if (arg === "artifacts" || (arg && typeof arg === "object" && arg.tab === "artifacts")) state.tab = "artifacts";
+    else if (arg === "threads" || (arg && typeof arg === "object" && arg.tab === "threads") || arg === undefined) state.tab = "threads";
+    ensureRoot(); shell(); state.root.classList.add("open");
+    if (state.tab === "artifacts") {
+      renderBody();
+      loadArtifacts(true);
+    } else {
+      renderBody();
+      if (!state.artLoaded) loadArtifacts(false);
+    }
     document.addEventListener("keydown", onKey);
     var q = document.getElementById("libQ"); if (q) q.focus();
   }
@@ -366,5 +1022,12 @@
     if (state.root) state.root.classList.remove("open");
     document.removeEventListener("keydown", onKey);
   }
-  window.LibraryUI = { open: open, close: close };
+  window.LibraryUI = {
+    open: open,
+    close: close,
+    listArtifacts: listArtifacts,
+    groupArtifacts: groupArtifacts,
+    openArtifact: openArtifact,
+    regenerateArtifact: regenerateArtifact
+  };
 })();
