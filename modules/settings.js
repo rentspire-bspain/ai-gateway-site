@@ -158,6 +158,8 @@
     { id: "instructions", label: "Site instructions", icon: "doc" },
     { id: "notifications", label: "Notifications", icon: "bell" },
     { id: "connectors", label: "Connectors", icon: "plug" },
+    { id: "teammates", label: "Teammates", icon: "person" },
+    { id: "enterprise", label: "Enterprise", icon: "org" },
     { id: "usage", label: "Usage", icon: "chart" },
     { id: "data", label: "Data controls", icon: "db" },
     { id: "about", label: "About", icon: "info" }
@@ -818,7 +820,9 @@
     connectors: paneConnectors,
     // usage: modules/usage.js (§34b) replaces the local-only pane when loaded; the
     // localStorage fallback stays for the rare case that module fails to load.
-    usage: function () { return (window.UsagePane && typeof window.UsagePane.render === "function") ? window.UsagePane.render() : paneUsage(); },
+    teammates: function () { var wrap = document.createElement("div"); wrap.id = "teammates-pane"; if (window.TeammatesPane && window.TeammatesPane.render) { setTimeout(window.TeammatesPane.render, 0); } return wrap; },
+    enterprise: function () { var wrap = document.createElement("div"); wrap.id = "enterprise-admin-pane"; if (window.EnterpriseAdminPane && window.EnterpriseAdminPane.render) { setTimeout(window.EnterpriseAdminPane.render, 0); } return wrap; },
+        usage: function () { return (window.UsagePane && typeof window.UsagePane.render === "function") ? window.UsagePane.render() : paneUsage(); },
     data: paneData, about: paneAbout
   };
 
