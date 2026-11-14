@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-2JR1dzzIXfaT8zx0Tk/EuEqiIhFbcBiwlDR+jkuGNvo=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-hxRH6yDyDGNleeAz4F/mAZ/WcLAS3/HLTAzwXUWLtA0=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -3951,8 +3951,19 @@ function splitFollowups(answer) {
   if (!m) return { body: text.trim(), section: "" };
   return { body: text.slice(0, m.index).trim(), section: text.slice(m.index) };
 }
+// 34b one-tap chips: the FULL imperative command, untruncated — this string is
+// what a chip tap submits to the gateway, so it must never be cut short (a
+// "…" mid-command is a broken command). tidyFollowup is display-only now.
+function followupCommand(raw) {
+  return String(raw || "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/[*_`]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 // Light cleanup only (the model's wording is used as-is): strip markdown
 // decoration, capitalise the first letter, cut at a WORD boundary if very long.
+// DISPLAY-ONLY (chip labels) — never used for the executed command.
 function tidyFollowup(raw) {
   let t = String(raw || "")
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
@@ -3971,7 +3982,7 @@ function extractSuggestedFollowups(text) {
   if (!section) return null;
   const items = section.replace(/^\s+/, "").split(/\n+/).slice(1)
     .map(l => l.replace(/^[\s>*•-]*/, "").replace(/^\d+[.)]\s*/, "").trim())
-    .map(tidyFollowup)
+    .map(followupCommand)
     .filter(l => l.length > 8 && l.length < 200);
   return items.length ? items.slice(0, 4) : null;
 }
@@ -4800,9 +4811,13 @@ function renderAnswer(container, text, sources, related, images, meta) {
       item.className = "related-item";
       item.setAttribute("role", "button");
       item.tabIndex = 0;
+      // 34b one-tap chips: the chip RUNS r as the full imperative command; the
+      // label is the tidied/truncated text, the payload is never truncated.
+      item.title = "Run this follow-up: " + r;
+      item.setAttribute("aria-label", "Run this follow-up: " + r);
       item.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>';
       const span = document.createElement("span");
-      span.textContent = r;
+      span.textContent = tidyFollowup(r);
       item.appendChild(span);
       item.onclick = () => submitQuery(r);
       item.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); submitQuery(r); } };
