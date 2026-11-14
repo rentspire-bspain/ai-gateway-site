@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-14T01:48:39+00:00",
- "base": "https://ai.spaincos.com",
+ "ts": "2026-11-14T02:29:36+00:00",
+ "base": "http://localhost:8765",
  "passed": 28,
- "failed": 0,
+ "failed": 3,
  "checks": [
   {
    "name": "gateway-status 200",
@@ -16,28 +16,28 @@
   },
   {
    "name": "simple query answers (Paris)",
-   "ok": true,
-   "detail": "HTTP 200"
+   "ok": false,
+   "detail": "HTTP 503"
   },
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "8.5s"
+   "detail": "0.2s"
   },
   {
    "name": "current-events answered",
-   "ok": true,
-   "detail": "HTTP 200"
+   "ok": false,
+   "detail": "HTTP 503"
   },
   {
    "name": "current-events fast path (loop skipped)",
-   "ok": true,
-   "detail": "skipped=research_sufficient"
+   "ok": false,
+   "detail": "skipped=None"
   },
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "9.7s"
+   "detail": "0.2s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -48,6 +48,21 @@
    "name": "memory_items table reachable",
    "ok": true,
    "detail": "HTTP 200"
+  },
+  {
+   "name": "index.html loads real modules",
+   "ok": true,
+   "detail": "52 refs"
+  },
+  {
+   "name": "all deployed modules match repo",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
+   "ok": true,
+   "detail": "build.js=v188 build.json=v188"
   },
   {
    "name": "landing renders",
@@ -132,7 +147,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n1 FAILED\n\u00b7 15/16 checks \u00b7 11/13/2026, 11:16:08 PM\nRun be"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 28/28 checks \u00b7 11/14/2026, 1:48:"
   },
   {
    "name": "follow-up chip submits (search state)",
@@ -145,5 +160,5 @@
    "detail": ""
   }
  ],
- "exit": 0
+ "exit": 1
 }
