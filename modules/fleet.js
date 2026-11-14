@@ -195,11 +195,35 @@
     }).join("") + "</ul>";
   }
 
+  function mountAutomations(host) {
+    if (!host) return;
+    if (root.AutomationsUI && typeof root.AutomationsUI.mount === "function") {
+      root.AutomationsUI.mount(host, { hideHeading: true });
+      return;
+    }
+    host.innerHTML = '<p class="fl-msg">Loading automations…</p>';
+    var s = document.createElement("script");
+    s.src = "/modules/automations.js";
+    s.onload = function () {
+      if (root.AutomationsUI && typeof root.AutomationsUI.mount === "function") {
+        root.AutomationsUI.mount(host, { hideHeading: true });
+      }
+    };
+    s.onerror = function () { host.innerHTML = '<p class="fl-msg">Could not load Automations module.</p>'; };
+    document.head.appendChild(s);
+  }
   function section(title, list) { return list.length ? '<h3 class="fl-h">' + esc(title) + " (" + list.length + ')</h3><div class="fl-grid">' + list.map(card).join("") + "</div>" : ""; }
   function render() {
     if (!el) return;
     var body = el.querySelector(".fl-body");
-    var tabs = '<div class="fl-tabs" style="display:flex;gap:8px;margin:0 0 12px"><button type="button" class="fl-tab" data-tab="overview"' + (tab === "overview" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Overview</button><button type="button" class="fl-tab" data-tab="guardians"' + (tab === "guardians" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Guardians</button><button type="button" class="fl-tab" data-tab="qa"' + (tab === "qa" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>QA</button><button type="button" class="fl-tab" data-tab="build"' + (tab === "build" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Build</button></div>';
+    var tabs = '<div class="fl-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px"><button type="button" class="fl-tab" data-tab="overview"' + (tab === "overview" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Overview</button><button type="button" class="fl-tab" data-tab="automations"' + (tab === "automations" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Automations</button><button type="button" class="fl-tab" data-tab="guardians"' + (tab === "guardians" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Guardians</button><button type="button" class="fl-tab" data-tab="qa"' + (tab === "qa" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>QA</button><button type="button" class="fl-tab" data-tab="build"' + (tab === "build" ? ' aria-pressed="true" style="font-weight:700"' : "") + '>Build</button></div>';
+    if (tab === "automations") {
+      if (!body.querySelector(".fl-auto-host")) {
+        body.innerHTML = '<div class="fl-wrap">' + tabs + '<div class="fl-auto-host"></div></div>';
+        mountAutomations(body.querySelector(".fl-auto-host"));
+      }
+      return;
+    }
     if (tab === "guardians") { body.innerHTML = '<div class="fl-wrap">' + tabs + guardHtml() + "</div>"; return; }
     if (tab === "build") { body.innerHTML = '<div class="fl-wrap">' + tabs + buildHtml() + "</div>"; return; }
     if (tab === "qa") { body.innerHTML = '<div class="fl-wrap">' + tabs + qaHtml() + "</div>"; return; }
@@ -214,8 +238,9 @@
       dispHtml() + section("Build lanes", by("build_lane")) + section("Runtime agents", by("runtime_agent")) + "</div>";
   }
   function onKey(e) { if (e.key === "Escape") close(); }
-  function open() {
-    if (el) return;
+  function open(initialTab) {
+    if (typeof initialTab === "string" && initialTab) tab = initialTab;
+    if (el) { render(); return; }
     if (!document.querySelector('link[href*="fleet.css"]')) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "/modules/fleet.css"; document.head.appendChild(l); }
     el = document.createElement("div"); el.className = "fl-root"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "Fleet");
     el.innerHTML = '<div class="fl-head"><div class="fl-grow"><h2>Fleet</h2><div class="fl-sub">Agents, guardians and org chart</div></div><button class="fl-x" aria-label="Close">×</button></div><div class="fl-body"></div>';
