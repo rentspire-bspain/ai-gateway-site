@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-13T23:16:08+00:00",
- "base": "http://localhost:8765",
- "passed": 15,
- "failed": 1,
+ "ts": "2026-11-14T01:48:39+00:00",
+ "base": "https://ai.spaincos.com",
+ "passed": 28,
+ "failed": 0,
  "checks": [
   {
    "name": "gateway-status 200",
@@ -22,7 +22,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "5.4s"
+   "detail": "8.5s"
   },
   {
    "name": "current-events answered",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "9.0s"
+   "detail": "9.7s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -48,21 +48,6 @@
    "name": "memory_items table reachable",
    "ok": true,
    "detail": "HTTP 200"
-  },
-  {
-   "name": "index.html loads real modules",
-   "ok": true,
-   "detail": "43 refs"
-  },
-  {
-   "name": "all deployed modules match repo",
-   "ok": true,
-   "detail": ""
-  },
-  {
-   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
-   "ok": true,
-   "detail": "build.js=v187 build.json=v187"
   },
   {
    "name": "landing renders",
@@ -80,10 +65,85 @@
    "detail": ""
   },
   {
-   "name": "frontend completed without crashing",
-   "ok": false,
-   "detail": "Error: Page.goto: net::ERR_FAILED at http://localhost:8765/t/prelaunch\nCall log:\n  - navigating to \"http://localhost:8765/t/prelaunch\", waiting unt"
+   "name": "thread renders",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "thread route loads all modules (no /t/ 404s)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "question/answer text parity (16px)",
+   "ok": true,
+   "detail": "{'q': 16, 'a': 16}"
+  },
+  {
+   "name": "follow-up chips render",
+   "ok": true,
+   "detail": "2"
+  },
+  {
+   "name": "Run-all button present",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "doc chip present (no auto-open)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "doc panel opens on chip click",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "doc h1 heading scale (20-28px)",
+   "ok": true,
+   "detail": "{'open': True, 'h1': '24.025px', 'code': True, 'mono': True}"
+  },
+  {
+   "name": "doc code monospace + copy",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "doc-chip collapses raw markdown",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "raw doc pre is hidden in chat",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "Connectors panel renders",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "Fleet page renders registry",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "Fleet QA tab shows fleet report",
+   "ok": true,
+   "detail": "Overview\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n1 FAILED\n\u00b7 15/16 checks \u00b7 11/13/2026, 11:16:08 PM\nRun be"
+  },
+  {
+   "name": "follow-up chip submits (search state)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "zero JS/CSP errors",
+   "ok": true,
+   "detail": ""
   }
  ],
- "exit": 1
+ "exit": 0
 }
