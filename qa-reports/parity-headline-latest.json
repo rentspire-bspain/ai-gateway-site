@@ -1,0 +1,57 @@
+{
+ "ts": "2026-11-14T06:44:17+00:00",
+ "version": "v205",
+ "headline_pct": 70.9,
+ "weighted_sum": 6952,
+ "total_weight": 98,
+ "categories": {
+  "Features": 96,
+  "Computer": 98,
+  "API": 86,
+  "Troubleshooting": 82,
+  "Voice": 65,
+  "Account": 58,
+  "Models": 86,
+  "Connectors": 58,
+  "Privacy": 60,
+  "Comet": 50,
+  "Premium": 57,
+  "Enterprise": 35,
+  "GettingStarted": 60,
+  "Desktop": 21,
+  "Billing": 92,
+  "Mobile": 0,
+  "Teammates": 0
+ },
+ "raw_items": {
+  "done": 104,
+  "partial": 33,
+  "gap": 20,
+  "total": 157
+ },
+ "path_to_75": {
+  "points_needed": 398
+ },
+ "owner_blockers": [
+  {
+   "item": "Broaden the fine-grained PAT beyond SHMT (unlocks all fleet build lanes)",
+   "url": "https://github.com/settings/personal-access-tokens"
+  },
+  {
+   "item": "Register OAuth apps: Slack/Dropbox/Outlook/Box (Connectors 58\u219285, +324 pts)",
+   "url": "https://api.slack.com/apps"
+  },
+  {
+   "item": "Apply the 4 SQL migrations: skills/automations/webapp-registry/ledger",
+   "url": "https://supabase.com/dashboard/project/bnxermyboeigvwonfrzx/sql/new"
+  },
+  {
+   "item": "Supabase auth_config_write (passkeys/2FA, Account 58\u219270)",
+   "url": "https://supabase.com/dashboard/project/bnxermyboeigvwonfrzx/settings/auth"
+  },
+  {
+   "item": "Twilio credentials (Voice 65\u219280)",
+   "url": "https://console.twilio.com"
+  }
+ ]
+}
