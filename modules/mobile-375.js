@@ -18,7 +18,7 @@
   function init() {
     if (window.matchMedia && !window.matchMedia("(max-width: 420px)").matches) return; // phones only
     if (document.querySelector(".m375-burger")) return;
-    var bar = document.getElementById("topbar") || document.querySelector(".topbar, header.topbar");
+    var bar = document.getElementById("topbar") || document.querySelector(".topbar, header.topbar, .main-header, main > .main-header");
     if (!bar) return;
     var btn = document.createElement("button");
     btn.className = "m375-burger";
