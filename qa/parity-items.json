@@ -1,7 +1,7 @@
 {
- "version": "v209",
+ "version": "v210",
  "generated_at": "2026-11-14T07:00:00Z",
- "note": "The single source of truth for the parity headline. Update scores per batch (with evidence in the doc's change log), then run: python3 qa/generate-parity-headline.py \u2014 the headline is computed, never hand-summed (the v204 classifier incident makes hand arithmetic permanently out of policy).",
+ "note": "The single source of truth for the parity headline. Update scores per batch (with evidence in the doc's change log), then run: python3 qa/generate-parity-headline.py — the headline is computed, never hand-summed (the v204 classifier incident makes hand arithmetic permanently out of policy).",
  "categories": [
   {
    "name": "Features",
@@ -41,7 +41,7 @@
   {
    "name": "Connectors",
    "weight": 12,
-   "score": 70
+   "score": 75
   },
   {
    "name": "Privacy",
@@ -101,7 +101,7 @@
    "url": "https://github.com/settings/personal-access-tokens"
   },
   {
-   "item": "Register OAuth apps: Slack/Dropbox/Outlook/Box (Connectors 58\u219285, +324 pts)",
+   "item": "Register OAuth apps: Slack/Dropbox/Outlook/Box (Connectors 58→85, +324 pts)",
    "url": "https://api.slack.com/apps"
   },
   {
@@ -109,11 +109,11 @@
    "url": "https://supabase.com/dashboard/project/bnxermyboeigvwonfrzx/sql/new"
   },
   {
-   "item": "Supabase auth_config_write (passkeys/2FA, Account 58\u219270)",
+   "item": "Supabase auth_config_write (passkeys/2FA, Account 58→70)",
    "url": "https://supabase.com/dashboard/project/bnxermyboeigvwonfrzx/settings/auth"
   },
   {
-   "item": "Twilio credentials (Voice 65\u219280)",
+   "item": "Twilio credentials (Voice 65→80)",
    "url": "https://console.twilio.com"
   }
  ]
