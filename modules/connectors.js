@@ -383,11 +383,16 @@
   function pcall(id, body) { return call("connectors", Object.assign({ provider: id }, body)); }
   function pconnect(P) {
     var oState = getProviderOAuthState(P.id, pstat[P.id]);
-    if (oState.hasClientConfig) {
+    // v227 PERMANENT FIX: prefer the SERVER connect flow when the server has app
+    // credentials — the server mints the OAuth state, which the callback exchange
+    // validates. The client-machine path (used when only /api/oauth-config has a
+    // clientId) cannot complete the exchange because its state token is client-side.
+    // It remains the fallback for server-unconfigured providers.
+    if (oState.hasClientConfig && !oState.hasServerConfig) {
       startClientOAuth(P.id, P.name, P.hosts);
       return;
     }
-    if (!oState.hasServerConfig) {
+    if (!oState.hasClientConfig && !oState.hasServerConfig) {
       pbanner[P.id] = { msg: "Owner setup required — register the " + P.name + " OAuth app at " + (oState.registrationUrl || P.registrationUrl) + " first.", kind: "warn" };
       render();
       return;
@@ -518,7 +523,9 @@
 
   function loadStatus() {
     loadOAuthConfig();
-    return loadAll().then(function () { if (!status) { status = { connected: false }; syncMachineConfig(); render(); } });
+    var done = loadAll().then(function () { if (!status) { status = { connected: false }; syncMachineConfig(); render(); } });
+    consumeStoredCodes(); // v227: exchange any stored OAuth codes from a completed callback
+    return done;
   }
   function say(msg, kind) { banner = msg ? { msg: msg, kind: kind || "info" } : null; render(); }
 
@@ -647,6 +654,43 @@
       note.setAttribute("role", "status");
       rc.appendChild(note);
     } catch (e) {}
+  }
+
+  /* v227 PERMANENT FIX: complete the paste-free connect flow. The callback page stores
+   * the authorization code + state in ai_oauth_pending_codes; this consumes it by
+   * calling the connectors function's exchange action server-side (the same exchange
+   * used by the #connector_code= return path). Runs on pane open and whenever a
+   * callback event arrives. Codes are one-time and cleared after use. */
+  var exchangeInFlight = {};
+  function consumeStoredCodes() {
+    var codesMap = watchGet("ai_oauth_pending_codes", {});
+    Object.keys(codesMap || {}).forEach(function (prov) {
+      var entry = codesMap[prov] || {};
+      var code = entry.code, state = entry.state;
+      if (!code || !state || exchangeInFlight[prov]) return;
+      exchangeInFlight[prov] = true;
+      session().then(function () {
+        return call("connectors", { action: "exchange", code: String(code), state: String(state) });
+      }).then(function (d) {
+        delete exchangeInFlight[prov];
+        var cm = watchGet("ai_oauth_pending_codes", {});
+        if (d && !d.error) {
+          delete cm[prov];
+          watchSet("ai_oauth_pending_codes", cm);
+          pstat[prov] = d;
+          pbanner[prov] = { msg: prov.charAt(0).toUpperCase() + prov.slice(1) + " connected" + (d.email || d.account ? " as " + (d.email || d.account) : "") + ".", kind: "ok" };
+          syncMachineConfig();
+        } else if (d && d.error && !/expired|invalid|start again/i.test(String(d.error))) {
+          // provider-side rejection: clear the one-time code, surface the error
+          delete cm[prov];
+          watchSet("ai_oauth_pending_codes", cm);
+          pbanner[prov] = { msg: d.error, kind: "err" };
+        }
+        // expired/invalid state codes are left to the retry-on-open logic (cleared on next successful connect)
+        render();
+        notifyBadges();
+      }).catch(function () { delete exchangeInFlight[prov]; });
+    });
   }
 
   function receiveOAuthCallback(evt) {
