@@ -721,6 +721,40 @@
         location.reload();
       })));
 
+    // v230: server-side chat history deletion (real, not just this device)
+    pane.appendChild(row("Delete all chat history (server)",
+      "Permanently removes every thread and message from your account on the server. Cannot be undone.",
+      twoStepConfirm("Delete all chat history", function () {
+        var client = (typeof sb !== "undefined") ? sb : window.sb;
+        if (!client || !client.auth) return;
+        client.auth.getSession().then(function (r) {
+          var tok = r && r.data && r.data.session && r.data.session.access_token;
+          var anon = (window.__appGlobals && window.__appGlobals.SUPABASE_ANON) || "";
+          if (!tok) throw new Error("Sign in first.");
+          var SB = "https://bnxermyboeigvwonfrzx.supabase.co";
+          var h = { apikey: anon, Authorization: "Bearer " + tok, "Content-Type": "application/json" };
+          // messages first (keyed by thread_id), then threads (own rows only — RLS enforces)
+          return fetch(SB + "/rest/v1/threads?select=id", { headers: h }).then(function (r2) {
+            return r2.json();
+          }).then(function (tids) {
+            var ids = (tids || []).map(function (t) { return t.id; });
+            var chain = Promise.resolve(0);
+            if (ids.length) {
+              chain = fetch(SB + "/rest/v1/thread_messages?thread_id=in.(" + ids.join(",") + ")", { method: "DELETE", headers: h })
+                .then(function () { return ids.length; });
+            }
+            return chain.then(function () {
+              return fetch(SB + "/rest/v1/threads?user_id=eq." + ((r.data.session.user || {}).id || ""), { method: "DELETE", headers: h });
+            });
+          }).then(function () {
+            lsDel("ai_threads");
+            location.reload();
+          });
+        }).catch(function (e) {
+          console.error("server delete failed", e);
+        });
+      })));
+
     // Delete everything (confirm twice + typed DELETE)
     var wrap = el("div", "stg-confirm");
     wrap.style.flexDirection = "column";
