@@ -14,16 +14,19 @@
       .replace(/[&<>]/g, function (c) { return "&" + ({ "&": "amp", "<": "lt", ">": "gt" })[c] + ";"; });
   }
   function authToken() {
-    var c = null;
-    try { c = JSON.parse(localStorage.getItem("sb-credential") || "{}"); } catch (e) {}
-    return (c && c.token) || "";
+    // v231: use the live Supabase session (the legacy sb-credential key is often absent)
+    var client = (typeof sb !== "undefined") ? sb : window.sb;
+    if (!client || !client.auth) return Promise.resolve("");
+    return client.auth.getSession().then(function (r) {
+      return (r && r.data && r.data.session && r.data.session.access_token) || "";
+    });
   }
   function anonKey() {
     try { var g = window.__appGlobals || {}; return g.SUPABASE_ANON || ""; } catch (e) { return ""; }
   }
   function team(action, extra) {
-    var tok = authToken();
     var body = Object.assign({ action: action }, extra || {});
+    return authToken().then(function (tok) {
     return fetch(TEAM_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + tok, apikey: anonKey() },
@@ -33,6 +36,7 @@
         if (!r.ok) throw new Error(String(j.error || ("HTTP " + r.status)).slice(0, 180));
         return j;
       });
+    });
     });
   }
   function btn(label, kind) { return el("button", "stg-btn" + (kind ? " stg-btn-" + kind : ""), label); }
