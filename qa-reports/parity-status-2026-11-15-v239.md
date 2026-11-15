@@ -1884,18 +1884,14 @@ Perplexity reference prices (verified 2026-11-11): Pro $20/mo or $200/yr; Max $2
 ### Why we can undercut: cost asymmetry
 Our stack is open-weight models on cheap/free routes plus our own search lanes. Marginal cost of a standard cited answer is roughly $0.01-$0.05 (model tokens + retrieval), versus Perplexity's consumer price of $0.15-$0.70 per quick answer and their real cost of frontier-model tokens + $5/1k search. That is a 5-30x cost advantage per unit; we can price at 60-80% below them and still hold 70%+ gross margin. The moat is Comptrove data grounding, not model access (per the business plan, section 16).
 
-### Consumer plans (undercut table) — v239 LOCKED PRICES (owner directive: tiers end in 8)
-| Tier | Market anchor | Boundview price | Undercut | Includes |
+### Consumer plans (undercut table)
+| Tier | Perplexity | ai.spaincos price | Undercut | Includes |
 |---|---|---|---|---|
-| Free | $0 | $0 | — | Unlimited quick answers (cheap route), 5 deep research/mo, auth-gated, **Gig Hub neuron earning** |
-| Core | ChatGPT Go $8 | **$8/mo ($80/yr)** | = Go, 60% under Plus | Unlimited answers, 5,000 credits/mo (post-split), all modes, exports |
-| Pro | Claude/ChatGPT/Perplexity $20 | **$18/mo ($180/yr)** | 10% under the $20 anchor | All lanes + sonar research, 15,000 credits/mo |
-| Max | Claude Max / ChatGPT Pro $100 | **$48/mo ($480/yr)** | 52% under | 50,000 credits/mo, priority routes, Kimi long-context, Council, Labs, scheduled research |
-| Unlimited | Claude Ultra / Perplexity Max $200 | **$98/mo ($980/yr)** | 51% under | 150,000 credits/mo, everything + agents |
-| Team | Claude Team $20-25/seat | **$18/seat** | 10-28% under | Pooled credits, shared collections, admin usage report |
-| Enterprise | Ent Max $325/seat | **$98/seat** | 70% under | DPA, SSO, retention controls, invoicing, 50,000 credits/seat/mo |
-
-P&L at these prices (30 days, blend, CPA-grounded free tier): 10K users $6,018 net @2% / $11,509 @5% / $20,660 @10%; 100K users $60,679 / $115,587 / $207,100 — net margins 79.7-88.7% (§8 of the pricing model artifact; see §29bz).
+| Free | $0, 1 research query/mo | $0 | — | Unlimited quick answers (cheap route), 5 deep research/mo, auth-gated |
+| Core | Pro $20/mo ($200/yr) | **$8/mo ($80/yr)** | 60% | Unlimited answers, 5,000 credits/mo (post-split), all modes, exports |
+| Max-equivalent | Max $200/mo ($2,000/yr) | **$50/mo ($500/yr)** | 75% | 50,000 credits/mo (post-split), priority routes, Council, Labs, scheduled research |
+| Team | (Teammate add-on) | **$20/seat** | — | Pooled credits, shared collections, admin usage report |
+| Enterprise | Ent Pro $40/seat, Ent Max $325/seat | **$15/seat Pro, $99/seat Max** | 62-70% | DPA, SSO, retention controls, invoicing, 1,500 credits/seat/mo |
 
 ### Credit economics (undercut the headline number)
 - **2,500 credits = $1** after the 10:1 credit split (owner directive 2026-11-11). Same dollar economics, bigger numbers: 1 credit = $0.01. Versus Perplexity's 100 credits = $1, our headline is "25x more credits per dollar" — pure optics, but honest: the per-unit price is what it always was.
@@ -2443,6 +2439,9 @@ All implementable on Supabase + Vercel + Render with open-weight costs:
 9. **Personal AI Field Guide** (7/10) — an evolving collectible map of skills actually used; publishable public version = every guide is free acquisition (the Wordle share-grid mechanic).
 10. **Community Recipes** (7/10) — publish/remix agent+automation recipes with creator badges; recipes are metadata executed in the user's own budget — zero platform compute for sharing.
 
+
+11. **THE AI EMAIL INBOX** (10/10 — owner directive 2026-11-15, QUEUED LAST: build only after everything else in this document is complete) — full reverse-engineered spec in §31d. Google Workspace just shipped this exact feature ("AI Inbox", Gemini, Beta — the owner's screenshots 2026-11-15); we clone-and-beat it on our stack: open-weight costs, cross-provider, and to-dos that EXECUTE via the agent fleet instead of just suggesting.
+
 **How it stays cheap:** streaks/quests/leagues/cards are Supabase rows; Render cron rotates quests and computes standings (existing guardian pattern); rewards are credits (our marginal cost ≈ $0 — gamification that costs nothing is the whole trick of our margin structure).
 
 ### 31c. Credit psychology — the 10:1 split offer, what the user actually feels (owner directive, in the doc)
@@ -2460,6 +2459,28 @@ All implementable on Supabase + Vercel + Render with open-weight costs:
 
 **Guardrails (learned from every company's complaints, §22):** never surprise-bill (reserve-then-settle is structural), never reward query volume over answer quality (leagues score SOLVED problems), streaks pause-capable (Duolingo freeze), no dark-pattern cancel (Muse's top complaint), training ON by default with a working one-tap opt-out plus a paid no-training tier, and cap daily variable-reward costs so delight never becomes a runaway bill (Perplexity's $7,245 lesson).
 
+
+
+## 31d. THE AI EMAIL INBOX — full reverse-engineered spec (owner directive 2026-11-15: "reverse-engineering this AI email inbox into the overall boundview.com and ai.spaincos.com closure document as another holy-shit feature")
+
+**Source:** Google Workspace "AI Inbox" (Gemini, Beta) — reverse-engineered from the owner's live screenshots (2026-11-15 09:22). What Google built, what we clone, and where we beat them.
+
+**What the product IS (from the screenshots):**
+1. **Greeting/triage header:** "Hi Brett — You have 20 to-dos and 4 topics to catch up on" + "Updated over 1 day ago" + refresh. The inbox leads with COUNTS of work, not a message list.
+2. **Suggested to-dos (the action tier):** cards extracted from emails that need a decision — "Approve plumbing repairs at Vue at St. Andrews Unit 9 ($6,400 slab pipe repair)", "Respond to Ashley regarding Unit 25 leak repair proposal", "Pay JAMS, Inc. invoice ($13,500 failed e-check, invoice 8501108)". Each card: 1–3 sentence abstractive summary (entities, dollar figures, deadlines, the explicit ask), attachment count badges, auto-created smart labels (Invoices/Receipts), unread dot, and QUICK ACTIONS: Reply (AI-assisted draft, sparkle icon), Snooze, Mark-complete, View, overflow menu. "Show 17 more" expander + reminders badge.
+3. **Topics to catch up on (the awareness tier):** cross-thread semantic clustering — emails from different senders/dates grouped under business topics ("NEF Debt Restructuring & IntegrityRise Management Transition", "Spain v. Mense Legal Arbitration & Asset Disputes", "Multifamily Portfolio Operations & Property Management", "Other Important Updates"), each with per-email abstractive summaries, mark-all-read per topic, attachment badges, relative timestamps.
+4. **The moat of the design:** triage splits the inbox into DO vs KNOW. Summaries pull the ask, the money, and the deadline to the surface. Zero-reading required to act.
+
+**Our build (ai.spaincos.com + boundview.com), all on the existing stack:**
+- **Ingestion:** Gmail only (owner directive: no Outlook — that connector stays external-user-only). The gcal connector already has Gmail scope; an `email-sync` edge function polls the Gmail API (history/push via Pub/Sub later), stores messages + threads in a per-user `email_messages` table (Supabase, main project — same pattern as thread_ledger).
+- **Classification + summarization (the AI tier):** an edge function per new email: (a) intent classify ACTION vs INFO (the existing intent classifier pattern), (b) extract {ask, entities, dollar figures, deadlines} as structured JSON, (c) 1–3 sentence abstractive summary, (d) topic clustering key (LLM-assigned topic id from a per-user topic table, new topics created when no match). ALL of this runs on the FREE/cheap lanes (DeepSeek V4.1 Flash at ~$0.0007/email, or free GLM/Qwen lanes) — per-user daily caps (v234) already bound the cost. Smart labels = the existing classifier pattern (Invoices/Receipts/Legal/Vendor).
+- **The UI:** a new Inbox module in the left nav (same openModule pattern as Fleet/Docs) with the two-tier layout: to-dos first (quick actions: AI Reply → drafts via call-model with the thread context and the user's voice from memory_items; Snooze → scheduled_tasks; Mark-complete; View → raw email), topics below (collapsible, mark-all-read, show-more). Greeting header with counts.
+- **Where we BEAT Google (the holy-shit part):** our Reply button doesn't just draft — it can DISPATCH (the existing fleet/automation rails): "approve the repair" can run the approval workflow, "pay the invoice" can prepare the payment record, a to-do can become an automation that handles every future email like it. Google suggests; we execute. Plus: cross-provider (any connector email source), the summaries feed memory_items (the inbox teaches your workspace), and it runs at open-weight COGS inside the existing per-user economics (§ scale doc) instead of a Workspace license.
+- **Cost model:** ~$0.0007/email classified+summarized on Flash; a 100-email/day user costs ~$0.07/day — inside even the free tier's daily ceiling. Topic clustering reuses embeddings infrastructure (context_embeddings pattern).
+- **Tables (new):** email_messages, email_topics, email_todos (with snooze/completed state), email_labels. All per-user RLS, same as threads.
+- **Build order (when its turn comes, LAST):** (1) email-sync + classification edge function + minimal to-do list UI; (2) topics clustering + two-tier UI; (3) quick actions (AI Reply, snooze, complete); (4) dispatch integration (to-do → agent/automation); (5) boundview.com packaging as a paid tier (gated behind Core+ — it is a natural Pro/Max feature).
+
+**Status: QUEUED (do not start until the rest of this document is complete — owner directive).**
 
 ## 32. Architecture verdict — control plane / compute plane split (added v172; 12-agent fleet design review)
 
