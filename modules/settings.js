@@ -426,6 +426,28 @@
       "Show in-app notifications for finished research and updates.",
       makeToggle(lsGet("ai_notify_inapp") !== "0", function (on) { lsSet("ai_notify_inapp", on ? "1" : "0"); }, "In-app inbox")));
 
+    // v230: native desktop notifications (Desktop phase 2) — real permission request
+    var dn = window.DesktopNotifications;
+    if (dn && dn.supported()) {
+      var dnCtl = el("div", "stg-controls");
+      var dnState = el("span", "stg-desc", "");
+      function dnRender() {
+        dnCtl.innerHTML = "";
+        var on = dn.enabled() && dn.permission() === "granted";
+        var t = makeToggle(on, function (v) {
+          if (v) dn.request(function (p) { dnRender(); });
+          else { dn.disable(); dnRender(); }
+        }, "Native notifications");
+        dnCtl.appendChild(t);
+        dnState.textContent = dn.permission() === "granted" ? "Granted" : (dn.permission() === "denied" ? "Blocked in the browser" : "Permission asked on first enable");
+      }
+      dnRender();
+      pane.appendChild(row("Native desktop notifications",
+        "Raise an OS notification when a response finishes while the tab is in the background.",
+        dnCtl));
+      pane.appendChild(dnState);
+    }
+
     var emailCtl = el("div", "stg-controls");
     emailCtl.appendChild(makeToggle(lsGet("ai_notify_email") === "1", function (on) { lsSet("ai_notify_email", on ? "1" : "0"); }, "Email digest"));
     var soon = el("span", "stg-desc stg-note", "Coming soon");
