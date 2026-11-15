@@ -3,6 +3,19 @@
 
 > **HEADLINE: weighted average total completion 90.1%**. The reproducible §26 score is 8828 ÷ 98 = 90.081632%, rounded to one decimal. No category rescore this batch — v236 is reliability + scale work (the standing rule: only evidence-verified moves change scores). Raw tracked-item count: **104✅ / 33🟡 / 20🔴** (157 items). All arithmetic computed by qa/generate-parity-headline.py against qa/parity-items.json v236 — never hand-summed.
 
+## 29bsA. v236 change log: boundview commercial pricing model finalized (2026-11-15 UTC)
+
+| Change | What | Verification |
+|---|---|---|
+| model_costs table refreshed (live) | All 24 gateway lanes replaced with live OpenRouter prices (Nov 15, 2026 API pull): deepseek-v4.1-flash-1017 $0.02/$0.108 per Mtok, glm-5.3 $0.084/$3.60, kimi-k3.1-pro $0.2403/$8.4023, llama-4-maverick $0.35/$1.00, gpt-5.6-sol $4.40/$22, sonar $1/$1, all :free lanes $0 — the stale glm-4.6/kimi-k2/deepseek-v3.1 rows that inflated usage estimates ~100x are gone | Verified by SELECT after the transaction: 24 rows, correct values |
+| Final tier set locked | Free $0 (300 credits/day + neuron earning) / Core $8 / Pro $20 / Max $50 / Unlimited $99 / Team $20/seat / Enterprise $99/seat, all on the 10:1 psychological-only credit split (2,500 credits = $1 display; ledger stores dollars) | Priced against Claude Pro $20/Max $100/Ultra $200, ChatGPT Go $8/Plus $20/Pro $100-500, Perplexity Pro $20/Max $200, Gemini AI Pro $19.99/Ultra $99.99 — all list prices verified Nov 2026 |
+| P&L by paid conversion (30 days, free tier earning $0.60/user via tasks+ads) | 10K users: $8,538 net @2% / $14,209 @5% / $23,660 @10%; 100K users: $85,879 / $142,587 / $237,099 — net margins 84.8-89.9% | Computed model at boundview-pricing/boundview-pricing-model.md §7; inputs = real 30-day gateway usage (~4,700 turns, ~1,500-char avg answers) x live per-token prices |
+| Free-tier neuron funnel quantified | 12% task engagement x 5 tasks/mo x ~$1.00 partner CPA + $0.27 ads = $0.60-0.87/free user/mo vs $0.09 COGS; at 5% conversion the free tier contributes ~35% of total revenue and lifts net margin 81%->88%; add "5,000 neurons = Core month" tasting redemption (costs ~$0.15 COGS, converts 20-30% of tasters) | Neurons system already live (settings-neurons.js, neurons-claim edge function, earn-only design) |
+| Stress test (verified) | Baseline 87.8%; 10x spike 45.6%; free-tier loss 78.1%; spike+free-loss UNCAPPED -69.4% -> WITH fair-use caps (3x plan norm + $500/day spend brake) 45.3%. Guardrails are mandatory: hard credit exhaustion, daily spend brake, lane degradation at cap | Computed; the uncapped negative case is the argument for caps-on (owner directive to run gateway caps off applies to ai.spaincos private use, NOT boundview commercial) |
+| model_costs usage accounting fix | api_usage_month estimates were ~100x inflated by stale prices ($45.18 for 481 requests; true cost <$1 at live prices) | Fixed by the table refresh above |
+
+**Full model with charts:** boundview-pricing-model.md (workspace artifact) — per-lane costs, fixed stack ($93/mo boundview standalone), conversion sensitivity, competitive ladder, subscription-vs-blend verdict.
+
 ## 29bs. v236: THE SELF-IMPROVEMENT-CYCLE ROLLOUT — every issue, diagnosed, fixed, verified, with the permanent solution (2026-11-15 UTC)
 
 **Method note (owner directive: "even if you already triaged them I need deeper insights into every single issue"):** each entry below carries the five fields the owner tracks: what was observed, the true root cause (found by reading the code, not guessing), the fix and its version, the live verification, and the permanent-solution class so the same failure cannot silently return.
