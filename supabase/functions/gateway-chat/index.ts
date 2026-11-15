@@ -1,8 +1,17 @@
+export const GATEWAY_VERSION = 236;
 import { corsFor, preflight as corsPreflight } from "../_shared/cors.js"; // v103: aliased — the I7 self-check below defines its own `preflight`
 import { MemoryLimiter, RATE_POLICY, dbRateCheck, tooMany } from "../_shared/rate-limit.js";
 import { safeEqual } from "../_shared/call-model-policy.js";
-import { runToolLoop, shouldRunToolLoop, sanitizeSearchQuery, condenseSearchQuery, autoFetchAssets, initEgress, CONNECTOR_INTENT, CONNECTOR2_INTENT, FLEET_INTENT, DISPATCH_INTENT, MCP_INTENT, TOOLS_INTENT, ACK_TURN_RE, needsComputation, toolRunPythonForFallback, toolPlatformStatus, toolCreateFile, resolveFleetEmail, toolRunRunnerJob, toolGithubWrite } from "./tool-loop.ts";
-import { runConnectorTool } from "./connector-tools-client.ts";   // v141 FLEET: server-side list_fleet auto-invocation
+import { runToolLoop, shouldRunToolLoop, sanitizeSearchQuery, condenseSearchQuery, autoFetchAssets, initEgress, CONNECTOR_INTENT, CONNECTOR2_INTENT, FLEET_INTENT, DISPATCH_INTENT, MCP_INTENT, TOOLS_INTENT, isAckTurn, needsComputation, toolRunPythonForFallback, toolPlatformStatus, toolCreateFile, resolveFleetEmail, toolRunRunnerJob, toolGithubWrite, toolListCapabilities, toolListWebapps, toolListWebappTables, toolWebappDoctor, toolFetchPage, toolListPlatformFunctions } from "./tool-loop.ts";
+// v191: capability-inventory asks (owner directive 2026-11-13). Matches the phrasings the owner
+// actually used ("CHECK AGAIN ON THE RUNNERS AND MODELS", "check deeply", "what got imported").
+export const PARITY_STATE = "v236 (2026-11-15): POST-FINISH TRAILING-CONTENT FIX (the real duplicated-text root cause from the guardian 20:00Z run): the free-lane upstream sends content deltas AFTER the finish_reason frame — late narration that landed after the injected Sources list and glued a restated sentence onto the answer; post-finish content frames are now dropped per SSE semantics. v235: DUPLICATED-SOURCES STREAM FIX — the self-improvement guardian (20:00Z run) caught the free-lane writer emitting its own Sources section, after which the citation linker injected a SECOND Sources list and glued the writer's continuation text to it; the linker now tracks emitted text and never injects a second list when a Sources heading already went through. v234 (2026-11-15): PER-USER DAILY SPEND CEILINGS + COST ATTRIBUTION — every chargeable request from a non-exempt user now checks a per-user daily cost ceiling (DAILY_SPEND_CEILING_USD, default $3/day, tracked in the new user_daily_spend table; owner + eval-bot exempt, the owner's ceiling stays the global $350/mo call-model cap raised from $100) and records the day's estimated cost per user; every call-model request now carries x-user-id so the ops.llm_requests ledger and gateway-meter objects attribute every paid call to the user that caused it (the per-user COGS data the Boundview pricing model needs); when tracked month spend crosses 50% of the $350 cap a spend_alert notification is dropped (one per user per day). call-model v235 (deployed separately): MONTHLY_SPEND_CAP default $100 -> $350 + user_id passthrough into ledger and meter objects. v231 (2026-11-15): COMMAND-LEAK STREAM SCRUB — the v206 Command-line strip only ran on the non-streaming path while the frontend ALWAYS streams, so the model's own **Command: ...** narration leaked into streamed answers (automation 2026-11-15T08:00Z, 2nd occurrence); a new SSE transform now buffers leading deltas and strips a leading Command line (+ stray divider) before anything reaches the client, simulation-tested 5/5. call-model v231 (deployed separately): FREE-NEVER-HARD-FAILS — the fallback chain now runs for any FREE chosen model even with a custom backend (the flint lane was surfacing raw upstream errors with no fallback). v230 (2026-11-15): COMPLETION-DOC SERVER-SIDE AUTO-INVOCATION — completion/closure/orchestration-doc requests (and continuation turns like 'proceed' in such threads) now get registry+doctor+status evidence gathered by the platform itself and injected, the tool loop is force-run, and the .md deliverable is auto-created if the model didn't (closes the owner-observed 'no callable tool functions are exposed to me here' defect — prompt rules alone don't execute tools). v229: completion-doc forcing rule in the capability baseline. v221 (2026-11-14): WEBAPP DOCTOR SERVER-SIDE AUTO-INVOCATION — webapp health asks now run the doctor on the platform side and inject the real matrix as evidence (prompt rules alone failed: the writer answered an Allowance health ask with web research about an unrelated product). v219 (2026-11-14): WEBAPP OPS ROUND — three new owner/fleet tools: webapp_doctor (live per-app health matrix, run before claiming any webapp is broken or healthy), create_webapp (register a NEW webapp in the live webapp_catalog — every registry tool sees it immediately, no redeploy; vaults its service key, verifies schema end-to-end — the permanent path for new projects created from ai.spaincos.com), and webapp_upsert (governed per-webapp write: upsert rows into any registered app's own PostgREST endpoint, audit-logged to webapp_write_log). v217: per-webapp REST access fixed platform-wide (service credentials for all 15 org projects; anon-at-root 401 root-caused). Honest parity headline computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed. v217 (2026-11-14): PER-WEBAPP REST ACCESS FIXED PLATFORM-WIDE — the per-webapp schema tools (list_webapp_tables / describe_webapp) now authenticate with each project's service-role credential (gateway_config webapp_service_<ref>, wired for ALL 15 Supabase projects in the org, including every current webapp AND future siblings: ahapartments, rentcap, rentspire-comps, Deal Engine, deal-desk-saas, property-ops, allowance, PERILMARK, NodeGrade, spain-terminal-staging, rentspire-customer, aml-workspace-preview, cii-platform, ai-gateway, ahwave-dashboard). The anon-key 401 at the PostgREST root is root-caused (project API settings reject anon at the root); the service credential is used ONLY for the read-only OpenAPI root fetch — schema metadata (table/column names), never row data, never printed. v207: fleet build lanes OPEN (PAT broadened) — mobile/teammates/enterprise builds dispatched; github-ops v5+v6 (default-branch + branch-slash fixes); runner tarball deploy live. v205: call-model tools passthrough FIXED (the root cause of the BUILD MODE failure chain). Honest parity headline is computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed.";
+const CAPABILITY_ASK = /\b(runners?|models?|jobs?|tools?|skills?)\b.{0,50}\b(in ai\.spaincos|imported|available|exist|check|deep|listed|registry|catalog)\b|\b(check|verify|list|show|enumerate|inventory)\b.{0,40}\b(runners?|models?|jobs?|tools?|skills?|capabilities)\b/i;
+// v192: webapp-scoped asks (owner directive 2026-11-13: sessions conflate webapps and their databases).
+// When the question is about a specific webapp, its pages, data, schema, or "the data behind" an app,
+// inject the webapp registry so the session answers per-app, never substituting one app's data universe.
+const WEBAPP_ASK = /\b(comptrove|terminal\.spaincos|spain terminal|pha solutions|refundsnap|crm)\b|\b(webapp|web app|webapps)\b.{0,60}\b(pages?|data|database|schema|inventory|list|each|individual)\b|\b(pages?|data points?|database|schema|ontology)\b.{0,40}\b(comptrove|terminal|pha|refundsnap|crm)\b/i;
+import { runConnectorTool, extractFleetWork } from "./connector-tools-client.ts";   // v141 FLEET: server-side list_fleet auto-invocation
 import { ProgressSink, wantsLiveProgress } from "./progress.ts";   // v103 F12
 import { scrubCredentials, harvestSecrets, REDACTION_NOTICE } from "./credential-scrub.ts";   // cycle 2 gap 2: shared output credential scrub (both paths)
 import { detectUnknownAcronyms, quoteAcronyms, acronymSearchHint, ACRONYM_WRITER_RULE, ACRONYM_PROMPT_EXAMPLES } from "./acronyms.ts";   // cycle 2 gap 1
@@ -21,6 +30,10 @@ import { buildSourceIndex, rewriteWebMarkers, alignOutlets, canonicalSourceItems
 // and Perplexity. This transform runs on the SSE pipe: it links markers in
 // content deltas (handling markers split across chunk boundaries) and
 // injects a final Sources delta just before the model's finish event.
+// v191 (owner directive 2026-11-13): CAPABILITY MANIFEST — list_capabilities tool for every
+// session; live named inventory of runner jobs / machines / models / tools; server-side
+// auto-invocation on inventory asks; cast-wide capability baseline injected into every
+// request so all sessions are at parity without per-session probing.
 // v180 (owner report 2026-11-12): some writer models percent-encode URLs that already
 // contain percent escapes, and each rewrite pass compounds it (% → %25 → %2525 → …).
 // Unwind any URL that carries the double-encoding signature; leave everything else
@@ -73,12 +86,22 @@ function linkCitationsSSE(body: ReadableStream<Uint8Array>, findings: Array<{ ti
     flush();
     return out;
   };
+  // v235b: once the writer emits its OWN "## Sources" heading (standalone line), everything
+  // from there on is dropped — the writer's hand-made list is malformed (no newline after the
+  // link, extract text glued in); the canonical formatted list is injected at finish instead.
+  let sawOwnSources = false;
+  let visibleText = "";
   const processContent = (content: string): string => {
     holdback += content;
+    emittedText += content;
+    if (!sawOwnSources && /(^|\n)#{1,3} ?Sources ?(\n|$)/i.test(emittedText)) { sawOwnSources = true; }
+    if (sawOwnSources) return "";
     const m = holdback.match(/(?:\[\d{0,2}|`+)$/);           // trailing partial marker (or partial ``` fence)?
     let emit: string;
     if (m) { emit = holdback.slice(0, holdback.length - m[0].length); holdback = m[0]; }
     else { emit = holdback; holdback = ""; }
+    if (sawOwnSources) return ""; // the heading line itself is dropped too
+    visibleText += emit;
     // v180: also unwind any double-encoded URLs the writer emitted inline
     return unwindDoubleEncodedUrls(linkMarkers(emit));
   };
@@ -88,6 +111,11 @@ function linkCitationsSSE(body: ReadableStream<Uint8Array>, findings: Array<{ ti
       .join("\n");
     return `data: ${JSON.stringify({ id: "src-links", object: "chat.completion.chunk", choices: [{ index: 0, delta: { content: `\n\n## Sources\n\n${list}` }, finish_reason: null }] })}\n\n`;
   };
+  // v235 (guardian 2026-11-15T20:00Z, duplicated-Sources defect): the free-lane writer can emit
+  // its OWN "## Sources" section mid-answer; the linker then injected a SECOND Sources list at
+  // finish_reason and glued the writer's continuation text to it. Track everything emitted;
+  // if a Sources heading already went through, NEVER inject ours.
+  let emittedText = "";
   let pendingLine = ""; // v66: SSE data lines can split across network chunks —
   // buffer the trailing partial line instead of appending a newline to it (the
   // old code turned a split JSON line into two unparseable lines and the
@@ -102,7 +130,7 @@ function linkCitationsSSE(body: ReadableStream<Uint8Array>, findings: Array<{ ti
     flush(controller) {
       if (pendingLine) { processSSELine(pendingLine, controller); pendingLine = ""; }
       // Stream ended without a finish event (timeout / client abort): still link what we can.
-      if (!sourcesEmitted && holdback) { controller.enqueue(encoder.encode(`data: ${JSON.stringify({ id: "src-links", object: "chat.completion.chunk", choices: [{ index: 0, delta: { content: linkMarkers(holdback) }, finish_reason: null }] })}\n\n`)); }
+      if (!sourcesEmitted && holdback && !sawOwnSources) { controller.enqueue(encoder.encode(`data: ${JSON.stringify({ id: "src-links", object: "chat.completion.chunk", choices: [{ index: 0, delta: { content: linkMarkers(holdback) }, finish_reason: null }] })}\n\n`)); }
       controller.enqueue(encoder.encode(decoder.decode()));
     }
   }));
@@ -118,11 +146,20 @@ function linkCitationsSSE(body: ReadableStream<Uint8Array>, findings: Array<{ ti
       sourcesEmitted = true;
       // flush any held-back partial marker first, then the Sources list
       if (holdback) { const rest = linkMarkers(holdback); holdback = ""; if (rest) controller.enqueue(encoder.encode(`data: ${JSON.stringify({ id: "src-links", object: "chat.completion.chunk", choices: [{ index: 0, delta: { content: rest }, finish_reason: null }] })}\n\n`)); }
-      if (used.size) controller.enqueue(encoder.encode(sourcesDelta()));
+      if (used.size && !/(^|\n)#{1,3}\s*Sources\b/i.test(visibleText)) controller.enqueue(encoder.encode(sourcesDelta())); // v235: the writer's own Sources section was dropped — always inject the canonical list; visibleText guards the (impossible) case where one survived
     }
     if (typeof ch?.delta?.content === "string") {
-      // v83: string-only — reasoning chunks arrive with content:null, and String(null) leaked the literal "null" into answers.
-      ch.delta.content = processContent(ch.delta.content);
+      // v235c (guardian 20:00Z trailing-junk defect): the free-lane upstream can keep sending
+      // content deltas AFTER the finish_reason frame (late narration, e.g. a restated answer
+      // sentence) — those frames landed AFTER the injected Sources list and glued duplicate
+      // text onto the end of the answer. Per SSE semantics, content after the finish chunk is
+      // not part of the answer: drop every post-finish content delta (content ON the finish
+      // frame itself is still processed normally above via the holdback flush).
+      if (sourcesEmitted && !ch?.finish_reason) { ch.delta.content = ""; }
+      else {
+        // v83: string-only — reasoning chunks arrive with content:null, and String(null) leaked the literal "null" into answers.
+        ch.delta.content = processContent(ch.delta.content);
+      }
     }
     controller.enqueue(encoder.encode(`data: ${JSON.stringify(evt)}\n`));
   }
@@ -901,6 +938,43 @@ async function recordUsage(userToken: string, costUsd: number, svc?: { key: stri
     });
   } catch { /* usage recording is best-effort; never block the answer */ }
 }
+
+// v234 PER-USER DAILY SPEND TRACKING: user_daily_spend (user_id, day) rows written with the
+// service key (RLS: no policies -> service role only). Same read-modify-upsert pattern as
+// recordUsage; races only undercount by a request — acceptable for a ceiling.
+async function dailyUsageState(uid: string): Promise<{ requests: number; cost: number }> {
+  const url = Deno.env.get("SUPABASE_URL") ?? "https://bnxermyboeigvwonfrzx.supabase.co";
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  const day = new Date().toISOString().slice(0, 10);
+  if (!key) return { requests: 0, cost: 0 };
+  try {
+    const r = await fetch(`${url}/rest/v1/user_daily_spend?select=requests,est_cost_usd&user_id=eq.${uid}&day=eq.${day}`, {
+      headers: { "apikey": key, "Authorization": `Bearer ${key}` }, signal: AbortSignal.timeout(5_000)
+    });
+    if (r.ok) {
+      const rows = await r.json();
+      const row = Array.isArray(rows) ? rows[0] : undefined;
+      return { requests: Number(row?.requests ?? 0), cost: Number(row?.est_cost_usd ?? 0) };
+    }
+  } catch { /* fail open: unreachable table = no recorded usage */ }
+  return { requests: 0, cost: 0 };
+}
+async function recordDailyUsage(uid: string, costUsd: number): Promise<void> {
+  const url = Deno.env.get("SUPABASE_URL") ?? "https://bnxermyboeigvwonfrzx.supabase.co";
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  if (!key || !uid) return;
+  const day = new Date().toISOString().slice(0, 10);
+  try {
+    const cur = await dailyUsageState(uid);
+    const body = { user_id: uid, day, requests: cur.requests + 1, est_cost_usd: Number((cur.cost + costUsd).toFixed(4)) };
+    const job = fetch(`${url}/rest/v1/user_daily_spend`, {
+      method: "POST",
+      headers: { "apikey": key, "Authorization": `Bearer ${key}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+      body: JSON.stringify(body), signal: AbortSignal.timeout(5_000)
+    }).catch(() => {});
+    (globalThis as any).EdgeRuntime?.waitUntil?.(job);
+  } catch { /* best-effort */ }
+}
 function parseAgentRunOutput(run: any): { text: string; sources: Array<{ title: string; url: string }> } {
   let text = "";
   const cites: Array<{ title: string; url: string; id: number }> = [];
@@ -1177,6 +1251,9 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
   }
   const userEmail = authUser?.email ?? "";
   const userId = authUser?.id ?? "";
+  // v234 PER-USER ATTRIBUTION: every call-model fetch in this handler carries the
+  // authenticated user id so the ops ledger + meter attribute cost to the user.
+  const CM_HEADERS: Record<string, string> = { ...GW_HEADERS, ...(userId ? { "x-user-id": userId } : {}) };
 
   // v72: private-site lock — only the owner's account (plus the QA test account)
   // may call this gateway. Everyone else gets a clean 403.
@@ -1478,7 +1555,8 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
     if (model === "auto") {
       routed = routeModel(String(messages[messages.length - 1]?.content || ""), messages.map((m: any) => String(m?.content || "")).join("\n"), !!imageAttach);
     }
-    const finalModel = routed ? routed.model : (model && model !== "auto" ? model : "z-ai/glm-5.3");
+    // v204: `let` — BUILD MODE turns (below) re-route to Kimi K3.1 Pro for real tool-call emission.
+    let finalModel = routed ? routed.model : (model && model !== "auto" ? model : "z-ai/glm-5.3");
     const reqStart = Date.now();
     const timeOk = (ms = 100_000) => Date.now() - reqStart < ms; // keep QA retries inside the edge wall-clock
     // v83 REASONING EFFORT: with no effort set, GLM-5.3 spends the ENTIRE 2,048-token cap on hidden
@@ -1504,7 +1582,7 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
       try {
         const rawRes = await fetch(callModelUrl, {
           method: "POST",
-          headers: GW_HEADERS,
+          headers: CM_HEADERS,
           body: JSON.stringify({ messages, purpose: "general", model: finalModel, max_tokens: tokenBudget }),
           signal: AbortSignal.timeout(120_000)
         });
@@ -1634,6 +1712,28 @@ Question: "${userQuery}"`;
     if (!creditTier) creditTier = { min: 5, max: 5 };  // legacy default: 5 (search tier)
     const creditCost = creditTier.max;   // reserve = tier max; settle = actual (<= max)
     const chargeable = !incognito && !FREE_PURPOSE.has(String(purpose || ""));
+    // v234 PER-USER DAILY SPEND CEILING (owner directive 2026-11-15): every non-exempt user
+    // (external Boundview-style accounts; the site is invite-only today) gets a daily
+    // model+research cost ceiling, tracked in user_daily_spend and checked BEFORE credits
+    // reserve so a capped user cannot start new paid work. Owner + eval-bot are exempt —
+    // the owner's ceiling is the global $350/mo call-model cap (raised from $100, v235).
+    // Recording is an upfront conservative estimate per mode (research + writer + retries
+    // for one request); exact per-call costs land in the ops.llm_requests ledger via
+    // call-model's user_id attribution. Fails OPEN (table unreachable = no cap) so a
+    // billing-infra hiccup can never break chat.
+    const DAILY_SPEND_CEILING_USD = Number(Deno.env.get("DAILY_SPEND_CEILING_USD") || "3");
+    const CAP_EXEMPT = ["bspain@spaincos.com", "eval-bot@spaincos.com"].includes(userEmail.toLowerCase());
+    const MODE_COST_EST: Record<string, number> = { quick: 0.002, search: 0.01, deep: 0.15, agent: 0.12 };
+    const requestCostEst = MODE_COST_EST[requestMode] ?? (model_council === true ? 0.03 : 0.01);
+    if (chargeable && !CAP_EXEMPT && userId) {
+      try {
+        const du = await dailyUsageState(userId);
+        if (du.cost >= DAILY_SPEND_CEILING_USD) {
+          return new Response(JSON.stringify({ error: "daily_spend_cap", message: `Daily usage cap reached ($${du.cost.toFixed(2)} of $${DAILY_SPEND_CEILING_USD.toFixed(2)}) — resets at midnight UTC. Upgrade your plan or top up credits in Settings > Billing for more.` }), { status: 429, headers: { ...cors, "Content-Type": "application/json" } });
+        }
+      } catch (_de) { /* fail open: never break chat on the cap check */ }
+      try { recordDailyUsage(userId, requestCostEst); } catch (_re) { /* best-effort */ }
+    }
     if (chargeable) {
       try {
         const rr = await fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/rpc/credits_reserve`, {
@@ -1752,7 +1852,7 @@ Question: "${userQuery}"`;
 
       const intentRes = await fetch(callModelUrl, {
         method: "POST",
-        headers: GW_HEADERS,
+        headers: CM_HEADERS,
         body: JSON.stringify({ messages: [{ role: "system", content: "You are an intent analyst. Respond with ONLY valid JSON." }, { role: "user", content: intentPrompt }], purpose: "summary", max_tokens: 300 }),
         signal: AbortSignal.timeout(30_000)
       });
@@ -1849,7 +1949,7 @@ Question: "${userQuery}"`;
     // v173 (owner report 2026-11-12, R1 incident): a pure acknowledgment or standing-rule
     // instruction is conversation management, not a research question — never burn a
     // web-search lane on it (the model searched MDN/tidyurls to "answer" a rule request).
-    if (ACK_TURN_RE.test(String(userQuery).trim())) { needsRetrieval = false; researchSkip = "ack_turn"; }
+    if (isAckTurn(String(userQuery))) { needsRetrieval = false; researchSkip = "ack_turn"; }   // v193: directive continuations are WORK turns, never acks
     // FOLLOW-UPS: a bare "what about X?" / "why?" carries no topic. Merge the
     // prior user question so retrieval searches the CONVERSATION topic, not the
     // orphaned follow-up text (which produced WhatsApp/Doctor Who findings).
@@ -2339,7 +2439,7 @@ Question: "${userQuery}"`;
             for (const im of imageAttaches.slice(0, 3)) vParts.push({ type: "image_url", image_url: { url: im.data_url } });
             const vRes = await fetch(callModelUrl, {
               method: "POST",
-              headers: GW_HEADERS,
+              headers: CM_HEADERS,
               body: JSON.stringify({
                 messages: [{ role: "user", content: vParts }],
                 purpose: "vision",
@@ -2403,6 +2503,7 @@ How to answer:
 - FORMAT FOR SCANNING (owner requirement 2026-11-12): never dense paragraph walls. Any answer longer than two short paragraphs must break into structure: a one-line direct answer up top, then bulleted lists for parallel items and numbered steps (1. 2. 3.) for anything sequential or procedural. Use emoji markers to signpost sections when there are 3+ sections (🔍 Findings, 📊 Figures, ⚠️ Risks, ✅ Actions, ➡️ Next) and to lead major bullets where it aids scanning — sparingly, never mid-sentence. Code always in triple-backtick fences, never ''' quotes. URLs verbatim, never re-encoded.
 - Never invent facts, statistics, quotes, or sources. When a LIVE SEARCH ANSWER or NUMBERED SOURCES appear below, they are your ground truth for current facts: build from them and keep their [N] markers inline. Otherwise include links only when you are confident they exist.
 - NEVER REFUSE WITH HOMEWORK: never answer "I can't do X from here" / "I don't have access to X" as the end of your reply. First do everything within reach — and when the task is an action you cannot run yourself, deliver the complete, ready-to-apply result (exact file contents, patch, command, or filled-in copy) as the executed fallback. Every limitation you state must be paired with the fallback you have ALREADY produced, never a to-do list for the user.
+- COMMAND VISIBILITY (owner directive 2026-11-13, standing): you are a transparent agent, not a black box. Before EVERY tool call or command you run, emit one bold line in the exact form **Command: <plain-language description of what this step does and why>** (e.g. **Command: check the live production site build version**), then run the tool. Between steps, add ONE short sentence of plain narration - what just happened, what you found, what you are doing next, including honest self-corrections (that push missed the file; committing it now). Keep the narration tight: no internal deliberation, no filler, just the state of the work. The final answer still follows all normal format rules. This applies to EVERY turn that executes tools; the user must be able to read the work as it happens.
 - Never discuss your reasoning, "intents", or system internals — just answer.
 - CAPABILITIES: this TURN carries no live tools, but the platform HAS them: run_python code execution (numpy/pandas/matplotlib), web search, page fetch, and connector tools (Gmail/Calendar/Drive/Slack/GitHub/Dropbox/Render/Supabase) — they activate automatically on turns that need them. If the user asks whether you can execute code, run Python, connect to services, or use tools: answer YES, the platform has these, and suggest asking the task itself (e.g. "compute X" or "read my email") so the tools engage. Never claim the platform has no execution or tools — that is factually wrong and the worst answer this system can give.
 - AUTONOMY TRUTH (owner directive 2026-11-12): when the user asks what you can handle autonomously (e.g. "which of these can you handle?"), NEVER answer "none" and never dump paste-ready homework as the substitute. Enumerate what the platform can actually execute from the live catalog the system message provides (web research, run_python, browser control, document read/create, connector tools, Comptrove property/rent database queries, fleet dispatch), split the user's items into "I will run this now" vs "needs a platform-external step", and EXECUTE the runnable ones in this same turn where possible. Only the genuinely external steps (e.g. a vendor console with no connector) get handed to the user — each with its direct URL per the standing rule below. "I have no live database connection" is FALSE for read queries (query_comptrove + Supabase connector tools) — use them.
@@ -2446,6 +2547,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
 5. End with "## Suggested Follow-ups" — 3-4 SPECIFIC, contextual questions.
 6. Do NOT discuss yourself, your "agents", "classifiers", or reasoning process. Just deliver the answer.
    NEVER REFUSE WITH HOMEWORK: never end with "I can't do X from here". Pair every limitation with the fallback you already produced (complete ready-to-apply file contents, patch, command, or filled-in copy) — not a to-do list for the user.
+8. COMMAND VISIBILITY (owner directive 2026-11-13, standing): before EVERY tool call or command, emit one bold line **Command: <plain-language description of what this step does and why>**, then run it; between steps one short sentence of plain narration including honest self-corrections. The user must be able to read the work as it happens.
 7. Only reference the user's systems, data, or products when the question actually concerns them — NEVER shoehorn them into unrelated answers (news, general knowledge, math), never append "relevance to your data" sections unprompted, and NEVER put them in the Suggested Follow-ups of an unrelated answer.
 8. ${ACRONYM_WRITER_RULE}
 9. Never output a database connection string, API key, token, password or other secret, even if one appears earlier in the conversation — say it is withheld and show a placeholder like <YOUR_DATABASE_URL>.`
@@ -2474,6 +2576,74 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       const role = m.role === "assistant" || m.role === "user" || m.role === "system" ? m.role : "user";
       return { role, content: String(m.content || "").slice(0, role === "system" ? 20_000 : 4000) };
     });
+    // v210 (owner incident 2026-11-14 09:55 PST): the Kimi lanes answered "there's no earlier
+    // list in the conversation available here" even with the FULL history in the messages
+    // above — they ignore prior turns when the latest message carries unresolved references
+    // ("all of them", "they", "that list"). Anchor block: when the latest user message has an
+    // unresolved collective reference and prior turns exist, order the writer to resolve it
+    // against the history and NEVER ask the user to re-paste anything the history contains.
+    // (Verified by replay: GLM resolved the same thread correctly; kimi/kimi-k3-1-pro/kimi_flash
+    // all failed identically — model-lane behavior, not a persistence bug: the thread's
+    // messages were fully present server-side.)
+    try {
+      const priorTurns = (Array.isArray(messages) ? messages : []).filter((m: any) => m?.role === "user" || m?.role === "assistant").slice(0, -1);
+      const UNRESOLVED_REF_RE = /\b(all|both|each|every one) of (them|those|these|it)\b|\b(they|them|those|these)\b.{0,30}\b(confirm|research|check|verify|terms|licenses?)\b/i;
+      if (priorTurns.length >= 2 && UNRESOLVED_REF_RE.test(String(userQuery))) {
+        // v211: the Kimi lanes ignore prior turns entirely (verified live: system-block
+        // anchors alone did not reach them). INLINE the last assistant content into the
+        // last user message so the reference resolves even if the model reads only the
+        // newest turn.
+        const lastAssistant = [...priorTurns].reverse().find((m: any) => m?.role === "assistant");
+        const excerpt = String(lastAssistant?.content || "").slice(0, 1200);
+        for (let li = capped.length - 1; li >= 0; li--) {
+          if (capped[li].role === "user") {
+            capped[li] = { role: "user", content: capped[li].content + (excerpt ? "\n\n[Conversation context: phrases like 'all of them', 'they', or 'that list' refer to the entities discussed in the earlier turns of THIS conversation. Most recent earlier answer for reference: " + excerpt + "]" : "") };
+            break;
+          }
+        }
+        capped.splice(1, 0, { role: "system", content: "CONVERSATION CONTEXT ANCHOR (v211): the FULL conversation history is present in the messages above. Phrases like 'all of them', 'they', 'them', or 'that list' refer to entities named earlier in THIS conversation — resolve them against the history and NEVER ask the user to paste or restate anything the history contains. If a referenced list exists, enumerate its items in your answer." });
+      }
+    } catch (_anchorErr) { /* fail open: the anchor is advisory */ }
+    // v200 (parity 34a) THREAD TASK LEDGER: alongside the thread's messages (carried in
+    // `messages` above and windowed into `capped` here), the gateway reads the thread's own
+    // durable task ledger (public.thread_ledger — same database/REST base as the thread
+    // persistence, service role) and injects it as a compact system block so the session
+    // CONTINUES its prior work instead of re-deriving state. Open tasks = kind 'task' rows
+    // not superseded by a kind 'done' row with the same text; plus recent dones. Max 20
+    // lines. Fail-open: no thread id / incognito / api-key mode / missing table or fetch
+    // error -> NO block, chat proceeds exactly as before.
+    let ledgerBlock = "";
+    const ledgerTid = typeof threadIdRaw === "string" ? threadIdRaw : "";
+    if (ledgerTid && !apiKeyMode && !incognito) {
+      const ledgerKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+      if (ledgerKey) {
+        try {
+          const lr = await fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/thread_ledger?select=kind,item&thread_id=eq.${encodeURIComponent(ledgerTid)}&order=ts.asc&limit=200`, { headers: { apikey: ledgerKey, Authorization: `Bearer ${ledgerKey}` }, signal: AbortSignal.timeout(4_000) });
+          if (lr.ok) {
+            const lrows: any = await lr.json();
+            if (Array.isArray(lrows) && lrows.length) {
+              const normItem = (s: unknown) => String(s ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+              const ledgerDone = new Set<string>();
+              for (const r of lrows) if (String(r?.kind) === "done") ledgerDone.add(normItem(r?.item));
+              const ledgerLines: string[] = [];
+              const openTasks: string[] = [];
+              for (const r of lrows) if (String(r?.kind) === "task" && !ledgerDone.has(normItem(r?.item))) openTasks.push(String(r?.item ?? "").replace(/\s+/g, " ").trim().slice(0, 160));
+              const doneItems: string[] = [];
+              for (const r of lrows) if (String(r?.kind) === "done") doneItems.push(String(r?.item ?? "").replace(/\s+/g, " ").trim().slice(0, 160));
+              if (openTasks.length) { ledgerLines.push("OPEN TASKS:"); for (const t of openTasks) ledgerLines.push("- [ ] " + t); }
+              if (doneItems.length) { ledgerLines.push("RECENTLY DONE:"); for (const t of doneItems.slice(-5)) ledgerLines.push("- [x] " + t); }
+              if (ledgerLines.length) ledgerBlock = "=== THREAD TASK LEDGER ===\nThis thread's own durable work ledger, auto-loaded at the start of every turn. Continue the OPEN TASKS rather than re-deriving them; when a task is verified complete, call the ledger tool with action 'done' and the same text. Record each task you start via the ledger tool (action 'add_task').\n" + ledgerLines.slice(0, 20).join("\n");
+            }
+          }
+        } catch (_le) { /* ledger unavailable: fail-open, no block */ }
+      }
+    }
+    if (ledgerBlock) capped.push({ role: "system", content: ledgerBlock });
+    // v191 CAPABILITY BASELINE (owner directive 2026-11-13): injected into EVERY session, every
+    // request — cast wide so all sessions are at parity and never have to be probed one by one.
+    // Every new deploy/batch updates the manifest automatically; sessions never answer inventory
+    // questions from memory or placeholders.
+    if (!apiKeyMode) capped.push({ role: "system", content: `CAPABILITY BASELINE (${GATEWAY_VERSION}, platform-wide — applies to every session): This platform's full live inventory (runner jobs, runner machines, models, session tools) is available via the list_capabilities tool, gathered live at request time. For ANY question about what tools, skills, jobs, runners, or models exist or were imported: call list_capabilities (or rely on the LIVE CAPABILITY MANIFEST evidence block) and answer with the REAL names. Never claim a platform capability is 'not retrievable from here', never invent placeholder names, and never substitute generic web results for the platform's own registry. Updates land platform-wide on every deploy — all sessions are at the same baseline. CURRENT BATCH STATE (auto-updated per deploy): ${PARITY_STATE}.\n\nWEBAPP MAP (${GATEWAY_VERSION}): this platform runs MULTIPLE separate webapps, each with its own repo, frontend, backend, and database/schema. The list_webapps tool is connected and returns the per-app map (ai.spaincos.com, terminal.spaincos.com/Spain Terminal, Comptrove, PHA Solutions, RefundSnap, CRM, Allowance, and the other Supabase-backed siblings). Call list_webapps BEFORE answering any question about a specific webapp, its pages, its data points, its database/schema, or 'the data behind' an app — and NEVER conflate one app's data universe with another's (Comptrove property facts are NOT Terminal's ops/migration tables). When you lack a page-level inventory for a specific app, say so and name the exact repo/project to read — never substitute another app's data. NETWORK CHECKS ARE EXECUTABLE BY YOU (v212, owner incident 2026-11-14: the writer claimed 'this session has no connected domain-registry lookup' and handed the user a paste-ready curl script): any plain HTTP lookup — domain registration/availability via RDAP (https://rdap.verisign.com/com/v1/domain/<NAME>: HTTP 200 = registered, 404 = no record), URL status checks, API pings — can and MUST be run by you via run_python (curl/urllib) or browser_step. NEVER claim a lookup is 'not connected' when it is a plain HTTP call, and NEVER hand the user a paste-ready script for a check you can run yourself; run it, report the real per-item results, and only then summarize. COMPLETION-DOC RULE (v229, owner-reported 2026-11-15: the writer answered a 100%-closure/orchestration request with chat prose and NO artifact): when the user asks for completion documentation, closure documents, orchestration status, parity reports, or 'the 100% completion doc', you MUST (1) gather live evidence first (list_webapps / webapp_doctor / platform_status for any named app), and (2) DELIVER THE DOCUMENT VIA create_file as a real .md artifact the user opens in the Artifacts panel — NEVER paste the whole document into the chat body. Chat text is the summary; the artifact is the deliverable. A gate is VERIFIED only with attached evidence (commit SHA, deployment ID, HTTP result, health check) — assertions without evidence are 🔴. COMET / BROWSER WORK IS REAL (v233, prompt-replay D3 finding 2026-11-15: "HANDLE WHATEVER ELSE IS REMAINING YOURSELF AND IN COMET" got a "cannot be executed from this session" refusal): the user's browser (Comet), its extension, and this platform's browser_step / fetch_page lanes are REAL execution surfaces in this session right now. When the user says to handle something "in Comet", "in the browser", or "via the extension", that is real work: run browser_step / fetch_page for the browsing parts, and for steps that must run inside the extension's side panel, produce the concrete instruction the extension will execute. NEVER claim browser/extension/Comet work "cannot be executed from this session" — that claim is wrong. If a specific step genuinely needs a human click in the browser, say exactly which step and what it does. ` + `WEBAPP TOOLS ARE EXECUTABLE BY YOU (v220, owner-observed defect 2026-11-14: the writer claimed the webapp_doctor tool 'could not be executed from this session' while it was connected the whole time — 3x in a row): webapp_doctor, list_webapps, describe_webapp, list_webapp_tables, create_webapp and webapp_upsert are REAL connected tools in this session right now. When the user asks about webapp health, a webapp's schema/tables, whether a webapp is broken or workable, or asks you to call any of these tools — CALL THE TOOL FIRST and report its actual output. NEVER claim a webapp tool is 'not exposed', 'not available in this session', or 'could not be executed' — that claim was wrong every time it was made. If a tool call fails, report the actual error from the tool result, never a pre-emptive refusal.` });
 
     // ============================================================
     // v83 ANSWER-OF-LAST-RESORT HELPERS
@@ -2499,7 +2669,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       try {
         const r = await fetch(callModelUrl, {
           method: "POST",
-          headers: GW_HEADERS,
+          headers: CM_HEADERS,
           body: JSON.stringify({ messages: capped, purpose, model: RELIABLE_MODEL, reasoning_effort: "low", max_tokens: 2048 }),
           signal: AbortSignal.timeout(45_000)
         });
@@ -2517,6 +2687,14 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     let toolLoop: Awaited<ReturnType<typeof runToolLoop>> | null = null;
     let toolLoopSkip = "";
     // v175: explicit runner-execution / GitHub-write asks (used for tool forcing + skip exemptions)
+    // v233 COMET INTENT (prompt-replay D3 finding 2026-11-15: "HANDLE WHATEVER ELSE IS
+    // REMAINING YOURSELF AND IN COMET" got a "cannot be executed from this session"
+    // refusal — the owner's browser extension is a REAL execution surface: browser_step,
+    // fetch_page, and the extension's side panel are live, and the platform can drive a
+    // real browser. "In Comet" / "in the browser" / "in the extension" is real work —
+    // it forces the tool loop (private-tool intent, added below) and is added to the
+    // writer's never-refuse rules, same pattern as the v220 webapp-tools fix.
+    const cometAsk = /\b(in|via|through|using|with) (comet|the extension|the browser|your browser|the side ?panel|browser extension)\b|\bcomet\b/i.test(String(userQuery));
     const runnerAsk = /\b(spain-runner|runner job|run [a-z0-9_]+ job|launch [a-z0-9_]+ job|execute [a-z0-9_]+ job|pdi_spine_check|policy_radar|comptrove_raw_scale_health|scheduler_backstop_report|digest_dead_man|permits_progress_check|traffic_anomaly_alert|run_runner_job)\b/i.test(String(userQuery));
     // v192: broadened — "commit these artifacts to the repos", "apply these to SHMT",
     // "open a PR with this SQL" all got claim-can't answers ("what I cannot do from this
@@ -2529,7 +2707,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     const toolCtx = {
       supabaseUrl: Deno.env.get("SUPABASE_URL") ?? "https://bnxermyboeigvwonfrzx.supabase.co",
       anonKey: sbAnonKey, userToken: apiKeyMode ? "" : token, userEmail, userId: apiKeyMode ? undefined : userId, isAdmin: apiKeyMode ? false : isAdmin, incognito, memberProfile: buildMemberProfile(personalization), userQuery: String(userQuery),
-      runnerAsk, ghWriteAsk,
+      runnerAsk, ghWriteAsk, cometAsk,
       searchFilters: { domains: searchF.domains, recency: searchF.recency },
       threadId: typeof threadIdRaw === "string" ? threadIdRaw : undefined,   // optional: frontend may send the open thread id so dispatch results can post back
       planAllowed: planDec.plan   // v103 I8: simple requests never get record_plan/mark_step
@@ -2576,6 +2754,105 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     if (!apiKeyMode && MCP_INTENT.test(String(userQuery))) capped.push({ role: "system", content: "The user is asking about MCP (Model Context Protocol) servers or their tools. The mcp_list_servers / mcp_list_tools / mcp_call_tool tools are connected and talk to the user's registered MCP servers through the platform's `mcp` function. Call them before answering — never claim MCP is inaccessible, and if mcp_list_servers returns an empty list, tell the user they can add MCP servers in Settings > Plugins & MCP." });
     // v140 FLEET: the loop model sometimes declines list_fleet even when offered — make the instruction explicit.
     if (!apiKeyMode && FLEET_INTENT.test(String(userQuery))) capped.push({ role: "system", content: "The user is asking about THIS platform's own agent fleet / registry / guardians / automations. The list_fleet tool is connected and returns the live registry from the platform's database (org chart, guardians, automations with schedules, build lanes, runtime agents). Call it before answering — never claim the fleet is inaccessible, and never substitute generic web results for it." });
+    // v191 CAPABILITY MANIFEST: server-side auto-invocation (owner directive 2026-11-13 — sessions kept
+    // answering inventory questions with placeholders or "not retrievable from here"). The platform
+    // fetches the live manifest itself and injects the REAL named inventory as evidence.
+    if (!apiKeyMode && (TOOLS_INTENT.test(String(userQuery)) || CAPABILITY_ASK.test(String(userQuery)))) {
+      try {
+        const cap = await toolListCapabilities({}, toolCtx);
+        if (cap) capped.splice(1, 0, { role: "system", content: `LIVE CAPABILITY MANIFEST (authoritative, gathered by the platform at request time — runner jobs read live off the spain-runner machine, model allowlist from the deployed policy, tool surface from this deploy. Use these REAL names; never invent placeholders, never claim a capability is "not retrievable"):\\n${String(cap).slice(0, 16000)}` });
+      } catch (_ce) { /* manifest fetch failed: the list_capabilities tool in the loop is the fallback */ }
+    }
+    // v192 WEBAPP REGISTRY: server-side auto-injection — when the question is about a specific webapp,
+    // its pages/data/schema, the platform injects the per-app map so the session differentiates apps.
+    // v200 (parity 34e): the injection also tells the session about the per-webapp schema tools —
+    // describe_webapp (registry entry + database connection facts) and list_webapp_tables (the live
+    // table/column list via the app's read-only Supabase REST endpoint). toolListWebapps is now
+    // imported here (it was referenced but never imported, so this injection silently no-oped).
+    if (!apiKeyMode && WEBAPP_ASK.test(String(userQuery))) {
+      try {
+        const wapps = await toolListWebapps({}, toolCtx);
+        if (wapps) capped.splice(1, 0, { role: "system", content: `WEBAPP REGISTRY (authoritative per-app map — which repo, frontend, backend, and database belongs to WHICH app. Scope your answer to the SPECIFIC app the user asked about; NEVER substitute one app's data universe for another's. For that app's DATABASE/SCHEMA/ONTOLOGY, the describe_webapp tool returns its registry entry + database connection facts (project ref, REST URL, dashboard URL, whether REST schema access is configured), and the list_webapp_tables tool returns the LIVE public table list with column names via the app's read-only Supabase REST endpoint — call them before answering any schema question instead of claiming the schema is 'not retrievable'; if REST is not configured they say so and give the direct dashboard URL):\n${String(wapps).slice(0, 12000)}` });
+      } catch (_we) { /* registry fetch failed: the list_webapps / describe_webapp tools in the loop are the fallback */ }
+    }
+    // v222 WEBAPP SCHEMA: server-side auto-invocation of list_webapp_tables (same pattern as v221
+    // webapp_doctor — the owner's standing directive: move execution OFF the model and ONTO the
+    // platform). When the ask is about a SPECIFIC webapp's schema/tables/columns, the PLATFORM
+    // fetches the live table list itself and injects it as evidence; the model never gets the
+    // choice to defer or substitute web research.
+    if (!apiKeyMode && /\b(schema|tables?|columns?|database|ontology)\b/i.test(String(userQuery))) {
+      const q = String(userQuery).toLowerCase();
+      const APP_TOKENS: Array<[string, string]> = [
+        ["comptrove", "Comptrove"], ["terminal", "terminal.spaincos.com (Spain Terminal)"],
+        ["allowance", "Allowance"], ["refundsnap", "RefundSnap"], ["parcel", "RefundSnap"],
+        ["pha", "PHA Solutions"], ["crm", "CRM (enrichment/contacts/marketing)"], ["ai-gateway", "ai.spaincos.com (AI gateway)"]
+      ];
+      for (const [token, appName] of APP_TOKENS) {
+        if (q.includes(token)) {
+          try {
+            const tbl = await toolListWebappTables({ app: appName }, toolCtx);
+            if (tbl) capped.splice(1, 0, { role: "system", content: `LIVE WEBAPP SCHEMA (authoritative table/column list for ${appName}, fetched by the platform from the app's own Supabase REST endpoint just now. Answer the user's schema/tables question from THIS data; never claim the schema is 'not retrievable', never substitute web search or another app's tables):\n${String(tbl).slice(0, 16000)}` });
+          } catch (_te) { /* schema fetch failed: the list_webapp_tables tool in the loop is the fallback */ }
+          break;
+        }
+      }
+    }
+    // v221 WEBAPP DOCTOR: server-side auto-invocation (owner directive 2026-11-14: despite the v220 forcing
+    // rule the writer model answered an "is Allowance healthy" ask with web research about an unrelated
+    // product instead of calling webapp_doctor). Prompt rules are not enough — when the ask is about
+    // webapp health/status, the PLATFORM runs the health check itself and injects the real matrix.
+    if (!apiKeyMode && /\b(health|healthy|unhealthy|broken|down|status|401)\b.{0,60}\b(web ?apps?|webapp|comptrove|terminal|allowance|refundsnap|pha|crm|parcel|property-ops|perilmark|nodegrade|rentcap|cii|aml)\b|\b(web ?apps?|webapp)\b.{0,40}\b(health|healthy|unhealthy|broken|down|status|401|doctor)\b/i.test(String(userQuery))) {
+      try {
+        const doc = await toolWebappDoctor({}, toolCtx);
+        if (doc) capped.splice(1, 0, { role: "system", content: `LIVE WEBAPP HEALTH MATRIX (authoritative, run by the platform's webapp_doctor just now — per-app REST endpoint + credential status. Answer the user's webapp health question from THIS data; never substitute web search or generic web results, and never claim the health check could not be run):\\n${String(doc).slice(0, 16000)}` });
+      } catch (_de2) { /* doctor failed: the webapp_doctor tool in the loop is the fallback */ }
+    }
+    // v230 COMPLETION-DOC: server-side evidence auto-invocation (owner-observed defect 2026-11-15:
+    // the Kimi writer, given the v229 prompt rule, honestly reported 'no callable tool functions are
+    // exposed to me here' on a 'proceed' follow-up — prompt rules do not execute tools; when the
+    // tool loop is skipped the model has nothing to call. When the ask is a completion/closure/
+    // orchestration document — or a continuation turn in a thread whose recent context is one — the
+    // PLATFORM gathers the registry + doctor + status evidence itself and injects it; the writer
+    // composes from real data and the .md deliverable is auto-created server-side (v230b below).
+    const completionDocCtx = String(capped.slice(-6).map((m: any) => String(m?.content || "")).join("\n")).toLowerCase();
+    const COMPLETION_DOC_RE = /\b(complet(ion|e) doc|closure doc|completion document|closure document|parity doc|parity document|orchestration doc|orchestration document|completion report|closure report|closure %|closure percent|closure percentage|master doc|status doc|compile .{0,40}document for tonight|compile .{0,40}completion doc)\b/i;
+    const completionDocIntent = COMPLETION_DOC_RE.test(String(userQuery)) || COMPLETION_DOC_RE.test(completionDocCtx);
+    if (!apiKeyMode && completionDocIntent) {
+      try {
+        const [wapps, doc, ps] = await Promise.all([toolListWebapps({}, toolCtx), toolWebappDoctor({}, toolCtx), toolPlatformStatus({}, toolCtx)]);
+        capped.splice(1, 0, { role: "system", content: `LIVE COMPLETION-DOC EVIDENCE (authoritative, gathered by the platform just now — you do NOT need to call tools to obtain this, do NOT claim tools are unavailable, and do NOT paste a whole document into the chat body — chat text is only the summary): WEBAPP REGISTRY:\n${String(wapps).slice(0, 5000)}\n\nHEALTH MATRIX (webapp_doctor):\n${String(doc).slice(0, 8000)}\n\nPLATFORM STATUS:\n${String(ps).slice(0, 4000)}\n\nDeliver the completion document itself via create_file as a .md artifact (reuse the thread's existing doc filename if one was made). Every VERIFIED claim needs its evidence line (HTTP result, deployment id, commit SHA); claims without evidence are OPEN, not verified.` });
+      } catch (_cdE) { /* evidence gather failed: the loop's tools are the fallback */ }
+    }
+    // v224 PLATFORM FUNCTIONS: server-side auto-invocation — asks about what functions/services/
+    // backend runs this platform get the LIVE function manifest injected (37 edge functions +
+    // purposes), so the answer comes from the platform's own inventory, never web research.
+    if (!apiKeyMode && /\b(what|which|list|show|enumerate).{0,40}\b(functions?|services?|backend|edge functions?)\b.{0,40}\b(this platform|ai\.spaincos|run(s|ning)? (this|the) (platform|site|backend))?|\b(what|which) .{0,30}\b(edge functions?|backend services?)\b/i.test(String(userQuery))) {
+      try {
+        const pf = await toolListPlatformFunctions({}, toolCtx);
+        if (pf) capped.splice(1, 0, { role: "system", content: `LIVE PLATFORM FUNCTION MANIFEST (authoritative, read by the platform from its own inventory just now — the 37 Supabase Edge Functions that run ai.spaincos.com with each one's purpose. Answer from THIS inventory; never claim the backend surface is not retrievable, never substitute web research):\n${String(pf).slice(0, 12000)}` });
+      } catch (_pfE) { /* manifest fetch failed: the list_platform_functions tool in the loop is the fallback */ }
+    }
+    // v223 PLATFORM STATUS: server-side auto-invocation — "call platform_status / what version is the
+    // gateway / is the platform healthy" asks get the LIVE status fetched by the platform and injected
+    // as evidence (the model previously answered from baseline text or called list_capabilities instead).
+    if (!apiKeyMode && /\b(platform status|platform health|system status|gateway (version|status|health)|what version|current version)\b/i.test(String(userQuery))) {
+      try {
+        const ps = await toolPlatformStatus({}, toolCtx);
+        if (ps) capped.splice(1, 0, { role: "system", content: `LIVE PLATFORM STATUS (authoritative, fetched by the platform just now — gateway version, fleet queue, harvest jobs, notifications. Answer the user's status/version question from THIS data; never claim the status could not be checked):\n${String(ps).slice(0, 8000)}` });
+      } catch (_pe) { /* platform_status fetch failed: the tool in the loop is the fallback */ }
+    }
+    // v223 URL FETCH: server-side auto-invocation — "fetch/read/summarize <url>" asks get the page
+    // fetched by the platform and injected as evidence (the model previously routed plain fetches
+    // through the research lane). Plain HTTP fetches are executable by the platform, never a handoff.
+    if (!apiKeyMode && /\b(fetch|read|open|summarize|check|look at)\b.{0,60}https?:\/\/\S+/i.test(String(userQuery))) {
+      try {
+        const u = String(userQuery).match(/https?:\/\/\S+/);
+        if (u) {
+          const fp = await toolFetchPage({ url: u[0].replace(/[).,]+$/, "") }, toolCtx);
+          if (fp) capped.splice(1, 0, { role: "system", content: `LIVE PAGE FETCH (authoritative, fetched by the platform just now — the page content for ${u[0]}. Summarize and quote from THIS content; never claim the page could not be fetched):\n${String(fp).slice(0, 16000)}` });
+        }
+      } catch (_fe2) { /* fetch failed: the fetch_page tool in the loop is the fallback */ }
+    }
     // v141 FLEET: server-side auto-invocation (same pattern as v95 autoFetchAssets) — the loop model is unreliable at
     // calling list_fleet on its own, so when the question is about the fleet the platform fetches the registry itself
     // and injects the real table as evidence. The writer then answers from actual data.
@@ -2589,7 +2866,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     // at calling tools) and tells the writer the real queue id. runDispatchTool is idempotent per request via toolCtx.dispatchDone.
     if (!apiKeyMode && !incognito && DISPATCH_INTENT.test(String(userQuery))) {
       try {
-        const d = JSON.parse(await runConnectorTool("dispatch_fleet", { instruction: String(userQuery).slice(0, 4000) }, toolCtx));
+        const d = JSON.parse(await runConnectorTool("dispatch_fleet", { instruction: extractFleetWork(String(userQuery).slice(0, 4000)) }, toolCtx));
         capped.splice(1, 0, { role: "system", content: `FLEET DISPATCH QUEUED (authoritative, done by the platform): the user's request was queued for the ops fleet as dispatch ${d.dispatch_id} (priority ${d.priority}, status queued). Tell the user: "Work queued for the ops fleet \u2014 results post back into this thread." and quote the id. Do NOT claim the work is already done or that you performed it; it runs asynchronously and the result arrives as a later message.` });
       } catch (de) { capped.splice(1, 0, { role: "system", content: `FLEET DISPATCH FAILED: ${String((de as Error).message || de).slice(0, 200)}. Tell the user the work was NOT queued and why; do not claim it was.` }); }
     }
@@ -2697,12 +2974,15 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     if (!apiKeyMode && (ESTATE_RE.test(String(userQuery)) || prNums.length)) {
       estateAsk = true;
       capped.splice(1, 0, { role: "system", content: "OWNER ESTATE CONTEXT (v191 — authoritative; use this instead of web search for the owner's own systems): (1) GitHub org rentspire-bspain; repos: SHMT (the Deal Engine / terminal monorepo — migration files live in supabase/migrations/), ai-gateway-site (this site's frontend), rentspire-comps (Comptrove web surfaces). A bare PR/issue number (e.g. #3794, #3500) is a rentspire-bspain/SHMT PR/issue unless the user names another repo — NEVER ask the user for the repo URL; use the PR/ISSUE STATUS EVIDENCE below (fetched live by the platform) or call github_write with action pr_status/issue_read, repo rentspire-bspain/SHMT. (2) The migration ledger is the ops.migration_slot table on the Deal Engine Supabase project dcyjmftriqayqaonitlx — a strictly in-order apply queue; as of 2026-11-12: ~604 applied, ~65 bound (waiting), high water mark via ops.migration_version_high_water(); '599 applied' is an older figure from a handoff doc. Issue #3500 is the RS-1 ledger GO campaign (ledger GO comments coordinate slot releases); rentspire-bspain-2 is the -2 principal account in that campaign. HWM = high water mark (ops.migration_version_high_water()), NOT a hospital metric. (3) Live tools: github_write (pr_status, issue_read + branch/commit/PR/comment/issue), run_runner_job, runner_job_status, query_comptrove, dispatch_fleet, browser_step, run_python. NEVER say 'no ledger exists', 'I can't pull live status', or 'drop the repo URL' for estate questions — read the evidence above or call the tools; if a tool genuinely fails, report the exact error." });
-      for (const n of prNums) {
-        try {
-          const pr = JSON.parse(await toolGithubWrite({ action: "pr_status", repo: "rentspire-bspain/SHMT", number: Number(n) }, toolCtx));
-          if (pr && !pr.error) capped.splice(1, 0, { role: "system", content: `PR STATUS (authoritative, fetched live from GitHub by the platform): rentspire-bspain/SHMT PR #${n} "${pr.title}" — state ${pr.state}${pr.merged ? ", MERGED " + pr.merged_at : ""}${pr.draft ? ", draft" : ""}; head ${pr.head} -> ${pr.base}; requested reviewers ${(pr.requested_reviewers || []).join(", ") || "none"}; checks: ${(pr.check_runs || []).map((c: any) => `${c.name}=${c.conclusion || c.status}`).join(", ") || "none reported"}; recent comments: ${(pr.recent_comments || []).map((c: any) => `${c.author}: ${String(c.body).slice(0, 200)}`).join(" | ") || "none"}. Use THIS for the PR's status — never claim you cannot pull it.` });
-        } catch (_pe) { /* PR fetch failed — the tool remains available to the loop */ }
-      }
+      // v233: the PR fetches ran SEQUENTIALLY — 5 PRs x ~8s = 40s of dead time before the writer
+      // even started, which pushed multi-PR review asks over the edge 150s idle limit (prompt-replay
+      // 504 finding: "Review PR #3779 and #3786..." IDLE_TIMEOUT). Now fetched in PARALLEL.
+      const prResults = await Promise.allSettled(prNums.map((n: any) => toolGithubWrite({ action: "pr_status", repo: "rentspire-bspain/SHMT", number: Number(n) }, toolCtx).then((r: any) => JSON.parse(r))));
+      prResults.forEach((res, i) => {
+        if (res.status !== "fulfilled") return;
+        const pr = res.value, n = prNums[i];
+        if (pr && !pr.error) capped.splice(1, 0, { role: "system", content: `PR STATUS (authoritative, fetched live from GitHub by the platform): rentspire-bspain/SHMT PR #${n} "${pr.title}" — state ${pr.state}${pr.merged ? ", MERGED " + pr.merged_at : ""}${pr.draft ? ", draft" : ""}; head ${pr.head} -> ${pr.base}; requested reviewers ${(pr.requested_reviewers || []).join(", ") || "none"}; checks: ${(pr.check_runs || []).map((c: any) => `${c.name}=${c.conclusion || c.status}`).join(", ") || "none reported"}; recent comments: ${(pr.recent_comments || []).map((c: any) => `${c.author}: ${String(c.body).slice(0, 200)}`).join(" | ") || "none"}. Use THIS for the PR's status — never claim you cannot pull it.` });
+      });
     }
     // v188 GO-CLOSURE AUTO-EXECUTION (owner incident 2026-11-12, three reports): a bare
     // "GO - CONTINUE CLOSING EVERYTHING YOU CAN AUTONOMOUSLY" / "CAN YOU KEEP CLOSING ALL OF
@@ -2720,6 +3000,20 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       } catch (de) { capped.splice(1, 0, { role: "system", content: `FLEET DISPATCH FAILED: ${String((de as Error).message || de).slice(0, 200)}. Tell the user the work was NOT queued and why; do not claim it was. You still have live execution tools (run_runner_job, github_write, query_comptrove, browser_step, run_python) — use them for anything the directive names concretely; never claim you cannot execute.` }); }
     }
     let executeArtifactsAsk = false;
+    // v202 BUILD MODE (fleet-dispatch build turns): unconditional — the probe showed the v201
+    // injection landed inside the handoff-doc conditional and never fired. Any build directive
+    // (chained build task / dispatch build / autonomous closure naming repos or branches) gets
+    // the tool-first execution order. github_write + github_search_* are in the allowlist for the
+    // owner (the dispatch mints the owner token), so the defs ARE offered — this makes the model use them.
+    if (!apiKeyMode && /chained build task|build task \(turn|fleet[- ]dispatch build|BUILD MODE probe/i.test(String(userQuery))) {
+      capped.splice(1, 0, { role: "system", content: "BUILD MODE (v202, standing — fleet-dispatch build turns): this turn is an AUTONOMOUS BUILD DIRECTIVE, not a research question. Execute with tools: (1) read the named repo/branch/files with github_search_* or github_write read operations FIRST; (2) write the code with github_write (create branch, commit files, open PR — never merge); (3) run any named checks with run_python or the runner tools; (4) report ONLY what you actually did: branch name, PR number, files changed. Do NOT run web research for build tasks — the search tools are NOT the deliverable. Do NOT answer with advice, plans, or paste-ready code — the deliverable is committed code and an open PR. If a required tool errors, report the exact error and stop; never claim a commit or PR that a tool result does not show." });
+      // v204 BUILD MODE MODEL ROUTING (three-probe verdict): free-lane GLM-5.3 narrates/fabricates
+      // github_write results instead of emitting real tool calls (probes 1-3 all caught by the claim
+      // guard; probe 3 claimed branch+PR#3 with nothing on GitHub). Kimi K3.1 Pro — already on the
+      // paid allowlist and the owner's strongest free lane — emits real tool calls. Build turns
+      // re-route to Kimi; research turns stay on GLM (the default above is untouched).
+      finalModel = "moonshotai/kimi-k3.1-pro";
+    }
     // v192 EXECUTE-THE-ARTIFACTS NUDGE (owner incident 13:31: "CAN YOU TRY AGAIN" after an
     // artifact-producing answer → the model AGAIN said "What I cannot do from this session —
     // commit these to the repos" while github_write commits + opens PRs as the owner).
@@ -2796,7 +3090,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         const CAPABILITY_INTENT = /\b(is|are|do|does|can|could|have|has)\b.{0,40}\b(execution|execute|sandbox|python|tools?|connected|connection)\b/i;
         // v175: runner execution and GitHub writes are private-tool work — web research can
         // NEVER substitute for actually calling run_runner_job / github_write.
-        const privateToolIntent = FLEET_INTENT.test(String(userQuery)) || DISPATCH_INTENT.test(String(userQuery)) || CONNECTOR_INTENT.test(String(userQuery)) || CONNECTOR2_INTENT.test(String(userQuery)) || CAPABILITY_INTENT.test(String(userQuery)) || runnerAsk || ghWriteAsk;
+        const privateToolIntent = FLEET_INTENT.test(String(userQuery)) || DISPATCH_INTENT.test(String(userQuery)) || CONNECTOR_INTENT.test(String(userQuery)) || CONNECTOR2_INTENT.test(String(userQuery)) || CAPABILITY_INTENT.test(String(userQuery)) || runnerAsk || ghWriteAsk || completionDocIntent || cometAsk;
         if (perplexityUsed && researchFindings.length >= 6 && intent.complexity !== "extreme" && !imageAttach && !agenticBypass && !privateToolIntent) {
           toolLoopSkip = "research_sufficient";
         } else {
@@ -2932,7 +3226,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         : [...capped, { role: "system", content: "Keep the answer COMPLETE within the token budget — concise, no filler — lead with the direct answer, state the specific figures, dates and names from the research (not vague summaries), and finish with the Suggested Follow-ups section." + (perplexityFullText ? " The LIVE SEARCH ANSWER above is your primary source: preserve its figures, dates and [N] markers." : "") }];
       const sres = await fetch(callModelUrl, {
         method: "POST",
-        headers: GW_HEADERS,
+        headers: CM_HEADERS,
         body: JSON.stringify({ messages: streamMessages, purpose, model: writerModel, reasoning_effort: writerEffort, max_tokens: tokenBudget, stream: true }),
         signal: AbortSignal.timeout(120_000)
       });
@@ -2942,7 +3236,76 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         // v58: when research findings exist, the pipe runs through linkCitationsSSE so
         // streamed answers carry the same [[N](url)] linked citations and Sources
         // list as the non-streaming path (bare [N] markers otherwise reach the user).
-        const guarded = guardEmptyStream(sres.body, lastResortAnswer); // v83: never end a stream with zero content
+        // v231 COMMAND-LEAK STREAM SCRUB (automation finding 2026-11-15T08:00Z, 2nd occurrence:
+        // "**Command: answer from the live search findings on Q3 2026 rent-growth leaders**"
+        // preceded the answer): the v206 strip only ran on the NON-streaming path, but the
+        // frontend ALWAYS streams — so the model's own **Command: ...** narration line leaked
+        // into streamed answers. This transform buffers the leading SSE content deltas; if the
+        // accumulated CONTENT starts with a Command-narration line, that line (plus a stray
+        // --- divider) is stripped from the rewritten first delta before anything reaches the
+        // client. The platform's own work log (built from real executed steps) is unaffected:
+        // it is prepended server-side below.
+        const scrubCommandLeakSSE = (body: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> => {
+          const enc = new TextEncoder(), dec = new TextDecoder();
+          let pending = "";            // raw bytes not yet split into complete SSE lines
+          const held: string[] = [];   // complete data lines held while deciding
+          let content = "";            // accumulated delta content across held lines
+          let decided = false;
+          const mk = (text: string, finish: string | null) =>
+            enc.encode(`data: ${JSON.stringify({ id: "gw-scrub", object: "chat.completion.chunk", choices: [{ index: 0, delta: text ? { content: text } : {}, finish_reason: finish }] })}\n\n`);
+          const decide = (controller: TransformStreamDefaultController<Uint8Array>, force = false) => {
+            if (decided) return;
+            // hold until the first content newline (a Command line always ends with one)
+            // or 300 chars of content — then decide and release everything. force (flush):
+            // the stream ended; judge whatever accumulated.
+            if (!force && !/\n/.test(content) && content.length < 300) return;
+            decided = true;
+            let out = content;
+            const m = out.match(/^\s*\*{0,2}Command:[^\n]*\*{0,2}\s*\n?/);
+            if (m) {
+              out = out.slice(m[0].length);
+              const div = out.match(/^\s*---\s*\n?/);
+              if (div) out = out.slice(div[0].length);
+            }
+            // re-emit the held lines: one merged content delta (scrubbed) + any non-content events
+            let finish: string | null = null;
+            for (const line of held) {
+              if (!line.startsWith("data:")) { controller.enqueue(enc.encode(line + "\n\n")); continue; }
+              try {
+                const j = JSON.parse(line.slice(5).trim());
+                const ch = j?.choices?.[0];
+                if (ch?.finish_reason) finish = ch.finish_reason;
+              } catch (_e) { /* passthrough line */ controller.enqueue(enc.encode(line + "\n\n")); }
+            }
+            if (out) controller.enqueue(mk(out, null));
+            if (finish) controller.enqueue(mk("", finish));
+          };
+          return body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
+            transform(chunk, controller) {
+              if (decided) { controller.enqueue(chunk); return; }
+              pending += dec.decode(chunk, { stream: true });
+              const lines = pending.split("\n");
+              pending = lines.pop() || "";
+              for (const raw of lines) {
+                const line = raw.trim();
+                if (!line) continue;
+                if (decided) { controller.enqueue(enc.encode(raw + "\n\n")); continue; } // pass the rest of this chunk through verbatim
+                held.push(line);
+                if (line.startsWith("data:")) {
+                  try {
+                    const j = JSON.parse(line.slice(5).trim());
+                    const c = j?.choices?.[0]?.delta?.content;
+                    if (typeof c === "string") content += c;
+                  } catch (_e) { /* keep holding */ }
+                }
+                decide(controller);
+              }
+              if (decided && pending) controller.enqueue(enc.encode(pending)); // trailing partial line
+            },
+            flush(controller) { if (!decided) decide(controller, true); },
+          }));
+        };
+        const guarded = guardEmptyStream(scrubCommandLeakSSE(sres.body), lastResortAnswer); // v83 + v231: never empty, never command-leaked
         // v84: dedicated follow-up stage — swallows the writer's own section, injects the specific one before finish.
         const requiredEndLine = extractEndLine(spaceInstructions);
         const withFollowUps = appendFollowUpsSSE(guarded, (ans, writerSec) => resolveFollowUps(callModelUrl, String(userQuery), ans, writerSec, todayStr), requiredEndLine);
@@ -3072,7 +3435,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       try {
         res = await fetch(callModelUrl, {
           method: "POST",
-          headers: GW_HEADERS,
+          headers: CM_HEADERS,
           body: JSON.stringify({ messages: capped, purpose, model: writerModel, reasoning_effort: writerEffort, max_tokens: tokenBudget }),
           signal: AbortSignal.timeout(120_000)
         });
@@ -3084,6 +3447,33 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     // AGENT 4: QA AGENT (verifies and polishes if needed)
     // ============================================================
     let finalResponse = data;
+    // v234 SPEND ALERTS (owner directive 2026-11-15 "implement the no-cap safety pieces"):
+    // call-model's x_meter rides on every paid response; when the month's tracked spend
+    // crosses 50% / 80% of the $350 global cap, drop ONE notification row for the owner
+    // per threshold per day (dedup: same-day check). Never blocks the answer.
+    try {
+      const ms = Number(data?.x_meter?.month_spend_usd);
+      const mc = Number(data?.x_meter?.monthly_cap_usd) || 350;
+      if (Number.isFinite(ms) && ms > 0 && userId) {
+        const frac = ms / mc;
+        if (frac >= 0.5) {
+          const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+          const day = new Date().toISOString().slice(0, 10);
+          const nUrl = `${Deno.env.get("SUPABASE_URL")}/rest/v1/notifications?select=id&user_id=eq.${userId}&type=eq.spend_alert&created_at=gte.${day}`;
+          const seen = await fetch(nUrl, { headers: { "apikey": svcKey, "Authorization": `Bearer ${svcKey}` }, signal: AbortSignal.timeout(5_000) });
+          const seenRows = seen.ok ? (await seen.json()) as any[] : [];
+          if (!Array.isArray(seenRows) || seenRows.length === 0) { // one alert per user per day
+            const pct = Math.round(frac * 100);
+            const job = fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/notifications`, {
+              method: "POST", headers: { "apikey": svcKey, "Authorization": `Bearer ${svcKey}`, "Content-Type": "application/json" },
+              body: JSON.stringify({ user_id: userId, type: "spend_alert", title: `LLM spend at ${pct}% of the $${mc} monthly cap`, body: `Tracked month-to-date model spend is $${ms.toFixed(2)} of the $${mc} cap (${pct}%). Paid lanes auto-downgrade to free models if the cap is hit.` }),
+              signal: AbortSignal.timeout(5_000)
+            }).catch(() => {});
+            (globalThis as any).EdgeRuntime?.waitUntil?.(job);
+          }
+        }
+      }
+    } catch (_se) { /* alerts never block the answer */ }
     let content = data?.choices?.[0]?.message?.content || "";
     const finishReason = data?.choices?.[0]?.finish_reason || "";
 
@@ -3102,7 +3492,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         : capped;
       const retryRes = await fetch(callModelUrl, {
         method: "POST",
-        headers: GW_HEADERS,
+        headers: CM_HEADERS,
         // Retry with the SAME purpose at the full budget plus a hard word limit —
         // the word limit also shrinks the reasoning burn, so the answer completes.
         // (Do NOT route retries to the "summary" purpose — that model is on a
@@ -3128,7 +3518,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       try {
       const retryRes = await fetch(callModelUrl, {
         method: "POST",
-        headers: GW_HEADERS,
+        headers: CM_HEADERS,
         body: JSON.stringify({ messages: [...capped, { role: "system", content: "QA REVIEW: Your previous response was too brief. Provide the complete, comprehensive answer with all relevant sections, data, and follow-ups. Professional, helpful tone." }], purpose, model: finalModel, reasoning_effort: reasoningEffort(intent.complexity), max_tokens: 4000 }),
         signal: AbortSignal.timeout(90_000)
       });
@@ -3145,7 +3535,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       try {
       const fixRes = await fetch(callModelUrl, {
         method: "POST",
-        headers: GW_HEADERS,
+        headers: CM_HEADERS,
         body: JSON.stringify({ messages: [...capped, { role: "system", content: "QA REVIEW: Your previous response lacked proper markdown structure. Restructure with clear headings (##, ###), sections, and lists. Professional, helpful tone." }], purpose, model: finalModel, reasoning_effort: reasoningEffort(intent.complexity), max_tokens: 4000 }),
         signal: AbortSignal.timeout(90_000)
       });
@@ -3173,7 +3563,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         try {
           const cleanRes = await fetch(callModelUrl, {
             method: "POST",
-            headers: GW_HEADERS,
+            headers: CM_HEADERS,
             body: JSON.stringify({ messages: [...capped, { role: "system", content: "QA REVIEW: Your previous response contained tool-call syntax or working notes to yourself. Produce ONLY the clean final answer for the user: no tool calls, no code fences around tool names, no monologue about searching or verifying, no mention of what you could not retrieve unless it is essential. Start directly with the answer." }], purpose, model: finalModel, reasoning_effort: reasoningEffort(intent.complexity), max_tokens: 4000 }),
             signal: AbortSignal.timeout(90_000)
           });
@@ -3195,7 +3585,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         try {
           const citeRes = await fetch(callModelUrl, {
             method: "POST",
-            headers: GW_HEADERS,
+            headers: CM_HEADERS,
             body: JSON.stringify({ messages: [...capped, { role: "system", content: "QA REVIEW: Your previous response cited no sources. Rewrite it with inline [N] citation markers for every factual claim drawn from the numbered findings (for example: \"The Seahawks won 29–13 [1].\"). Keep the same content, structure, and length." }], purpose, model: finalModel, reasoning_effort: reasoningEffort(intent.complexity), max_tokens: 4000 }),
             signal: AbortSignal.timeout(90_000)
           });
@@ -3218,6 +3608,33 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     // linked and a Sources list is appended exactly like a model answer.
     let fallbackReason = "";
     let outStatus = res.status;
+    // v231b UPSTREAM-ERROR GRACEFUL DEGRADATION (flint-lane incident 2026-11-15: call-model returned
+    // an error payload — BOTH free models rate-limited (OpenRouter flint daily cap + Groq Qwen TPD) —
+    // and the raw error reached the client with empty content. If the writer response carries an
+    // upstream error and no content, degrade: research text if present, else the reliable-model rewrite
+    // (DeepSeek flash, fractions of a cent), and if BOTH are unavailable, an honest plain-text notice
+    // instead of a raw JSON error blob. The user must NEVER see {"error":{...}} as an answer.
+    {
+      const errObj = (finalResponse as any)?.error;
+      if (errObj && !String((finalResponse as any)?.choices?.[0]?.message?.content || "").trim()) {
+        const rText2 = researchFallbackText();
+        let replacement2 = rText2;
+        let reason2 = perplexityFullText ? "upstream_error_used_live_search_text" : "upstream_error_used_findings_digest";
+        if (!replacement2) { replacement2 = await reliableModelAnswer(); reason2 = "upstream_error_used_reliable_model"; }
+        if (replacement2) {
+          finalResponse = { id: "gw-upstream-fallback", object: "chat.completion", model: finalResponse?.model || finalModel,
+            choices: [{ index: 0, message: { role: "assistant", content: replacement2 }, finish_reason: "stop" }],
+            x_upstream_error_served_fallback: reason2 };
+          fallbackReason = reason2; outStatus = 200;
+        } else {
+          const em = typeof errObj === "object" ? String(errObj?.message || errObj?.code || "model unavailable") : String(errObj);
+          finalResponse = { id: "gw-upstream-fallback", object: "chat.completion", model: finalResponse?.model || finalModel,
+            choices: [{ index: 0, message: { role: "assistant", content: `The free model lanes are temporarily at their provider rate limits, so this answer could not be generated right now. The paid default lane is unaffected — switch the model selector off the free lane and resend. (Provider message: ${em.slice(0, 220)})` }, finish_reason: "stop" }],
+            x_upstream_error_served_fallback: "honest_notice" };
+          fallbackReason = "upstream_error_honest_notice"; outStatus = 200;
+        }
+      }
+    }
     {
       const cur = String(finalResponse?.choices?.[0]?.message?.content || "");
       const curLen = cur.trim().length;
@@ -3252,7 +3669,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         try {
           const rr = await fetch(callModelUrl, {
             method: "POST",
-            headers: GW_HEADERS,
+            headers: CM_HEADERS,
             body: JSON.stringify({ messages: [...capped, { role: "assistant", content: cur0 }, { role: "system", content: "POLICY REWRITE: your previous reply refused or deferred the task (\"I can't do that from here\"). Rewrite it so it never ends in a bare limitation: do everything within reach and deliver the COMPLETE, ready-to-apply result as the executed fallback (exact file contents, patch, commands, or filled-in copy, using the research and context above). State any real limitation in ONE short sentence AFTER the delivered work, never as the answer. No homework, no 'you can do this yourself'." }], purpose, model: writerModel, reasoning_effort: "medium", max_tokens: 4000 }),
             signal: AbortSignal.timeout(90_000)
           });
@@ -3276,7 +3693,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         try {
           const rr = await fetch(callModelUrl, {
             method: "POST",
-            headers: GW_HEADERS,
+            headers: CM_HEADERS,
             body: JSON.stringify({ messages: [...capped, { role: "assistant", content: curC }, { role: "system", content: "CLAIM-CAN'T REWRITE (v188): your previous reply claimed you cannot execute (\"I can't safely close\", \"no live execution\", \"nothing was fired\", or paste-ready artifacts instead of execution). That is false for this system: live execution tools ARE connected (run_runner_job, runner_job_status, github_write, github_search_*, query_comptrove, dispatch_fleet, browser_step, run_python) and the platform already queued the user's directive to the ops fleet. Rewrite the answer to lead with what was actually dispatched/executed (quote the dispatch id and any tool results above), enumerate the concrete next closures with owners, and state at most ONE short sentence of real remaining limits (owner-only approvals). No paste-ready homework blocks." }], purpose, model: writerModel, reasoning_effort: "medium", max_tokens: 4000 }),
             signal: AbortSignal.timeout(90_000)
           });
@@ -3413,6 +3830,21 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
           }
         } catch (_cf) { /* best effort */ }
       }
+      // v230b COMPLETION-DOC AUTO-ARTIFACT: the owner's observed breakage (2026-11-15 screenshot)
+      // was a completion doc delivered as chat prose with NO .md artifact. When the turn is a
+      // completion-doc request and no create_file call landed, the platform writes the artifact
+      // itself from the writer's response so the deliverable is always a real file in the
+      // Artifacts panel. Chat text stays the summary.
+      if (completionDocIntent && !(toolCtx.assets || []).some((a: any) => String(a?.name || "").endsWith(".md"))) {
+        try {
+          const fin = String(finalResponse?.choices?.[0]?.message?.content || "");
+          if (fin.length > 300) {
+            const dateStr = new Date().toISOString().slice(0, 10);
+            const out = await toolCreateFile({ filename: `completion-status-${dateStr}.md`, format: "md", content: fin.slice(0, 60_000), title: "Completion Status" }, toolCtx);
+            if (String(out).includes('"ok":true')) console.log("v230b auto completion-doc artifact: completion-status-" + dateStr + ".md");
+          }
+        } catch (_cd2) { /* best effort */ }
+      }
       if (toolCtx.assets?.length) finalResponse.x_assets = toolCtx.assets;
       if (toolCtx.plan?.length) finalResponse.x_plan = toolCtx.plan.map((p: any) => ({ n: p.n, text: p.text, status: p.status, evidence: p.evidence }));   // v103 I8 (v124: + evidence)
       finalResponse.x_plan_decision = { plan: planDec.plan, score: planDec.score, source: toolCtx.plan?.length ? "tool_loop" : planDec.plan ? "writer" : "none", auto_agentic: !!toolCtx.planCompact, python_first: !!toolCtx.pythonFirst };
@@ -3429,6 +3861,143 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       finalResponse.x_tool_loop = toolLoop
         ? { rounds: toolLoop.rounds, used: toolLoop.used, reused_final: !!toolLoop.finalData, tools: toolLoop.trace, skipped: toolLoop.skipped ?? null }
         : { skipped: toolLoopSkip || null };
+  
+      // v194 COMMAND VISIBILITY (owner directive 2026-11-13): truthful per-turn work log built
+      // ONLY from steps that actually executed — plan, research lane, tool-loop trace, assets.
+      // (flat string concatenation: no nested template literals, eszip-safe)
+      try {
+        const wl: string[] = [];
+        if (toolCtx.plan && toolCtx.plan.length) {
+          const done = toolCtx.plan.filter(function (p: any) { return p.status === "done"; }).length;
+          wl.push("**Command: plan the work** \u2014 " + String(toolCtx.plan.length) + " steps" + (done ? " (" + done + " completed)" : ""));
+        }
+        if (researchSkip) wl.push("**Command: retrieval decision** \u2014 skipped (" + researchSkip + ")");
+        else if (researchLane && researchLane !== "none") wl.push("**Command: run live web research** \u2014 lane " + researchLane + ", " + String(subResearchCount || 0) + " sub-queries, " + String(researchFindings.length) + " sources");
+        if (toolLoop && toolLoop.trace && toolLoop.trace.length) {
+          for (const t of toolLoop.trace) {
+            wl.push("**Command: " + t.tool + "** \u2014 " + (t.ok ? "ok" : "failed") + " in " + String(t.ms) + "ms" + (t.chars ? ", " + String(t.chars) + " chars returned" : ""));
+          }
+        } else if (toolLoop && toolLoop.used) {
+          wl.push("**Command: tool loop** \u2014 " + String(toolLoop.rounds) + " rounds");
+        }
+        if (autoAsset && autoAsset.trace && autoAsset.trace.length) wl.push("**Command: fetch supporting assets** \u2014 " + String(autoAsset.trace.length) + " fetched");
+        if (toolCtx.assets && toolCtx.assets.length) wl.push("**Command: attach files** \u2014 " + String(toolCtx.assets.length) + " file(s)");
+        if (wl.length) {
+          const c0 = finalResponse && finalResponse.choices && finalResponse.choices[0] && finalResponse.choices[0].message ? finalResponse.choices[0].message.content : "";
+          if (typeof c0 === "string" && c0.indexOf("Commands executed this turn") === -1) {
+            // v206 (2026-11-14, self-improvement cycle 13-run finding): the model sometimes
+            // echoes its own command narration as the FIRST line of the answer
+            // ("**Command: synthesize the C&W October 2026 ranking with the sub-research on
+            // drivers**") — an internal orchestration line leaking into user-facing text.
+            // The work log above is built ONLY from real executed steps, so any leading
+            // **Command: ...** line in the model's own content is a leak: strip it.
+            let clean = c0.replace(/^(\s*\*{0,2}Command:.*\*{0,2}\s*)(\n+)+/, "");
+            if (clean !== c0) clean = clean.replace(/^\s*---\s*\n+/, ""); // drop a stray divider left behind
+            finalResponse.choices[0].message.content = "**Commands executed this turn (" + wl.length + ")**\n\n" + wl.join("\n") + "\n\n---\n\n" + clean;
+          }
+        }
+      } catch (_wl) { /* best effort */ }
+
+      // v199 CLAIM GUARD (parity doc 34f, owner complaint 2026-11-13: the assistant
+      // "hallucinates and says it's completing items and then doesn't do them"):
+      // server-side post-response check on the assembled answer. Completion claims
+      // (merged PR #N, opened PR #N, commit SHA, deployed, "already applied",
+      // is-done/is-fixed/is-merged) are matched against the tool evidence available
+      // in THIS turn's context: toolLoop.trace, toolCtx.plan (done steps), and the
+      // tool-loop evidence text (which carries github_write tool results). A claim
+      // with no matching evidence gets a visible honest caveat prepended; the
+      // response is annotated, never blocked. Deterministic regex + trace matching
+      // only — no extra model calls. (flat string concatenation: no nested
+      // template literals, eszip-safe)
+      try {
+        const cgRaw = finalResponse && finalResponse.choices && finalResponse.choices[0] && finalResponse.choices[0].message ? finalResponse.choices[0].message.content : "";
+        if (typeof cgRaw === "string" && cgRaw.length > 0) {
+          // evidence corpus: tool results (github_write etc.), trace tool names, done plan steps
+          const cgEv = String(toolLoop && toolLoop.evidence ? toolLoop.evidence : "").toLowerCase();
+          const cgTrace: string[] = [];
+          if (toolLoop && toolLoop.trace && toolLoop.trace.length) for (const t of toolLoop.trace) cgTrace.push(String(t.tool || "") + (t.ok ? ":ok" : ":failed"));
+          const cgDone: string[] = [];
+          if (toolCtx && toolCtx.plan && toolCtx.plan.length) for (const p of toolCtx.plan) if (String(p && p.status) === "done") cgDone.push(String(p && p.text || "") + " " + String(p && p.evidence || ""));
+          const cgCorpus = (cgEv + "\n" + cgTrace.join(" ") + "\n" + cgDone.join("\n")).toLowerCase();
+          // did any write-ish tool actually succeed this turn?
+          const cgWriteOk = cgDone.length > 0 || cgTrace.some(function (s: string) { return s.indexOf(":ok") !== -1 && /github_write|create_pr|commit|push|deploy|run_runner_job/.test(s); });
+          const cgDeployOk = cgCorpus.indexOf("deployed") !== -1 || cgTrace.some(function (s: string) { return s.indexOf(":ok") !== -1 && /deploy/.test(s) && !/status|list|logs?|health/.test(s); });
+          const caveats: string[] = [];
+          const cgSeen = new Set<string>();
+          const cgAdd = function (claim: string) { if (claim && !cgSeen.has(claim)) { cgSeen.add(claim); caveats.push(claim); } };
+          // future/intent phrasing ("will be deployed") is not a completion claim
+          const cgIsFuture = function (idx: number) { return /(?:will|would|to be|should be|should have been|will have been|can be|could be|could have been|plann?ed|going to|about to|needs? to)\s+(?:be\s+|have\s+been\s+)?$/i.test(cgRaw.slice(Math.max(0, idx - 80), idx)); };
+          let mm: RegExpExecArray | null;
+          // merged PR #N ("I merged PR #96", "PR #96 is merged")
+          const rePrMerged = /\b(?:merged?|landed?)\b[^.\n]{0,60}\b(?:PR|pull request)\s*#?\s*(\d+)|\b(?:PR|pull request)\s*#?\s*(\d+)\b[^.\n]{0,60}\b(?:is|has been|was|got|now)\s+merged\b/gi;
+          while ((mm = rePrMerged.exec(cgRaw)) !== null) {
+            if (cgIsFuture(mm.index)) continue;
+            const n = mm[1] || mm[2] || "";
+            if (!n) continue;
+            const numOk = cgCorpus.indexOf("#" + n) !== -1 || cgCorpus.indexOf("/pull/" + n) !== -1;
+            if (!(numOk && cgCorpus.indexOf("merged") !== -1)) cgAdd("PR #" + n + " merged");
+          }
+          // opened/created PR #N
+          const rePrOpen = /\b(?:opened|created|submitted)\s+(?:a\s+)?(?:PR|pull request)\s*#?\s*(\d+)|\b(?:PR|pull request)\s*#?\s*(\d+)\b[^.\n]{0,40}\b(?:is|has been|was)\s+(?:open(?:ed)?|created|submitted)\b/gi;
+          while ((mm = rePrOpen.exec(cgRaw)) !== null) {
+            if (cgIsFuture(mm.index)) continue;
+            const n = mm[1] || mm[2] || "";
+            if (!n) continue;
+            if (!(cgCorpus.indexOf("#" + n) !== -1 || cgCorpus.indexOf("/pull/" + n) !== -1)) cgAdd("PR #" + n + " opened");
+          }
+          // commit SHA claims ("committed 3f2a1bc", "pushed 3f2a1bc9012d")
+          const reSha = /\b(?:commit|pushed|revision)\s+([0-9a-f]{7,40})\b/gi;
+          while ((mm = reSha.exec(cgRaw)) !== null) {
+            if (cgIsFuture(mm.index)) continue;
+            const sha = String(mm[1] || "").toLowerCase();
+            if (sha && cgCorpus.indexOf(sha) === -1) cgAdd("commit " + sha.slice(0, 10));
+          }
+          // deployed / deployment succeeded
+          const reDeployed = /\bdeployed\b|\bdeploy(?:ment)?\s+(?:succeeded|went live|is live)\b/gi;
+          while ((mm = reDeployed.exec(cgRaw)) !== null) {
+            if (cgIsFuture(mm.index)) continue;
+            if (!cgDeployOk) cgAdd("deployed");
+          }
+          // bare "merged" ("it is merged", "I merged it") — skip when the sentence names a
+          // PR/pull request: the numbered pattern above already owns that claim.
+          const reMerged = /\b(?:is|are|has been|have been|was|were|now)\s+merged\b|\bI\s+(?:have\s+|'ve\s+)?merged\b/gi;
+          while ((mm = reMerged.exec(cgRaw)) !== null) {
+            if (cgIsFuture(mm.index)) continue;
+            const cgWin = cgRaw.slice(Math.max(0, mm.index - 60), Math.min(cgRaw.length, mm.index + mm[0].length + 20));
+            if (/\b(?:PR|pull request)\b/i.test(cgWin)) continue;
+            if (cgCorpus.indexOf("merged") === -1) cgAdd("merged");
+          }
+          // pushed / committed (with an object)
+          const rePushed = /\b(?:pushed|committed)\s+(?:the|it|this|that|my|our|them|these|those|changes?|branch|commit|fix|patch|file|files)\b/gi;
+          while ((mm = rePushed.exec(cgRaw)) !== null) {
+            if (cgIsFuture(mm.index)) continue;
+            if (!cgWriteOk) cgAdd(String(mm[0]).toLowerCase().trim());
+          }
+          // "already applied/done/fixed/..." and "has been applied/fixed/..."
+          const reAlready = /\balready\s+(?:been\s+)?(applied|done|fixed|deployed|merged|committed|pushed|resolved|handled)\b|\b(?:has|have|'?ve)\s+(?:already\s+)?been\s+(applied|fixed|deployed|merged|committed|pushed|resolved|done)\b/gi;
+          while ((mm = reAlready.exec(cgRaw)) !== null) {
+            if (cgIsFuture(mm.index)) continue;
+            const verb = String(mm[1] || mm[2] || "").toLowerCase();
+            if (!verb) continue;
+            const ok = verb === "deployed" ? cgDeployOk : verb === "merged" ? cgCorpus.indexOf("merged") !== -1 : cgWriteOk;
+            if (!ok) cgAdd("already " + verb);
+          }
+          // "is done/fixed/resolved/complete(d)/applied/handled"
+          const reDone = /\b(?:is|are|it'?s|that'?s|everything'?s|all)\s+(?:all\s+|now\s+|fully\s+)*(done|complete[d]?|fixed|resolved|handled|applied)\b/gi;
+          while ((mm = reDone.exec(cgRaw)) !== null) {
+            if (cgIsFuture(mm.index)) continue;
+            const verb = String(mm[1] || "").toLowerCase();
+            if (!verb) continue;
+            if (!cgWriteOk) cgAdd(verb === "complete" || verb === "completed" ? "completed" : verb);
+          }
+          if (caveats.length) {
+            const lines: string[] = [];
+            for (const c of caveats.slice(0, 6)) lines.push("**Claim check:** " + c + " \u2014 no tool evidence in this turn; verified status unknown.");
+            finalResponse.choices[0].message.content = lines.join("\n") + "\n\n---\n\n" + cgRaw;
+            finalResponse.x_claim_check = { flagged: caveats.length, claims: caveats.slice(0, 6) };
+          }
+        }
+      } catch (_cg) { /* best effort — never break the response */ }
     }
 
     // If an image was generated, include it in the response
