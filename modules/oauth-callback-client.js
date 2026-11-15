@@ -30,6 +30,19 @@
     return p.replace(/[^a-z0-9_-]/g, "") || "oauth";
   }
 
+  /* v230: server-minted states (connectors "start" flow: base64url JSON {uid,exp,n,p} + HMAC)
+   * are validated AUTHORITATIVELY server-side at exchange time (signature + uid + expiry).
+   * The local pending map only knows client-machine states, so a stale local entry must
+   * never reject a valid server state — that mis-fired as "state_mismatch" for the owner. */
+  function isServerMintedState(state) {
+    if (!state || state.indexOf(".") < 1) return false;
+    try {
+      var payload = state.slice(0, state.indexOf("."));
+      var json = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+      return !!(json && json.uid && json.exp && json.p);
+    } catch (e) { return false; }
+  }
+
   function run() {
     var host = doc.getElementById("oauth-callback-root");
     var qs = new URLSearchParams((root.location && root.location.search) || "");
@@ -47,9 +60,18 @@
     } catch (e) {}
 
     var pendingMap = lsGet("ai_oauth_pending") || {};
+    // v230: drop stale client-machine pending entries (>15 min old) — leftovers from
+    // earlier attempts must not reject fresh flows.
+    var nowMs = Date.now();
+    Object.keys(pendingMap).forEach(function (k) {
+      var e = pendingMap[k];
+      var t = e && (e.startedAt || e.at);
+      if (t && nowMs - Number(t) > 15 * 60 * 1000) delete pendingMap[k];
+    });
+    lsSet("ai_oauth_pending", pendingMap);
     var pendingEntry = pendingMap[provider] || null;
     var stateVerified = !!(pendingEntry && pendingEntry.state && state && pendingEntry.state === state);
-    var stateMismatch = !!(pendingEntry && pendingEntry.state && state && pendingEntry.state !== state);
+    var stateMismatch = !!(pendingEntry && pendingEntry.state && state && pendingEntry.state !== state && !isServerMintedState(state));
     var nowIso = new Date().toISOString();
 
     var statusNote = doc.getElementById("cb-storage-note");
