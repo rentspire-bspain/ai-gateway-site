@@ -17,6 +17,14 @@
   function parseProvider(providerAttr, state) {
     var p = String(providerAttr || "").trim().toLowerCase();
     if (!p && state && state.indexOf(":") > 0) p = state.slice(0, state.indexOf(":")).trim().toLowerCase();
+    // v227: server-minted state (base64url JSON payload "p" field — connectors "start" flow)
+    if (!p && state && state.indexOf(".") > 0) {
+      try {
+        var payload = state.slice(0, state.indexOf("."));
+        var json = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+        p = String((json && json.p) || "");
+      } catch (e) {}
+    }
     if (p === "microsoft" || p === "msft" || p === "entra") return "outlook";
     if (p === "gmail" || p === "gmail-gcal") return "google";
     return p.replace(/[^a-z0-9_-]/g, "") || "oauth";
