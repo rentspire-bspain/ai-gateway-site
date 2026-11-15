@@ -19,7 +19,7 @@
     if (active && active.btn === btn) { stop(); return; }
     stop();
     var u = new root.SpeechSynthesisUtterance(String(text).slice(0, 6000));
-    u.rate = 1.0;
+    try { u.rate = parseFloat(localStorage.getItem("ai_tts_rate") || "1") || 1.0; } catch (e) { u.rate = 1.0; }
     u.onend = stop; u.onerror = stop;
     btn.textContent = "⏹";
     btn.setAttribute("aria-label", "Stop reading");

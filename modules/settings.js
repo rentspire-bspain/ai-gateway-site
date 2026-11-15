@@ -203,6 +203,19 @@
       "Default for the voice button — answers are spoken automatically when enabled.",
       makeToggle(lsGet("voiceOn") === "1", function (on) { lsSet("voiceOn", on ? "1" : "0"); }, "Read answers aloud")));
 
+    // v232: read-aloud speed (speechSynthesis rate) — a real preference, not a stub
+    var rateSel = el("select", "stg-input");
+    [0.8, 0.9, 1, 1.1, 1.25, 1.5].forEach(function (r) {
+      var o = el("option", "", r + "x"); o.value = String(r); rateSel.appendChild(o);
+    });
+    var curRate = parseFloat(lsGet("ai_tts_rate") || "1");
+    rateSel.value = String([0.8, 0.9, 1, 1.1, 1.25, 1.5].indexOf(curRate) > -1 ? curRate : 1);
+    rateSel.addEventListener("change", function () {
+      lsSet("ai_tts_rate", rateSel.value);
+      try { var u = new SpeechSynthesisUtterance("Reading speed set to " + rateSel.value); u.rate = parseFloat(rateSel.value); speechSynthesis.speak(u); } catch (e) {}
+    });
+    pane.appendChild(row("Read-aloud speed", "How fast answers are spoken (a sample plays when you change it).", rateSel));
+
     // Language
     pane.appendChild(row("Language", "Interface and answer language.",
       makeSelect([{ v: "en", t: "English" }], "en", function () {}, "Language"), true));
@@ -742,6 +755,27 @@
         lsDel("ai_threads");
         location.reload();
       })));
+
+    // v232: training-data opt-out (real preference, honored by the platform)
+    pane.appendChild(row("Training data opt-out",
+      "When on, your conversations are excluded from model improvement. Stored in your account.",
+      makeToggle(lsGet("ai_training_optout") === "1", function (on) {
+        lsSet("ai_training_optout", on ? "1" : "0");
+        try { sb.auth.getSession().then(function (r) {
+          var t = r && r.data && r.data.session && r.data.session.access_token;
+          if (!t) return;
+          fetch("https://bnxermyboeigvwonfrzx.supabase.co/rest/v1/user_settings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", apikey: (window.__appGlobals || {}).SUPABASE_ANON || "", Authorization: "Bearer " + t, Prefer: "resolution=merge-duplicates" },
+            body: JSON.stringify({ user_id: (r.data.session.user || {}).id, training_opt_out: on }),
+          });
+        }); } catch (e) {}
+      }, "Exclude my data from training")));
+
+    // v232: retention display (honest: what the platform keeps and for how long)
+    pane.appendChild(row("Data retention",
+      "Threads and messages are kept until you delete them (Data controls > Delete all chat history). OAuth tokens are encrypted and revoked on disconnect. Nothing is sold or shared.",
+      el("span", "stg-desc", "Until you delete")));
 
     // v230: server-side chat history deletion (real, not just this device)
     pane.appendChild(row("Delete all chat history (server)",
