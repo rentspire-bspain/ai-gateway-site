@@ -83,3 +83,41 @@
   /* doc/artifact panels take the full screen on phones */
   #docs-panel, .doc-panel, #artifact-library { width: 100vw !important; max-width: 100vw !important; }
 }
+
+/* ---- v229: fleet-audit 375px hardening (BUILD: Mobile deep flows harvest) ----
+   Additive global floors + pane fixes from the 2026-11-15 fleet build result,
+   mapped to the real selectors. No existing rules redefined. */
+@media (max-width: 480px) {
+  /* tap-target floor: interactive elements never below 44px */
+  button, a[role="button"], input, select, .stg-row, .followups a, .fu-chip {
+    min-height: 44px;
+  }
+  /* kill horizontal jitter inside panes */
+  .pane, [class*="pane"], main, #main { overflow-x: hidden; }
+  /* long key strings must not burst layout (API pane, connectors token boxes) */
+  code, .api-key, .stg-key, kbd, .mono {
+    word-break: break-all; overflow-wrap: anywhere;
+  }
+  /* docs panel: pre/code scroll horizontally instead of stretching the pane */
+  .docs-panel pre, .dp-md pre, pre {
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+  /* composer: clear the iOS keyboard / home indicator */
+  .composer, .composer-bar, [class*="composer"] {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  /* modals never wider than the viewport (thread restore, settings) */
+  .modal, dialog, [role="dialog"] {
+    width: min(92vw, 480px); max-width: 92vw;
+  }
+  /* library cards stack at phone widths */
+  .library-grid, .cards, .card-grid {
+    grid-template-columns: 1fr;
+  }
+  /* follow-up chips get breathing room */
+  .followups, .fu-row { gap: 12px; }
+  .fu-chip { display: inline-flex; align-items: center; }
+  /* one sticky layer max — nothing else may pin */
+  [class*="sticky"]:not([data-sticky]) { position: static !important; }
+}
