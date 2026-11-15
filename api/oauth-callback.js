@@ -112,7 +112,7 @@ function renderHtmlPage({ statusTitle, eyebrow, headline, subtext, provider, pro
     ${isSuccess ? '<button class="btn ghost" type="button" id="cb-close-btn">Close tab</button>' : ''}
   </div>
 </main>
-<script src="/modules/oauth-callback-client.js"></script>
+<script src="/modules/oauth-callback-client.js?v=227"></script>
 </body>
 </html>`;
 }
