@@ -3,6 +3,13 @@
 
 > **HEADLINE: weighted average total completion 90.1%**. The reproducible §26 score is 8828 ÷ 98 = 90.081632%, rounded to one decimal. No category rescore this batch — v236 is reliability + scale work (the standing rule: only evidence-verified moves change scores). Raw tracked-item count: **104✅ / 33🟡 / 20🔴** (157 items). All arithmetic computed by qa/generate-parity-headline.py against qa/parity-items.json v237 — never hand-summed.
 
+## 29ca. v239 change log: consumer plans table locked at $18/$48/$98 (2026-11-15 late UTC, owner directive)
+
+| Change | What | Verification |
+|---|---|---|
+| §18 consumer plans table updated | All tier prices end in 8 per owner directive: Core $8 / Pro $18 / Max $48 / Unlimited $98 / Team $18/seat / Enterprise $98/seat, with the market anchors and undercut percentages recomputed (Pro 10% under the $20 anchor, Max 52% under $100 tiers, Unlimited 51% under $200 tiers) | Every anchor price re-verified Nov 2026: Claude Pro $20/Max $100/Ultra $200, ChatGPT Go $8/Plus $20/Pro $100-500, Perplexity Pro $20/Max $200, Gemini Ultra $99.99 |
+| Reconciled P&L attached to §18 | 10K: $6,018/$11,509/$20,660 net at 2/5/10%; 100K: $60,679/$115,587/$207,100 — margins 79.7-88.7% | §29bz model, single tier set, blend confirmed |
+
 ## 29bz. v238 change log: pricing locked at $18/$48/$98 — neuron task funnel + partner integration plan (2026-11-15 late UTC, owner directive)
 
 | Change | What | Verification |
