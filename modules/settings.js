@@ -876,7 +876,7 @@
     connectors: paneConnectors,
     // usage: modules/usage.js (§34b) replaces the local-only pane when loaded; the
     // localStorage fallback stays for the rare case that module fails to load.
-    teammates: function () { var wrap = document.createElement("div"); wrap.id = "teammates-pane"; if (window.TeammatesPane && window.TeammatesPane.render) { setTimeout(window.TeammatesPane.render, 0); } return wrap; },
+    teammates: function () { var wrap = document.createElement("div"); wrap.id = "teammates-pane"; if (window.SettingsTeammatesPane && window.SettingsTeammatesPane.render) { setTimeout(window.SettingsTeammatesPane.render, 0); } else if (window.TeammatesPane && window.TeammatesPane.render) { setTimeout(window.TeammatesPane.render, 0); } return wrap; },
     enterprise: function () { var wrap = document.createElement("div"); wrap.id = "enterprise-admin-pane"; if (window.EnterpriseAdminPane && window.EnterpriseAdminPane.render) { setTimeout(window.EnterpriseAdminPane.render, 0); } return wrap; },
         usage: function () { return (window.UsagePane && typeof window.UsagePane.render === "function") ? window.UsagePane.render() : paneUsage(); },
     data: paneData, about: paneAbout
