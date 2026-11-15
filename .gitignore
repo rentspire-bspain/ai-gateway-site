@@ -1,1 +1,3 @@
 .vercel
+qa-reports/prompt-corpus.json
+qa-reports/prompt-replay/
