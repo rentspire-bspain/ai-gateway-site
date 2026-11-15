@@ -113,3 +113,19 @@ function openInTab(pending) {
   chrome.storage.session.set({ pendingAsk: { ...pending, target: "tab" } })
     .finally(() => chrome.tabs.create({ url: SITE + "/" }));
 }
+
+// v1.1.0: keyboard commands — open the side panel / summarize the page
+chrome.commands && chrome.commands.onCommand && chrome.commands.onCommand.addListener(async (command) => {
+  try {
+    if (command === "open-sidepanel") {
+      // same behavior as the action button: open the side panel
+      chrome.sidePanel && chrome.sidePanel.open && chrome.sidePanel.open({ windowId: (await chrome.windows.getCurrent()).id });
+    } else if (command === "summarize-page") {
+      const tab = await chrome.tabs.query({ active: true, currentWindow: true });
+      const url = tab && tab[0] && tab[0].url;
+      if (!url) return;
+      chrome.storage.local.set({ pendingAsk: { id: Date.now().toString(36), text: "Read and summarize this page: " + url, at: Date.now() } });
+      chrome.sidePanel && chrome.sidePanel.open && chrome.sidePanel.open({ windowId: (await chrome.windows.getCurrent()).id });
+    }
+  } catch (_e) { /* side panel API unavailable in this Chrome version */ }
+});

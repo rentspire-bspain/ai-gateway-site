@@ -93,6 +93,27 @@
     pane.appendChild(nameIn);
     pane.appendChild(nameMsg);
 
+    // ---------- Change email (v234: real flow, confirmation sent to both addresses) ----------
+    pane.appendChild(el("h3", "stg-pane-title", "Change email"));
+    pane.appendChild(el("p", "stg-pane-sub", "Changing your email sends a confirmation to both the old and new address. The change applies once you confirm."));
+    var emIn = input("New email address");
+    var emBtn = btn("Send confirmation");
+    var emMsg = el("div", "stg-desc", "");
+    emBtn.addEventListener("click", function () {
+      var v = emIn.value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { msg(emMsg, "Enter a valid email address.", false); return; }
+      if (v === email) { msg(emMsg, "That is already your email.", false); return; }
+      emBtn.disabled = true;
+      client.auth.updateUser({ email: v }).then(function () {
+        msg(emMsg, "Confirmation sent to " + v + " — check both inboxes and click the link.", true);
+        emIn.value = "";
+      }).catch(function (e) {
+        var m = String(e.message || e);
+        msg(emMsg, /already registered|already in use/i.test(m) ? "That email is already registered to an account." : m.slice(0, 140), false);
+      }).finally(function () { emBtn.disabled = false; });
+    });
+    pane.appendChild(emIn); pane.appendChild(emBtn); pane.appendChild(emMsg);
+
     // ---------- Change password ----------
     pane.appendChild(el("h3", "stg-pane-title", "Change password"));
     pane.appendChild(el("p", "stg-pane-sub", "Pick a strong password you don't use anywhere else."));
