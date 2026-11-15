@@ -1,2 +1,2 @@
-window.BUILD = "v237";
+window.BUILD = "v238";
 console.log("[ai.spaincos] build " + window.BUILD);
