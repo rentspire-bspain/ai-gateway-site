@@ -141,6 +141,42 @@
     return auto;
   }
 
+  /* v226: the "automate" checklist item now self-checks from the DATABASE (the last
+   * auto-flag gap — GettingStarted completion). Any automation row OR fleet dispatch
+   * in the user's own history marks it done automatically. Runs after render; if it
+   * flips the flag the checklist re-renders. */
+  function detectAutomateAsync() {
+    try {
+      var sbClient = (typeof sb !== "undefined") ? sb : window.sb;
+      if (!sbClient || !sbClient.auth || typeof sbClient.auth.getSession !== "function") return;
+      sbClient.auth.getSession().then(function (r) {
+        var tok = r && r.data && r.data.session && r.data.session.access_token;
+        if (!tok) return;
+        var H = { apikey: window.SUPABASE_ANON || "", Authorization: "Bearer " + tok };
+        var SB_REST = "https://bnxermyboeigvwonfrzx.supabase.co/rest/v1";
+        var check = SB_REST + "/automations?select=id&limit=1";
+        fetch(check, { headers: H }).then(function (res) {
+          if (!res.ok) return fetch(SB_REST + "/fleet_dispatch?select=id&limit=1", { headers: H });
+          return res;
+        }).then(function (res) {
+          if (!res || !res.ok) return;
+          return res.json().then(function (rows) {
+            if (Array.isArray(rows) && rows.length > 0) {
+              var cur = window.__obAutoCache || {};
+              if (!cur["automate"]) {
+                cur["automate"] = 1;
+                window.__obAutoCache = cur;
+                if (typeof window.OnboardingUI !== "undefined" && typeof window.OnboardingUI.refresh === "function") {
+                  window.OnboardingUI.refresh();
+                }
+              }
+            }
+          });
+        }).catch(function () {});
+      }).catch(function () {});
+    } catch (e) { /* best effort */ }
+  }
+
   function checklistState() {
     var manual = manualMap();
     var auto = detectChecklistAuto();
@@ -677,6 +713,7 @@
     prev: prevStep,
     goToStep: goToStep,
     getState: getState,
+    refresh: function () { detectAutomateAsync(); try { mountChecklist(); } catch (e) {} },
     runExample: runExample,
     syncEmptyState: syncEmptyState,
     CHECKLIST: CHECKLIST,
