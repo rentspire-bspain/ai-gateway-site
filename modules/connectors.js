@@ -189,6 +189,13 @@
       help: "supabase.com/dashboard/account/tokens > Generate new token.",
       permissions: ["List projects", "Project health"],
       note: "Ask in chat: “list my Supabase projects”, “is my project healthy”."
+    },
+    {
+      id: "vercel", name: "Vercel", logo: "V", kind: "key",
+      keyLabel: "Vercel access token",
+      help: "vercel.com/account/settings/tokens > Create a token.",
+      permissions: ["List projects", "Deployment status + logs"],
+      note: "Ask in chat: “list my Vercel projects”, “what deployed today”."
     }
   ];
 
