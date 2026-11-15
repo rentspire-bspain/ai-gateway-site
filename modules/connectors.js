@@ -680,13 +680,13 @@
           pstat[prov] = d;
           pbanner[prov] = { msg: prov.charAt(0).toUpperCase() + prov.slice(1) + " connected" + (d.email || d.account ? " as " + (d.email || d.account) : "") + ".", kind: "ok" };
           syncMachineConfig();
-        } else if (d && d.error && !/expired|invalid|start again/i.test(String(d.error))) {
-          // provider-side rejection: clear the one-time code, surface the error
+        } else if (d && d.error) {
+          // any exchange rejection (provider-side or state-side): the one-time code is
+          // spent either way — clear it and surface the error banner.
           delete cm[prov];
           watchSet("ai_oauth_pending_codes", cm);
           pbanner[prov] = { msg: d.error, kind: "err" };
         }
-        // expired/invalid state codes are left to the retry-on-open logic (cleared on next successful connect)
         render();
         notifyBadges();
       }).catch(function () { delete exchangeInFlight[prov]; });
@@ -845,6 +845,7 @@
     setOAuthConfig: setOAuthConfig,
     getOAuthState: function (id) { return getProviderOAuthState(id, id === "google" ? status : pstat[id]); },
     _receiveOAuthCallback: receiveOAuthCallback,
+    _consumeStoredCodes: consumeStoredCodes,
     _handleReturn: handleReturn
   };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", handleReturn); else handleReturn();
