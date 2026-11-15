@@ -1,0 +1,58 @@
+{
+ "ts": "2026-11-15T00:16:43Z",
+ "passed": 4,
+ "total": 4,
+ "tests": [
+  {
+   "name": "webapp-health-allowance",
+   "query": "Is the Allowance webapp healthy? Check webapp health for Allowance.",
+   "ok": true,
+   "evidence": {
+    "matched": [
+     "HTTP 200",
+     "sohkloywunleaftzzdof"
+    ],
+    "forbidden_found": []
+   },
+   "answer_head": "**Commands executed this turn (1)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n\n---\n\nYes \u2014 the Allowance (ICHRA) webapp is healthy. The live health check (run just now) shows:\n\n- \ud83d\udfe2 **REST endpoint**: HTTP 200\n- \ud83d\udfe2 **Supabase access**: healthy (service_role creden"
+  },
+  {
+   "name": "webapp-schema-comptrove",
+   "query": "What tables does the Comptrove database have? I need the schema.",
+   "ok": true,
+   "evidence": {
+    "matched": [
+     "1,?743"
+    ],
+    "forbidden_found": []
+   },
+   "answer_head": "**Commands executed this turn (1)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n\n---\n\n**Comptrove's database (Deal Engine Supabase project `dcyjmftriqayqaonitlx`) exposes 1,743 tables** through its PostgREST endpoint. Here's the schema, pulled live from the app's"
+  },
+  {
+   "name": "webapp-schema-allowance",
+   "query": "How many tables are in the Allowance webapp's database?",
+   "ok": true,
+   "evidence": {
+    "matched": [
+     "44 tables",
+     "\\b44\\b"
+    ],
+    "forbidden_found": []
+   },
+   "answer_head": "**Commands executed this turn (1)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n\n---\n\n**44 tables** in the Allowance (ICHRA) Supabase database (project `sohkloywunleaftzzdof`), confirmed from the live PostgREST schema listing.\n\nThey span these functional groups:\n"
+  },
+  {
+   "name": "webapp-registry",
+   "query": "what webapps exist on this platform",
+   "ok": true,
+   "evidence": {
+    "matched": [
+     "terminal\\.spaincos\\.com",
+     "Comptrove"
+    ],
+    "forbidden_found": []
+   },
+   "answer_head": "**Commands executed this turn (1)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n\n---\n\nThe platform's webapp catalog is live and queryable \u2014 I'll call list_webapps to get the real registry.\n\n**Command: list the registered webapps in the platform's live catalog**\n\n"
+  }
+ ]
+}
