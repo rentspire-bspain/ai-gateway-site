@@ -1,5 +1,5 @@
 {
-  "version": "v224",
+  "version": "v225",
   "generated_at": "2026-11-14T00:00:00Z",
   "note": "v217 (2026-11-14): per-webapp REST access fixed platform-wide \u2014 the account's Supabase projects reject the anon key at the PostgREST OpenAPI root (root cause of the fleet-wide 401s); the schema tools now use per-project service credentials (gateway_config webapp_service_<ref>) for the read-only root fetch, wired for ALL 15 org projects. Live-verified: Deal Engine 1743 tables (Comptrove/Terminal/PHA/RefundSnap/CRM), Allowance 44, ai-gateway 73. \u00a726f item 14 closes to \u2705. Category scores unchanged this batch (item was doc-tracked, not category-scored); headline still computed by qa/generate-parity-headline.py.",
   "categories": [
@@ -41,7 +41,7 @@
     {
       "name": "Connectors",
       "weight": 12,
-      "score": 75
+      "score": 82
     },
     {
       "name": "Privacy",
