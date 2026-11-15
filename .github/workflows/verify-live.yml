@@ -25,6 +25,8 @@ jobs:
           done
           echo "::error::ai.spaincos.com does not match repo index.html - deploy did not reach production"
           exit 1
+      - name: CSP inline-script hash self-check (v241 guard: a stale hash makes the whole app JS-dead)
+        run: python3 qa/csp-hash-check.py
       - name: PR pre-merge check (live verification runs post-deploy on master)
         if: github.event_name == 'pull_request'
         run: |
