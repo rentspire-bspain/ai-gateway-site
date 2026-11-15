@@ -112,6 +112,36 @@
         trail.innerHTML = "";
         trail.appendChild(el("p", "stg-empty-note", "Dispatch trail unavailable right now."));
       });
+
+    // v230: security audit trail (audit_logs, RLS-scoped to the signed-in user)
+    var auditBox = el("div");
+    host.appendChild(el("div", "stg-group-label", "Security audit trail (your account actions)"));
+    host.appendChild(auditBox);
+    fetch(SB + "/rest/v1/audit_logs?select=action,detail,created_at&order=created_at.desc&limit=20", { headers: { Authorization: "Bearer " + tok, apikey: ak || "" } })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("audit " + r.status)); })
+      .then(function (rows) {
+        auditBox.innerHTML = "";
+        if (!Array.isArray(rows) || !rows.length) {
+          auditBox.appendChild(el("p", "stg-empty-note", "No account actions recorded yet."));
+          return;
+        }
+        rows.forEach(function (a) {
+          var row = el("div", "ent-dispatch-row");
+          var t = el("div", "sec-device-text");
+          var nm = el("div", "sec-device-name");
+          nm.textContent = String(a.action || "event");
+          t.appendChild(nm);
+          var meta = el("div", "sec-device-meta");
+          meta.textContent = String(a.detail || "") + " · " + fmtAt(a.created_at);
+          t.appendChild(meta);
+          row.appendChild(t);
+          auditBox.appendChild(row);
+        });
+      })
+      .catch(function () {
+        auditBox.innerHTML = "";
+        auditBox.appendChild(el("p", "stg-empty-note", "Audit trail unavailable right now."));
+      });
     return host;
   }
 
