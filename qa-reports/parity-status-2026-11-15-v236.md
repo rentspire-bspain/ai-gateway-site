@@ -1,9 +1,9 @@
 # ai.spaincos.com: 100% Completion Parity Document (v236)
-**2026-11-15 (night #5 UTC) · v235 90% CROSSED — headline 88.9% → 90.1% (8828/98, computed) · owner-requested fix batch shipped live: Comet extension v1.1.0 (keyboard commands: Ctrl+Shift+S open side panel, Ctrl+Shift+A summarize page; manifest live at ai.spaincos.com/extension/manifest.json), Account email-change flow (new email input + confirmation to both addresses, validated and error-handled — live in the Account pane), GettingStarted guided next-steps section (six one-click guided actions appended to the onboarding checklist) · PLUS gateway v229 (deployed): the COMPLETION-DOC forcing rule — when the user asks for a completion/closure/orchestration document, the model MUST gather live evidence (list_webapps/webapp_doctor/platform_status) and deliver via create_file as a real .md artifact, never paste the whole doc into chat; VERIFIED gates require attached evidence (commit SHA, deployment ID, HTTP result, health check) — this closes the owner's screenshot complaint (chat prose instead of an artifact with no live registry evidence) · rescores: Comet 50→70 (+60), GettingStarted 85→90 (+25), Account 85→90 (+30) · teal bar v235 — headline 88.5% → 88.9% (8713/98, computed) · ALL SEVEN PERSONAL PROVIDERS CONNECTED on the owner's account: Slack, Dropbox, Google, GitHub (auto-provisioned from the platform key), Render (owner-pasted), Vercel (owner-pasted — unblocked by fixing MY deploy mistake: the v3 connectors-function deploy had missed providers.ts, so 'vercel' was an unknown provider; redeployed with the file, verified live), Supabase (owner-pasted with projects_read — the earlier 403s were the granular token missing the Account-and-organization > Projects > Read permission) · Outlook remains external-user-only (boundview) and Box removed, both by owner decision · the paste-time validation (Save key hits the live provider API before saving) means every connection row is a verified-working token · Connectors rescored 95→98 (the -2: external-user OAuth paths not yet exercised by real boundview users) · teal bar v234**
+**2026-11-15 (night #5–6 UTC) · v236 SELF-IMPROVEMENT ROLLOUT — the full audit-fleet and self-improvement-cycle findings are now tracked in this document, one by one, with root cause / fix / verification / permanent solution (§29bs–§29bv below) · headline stays 90.1% (8828/98, computed) · gateway v230–v234 deployed: completion-doc evidence + auto-artifact, command-leak SSE scrub, free-never-hard-fails fallback chain, service-key auth fix, upstream-error graceful degradation, COMET never-refuse, parallel PR fetches, per-user daily spend ceilings + per-call user attribution + $350/mo owner cap (call-model v235) · call-model v231–v234 deployed · full scale + unit-economics model shipped (qa-reports/scale-and-unit-economics-2026-11-15.md): verified per-token COGS for every lane, 80–97% margins, Core-plan worst case identified with the fix, per-user attribution design, boundview separation plan · the 717-prompt full-history replay fleet runs in the background (365/717 done at last check) · teal bar v236** — headline 88.9% → 90.1% (8828/98, computed) · owner-requested fix batch shipped live: Comet extension v1.1.0 (keyboard commands: Ctrl+Shift+S open side panel, Ctrl+Shift+A summarize page; manifest live at ai.spaincos.com/extension/manifest.json), Account email-change flow (new email input + confirmation to both addresses, validated and error-handled — live in the Account pane), GettingStarted guided next-steps section (six one-click guided actions appended to the onboarding checklist) · PLUS gateway v229 (deployed): the COMPLETION-DOC forcing rule — when the user asks for a completion/closure/orchestration document, the model MUST gather live evidence (list_webapps/webapp_doctor/platform_status) and deliver via create_file as a real .md artifact, never paste the whole doc into chat; VERIFIED gates require attached evidence (commit SHA, deployment ID, HTTP result, health check) — this closes the owner's screenshot complaint (chat prose instead of an artifact with no live registry evidence) · rescores: Comet 50→70 (+60), GettingStarted 85→90 (+25), Account 85→90 (+30) · teal bar v235 — headline 88.5% → 88.9% (8713/98, computed) · ALL SEVEN PERSONAL PROVIDERS CONNECTED on the owner's account: Slack, Dropbox, Google, GitHub (auto-provisioned from the platform key), Render (owner-pasted), Vercel (owner-pasted — unblocked by fixing MY deploy mistake: the v3 connectors-function deploy had missed providers.ts, so 'vercel' was an unknown provider; redeployed with the file, verified live), Supabase (owner-pasted with projects_read — the earlier 403s were the granular token missing the Account-and-organization > Projects > Read permission) · Outlook remains external-user-only (boundview) and Box removed, both by owner decision · the paste-time validation (Save key hits the live provider API before saving) means every connection row is a verified-working token · Connectors rescored 95→98 (the -2: external-user OAuth paths not yet exercised by real boundview users) · teal bar v234**
 
-> **HEADLINE: weighted average total completion 90.1%**. The reproducible §26 score is 8828 ÷ 98 = 90.081632%, rounded to one decimal. This batch adds +1.2 percentage points (Comet 50→70 = +60, GettingStarted 85→90 = +25, Account 85→90 = +30; +115 weighted pts). Raw tracked-item count: **104✅ / 33🟡 / 20🔴** (157 items). All arithmetic computed by qa/generate-parity-headline.py against qa/parity-items.json v235 — never hand-summed.
+> **HEADLINE: weighted average total completion 90.1%**. The reproducible §26 score is 8828 ÷ 98 = 90.081632%, rounded to one decimal. No category rescore this batch — v236 is reliability + scale work (the standing rule: only evidence-verified moves change scores). Raw tracked-item count: **104✅ / 33🟡 / 20🔴** (157 items). All arithmetic computed by qa/generate-parity-headline.py against qa/parity-items.json v236 — never hand-summed.
 
-## 29bs. v236 change log: boundview commercial pricing model finalized (2026-11-15 UTC)
+## 29bsA. v236 change log: boundview commercial pricing model finalized (2026-11-15 UTC)
 
 | Change | What | Verification |
 |---|---|---|
@@ -15,6 +15,122 @@
 | model_costs usage accounting fix | api_usage_month estimates were ~100x inflated by stale prices ($45.18 for 481 requests; true cost <$1 at live prices) | Fixed by the table refresh above |
 
 **Full model with charts:** boundview-pricing-model.md (workspace artifact) — per-lane costs, fixed stack ($93/mo boundview standalone), conversion sensitivity, competitive ladder, subscription-vs-blend verdict.
+
+## 29bs. v236: THE SELF-IMPROVEMENT-CYCLE ROLLOUT — every issue, diagnosed, fixed, verified, with the permanent solution (2026-11-15 UTC)
+
+**Method note (owner directive: "even if you already triaged them I need deeper insights into every single issue"):** each entry below carries the five fields the owner tracks: what was observed, the true root cause (found by reading the code, not guessing), the fix and its version, the live verification, and the permanent-solution class so the same failure cannot silently return.
+
+### Issue 1 — Kimi lane: "no callable tool functions are exposed to me here" (owner screenshot)
+
+- **Observed:** the owner's completion-doc thread: Kimi K3.1 Pro answered a "proceed" follow-up with a refusal claiming list_webapps/webapp_doctor/create_file were not executable.
+- **Root cause (two layers):** (1) the v229 fix was a PROMPT rule — prompt rules do not execute tools; when the tool loop is skipped (short follow-ups classify as "simple intent", and research_sufficient can also skip the loop), the writer model has literally nothing to call, and it honestly said so. (2) The tool loop's gate had no completion-doc intent, so evidence gathering never ran on that turn.
+- **Fix (gateway v230, deployed, live-verified):** the platform now gathers the evidence ITSELF — list_webapps + webapp_doctor + platform_status run server-side on every completion-doc-classified turn (including continuation turns via thread-context matching) and are injected as a system evidence block; the tool loop is force-run (privateToolIntent); and if the model still fails to call create_file, the platform auto-creates the .md artifact from the writer's response (v230b).
+- **Verification (live):** the exact owner scenario now returns: turn 1 = real registry data (8/9 webapps HTTP 200, 76 tables) + `completion-status-2026-11-15.md` delivered as an artifact; turn 2 ("proceed") = continued work, same filename updated in place (v193 same-file rule), zero refusal, zero token leak.
+- **Permanent solution class:** platform-side auto-invocation (the v221 pattern). Standing rule for every future capability: NEVER rely on prompt rules to make a model call a tool — detect the intent server-side and execute it there.
+
+### Issue 2 — Command-narration leak in streamed answers ("**Command: answer from the live search findings...**")
+
+- **Observed:** self-improvement cycle 2026-11-15T08:00Z (2nd occurrence; 1st was 2026-11-14). The writer's internal command narration appeared as the first line of the user's answer.
+- **Root cause:** the v206 fix that stripped leading "**Command: ...**" lines ran ONLY on the non-streaming response path — but the frontend ALWAYS streams (v83 comment in the code says so). The strip was dead code for real traffic.
+- **Fix (gateway v231, deployed):** a new SSE transform (scrubCommandLeakSSE) wraps the raw model stream: it buffers the leading content deltas, and if the accumulated content starts with a Command-narration line, strips it (plus a stray --- divider) before anything reaches the client. Clean answers pass through untouched.
+- **Verification:** 5-case simulation BEFORE deploy (leak scrubbed + content kept; clean passthrough; split chunks; flush path; multi-chunk leak) — the simulation caught and fixed a real bug (dropped events in the same chunk) before it shipped. Then live-verified: streamed research answer, 7,199 chars, first delta clean, citations intact.
+- **Permanent solution class:** simulate-then-deploy for stream transforms; and the standing rule that any output-hygiene fix must be applied on BOTH stream and non-stream paths.
+
+### Issue 3 — Flint lane "upstream model error", no fallback
+
+- **Observed:** cycle 08:00Z: flint lane probe failing with "upstream model error", returned_model null, no fallback; the other three lanes passed.
+- **Root cause (three layers):** (1) the fallback chain in call-model was disabled whenever a custom backend URL was configured (`!custom` guard) — so a free-lane upstream error surfaced raw; (2) BOTH free providers were simultaneously at their daily rate limits (OpenRouter flint free-tier daily cap + Groq Qwen 200K tokens/day — the deeper finding); (3) when call-model returned an error payload, the gateway passed the raw JSON error blob to the client as the "answer".
+- **Fix (call-model v231/v231b + gateway v232, all deployed, live-verified):** (1) free models now ALWAYS fall back to the other free model, routing to each model's own provider (the chain tries the configured backend first, then the default provider); (2) my first deploy initially broke gateway-status auth (it rejected the platform's own service key — caught within minutes via the live probe and fixed: platform-internal service-key callers are accepted alongside the gateway token); (3) the gateway now degrades gracefully on upstream errors: research text → reliable paid writer → honest plain-text notice telling the user to switch lanes — the user never sees a raw error blob.
+- **Verification (live):** gateway-status now shows Flint "pass — served by fallback (qwen)" with transparent x_fallback_from marking; the flint lane through the full gateway returns a clean 200 with guidance, not an error.
+- **Permanent solution class:** free-never-hard-fails + graceful degradation + transparent fallback marking. The provider rate limits themselves are a capacity item — see §29bv (the scale model).
+
+### Issue 4 — System-wide latency degradation (first tokens 19.7s / 23.2s / 34.5s vs 4–6s norm)
+
+- **Observed:** the 08:00Z cycle: all three probe queries far slower than norm.
+- **Root cause:** load-induced — the 717-prompt full-history replay fleet (4 workers) was hammering the gateway during the cycle window, compounding with the free-lane rate-limit retries (each retry adds 20–30s backoff). Not a config change, not a code regression.
+- **Fix/verification:** re-verified simple/complex queries at normal latency when idle; the replay now runs with retry-aware pacing; the nightly cycle's thresholds stay as the early-warning system.
+- **Permanent solution class:** heavy QA batteries must run with concurrency limits against production (or against a staging project) — a rule now baked into the harness (4 workers max + backoff).
+
+### Issue 5 — Prompt-replay findings (the owner's full 717-prompt history, D-classified)
+
+- **D1 (633 invalid results):** the harness silently lost its auth token mid-run (~1h expiry) — a HARNESS bug, not a site bug. Fixed: re-mint on 401 under a lock; the 633 re-run is live (365/717 done at last check; 245+ clean).
+- **D3 dead-end (1):** "HANDLE WHATEVER ELSE IS REMAINING YOURSELF AND IN COMET" → "cannot be executed from this session". Fixed (gateway v233, live-verified): COMET/browser/extension intent now forces the tool loop and carries a never-refuse rule — the same prompt now returns honest, real handling with the browser/extension lanes named. Permanent class: same as Issue 1 — intent detection + platform-side forcing, not prompt hints.
+- **504 IDLE_TIMEOUT (1):** "Review PR #3779 and #3786..." hit the edge 150s idle limit. Root cause: the estate block fetched up to 5 PR statuses SEQUENTIALLY (~8s each) before the writer even started. Fixed (gateway v233): the PR fetches now run in parallel (Promise.allSettled). Permanent class: no sequential I/O in the pre-writer path.
+- **D4 truncation flags (17):** checker strictness — work-directive answers legitimately end in task lists. Fixed: the heuristic now accepts list items, headings, table rows, and bold-label endings; only genuine mid-sentence cuts or unbalanced code fences flag. The 17 will be re-scored in the final triage.
+- **546 WORKER_RESOURCE_LIMIT:** concurrency-induced (same prompts pass serially). Fixed in the harness (retry+backoff). The SITE-side permanent fix is §29bv's queue-the-heavy-lanes architecture — the edge runtime's per-worker resource ceiling is the one wall that cannot be patched in code.
+- **Corpus privacy (found during triage):** the owner's 717-prompt corpus (with pasted provider keys inside some prompts) almost got committed to a repo whose qa-reports/ is PUBLICLY SERVED (verified: the v235 doc is world-readable). Caught before push. Permanent controls: corpus lives outside the repo at /home/user/workspace/qa-private/ (gitignored), credential scrubbing (sbp_/rnd_/ghp_/xox-/sk- tokens redacted) before any prompt enters a replay thread, and the safety gate that blocked the push.
+
+### Issue 6 — Pre-launch gate RED (14:00Z QA fleet run: 19/30)
+
+- **Observed:** 11 fails: build.json=v234 vs build.js=v235 (stale-tab detector), current-events fast path (model call failed under rate limits), and 9 frontend doc-panel E2E checks.
+- **Root cause:** the E2E cluster is a cascade — the doc-producing test query hit the rate-limited free lanes and produced no artifact, so every chip/panel assertion failed against a thread with no content; build.json was a genuine v235 deploy-hygiene miss (build.js bumped, build.json not).
+- **Status:** build.json bump queued for the next site PR; the E2E cascade self-resolves as the free pools reset; the underlying fragility (doc E2E depends on a live model answer) is a test-design item — the gate should use a deterministic fixture for doc-panel assertions.
+- **Permanent solution class:** QA gates must not depend on live provider availability — deterministic fixtures for UI assertions, live probes only for backend smoke.
+
+### Issue 7 — Contract tests 12/13 (one flake: tool-ledger)
+
+- **Observed:** the record_plan tool did not fire on one run (was green on the prior run).
+- **Root cause class:** model-dependent tool-call flakiness in the loop (the v172-documented GLM tool-call unreliability family) — intermittent, load-sensitive.
+- **Status:** re-ran green on the next idle run; the ledger forcing rule (v200-class) covers it. Tracked as R13 in the reliability ledger: intermittent tool-call flakiness under load — the permanent fix is the queue architecture (§29bv), which removes load from the synchronous path.
+
+## 29bt. v236 change log: reliability + scale round (2026-11-15 UTC)
+
+| Change | What | Verification |
+|---|---|---|
+| Gateway v230 (deployed) | Completion-doc server-side evidence + forced loop + auto .md artifact | Live: registry data injected, artifact delivered, "proceed" continues (Issue 1) |
+| Gateway v231 (deployed) | Command-leak SSE scrub | 5/5 simulation + live stream clean (Issue 2) |
+| Gateway v232 (deployed) | Upstream-error graceful degradation (research text → reliable writer → honest notice) | Live: flint lane returns clean 200 with guidance (Issue 3.3) |
+| Gateway v233 (deployed) | COMET never-refuse + parallel PR fetches | Live: D3 prompt answered honestly; 504 class removed (Issues 5.D3, 5.504) |
+| Call-model v231/231b (deployed) | Free-never-hard-fails chain + service-key auth fix | gateway-status: flint pass via fallback, 3/3 lanes auth OK (Issue 3) |
+| Call-model v234 (deployed) | Guardrails: MONTHLY_SPEND_CAP $20→$100, DAILY_PAID_CALL_CAP 2,000→50,000 | Deployed ACTIVE; env vars confirmed unset so code defaults are live |
+| PR #180/#181-class harness work | all-model audit battery (17 lanes x 4 scenarios), prompt-replay fleet (717 prompts, 7 deviation classes, re-mint + scrubbing), D4 retune | Harnesses run clean; replay in flight |
+| Scale + unit-economics model | qa-reports/scale-and-unit-economics-2026-11-15.md — verified per-token COGS for every lane, margins 80–97%, Core worst case + fix, per-user attribution design, boundview separation, auto-scale architecture | All figures from live provider APIs/docs (labeled); site pricing from the live checkout function |
+
+## 29bu. The rate-limit capacity map (verified 2026-11-15)
+
+| Lane | Provider | Ceiling | Capacity |
+|---|---|---|---|
+| Flint | OpenRouter free | 50 req/day (1,000 after $10 lifetime credits) | 50→1,000/day |
+| Qwen summary | Groq free | 200K tokens/day, 8K/min, 30 RPM | ~130–200 answers/day |
+| Default writer | OpenRouter paid (DeepSeek Flash) | no request cap, ~$0.0001/answer | limited by our caps (now 50K/day) |
+| All premium lanes | OpenRouter paid | no request cap, per-token | margin-controlled via credits |
+
+**The scaling math:** at ~$0.0001/quick answer and $0.002–0.008/search answer, 10,000 heavy answers/day costs $3–30/day of model spend. The real walls are (1) the shared free pools, (2) the edge runtime's per-worker resource ceiling under concurrency (546s), and (3) the 150s idle limit on synchronous calls — all three are solved by the queue architecture below, not by spending more.
+
+## 29bv. The permanent scale architecture (build plan)
+
+1. **Queue the heavy lanes:** deep-research and agent turns route through the existing fleet-dispatch/research-jobs queue (async, results post back to the thread) instead of the synchronous gateway call. Light turns stay synchronous for latency. This is THE fix for the 546/504 class — the same machinery that already runs the nightly cycles.
+2. **Per-user attribution ("no cap, with margins"):** the credits ledger already meters every answer per user (reserve-then-settle); the path to no-global-cap is (a) per-user daily spend ceilings in credits_reserve, (b) auto-top-up alerting at 80% of the monthly cap, (c) user_id on gateway-meter objects for per-user COGS reporting.
+3. **Boundview.com as its own project:** separate Supabase project (Pro), separate auth/credits/usage tables, forked checkout with its own Stripe, per-project keys so external usage meters separately from the owner's.
+4. **Free-tier hard caps:** free users get the free lanes only, 20 answers/day — the shared free pools cannot survive uncapped external users.
+5. **Lane-ID reconciliation:** 4 lane IDs have drifted from the live OpenRouter catalog (kimi-k3.1-flash, glm-5.3-air, minimax-m2 exact, gemma-4-31b non-it) — reconcile MODEL_OVERRIDES and add a lane-health probe to the nightly cycle.
+
+## 29bw. Reliability ledger additions
+
+| # | Defect | Root cause | Fix (version) | Verification |
+|---|---|---|---|---|
+| R13 | Kimi "no callable tools" on follow-up turns | prompt rules don't execute tools; loop skipped on simple-intent follow-ups | v230 platform-side evidence + forced loop + auto-artifact | Live: owner scenario verified end-to-end |
+| R14 | Command-narration leak in streams | v206 strip was non-streaming-only; frontend always streams | v231 SSE scrub transform | 5/5 simulation + live stream clean |
+| R15 | Flint raw upstream error, no fallback | fallback chain dead with custom backend; both free pools rate-limited | v231 free-never-fails chain; v232 graceful degradation | gateway-status: flint pass via fallback |
+| R16 | 504 idle timeout on multi-PR review asks | sequential PR fetches (~8s each) in the pre-writer path | v233 parallel fetches | Deployed; class removed |
+| R17 | COMET "cannot be executed" refusal | no COMET intent in forcing rules | v233 cometAsk forcing + never-refuse rule | Live: prompt answered honestly |
+| R18 | Harness token expiry (633 invalid replays) | QA harness minted once, token ~1h | v232 harness re-mint on 401 | Re-run live, 245+ clean so far |
+
+
+## 29bx. v236b change log: PER-USER CAPS LIVE + owner cap $100→$350 (2026-11-15 late UTC, owner directive)
+
+**The ask:** per-user caps for boundview external users, owner's personal ai.spaincos.com cap raised to $350/mo, and the three "no-cap safety pieces" built WITHOUT removing the cap.
+
+**Shipped, deployed, and live-verified (all four):**
+
+1. **Owner cap raised $100 → $350/mo** (call-model v235, deploy #53, live-verified): `MONTHLY_SPEND_CAP` default is now 350 — the response's `x_meter.monthly_cap_usd: 350` was confirmed on a live paid call. The cap stays (owner decision: it protects against runaway loops, e.g. the 346-row self-replicating fleet loop caught earlier); it is a circuit-breaker, not a business limit.
+2. **Per-user daily spend ceilings** (gateway-chat v234, deploy #232): every chargeable request from a NON-EXEMPT user checks the new `user_daily_spend` table (user_id, day, requests, est_cost_usd — created via governed SQL, RLS on, service-role writes only) BEFORE credits reserve; over the ceiling ($3/day default, `DAILY_SPEND_CEILING_USD` env) the request 402s with a clean upgrade/top-up message. Owner + eval-bot are exempt — the owner's ceiling is the $350 global cap. Table round-trip verified live (insert, read-modify-write, delete).
+3. **Per-user cost attribution**: every in-handler call-model fetch now carries `x-user-id`, and call-model v235 writes it into BOTH the `ops.llm_requests` ledger (new `user_id` column + index via governed SQL with break-glass reason) and the gateway-meter objects. Live-verified: five consecutive paid calls (intent, writer, retries) all landed in the ledger with `user_id = <eval-bot uuid>` and exact per-call cost — the per-user COGS-vs-revenue data the boundview pricing model needs.
+4. **Spend alerts**: when tracked month spend crosses 50% of the cap, the gateway drops a `spend_alert` notification row (one per user per day) — visible in the site's notification bell. Never blocks the answer.
+
+**Fail-safe design:** the daily cap check and recording fail OPEN (unreachable table = no cap, chat never breaks), mirroring the credits-ledger philosophy; the $350 global cap fails CLOSED in call-model (unknown meter state downgrades to free).
+
+**Known gap (tracked):** the daily-ceiling enforcement branch cannot be exercised live yet — the site is invite-only and both allowlisted accounts are exempt; the mechanics (table, helpers, code path) are verified and the branch fires the moment a non-exempt user exists (boundview).
 
 ## 29br. v235 change log: 90% crossed — owner fix batch + completion-doc rule (2026-11-15 UTC)
 
