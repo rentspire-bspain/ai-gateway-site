@@ -113,6 +113,27 @@
         trail.appendChild(el("p", "stg-empty-note", "Dispatch trail unavailable right now."));
       });
 
+    // v232: enterprise configuration surface (SSO / SCIM / audit export) — status cards
+    host.appendChild(el("div", "stg-group-label", "Enterprise configuration"));
+    var cfgBox = el("div");
+    host.appendChild(cfgBox);
+    [
+      { n: "Single sign-on (SSO)", d: "SAML/OIDC identity-provider login. For boundview.com external users; this private deployment uses email + password/passkey.", status: "External users (boundview)" },
+      { n: "SCIM directory sync", d: "Automatic member provisioning and deprovisioning from your identity provider.", status: "External users (boundview)" },
+      { n: "Audit log export", d: "The security audit trail above is exportable as CSV via the API (GET /rest/v1/audit_logs with your session).", status: "Live" }
+    ].forEach(function (c) {
+      var row = el("div", "ent-dispatch-row");
+      var t = el("div", "sec-device-text");
+      var nm = el("div", "sec-device-name");
+      nm.textContent = c.n;
+      t.appendChild(nm);
+      var meta = el("div", "sec-device-meta");
+      meta.textContent = c.status + " · " + c.d;
+      t.appendChild(meta);
+      row.appendChild(t);
+      cfgBox.appendChild(row);
+    });
+
     // v230: security audit trail (audit_logs, RLS-scoped to the signed-in user)
     var auditBox = el("div");
     host.appendChild(el("div", "stg-group-label", "Security audit trail (your account actions)"));
