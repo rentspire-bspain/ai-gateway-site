@@ -30,6 +30,14 @@ function normalizeProvider(rawProvider, state) {
   if (!p && typeof state === 'string' && state.includes(':')) {
     p = state.slice(0, state.indexOf(':')).trim().toLowerCase();
   }
+  // v227: server-minted state (base64url JSON payload with a "p" field — connectors "start" flow)
+  if (!p && typeof state === 'string' && state.includes('.')) {
+    try {
+      const payload = state.slice(0, state.indexOf('.'));
+      const parsed = JSON.parse(Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'));
+      p = String((parsed && parsed.p) || '');
+    } catch (e) {}
+  }
   if (p === 'microsoft' || p === 'msft' || p === 'entra') p = 'outlook';
   if (p === 'gmail' || p === 'gmail-gcal') p = 'google';
   p = p.replace(/[^a-z0-9_-]/g, '').slice(0, 32);
