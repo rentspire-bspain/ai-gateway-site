@@ -104,8 +104,15 @@
     }
     function refresh() {
       team("whoami").then(function (w) {
-        var canManage = w && (w.role === "owner" || w.role === "admin");
-        who.textContent = "Your role: " + (w && w.role ? w.role : "member") + (canManage ? " — you can manage teammates." : " — view only.");
+        if (!w || !w.role) {
+          // not on a team yet — honest state, not an error
+          who.textContent = "You're not on a team yet — ask an owner to invite you.";
+          list.innerHTML = "";
+          list.appendChild(el("p", "stg-empty-note", "No team membership for this account."));
+          return;
+        }
+        var canManage = w.role === "owner" || w.role === "admin";
+        who.textContent = "Your role: " + w.role + (canManage ? " — you can manage teammates." : " — view only.");
         return team("members").then(function (d) { renderList(d && d.members, canManage); });
       }).catch(function (e) {
         who.textContent = "Team data unavailable right now.";
