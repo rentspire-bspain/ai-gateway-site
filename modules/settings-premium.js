@@ -45,6 +45,9 @@
   // ---------- Teammates pane (management, owner/admin gated server-side) ----------
   function buildTeammates() {
     var pane = el("div", "stg-pane");
+    // mount into the settings host if present (the settings.js wrapper calls us via setTimeout)
+    var host0 = document.getElementById("teammates-pane");
+    if (host0 && !host0.children.length) { setTimeout(function () { host0.appendChild(pane); }, 0); }
     pane.appendChild(el("h3", "stg-pane-title", "Teammates"));
     pane.appendChild(el("p", "stg-pane-sub", "Invite teammates and manage roles. Only owners/admins can make changes — the server enforces it."));
     var who = el("p", "stg-desc", "Checking your role…");
