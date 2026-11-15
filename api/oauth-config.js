@@ -48,12 +48,10 @@ module.exports = async (req, res) => {
     dropbox: buildEntry(process.env.DROPBOX_OAUTH_CLIENT_ID, {
       scope: process.env.DROPBOX_OAUTH_SCOPE,
     }),
+    // outlook: external-user (boundview) connector — owner uses Gmail
     outlook: buildEntry(process.env.OUTLOOK_OAUTH_CLIENT_ID || process.env.MICROSOFT_OAUTH_CLIENT_ID, {
       scope: process.env.OUTLOOK_OAUTH_SCOPE || process.env.MICROSOFT_OAUTH_SCOPE,
       tenant: process.env.MICROSOFT_OAUTH_TENANT_ID,
-    }),
-    box: buildEntry(process.env.BOX_OAUTH_CLIENT_ID, {
-      scope: process.env.BOX_OAUTH_SCOPE,
     }),
     google: buildEntry(process.env.GOOGLE_OAUTH_CLIENT_ID, {
       scope: process.env.GOOGLE_OAUTH_SCOPE,

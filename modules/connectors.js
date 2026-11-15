@@ -165,14 +165,7 @@
       registrationUrl: "https://entra.microsoft.com",
       hosts: ["login.microsoftonline.com"],
       permissions: ["Read mail (Mail.Read)", "Read calendar events (Calendars.Read)"],
-      note: "Ask in chat: “summarize unread Outlook messages”, “what’s on my Outlook calendar today”."
-    },
-    {
-      id: "box", name: "Box", logo: "X", kind: "oauth",
-      registrationUrl: "https://app.box.com/developers/console",
-      hosts: ["app.box.com", "account.box.com"],
-      permissions: ["List files and folders", "Read document contents"],
-      note: "Ask in chat: “find the Q3 report in Box”, “list folders in my Box account”."
+      note: "External-user connector (boundview) \u2014 the owner uses Gmail. Ask in chat: \u201csummarize unread Outlook messages\u201d."
     },
     {
       id: "github", name: "GitHub", logo: "H", kind: "oauth",
