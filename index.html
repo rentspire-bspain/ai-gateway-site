@@ -1727,6 +1727,7 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
       <button class="auth-btn-secondary" id="authSendCode">Send email code instead</button>
       <button class="auth-btn-secondary" id="authPasskeyBtn" style="margin-top:8px">Sign in with passkey</button>
       <button class="auth-link" id="authSetPass" type="button" style="margin-top:10px">Set or reset my password (email link)</button>
+      <button class="auth-link" id="authForgot" type="button" style="margin-top:2px">Forgot password?</button>
     </div>
     <div id="authStep3" style="display:none">
       <div class="auth-input-group">
@@ -1757,7 +1758,18 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 const SUPABASE_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
 const SUPABASE_ANON = "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb";
 const GATEWAY = SUPABASE_URL + "/functions/v1";
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  // v240 (owner directive: STOP LOGGING ME OUT): the site also runs inside the Comet
+  // extension's side-panel iframe, sharing the tab's session via the site-bridge mirror.
+  // TWO supabase-js clients refreshing the SAME refresh token race each other — outside the
+  // 10s reuse window Supabase revokes the whole session family and signs the user out
+  // everywhere. In an iframe we NEVER refresh: the bridge mirrors the tab's fresh tokens
+  // into this frame's localStorage every second, so the panel stays signed in without
+  // ever touching the refresh endpoint. Only the top window refreshes.
+  auth: (window.self !== window.top)
+    ? { persistSession: true, autoRefreshToken: false, detectSessionInUrl: false }
+    : { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
 
 // v92: CSP-safe bridge for modules (no eval — the CSP blocks indirect eval).
 // Modules read/write the app's top-level bindings through these getters/setters.
@@ -3282,6 +3294,10 @@ const AuthGuard = (function () {
   }
   // proactive check (init + tab focus): a revoked/expired session must not keep looking signed in
   async function verify(force) {
+    // v240: NEVER refresh from inside an iframe (the Comet side panel) — see the client
+    // creation comment. The bridge mirrors the tab's tokens here; a refresh from this
+    // frame is exactly the double-refresh that got the owner logged out.
+    if (window.self !== window.top) return true;
     if (expired || !currentUser) return true;
     if (!force && Date.now() - lastVerify < 5 * 60 * 1000) return true;
     lastVerify = Date.now();
@@ -3553,6 +3569,24 @@ document.getElementById("authSendCode").onclick = async () => {
   const email = document.getElementById("authEmail").value.trim();
   if (!email) return err.textContent = "Enter your email";
   if (!(await signinAllowed(email))) return err.textContent = "This site is invite-only — ask the owner to invite your email.";
+  // v240 (owner directive 2026-11-15: EMAIL CODES NOT WORKING): the Supabase Auth project has
+  // NO SMTP configured, so signInWithOtp returned 200 but the email was never delivered. All
+  // auth email now goes through the auth-email-relay edge function on the project's verified
+  // Resend sender. The built-in path stays as a fallback only if the relay is unreachable.
+  try {
+    const r = await fetch("https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/auth-email-relay", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "send", email })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.ok) {
+      document.getElementById("authStep1").style.display = "none";
+      document.getElementById("authStep2").style.display = "block";
+      return;
+    }
+    if (r.status !== 502 && r.status !== 503 && r.status !== 0) { err.textContent = j.error || "Code send failed — try password sign-in."; err.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
+    // relay unreachable: try the built-in path (email may not arrive — SMTP unconfigured)
+  } catch (_e) { /* fall through to built-in */ }
   const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
   if (error) {
     // v74: friendly rate-limit message instead of Supabase's raw 429 text
@@ -3577,10 +3611,43 @@ document.getElementById("authVerify").onclick = async () => {
     if (r.error) return err.textContent = r.error.message;
     window.__mfaFactor = null; authOverlay.style.display = "none"; location.reload(); return;
   }
+  // v240: verify through the relay (it mints the session server-side from the admin magic-link
+  // exchange) and hydrate the local session from the returned tokens. Built-in verifyOtp stays
+  // as the fallback for the 8-digit built-in codes.
+  try {
+    const r = await fetch("https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/auth-email-relay", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "verify", email, code })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.ok && j.session?.access_token && j.session?.refresh_token) {
+      await sb.auth.setSession({ access_token: j.session.access_token, refresh_token: j.session.refresh_token });
+      authOverlay.style.display = "none";
+      location.reload();
+      return;
+    }
+    if (r.status !== 502 && r.status !== 503 && r.status !== 0) { err.textContent = j.error || "Verification failed — request a new code."; return; }
+  } catch (_e) { /* fall through to built-in */ }
   const { error } = await sb.auth.verifyOtp({ email, token: code, type: "email" });
   if (error) return err.textContent = error.message;
   authOverlay.style.display = "none";
   location.reload();
+};
+// v240: FORGOT PASSWORD — Supabase's built-in recovery email never delivered (no SMTP), so the
+// recovery link is generated with the admin API and emailed via the relay's Resend sender.
+document.getElementById("authForgot").onclick = async () => {
+  const err = document.getElementById("authError");
+  err.textContent = "";
+  const email = document.getElementById("authEmail").value.trim();
+  if (!email) return err.textContent = "Enter your email first, then tap Forgot password.";
+  try {
+    const r = await fetch("https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/auth-email-relay", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "recovery", email })
+    });
+    const j = await r.json().catch(() => ({}));
+    err.textContent = r.ok && j.ok ? "Password-reset link sent — check your inbox (and spam)." : (j.error || "Could not send the reset email — try again.");
+  } catch (e) { err.textContent = "Could not send the reset email — try again."; }
 };
 // v158: recovery-link landing — the user just clicked "set my password" in their email;
 // show the new-password form once a session exists (supabase-js exchanged the link code).
