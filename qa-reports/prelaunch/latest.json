@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-16T00:49:49+00:00",
+ "ts": "2026-11-16T19:18:05+00:00",
  "base": "https://ai.spaincos.com",
- "passed": 26,
- "failed": 2,
+ "passed": 30,
+ "failed": 1,
  "checks": [
   {
    "name": "gateway-status 200",
@@ -21,8 +21,8 @@
   },
   {
    "name": "simple query < 30s",
-   "ok": false,
-   "detail": "31.9s"
+   "ok": true,
+   "detail": "15.1s"
   },
   {
    "name": "current-events answered",
@@ -37,7 +37,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "29.2s"
+   "detail": "26.9s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -48,6 +48,21 @@
    "name": "memory_items table reachable",
    "ok": true,
    "detail": "HTTP 200"
+  },
+  {
+   "name": "index.html loads real modules",
+   "ok": true,
+   "detail": "70 refs"
+  },
+  {
+   "name": "all deployed modules match repo",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
+   "ok": true,
+   "detail": "build.js=v248 build.json=v248"
   },
   {
    "name": "landing renders",
@@ -132,7 +147,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 28/28 checks \u00b7 11/15/2026, 1:57:"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n2 FAILED\n\u00b7 26/28 checks \u00b7 11/16/2026, 12:49:"
   },
   {
    "name": "follow-up chip submits (search state)",

@@ -16,6 +16,12 @@ import argparse, json, os, re, sys, time, urllib.request, urllib.error
 from pathlib import Path
 
 BASE = "https://ai.spaincos.com"
+# Vercel Protection Bypass for Automation (x-vercel-protection-bypass). Owner creates the
+# secret in Vercel Dashboard -> Project -> Settings -> Deployment Protection; a system
+# bypass rule is the equivalent edge-only fix. This keeps benchmark and pre-launch
+# traffic from being treated as an unverified bot. Set env VERCEL_PROTECTION_BYPASS
+# (kept out of the repo so the secret never lands in source or a log).
+VERCEL_BYPASS = os.environ.get("VERCEL_PROTECTION_BYPASS")
 SB = "https://bnxermyboeigvwonfrzx.supabase.co"
 ANON = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJueGVybXlib2VpZ3Z3b25mcnp4Iiwi"
         "cm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMTk5NTUsImV4cCI6MjEwODc5NTk1NX0.Xj3QP2IFsxzfFLJG8t6RpQlzLWFxpC6BcdGsXn-70CY")
@@ -42,14 +48,30 @@ def write_report(base):
         f.write(json.dumps({"ts": rec["ts"], "passed": rec["passed"], "failed": rec["failed"], "exit": rec["exit"]}) + "\n")
     return rec
 
-def http(url, timeout=20, data=None, headers=None):
-    req = urllib.request.Request(url, data=data, headers=headers or {}, method="POST" if data else "GET")
-    t0 = time.time()
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return r.status, r.read(), round(time.time() - t0, 1)
-    except urllib.error.HTTPError as e:
-        return e.code, e.read(), round(time.time() - t0, 1)
+# x-vercel-mitigated: challenge is Vercel edge mitigation (a JS challenge a script
+# cannot pass). It is transient for known-good QA traffic, so retry a bounded number
+# of times rather than letting a whole harness pass be recorded as failed. A
+# protection-bypass or system-bypass rule is the permanent fix; this is the fallback.
+def http(url, timeout=20, data=None, headers=None, _retries=4):
+    last = (0, b"", 0.0)
+    for attempt in range(_retries):
+        h = dict(headers or {})
+        if VERCEL_BYPASS and "x-vercel-protection-bypass" not in h:
+            h["x-vercel-protection-bypass"] = VERCEL_BYPASS
+        req = urllib.request.Request(url, data=data, headers=h, method="POST" if data else "GET")
+        t0 = time.time()
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.status, r.read(), round(time.time() - t0, 1)
+        except urllib.error.HTTPError as e:
+            body = e.read()
+            mitigated = (e.headers.get("x-vercel-mitigated") == "challenge")
+            last = (e.code, body, round(time.time() - t0, 1))
+            if mitigated and attempt + 1 < _retries:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            return last
+    return last
 
 def mint():
     st, body, _ = http(f"{SB}/auth/v1/token?grant_type=password", 20,
