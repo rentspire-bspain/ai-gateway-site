@@ -142,7 +142,7 @@ def main():
     recs, fails = [], 0
     with cf.ThreadPoolExecutor(max_workers=a.jobs) as ex:
         futs = {ex.submit(run_one, lid, sc, tok, uid, run_ix + ix * 1000): (lid, sc, ix)
-                for ix, (lid, sc) in enumerate(jobs)}
+                for ix, (lid, sc, _ix) in enumerate(jobs)}
         for f in cf.as_completed(futs):
             r = f.result()
             recs.append(r)
