@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-16T19:18:05+00:00",
+ "ts": "2026-11-16T19:38:38+00:00",
  "base": "https://ai.spaincos.com",
- "passed": 30,
- "failed": 1,
+ "passed": 21,
+ "failed": 9,
  "checks": [
   {
    "name": "gateway-status 200",
@@ -22,7 +22,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "15.1s"
+   "detail": "18.8s"
   },
   {
    "name": "current-events answered",
@@ -31,13 +31,13 @@
   },
   {
    "name": "current-events fast path (loop skipped)",
-   "ok": false,
-   "detail": "skipped=None"
+   "ok": true,
+   "detail": "skipped=research_sufficient"
   },
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "26.9s"
+   "detail": "20.6s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -62,7 +62,7 @@
   {
    "name": "build.json matches shipped BUILD (stale-tab detector armed)",
    "ok": true,
-   "detail": "build.js=v248 build.json=v248"
+   "detail": "build.js=v249 build.json=v249"
   },
   {
    "name": "landing renders",
@@ -81,7 +81,7 @@
   },
   {
    "name": "thread renders",
-   "ok": true,
+   "ok": false,
    "detail": ""
   },
   {
@@ -91,42 +91,42 @@
   },
   {
    "name": "question/answer text parity (16px)",
-   "ok": true,
-   "detail": "{'q': 16, 'a': 16}"
+   "ok": null,
+   "detail": "None"
   },
   {
    "name": "follow-up chips render",
-   "ok": true,
-   "detail": "2"
+   "ok": false,
+   "detail": "0"
   },
   {
    "name": "Run-all button present",
-   "ok": true,
+   "ok": false,
    "detail": ""
   },
   {
    "name": "doc chip present (no auto-open)",
-   "ok": true,
+   "ok": false,
    "detail": ""
   },
   {
    "name": "doc panel opens on chip click",
-   "ok": true,
+   "ok": false,
    "detail": ""
   },
   {
    "name": "doc h1 heading scale (20-28px)",
-   "ok": true,
-   "detail": "{'open': True, 'h1': '24.025px', 'code': True, 'mono': True}"
+   "ok": false,
+   "detail": "{'open': False, 'h1': 'x', 'code': False, 'mono': False}"
   },
   {
    "name": "doc code monospace + copy",
-   "ok": true,
+   "ok": false,
    "detail": ""
   },
   {
    "name": "doc-chip collapses raw markdown",
-   "ok": true,
+   "ok": false,
    "detail": ""
   },
   {
@@ -147,12 +147,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n2 FAILED\n\u00b7 26/28 checks \u00b7 11/16/2026, 12:49:"
-  },
-  {
-   "name": "follow-up chip submits (search state)",
-   "ok": true,
-   "detail": ""
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n1 FAILED\n\u00b7 30/31 checks \u00b7 11/16/2026, 7:18:0"
   },
   {
    "name": "zero JS/CSP errors",
