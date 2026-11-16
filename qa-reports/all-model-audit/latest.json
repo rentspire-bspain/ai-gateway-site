@@ -1,0 +1,56 @@
+{
+ "ts": "2026-11-16T04:01:54+00:00",
+ "lanes": 1,
+ "scenarios": [
+  "sanity",
+  "tool-use",
+  "leak",
+  "doc-rule"
+ ],
+ "repeat": 1,
+ "total": 4,
+ "failed": 0,
+ "results": [
+  {
+   "lane": "kimi",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 90.6,
+   "chars": 4850,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n**Tonight\u2019s closure percentage is not determinable: no in-scope item list or item-level a"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 58.8,
+   "chars": 2153,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 24.1,
+   "chars": 651,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 113.5,
+   "chars": 2807,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  }
+ ]
+}
