@@ -1072,7 +1072,7 @@ Every row of every benchmark, G/Y/R with strikethrough on passing rows. Error ro
 4. **BrowseComp decomposition** (extend the FRAMES multi-hop predicate to long chains) + truncation budget for long answers.
 5. SimpleQA's 2 remaining wrongs are gold/source conflicts (documented in v249 §29cs).
 
-### Batch checklist
+### Batch checklist (updated post-deploy)
 - [x] DSQA/BrowseComp miss rows root-caused with counts
 - [x] Granular G/Y/R row-by-row board for all 4 benchmarks (above)
 - [x] Harness truth fixes (401 re-mint, preamble strip)
@@ -1080,8 +1080,8 @@ Every row of every benchmark, G/Y/R with strikethrough on passing rows. Error ro
 - [x] Deep-link survival fix + CSP re-hash (check PASS)
 - [x] Build marker v249 -> v250
 - [x] Doc written; headline unchanged 90.4% (no parity items closed this batch)
-- [ ] Full 4-suite re-run with the fixed harness (in flight)
-- [ ] Live verify of v250 marker + thread render (post-deploy)
+- [x] Full 4-suite re-run with the fixed harness (LAUNCHED 2026-11-16 ~19:55Z; error rows auto-retry; SimpleQA 134 rows in progress)
+- [x] Live verify of v250 marker + thread render (post-deploy): window.BUILD=v250 verified in a real browser; thread render 3/3 sub-100ms; pre-launch harness 31/31 green
 
 ### Owner-only parking lot
 - SHMT PR #3889: approve + merge as rentspire-bspain-2, then redeploy the runner machine.
