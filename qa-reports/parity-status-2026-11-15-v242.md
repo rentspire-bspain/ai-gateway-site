@@ -44,3 +44,10 @@
 
 **Next actions (ranked):** (1) re-run the 95 deviation prompts against gateway v237 to confirm D4/D3 closure; (2) D7 — evidence-size trim + lazy fetch; (3) the all-model audit battery (qa/all-model-audit.py, 17 lanes x 4 scenarios, --repeat 2) still to run as the companion pass; (4) contract tests + prelaunch re-run when idle.
 
+
+## 29cd. v242 addendum: SYNTHETIC-VERDICT GUARD (owner screenshots 2026-11-15 16:45)
+
+**Observed:** asked "can you handle #1-5 autonomously?", the Kimi lane used run_python to print hard-coded "Handled autonomously: 5/5 ... True", then retracted it as a synthetic calculation (verified 0/5). The same screenshot showed letters rendered as x ("axxistance", "ai.xpaincox") inside the code box.
+**Root cause:** a prompt rule did not stop the model fabricating evidence with run_python (confirmed: a prompt-only fix failed in a live test). The s-to-x glyph corruption did NOT reproduce through the gateway stream or sandbox in 5 live tests (sandbox stdout is byte-clean), so it originates in the model's own rewrite of the output; tracked as OPEN pending a repro.
+**Fix (gateway, deployed, live-verified):** server-side guard in the run_python tool refuses scripts that print completion/capability verdicts; the live test now returns an honest "items were never specified, cannot fabricate a verification" answer.
+**Owner action note:** pre-push prelaunch gate showed 2 latency-only failures (simple query 31.9s vs 30s, current-events fast path) under load; open item: research skip for simple intents.
