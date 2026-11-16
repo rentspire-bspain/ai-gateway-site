@@ -1,3 +1,4 @@
 .vercel
 qa-reports/prompt-corpus.json
 qa-reports/prompt-replay/
+qa/__pycache__/
