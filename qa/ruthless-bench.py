@@ -100,9 +100,19 @@ for abbr, full in [("jan", "january"), ("feb", "february"), ("mar", "march"), ("
                    ("sept", "september"), ("oct", "october"), ("nov", "november"), ("dec", "december")]:
     MONTHS[abbr] = MONTHS[full]
 WEEKDAYS = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}
+STOPWORDS = {"of", "the", "a", "an", "in", "on", "at", "to", "and", "or", "for", "was", "were", "is", "are", "it"}
+NUMWORDS = {w: str(i) for i, w in enumerate(
+    ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+     "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"])}
+for n, w in [(30, "thirty"), (40, "forty"), (50, "fifty"), (60, "sixty"), (70, "seventy"), (80, "eighty"), (90, "ninety"), (100, "hundred")]:
+    NUMWORDS[w] = str(n)
+
+import unicodedata
+def deaccent(s):
+    return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
 
 def norm(s):
-    s = str(s).lower()
+    s = deaccent(str(s).lower())
     s = re.sub(r"[\$%€£]", "", s)
     s = re.sub(r"(\d),(\d{3})", r"\1\2", s)
     s = re.sub(r"[^a-z0-9.,\- ]", " ", s)
@@ -111,17 +121,28 @@ def norm(s):
 
 def canon_tokens(s):
     """Canonical token multiset for fair matching: month names -> numbers,
-    weekdays dropped, ordinal suffixes stripped, numbers normalized."""
+    weekdays/stopwords dropped, ordinal suffixes stripped, ranges split,
+    number-words digitized, accents folded."""
     s = norm(s)
     s = re.sub(r"\b(\d+)(st|nd|rd|th)\b", r"\1", s)
+    s = s.replace("–", "-").replace("—", "-")
+    s = re.sub(r"(\d{2,4})\s*[-/]\s*(\d{2,4})", r"\1 \2", s)   # 1953-1955 / 1953/1955 -> two tokens
     toks = []
     for t in s.split():
         t = t.strip(".,")  # strip sentence punctuation before lookups
-        if not t or t in WEEKDAYS:
+        if not t or t in WEEKDAYS or t in STOPWORDS:
             continue
-        t = MONTHS.get(t, t)
+        t = MONTHS.get(t, NUMWORDS.get(t, t))
         toks.append(t)
     return toks
+
+def nums_close(a, b, tol=0.05, pct=0.02):
+    """Numeric tolerance: 1.78 == 1.8 (rounding), 107 minutes == 1.78 hours is NOT (unit change)."""
+    try:
+        fa, fb = float(a), float(b)
+    except Exception:
+        return False
+    return abs(fa - fb) <= tol or abs(fa - fb) / max(abs(fb), 1e-9) <= pct
 
 def gold_candidates(gold):
     """Fair readings of a gold answer: the full string, parentheticals stripped
@@ -138,21 +159,29 @@ def gold_candidates(gold):
 
 def gold_in_answer(gold, answer_text):
     """True if the gold answer is present in the answer under any fair reading:
-    exact normalized containment, or full canonical-token multiset coverage
-    (e.g. '27 Nov 2023' vs 'Monday, November 27, 2023')."""
+    exact normalized containment, full canonical-token multiset coverage
+    (e.g. '27 Nov 2023' vs 'Monday, November 27, 2023'), or a single numeric
+    gold matching any number in the answer within rounding tolerance
+    ('1.8' == '1.78', '1953-1955' == 'from 1953 until 1955')."""
+    from collections import Counter
     for g in gold_candidates(gold):
         a_n, g_n = norm(answer_text), norm(g)
         if g_n and g_n in a_n:
             return True
         gtoks = canon_tokens(g)
-        if not gtoks or len(gtoks) > 8:  # long golds fall back to containment only
+        if not gtoks:
             continue
-        # all gold tokens must appear in the answer's canonical tokens
         atoks = canon_tokens(answer_text)
-        from collections import Counter
         ac, gc = Counter(atoks), Counter(gtoks)
-        if all(ac.get(t, 0) >= c for t, c in gc.items()):
+        if len(gtoks) <= 8 and all(ac.get(t, 0) >= c for t, c in gc.items()):
             return True
+        # single-number gold: accept any number in the answer within tolerance
+        # (SimpleQA golds like '1.8' vs a source-precise '1.78'; '17.2' vs '17.4' is a
+        # 1.2% delta — data conflict, still counted wrong; tolerance is 5%/2%)
+        if len(gtoks) == 1 and re.fullmatch(r"\d+(\.\d+)?", gtoks[0]):
+            for t in atoks:
+                if re.fullmatch(r"\d+(\.\d+)?", t) and nums_close(t, gtoks[0]):
+                    return True
     return False
 
 def final_answer(text):
