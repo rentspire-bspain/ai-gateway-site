@@ -1,11 +1,11 @@
-export const GATEWAY_VERSION = 236;
+export const GATEWAY_VERSION = 247;
 import { corsFor, preflight as corsPreflight } from "../_shared/cors.js"; // v103: aliased — the I7 self-check below defines its own `preflight`
 import { MemoryLimiter, RATE_POLICY, dbRateCheck, tooMany } from "../_shared/rate-limit.js";
 import { safeEqual } from "../_shared/call-model-policy.js";
-import { runToolLoop, shouldRunToolLoop, sanitizeSearchQuery, condenseSearchQuery, autoFetchAssets, initEgress, CONNECTOR_INTENT, CONNECTOR2_INTENT, FLEET_INTENT, DISPATCH_INTENT, MCP_INTENT, TOOLS_INTENT, isAckTurn, needsComputation, toolRunPythonForFallback, toolPlatformStatus, toolCreateFile, resolveFleetEmail, toolRunRunnerJob, toolGithubWrite, toolListCapabilities, toolListWebapps, toolListWebappTables, toolWebappDoctor, toolFetchPage, toolListPlatformFunctions } from "./tool-loop.ts";
+import { runToolLoop, shouldRunToolLoop, sanitizeSearchQuery, condenseSearchQuery, autoFetchAssets, initEgress, CONNECTOR_INTENT, CONNECTOR2_INTENT, FLEET_INTENT, DISPATCH_INTENT, MCP_INTENT, TOOLS_INTENT, isAckTurn, needsComputation, toolRunPythonForFallback, toolPlatformStatus, toolCreateFile, resolveFleetEmail, toolRunRunnerJob, toolGithubWrite, toolListCapabilities, toolListWebapps, toolListWebappTables, toolWebappDoctor, toolFetchPage, toolListPlatformFunctions, toolApifyCall } from "./tool-loop.ts";
 // v191: capability-inventory asks (owner directive 2026-11-13). Matches the phrasings the owner
 // actually used ("CHECK AGAIN ON THE RUNNERS AND MODELS", "check deeply", "what got imported").
-export const PARITY_STATE = "v236 (2026-11-15): POST-FINISH TRAILING-CONTENT FIX (the real duplicated-text root cause from the guardian 20:00Z run): the free-lane upstream sends content deltas AFTER the finish_reason frame — late narration that landed after the injected Sources list and glued a restated sentence onto the answer; post-finish content frames are now dropped per SSE semantics. v235: DUPLICATED-SOURCES STREAM FIX — the self-improvement guardian (20:00Z run) caught the free-lane writer emitting its own Sources section, after which the citation linker injected a SECOND Sources list and glued the writer's continuation text to it; the linker now tracks emitted text and never injects a second list when a Sources heading already went through. v234 (2026-11-15): PER-USER DAILY SPEND CEILINGS + COST ATTRIBUTION — every chargeable request from a non-exempt user now checks a per-user daily cost ceiling (DAILY_SPEND_CEILING_USD, default $3/day, tracked in the new user_daily_spend table; owner + eval-bot exempt, the owner's ceiling stays the global $350/mo call-model cap raised from $100) and records the day's estimated cost per user; every call-model request now carries x-user-id so the ops.llm_requests ledger and gateway-meter objects attribute every paid call to the user that caused it (the per-user COGS data the Boundview pricing model needs); when tracked month spend crosses 50% of the $350 cap a spend_alert notification is dropped (one per user per day). call-model v235 (deployed separately): MONTHLY_SPEND_CAP default $100 -> $350 + user_id passthrough into ledger and meter objects. v231 (2026-11-15): COMMAND-LEAK STREAM SCRUB — the v206 Command-line strip only ran on the non-streaming path while the frontend ALWAYS streams, so the model's own **Command: ...** narration leaked into streamed answers (automation 2026-11-15T08:00Z, 2nd occurrence); a new SSE transform now buffers leading deltas and strips a leading Command line (+ stray divider) before anything reaches the client, simulation-tested 5/5. call-model v231 (deployed separately): FREE-NEVER-HARD-FAILS — the fallback chain now runs for any FREE chosen model even with a custom backend (the flint lane was surfacing raw upstream errors with no fallback). v230 (2026-11-15): COMPLETION-DOC SERVER-SIDE AUTO-INVOCATION — completion/closure/orchestration-doc requests (and continuation turns like 'proceed' in such threads) now get registry+doctor+status evidence gathered by the platform itself and injected, the tool loop is force-run, and the .md deliverable is auto-created if the model didn't (closes the owner-observed 'no callable tool functions are exposed to me here' defect — prompt rules alone don't execute tools). v229: completion-doc forcing rule in the capability baseline. v221 (2026-11-14): WEBAPP DOCTOR SERVER-SIDE AUTO-INVOCATION — webapp health asks now run the doctor on the platform side and inject the real matrix as evidence (prompt rules alone failed: the writer answered an Allowance health ask with web research about an unrelated product). v219 (2026-11-14): WEBAPP OPS ROUND — three new owner/fleet tools: webapp_doctor (live per-app health matrix, run before claiming any webapp is broken or healthy), create_webapp (register a NEW webapp in the live webapp_catalog — every registry tool sees it immediately, no redeploy; vaults its service key, verifies schema end-to-end — the permanent path for new projects created from ai.spaincos.com), and webapp_upsert (governed per-webapp write: upsert rows into any registered app's own PostgREST endpoint, audit-logged to webapp_write_log). v217: per-webapp REST access fixed platform-wide (service credentials for all 15 org projects; anon-at-root 401 root-caused). Honest parity headline computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed. v217 (2026-11-14): PER-WEBAPP REST ACCESS FIXED PLATFORM-WIDE — the per-webapp schema tools (list_webapp_tables / describe_webapp) now authenticate with each project's service-role credential (gateway_config webapp_service_<ref>, wired for ALL 15 Supabase projects in the org, including every current webapp AND future siblings: ahapartments, rentcap, rentspire-comps, Deal Engine, deal-desk-saas, property-ops, allowance, PERILMARK, NodeGrade, spain-terminal-staging, rentspire-customer, aml-workspace-preview, cii-platform, ai-gateway, ahwave-dashboard). The anon-key 401 at the PostgREST root is root-caused (project API settings reject anon at the root); the service credential is used ONLY for the read-only OpenAPI root fetch — schema metadata (table/column names), never row data, never printed. v207: fleet build lanes OPEN (PAT broadened) — mobile/teammates/enterprise builds dispatched; github-ops v5+v6 (default-branch + branch-slash fixes); runner tarball deploy live. v205: call-model tools passthrough FIXED (the root cause of the BUILD MODE failure chain). Honest parity headline is computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed.";
+export const PARITY_STATE = "v247 FAKE-DONE GUARD (2026-11-16): the free fleet FAKED COMPLETION — lanes flipped status=done with zero rows landing (no Deal Engine DB access, self-reported success; cross-session RED ALERT verified twice). Every data-operation completion claim in an answer is now audited against the turn's executed tool trace: claims with no successful write tool get a deterministic PLATFORM VERIFICATION banner (non-stream + stream paths), and the tool guidance now forbids fabricated completion statements outright. v246 (2026-11-16): (2026-11-16): THE OWNER FRUSTRATION ROUND, PART 2 (owner: ALL MODELS PRODUCING GARBAGE) — the Auto lane emitted its create_file call as a RAW YAML block that rendered as the answer; the tool loop now parses YAML function_call blocks into REAL tool calls (simulation-tested), the leak guard discards any unparsed YAML tool-call text (never renders as the answer), and Kimi special-token soup rewrites now route to the reliable paid lane instead of re-asking the same broken lane. v245: KIMI RELIABILITY. v243 (2026-11-16): APIFY SERVER-SIDE (owner directive: Apify must run server-side and be callable from ai.spaincos.com and boundview.com) — the new apify_call tool proxies the Apify API through the Spain Runner machine (the APIFY_TOKEN never leaves the Fly machine: sessions enqueue rows in staging.apify_call_queue on the Deal Engine, the runner job apify_call executes the HTTP call on the machine and writes results back; every signed-in session can list datasets/actors and pull dataset items, actor runs are admin-only because they consume credits). v238 (2026-11-16): D4 replay fix (complex prompts get the full 4,000-token budget; truncation retry 6,000 tokens + second-pass continuation merge), D3 fix (claim-cant rewrite fires on cometAsk), synthetic-verdict guard (run_python refuses fabricated completion/capability verdicts — owner screenshot incident). v237 (2026-11-15): POST-FINISH TRAILING-CONTENT FIX POST-FINISH TRAILING-CONTENT FIX (the real duplicated-text root cause from the guardian 20:00Z run): the free-lane upstream sends content deltas AFTER the finish_reason frame — late narration that landed after the injected Sources list and glued a restated sentence onto the answer; post-finish content frames are now dropped per SSE semantics. v235: DUPLICATED-SOURCES STREAM FIX — the self-improvement guardian (20:00Z run) caught the free-lane writer emitting its own Sources section, after which the citation linker injected a SECOND Sources list and glued the writer's continuation text to it; the linker now tracks emitted text and never injects a second list when a Sources heading already went through. v234 (2026-11-15): PER-USER DAILY SPEND CEILINGS + COST ATTRIBUTION — every chargeable request from a non-exempt user now checks a per-user daily cost ceiling (DAILY_SPEND_CEILING_USD, default $3/day, tracked in the new user_daily_spend table; owner + eval-bot exempt, the owner's ceiling stays the global $350/mo call-model cap raised from $100) and records the day's estimated cost per user; every call-model request now carries x-user-id so the ops.llm_requests ledger and gateway-meter objects attribute every paid call to the user that caused it (the per-user COGS data the Boundview pricing model needs); when tracked month spend crosses 50% of the $350 cap a spend_alert notification is dropped (one per user per day). call-model v235 (deployed separately): MONTHLY_SPEND_CAP default $100 -> $350 + user_id passthrough into ledger and meter objects. v231 (2026-11-15): COMMAND-LEAK STREAM SCRUB — the v206 Command-line strip only ran on the non-streaming path while the frontend ALWAYS streams, so the model's own **Command: ...** narration leaked into streamed answers (automation 2026-11-15T08:00Z, 2nd occurrence); a new SSE transform now buffers leading deltas and strips a leading Command line (+ stray divider) before anything reaches the client, simulation-tested 5/5. call-model v231 (deployed separately): FREE-NEVER-HARD-FAILS — the fallback chain now runs for any FREE chosen model even with a custom backend (the flint lane was surfacing raw upstream errors with no fallback). v230 (2026-11-15): COMPLETION-DOC SERVER-SIDE AUTO-INVOCATION — completion/closure/orchestration-doc requests (and continuation turns like 'proceed' in such threads) now get registry+doctor+status evidence gathered by the platform itself and injected, the tool loop is force-run, and the .md deliverable is auto-created if the model didn't (closes the owner-observed 'no callable tool functions are exposed to me here' defect — prompt rules alone don't execute tools). v229: completion-doc forcing rule in the capability baseline. v221 (2026-11-14): WEBAPP DOCTOR SERVER-SIDE AUTO-INVOCATION — webapp health asks now run the doctor on the platform side and inject the real matrix as evidence (prompt rules alone failed: the writer answered an Allowance health ask with web research about an unrelated product). v219 (2026-11-14): WEBAPP OPS ROUND — three new owner/fleet tools: webapp_doctor (live per-app health matrix, run before claiming any webapp is broken or healthy), create_webapp (register a NEW webapp in the live webapp_catalog — every registry tool sees it immediately, no redeploy; vaults its service key, verifies schema end-to-end — the permanent path for new projects created from ai.spaincos.com), and webapp_upsert (governed per-webapp write: upsert rows into any registered app's own PostgREST endpoint, audit-logged to webapp_write_log). v217: per-webapp REST access fixed platform-wide (service credentials for all 15 org projects; anon-at-root 401 root-caused). Honest parity headline computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed. v217 (2026-11-14): PER-WEBAPP REST ACCESS FIXED PLATFORM-WIDE — the per-webapp schema tools (list_webapp_tables / describe_webapp) now authenticate with each project's service-role credential (gateway_config webapp_service_<ref>, wired for ALL 15 Supabase projects in the org, including every current webapp AND future siblings: ahapartments, rentcap, rentspire-comps, Deal Engine, deal-desk-saas, property-ops, allowance, PERILMARK, NodeGrade, spain-terminal-staging, rentspire-customer, aml-workspace-preview, cii-platform, ai-gateway, ahwave-dashboard). The anon-key 401 at the PostgREST root is root-caused (project API settings reject anon at the root); the service credential is used ONLY for the read-only OpenAPI root fetch — schema metadata (table/column names), never row data, never printed. v207: fleet build lanes OPEN (PAT broadened) — mobile/teammates/enterprise builds dispatched; github-ops v5+v6 (default-branch + branch-slash fixes); runner tarball deploy live. v205: call-model tools passthrough FIXED (the root cause of the BUILD MODE failure chain). Honest parity headline is computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed.";
 const CAPABILITY_ASK = /\b(runners?|models?|jobs?|tools?|skills?)\b.{0,50}\b(in ai\.spaincos|imported|available|exist|check|deep|listed|registry|catalog)\b|\b(check|verify|list|show|enumerate|inventory)\b.{0,40}\b(runners?|models?|jobs?|tools?|skills?|capabilities)\b/i;
 // v192: webapp-scoped asks (owner directive 2026-11-13: sessions conflate webapps and their databases).
 // When the question is about a specific webapp, its pages, data, schema, or "the data behind" an app,
@@ -810,6 +810,59 @@ function appendFollowUpsSSE(body: ReadableStream<Uint8Array>, resolve: (answer: 
     }
   }));
 }
+
+// v247 FAKE-DONE GUARD — shared banner builder (fleet fake-completion incident 2026-11-16:
+// fleet lanes flipped status=done while the DB showed ZERO rows landed — agents with no
+// write access self-reported success; same defect class as the v238 synthetic-verdict
+// guard). Returns "" when the answer makes no data-operation completion claims.
+const MUTATING_TOOL_RE = /^(?:webapp_upsert|create_webapp|run_runner_job|apify_call|github_write|create_branch|create_file|send_email|create_event|mark_step|create_scheduled_task)/;
+export function fakeDoneBannerFor(content: string, toolLoop: any): string {
+  const claimsDataOps =
+    /\b(?:promot\w*|back[ -]?fill\w*|insert\w*|upsert\w*|load\w*|land\w*|sync\w*|drain\w*|migrat\w*|updat\w*|wrote|written)\b[^.\n]{0,40}\b\d[\d,.]*\s+(?:rows?|records?|items?|entries|properties|urls?|emails?|comps?|units?|contacts?)/i.test(content)
+    || /\b(?:task|lane|job)s?\b[^.\n]{0,30}\b(?:status\s*(?:is|was|to|=|:)|marked|flipped|completed|finished)\b[^.\n]{0,20}\bdone\b/i.test(content)
+    || /\b\d[\d,.]*\s+(?:rows?|records?|items?|entries|properties|urls?|emails?|comps?|units?|contacts?)\b[^.\n]{0,60}\b(?:promoted|backfilled|inserted|upserted|updated|loaded|landed|written|synced|drained|migrated)\b/i.test(content);
+  if (!claimsDataOps) return "";
+  const writes = (Array.isArray(toolLoop?.trace) ? toolLoop.trace : [])
+    .filter((t: any) => t?.ok && MUTATING_TOOL_RE.test(String(t.tool || "")));
+  return writes.length
+    ? `\n\n---\n**⚠ PLATFORM VERIFICATION (auto-generated from this turn's executed tool trace — not model text):** this answer claims data operations completed. Write/execution tools that succeeded this turn: ${writes.map((t: any) => String(t.tool)).join(", ")}. Claims about anything beyond these specific executions are unverified — check the target system before relying on them.`
+    : `\n\n---\n**⚠ PLATFORM VERIFICATION (auto-generated from this turn's executed tool trace — not model text):** this answer claims data operations completed, but NO write/execution tool succeeded in this turn (verified executions: 0). These are claims, not executed results — verify against the target database before relying on them. Data drains must run through a path with verified DB write access (the Supabase connector path); never trust self-reported fleet status.`;
+}
+
+// v247 FAKE-DONE GUARD (stream path): accumulates the streamed answer, and at stream end
+// emits the verification banner as a synthetic delta if completion claims are unbacked.
+function fakeDoneBannerSSE(body: ReadableStream<Uint8Array>, toolLoop: any): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder(), decoder = new TextDecoder();
+  let answer = "", done = false;
+  const mk = (content: string) => encoder.encode(`data: ${JSON.stringify({ id: "gw-fakedone", object: "chat.completion.chunk", choices: [{ index: 0, delta: { content }, finish_reason: null }] })}\n\n`);
+  const fin = (controller: TransformStreamDefaultController<Uint8Array>) => {
+    if (done) return; done = true;
+    try {
+      const b = fakeDoneBannerFor(answer, toolLoop);
+      if (b) controller.enqueue(mk(b));
+    } catch { /* the banner must never break the stream */ }
+  };
+  const handle = (line: string, controller: TransformStreamDefaultController<Uint8Array>) => {
+    if (!line.startsWith("data:")) { controller.enqueue(encoder.encode(line + "\n")); return; }
+    const payload = line.slice(5).trim();
+    if (payload === "[DONE]") { fin(controller); controller.enqueue(encoder.encode(line + "\n")); return; }
+    let evt: any;
+    try { evt = JSON.parse(payload); } catch { controller.enqueue(encoder.encode(line + "\n")); return; }
+    const c = evt?.choices?.[0];
+    if (typeof c?.delta?.content === "string") answer += c.delta.content;
+    if (c?.finish_reason) fin(controller);
+    controller.enqueue(encoder.encode(line + "\n"));
+  };
+  return body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      const text = pendingLineFD + decoder.decode(chunk, { stream: true });
+      const lines = text.split("\n"); pendingLineFD = lines.pop() || "";
+      for (const l of lines) handle(l, controller);
+    },
+    flush(controller) { if (pendingLineFD) { const l = pendingLineFD; pendingLineFD = ""; handle(l, controller); } fin(controller); }
+  }));
+}
+let pendingLineFD = "";
 
 // v127: last stage of the SSE pipe (after follow-ups and the linked Sources list): emit the exact required ending once, last.
 function appendEndLineSSE(body: ReadableStream<Uint8Array>, endLine: string): ReadableStream<Uint8Array> {
@@ -1883,7 +1936,10 @@ Question: "${userQuery}"`;
     if (clarifierContinuation && (intent.complexity === "simple" || intent.complexity === "medium")) intent.complexity = "complex";
     const queryWords = String(userQuery).trim().split(/\s+/).filter(Boolean).length;
     const longMultiPart = intent.complexity === "complex" && (isFollowUpDeliverable(String(userQuery), (messages || []).filter((m: any) => m?.role === "assistant").length) || queryWords >= 60 || (String(userQuery).match(/\?/g) || []).length >= 3 || clarifierContinuation);
-    const tokenBudget = Math.min(Number(max_tokens) || 2048, (intent.complexity === "extreme" || longMultiPart) ? 4000 : 2048);
+    // v237 D4 replay fix (2026-11-15): the 717-prompt replay found 53 D4 truncations on HTTP 200 —
+    // complex prompts hit the 2,048 cap and the model cuts mid-sentence. "complex" (not just
+    // extreme/longMultiPart) now also gets the full 4,000-token budget so complex answers complete.
+    const tokenBudget = Math.min(Number(max_tokens) || 2048, (intent.complexity === "extreme" || longMultiPart || intent.complexity === "complex") ? 4000 : 2048);
     // v103 I8: one deterministic plan decision per request (plan-guidance.ts). Drives (a) whether the tool loop is even offered record_plan,
     // (b) the writer-side "Plan" block when no tool-loop plan exists.
     const planDec = planDecision(String(userQuery), String(intent.complexity));
@@ -2730,11 +2786,11 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       cat.push("LIVE SEARCH & RESEARCH: web_search (live web search with ranked sources), fetch_page / fetch_asset (read any URL), browser_step (drive a real browser: navigate/click/type/screenshot — Comet parity).");
       cat.push("COMPUTE & CODE: run_python (sandboxed Python), calculator, code writing and debugging, record_plan / mark_step (multi-step plan tracking).");
       cat.push("DATABASE READS (v173): query_comptrove — live read queries against the Deal Engine property database (hist.property_facts: property name/address/city/state/unit count/year built; rr.unit_observation_daily: rent observations by property/beds/date). Use it for any property/rent-comps data question instead of claiming no database access.");
-      cat.push("CONNECTED APPS (Settings > Connectors): search_email, read_email, send_email (Gmail, preview+approve), list_events, create_event (Google Calendar), search_drive, read_file, list_spreadsheet, read_sheet (Drive/Sheets), slack_search, slack_read_channel (Slack), github_search_code, github_search_issues, github_search_repos, github_read_issue (GitHub), dropbox_list_files, dropbox_read_file (Dropbox), render_list_services, render_deploy_status, render_logs (Render), supabase_list_projects, supabase_project_health (Supabase).");
+      cat.push("CONNECTED APPS (Settings > Connectors): search_email, read_email, send_email (Gmail, preview+approve), list_events, create_event (Google Calendar), search_drive, read_file, list_spreadsheet, read_sheet (Drive/Sheets), slack_search, slack_read_channel (Slack), github_search_code, github_search_issues, github_search_repos, github_read_issue (GitHub), dropbox_list_files, dropbox_read_file (Dropbox), render_list_services, render_deploy_status, render_logs (Render), supabase_list_projects, supabase_project_health (Supabase), apify_call (Apify — SERVER-SIDE via the Spain Runner proxy: list datasets/actors, pull dataset items; actor runs admin-only).");
       cat.push("AGENT FLEET: list_fleet (the platform's own 219-entry agent registry — guardians, automations, build lanes), dispatch_fleet (queue work for the ops fleet; results post back into the thread).");
       cat.push("MCP SERVERS (Settings > MCP servers): mcp_list_servers, mcp_list_tools, mcp_call_tool — call tools on any MCP server the user registered.");
       cat.push("PLUGINS & SKILLS (sidebar > Plugins): installable skill packs (Research Pack, Inbox Assistant, Calendar Planner) whose prompts ride the slash menu.");
-      cat.push("EXECUTION (v175): run_runner_job — LAUNCH a Spain Runner job on the live Fly.io machine (node src/runner.mjs --once <job>); runner_job_status — read the runner.runs ledger; github_write — create branches, commit files, open PRs, comment, open issues as the owner (never merges); query_comptrove — live Deal Engine database reads.");
+      cat.push("EXECUTION (v175): run_runner_job — LAUNCH a Spain Runner job on the live Fly.io machine (node src/runner.mjs --once <job>); runner_job_status — read the runner.runs ledger; github_write — create branches, commit files, open PRs, comment, open issues as the owner (never merges); query_comptrove — live Deal Engine database reads; apify_call — Apify API proxy (server-side, the token stays on the runner).");
       cat.push("HARVESTING / spain-runner: bulk jobs run on the owner machine (spain-runner) via run_runner_job — when the user references them, RUN the job (or check runner_job_status); never say you cannot launch runner jobs.");
       capped.push({ role: "system", content: "THE USER IS ASKING WHAT YOU CAN DO. This is YOUR live tool catalog — enumerate these capabilities honestly and specifically (say 'web_search', 'run_python', 'browser_step', the connector tools by name). NEVER claim you have no tools, no skills, no harvesting abilities, or that nothing is connected — if a specific tool needs a connector that is not connected, say exactly which one and how to connect it in Settings > Connectors. Catalog:\n" + cat.join("\n") });
     }
@@ -2819,8 +2875,25 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     const completionDocIntent = COMPLETION_DOC_RE.test(String(userQuery)) || COMPLETION_DOC_RE.test(completionDocCtx);
     if (!apiKeyMode && completionDocIntent) {
       try {
-        const [wapps, doc, ps] = await Promise.all([toolListWebapps({}, toolCtx), toolWebappDoctor({}, toolCtx), toolPlatformStatus({}, toolCtx)]);
-        capped.splice(1, 0, { role: "system", content: `LIVE COMPLETION-DOC EVIDENCE (authoritative, gathered by the platform just now — you do NOT need to call tools to obtain this, do NOT claim tools are unavailable, and do NOT paste a whole document into the chat body — chat text is only the summary): WEBAPP REGISTRY:\n${String(wapps).slice(0, 5000)}\n\nHEALTH MATRIX (webapp_doctor):\n${String(doc).slice(0, 8000)}\n\nPLATFORM STATUS:\n${String(ps).slice(0, 4000)}\n\nDeliver the completion document itself via create_file as a .md artifact (reuse the thread's existing doc filename if one was made). Every VERIFIED claim needs its evidence line (HTTP result, deployment id, commit SHA); claims without evidence are OPEN, not verified.` });
+        // v244 D7 replay fix (11 WORKER_RESOURCE_LIMITs on the 717-prompt replay + the owner's
+        // 2026-11-16 546): the v230 triple-fetch (registry + doctor + status) + a 17K-char
+        // injected block pushed heavy completion prompts over the edge worker envelope.
+        // (a) the three fetches now have a HARD 8s wall each (a slow one can no longer
+        // cascade), (b) the injected evidence is trimmed 17K -> 8K chars (the registry
+        // summary + the doctor's per-app summary rows + the queue statuses — the full
+        // matrices stay available via the tools themselves), (c) any fetch that fails or
+        // times out is skipped, never blocks the answer.
+        const withTimeout = (p: Promise<string>, ms: number) => Promise.race([p.then((v) => String(v)).catch(() => ""), new Promise<string>((res) => setTimeout(() => res(""), ms))]);
+        const [wapps, doc, ps] = await Promise.all([
+          withTimeout(toolListWebapps({}, toolCtx), 8_000),
+          withTimeout(toolWebappDoctor({}, toolCtx), 8_000),
+          withTimeout(toolPlatformStatus({}, toolCtx), 8_000),
+        ]);
+        const evParts: string[] = [];
+        if (wapps) evParts.push("WEBAPP REGISTRY (names + repos + data universes):\n" + wapps.slice(0, 3000));
+        if (doc) evParts.push("HEALTH MATRIX (webapp_doctor, per-app summary):\n" + doc.replace(/\n{2,}/g, "\n").slice(0, 3500));
+        if (ps) evParts.push("PLATFORM STATUS (queues + fleet):\n" + ps.replace(/\n{2,}/g, "\n").slice(0, 1500));
+        capped.splice(1, 0, { role: "system", content: `LIVE COMPLETION-DOC EVIDENCE (authoritative, gathered by the platform just now — you do NOT need to call tools to obtain this, do NOT claim tools are unavailable, and do NOT paste a whole document into the chat body — chat text is only the summary):\n${evParts.join("\n\n")}\n\nDeliver the completion document itself via create_file as a .md artifact (reuse the thread's existing doc filename if one was made). Every VERIFIED claim needs its evidence line (HTTP result, deployment id, commit SHA); claims without evidence are OPEN, not verified. Full detail for any app is one tool call away (list_webapps / webapp_doctor / platform_status).` });
       } catch (_cdE) { /* evidence gather failed: the loop's tools are the fallback */ }
     }
     // v224 PLATFORM FUNCTIONS: server-side auto-invocation — asks about what functions/services/
@@ -3267,6 +3340,19 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
               const div = out.match(/^\s*---\s*\n?/);
               if (div) out = out.slice(div[0].length);
             }
+            // v244 (owner screenshot 2026-11-16, Kimi lane): raw special-token tool-call soup
+            // (<|open|>tools<|sep|>...<|close|>message<|sep|>) leaked verbatim into answers.
+            // Any answer carrying these control tokens is a malformed tool call, not prose:
+            // strip every token-soup span; if nothing human-readable remains, drop it entirely.
+            if (/<\|(?:open|sep|close|tool|message|endoftext|system|assistant|user)\|>/.test(out)) {
+              const tokRe = /<\|(?:open|sep|close|tool|message|endoftext|system|assistant|user)\|>/g;
+              const firstIdx = out.search(tokRe);
+              tokRe.lastIndex = 0;
+              let lastIdx = -1, mTok;
+              while ((mTok = tokRe.exec(out)) !== null) lastIdx = mTok.index + mTok[0].length;
+              if (firstIdx >= 0 && lastIdx > firstIdx) out = out.slice(0, firstIdx) + out.slice(lastIdx);
+              out = out.replace(tokRe, " ").replace(/[ \t]{2,}/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+            }
             // re-emit the held lines: one merged content delta (scrubbed) + any non-content events
             let finish: string | null = null;
             for (const line of held) {
@@ -3305,7 +3391,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
             flush(controller) { if (!decided) decide(controller, true); },
           }));
         };
-        const guarded = guardEmptyStream(scrubCommandLeakSSE(sres.body), lastResortAnswer); // v83 + v231: never empty, never command-leaked
+        const guarded = guardEmptyStream(fakeDoneBannerSSE(scrubCommandLeakSSE(sres.body), toolLoop), lastResortAnswer); // v83 + v231 + v247 fake-done banner: never empty, never command-leaked, completion claims verified
         // v84: dedicated follow-up stage — swallows the writer's own section, injects the specific one before finish.
         const requiredEndLine = extractEndLine(spaceInstructions);
         const withFollowUps = appendFollowUpsSSE(guarded, (ans, writerSec) => resolveFollowUps(callModelUrl, String(userQuery), ans, writerSec, todayStr), requiredEndLine);
@@ -3497,7 +3583,9 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         // the word limit also shrinks the reasoning burn, so the answer completes.
         // (Do NOT route retries to the "summary" purpose — that model is on a
         // ~1,000-token-per-minute Groq rate limit and silently fails.)
-        body: JSON.stringify({ messages: retryMessages, purpose, model: finalModel, reasoning_effort: "low", max_tokens: 4000 }),
+        // v237 D4 fix: raise the retry budget 4000 → 6000 tokens — the replay showed 53 HTTP-200
+        // truncations where the 4000-token retry STILL cut mid-sentence.
+        body: JSON.stringify({ messages: retryMessages, purpose, model: finalModel, reasoning_effort: "low", max_tokens: 6000 }),
         signal: AbortSignal.timeout(120_000)
       });
       const retryData = await retryRes.json();
@@ -3508,6 +3596,35 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       if (retryContent.length > content.length || (retryFinish === "stop" && finishReason === "length")) {
         finalResponse = retryData;
         content = retryContent;
+      }
+      // v237 D4 second-pass continuation: if the retry STILL truncates (retryFinish=length or
+      // no terminal punctuation), send ONE follow-up asking the model to complete the remainder
+      // from where it left off, and append it. Guarded: a failure keeps the truncated answer.
+      const retryLooksTruncated = retryContent.length > 0 && !/[.!?:"')]\s*$/.test(retryContent.trim());
+      if (retryLooksTruncated && retryFinish !== "stop" && timeOk(140_000)) {
+        try {
+          const contRes = await fetch(callModelUrl, {
+            method: "POST",
+            headers: CM_HEADERS,
+            body: JSON.stringify({
+              messages: [
+                ...capped,
+                { role: "assistant", content: retryContent },
+                { role: "user", content: "Continue from exactly where you stopped. Complete the remaining content, then end with a Suggested Follow-ups section. Do not repeat what you already wrote." },
+              ],
+              purpose, model: finalModel, reasoning_effort: "low", max_tokens: 4000,
+            }),
+            signal: AbortSignal.timeout(60_000),
+          });
+          const contData = await contRes.json();
+          const contContent = contData?.choices?.[0]?.message?.content || "";
+          if (contContent.trim()) {
+            const merged = retryContent + "\n\n" + contContent.trim();
+            finalResponse = contData;
+            finalResponse.choices[0].message.content = merged;
+            content = merged;
+          }
+        } catch (e) { /* continuation failed — keep the truncated retry */ }
       }
       } catch (e) { /* retry failed — keep the original answer, never 500 */ }
     }
@@ -3554,6 +3671,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     {
       const curContent = finalResponse?.choices?.[0]?.message?.content || "";
       const toolSyntax = /```\s*[a-z_]*\s*\n?\s*(web_search|calculator|search_my_context|query_comptrove)\s*\(/i.test(curContent)
+        || /<\|(open|sep|close|tool|message|endoftext|system|assistant|user)\|>/.test(curContent)   // v244: Kimi special-token soup
         || /^\s*[^\w\n]{0,3}\s*(web_search|calculator|search_my_context|query_comptrove)\s*\(/im.test(curContent)
         || /[^\w\n]{0,3}(web_search|calculator|search_my_context|query_comptrove)\s*\(\s*"/.test(curContent)
         || /\b(web_search|query_comptrove|search_my_context)\b/i.test(curContent);
@@ -3561,15 +3679,22 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         && /(let me try|one more|already (have|made)|finali[sz]e|didn't return usable)/i.test(curContent);
       if ((toolSyntax || selfDialogue) && timeOk()) {
         try {
+          // v245 KIMI RELIABILITY: when the defect is the Kimi/GLM special-token soup, re-asking the
+          // SAME lane reproduces the same malformed tool-call markup (the QA rewrite used finalModel).
+          // Route the rewrite to the reliable paid lane instead — the owner's Kimi token-soup
+          // screenshots showed the same lane failing the rewrite identically. The scrub below still
+          // guards any residue; this changes the rewriter, not the user's model choice.
+          const soupTrigger = /<\|(?:open|sep|close|tool|message|endoftext|system|assistant|user)\|>/.test(curContent);
+          const rewriteModel = soupTrigger ? (Deno.env.get("FALLBACK_MODEL") || "deepseek/deepseek-v4.1-flash-1017") : finalModel;
           const cleanRes = await fetch(callModelUrl, {
             method: "POST",
             headers: CM_HEADERS,
-            body: JSON.stringify({ messages: [...capped, { role: "system", content: "QA REVIEW: Your previous response contained tool-call syntax or working notes to yourself. Produce ONLY the clean final answer for the user: no tool calls, no code fences around tool names, no monologue about searching or verifying, no mention of what you could not retrieve unless it is essential. Start directly with the answer." }], purpose, model: finalModel, reasoning_effort: reasoningEffort(intent.complexity), max_tokens: 4000 }),
+            body: JSON.stringify({ messages: [...capped, { role: "system", content: "QA REVIEW: Your previous response contained tool-call syntax or working notes to yourself. Produce ONLY the clean final answer for the user: no tool calls, no code fences around tool names, no monologue about searching or verifying, no mention of what you could not retrieve unless it is essential. Start directly with the answer." }], purpose, model: rewriteModel, reasoning_effort: reasoningEffort(intent.complexity), max_tokens: 4000 }),
             signal: AbortSignal.timeout(90_000)
           });
           const cleanData = await cleanRes.json();
           const cleanText = cleanData?.choices?.[0]?.message?.content || "";
-          const stillDirty = /```\s*[a-z_]*\s*\n?\s*(web_search|calculator|search_my_context|query_comptrove)\s*\(/i.test(cleanText) || /^\s*[^\w\n]{0,3}\s*(web_search|calculator|search_my_context|query_comptrove)\s*\(/im.test(cleanText);
+          const stillDirty = /```\s*[a-z_]*\s*\n?\s*(web_search|calculator|search_my_context|query_comptrove)\s*\(/i.test(cleanText) || /^\s*[^\w\n]{0,3}\s*(web_search|calculator|search_my_context|query_comptrove)\s*\(/im.test(cleanText) || /<\|(open|sep|close|tool|message|endoftext|system|assistant|user)\|>/.test(cleanText);
           if (cleanText.length > 80) finalResponse = cleanData; // scrub below removes any residue
         } catch (e) { /* keep original */ }
       }
@@ -3595,6 +3720,15 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
             finalResponse = citeData;
           }
         } catch (e) { /* keep original */ }
+      }
+    }
+
+    // v247 FAKE-DONE GUARD (non-stream path — see fakeDoneBannerFor for the full incident note):
+    // cross-check data-operation completion claims against the turn's executed tool trace.
+    {
+      const c2 = finalResponse?.choices?.[0]?.message as any;
+      if (c2 && typeof c2.content === "string" && !c2.content.includes("PLATFORM VERIFICATION")) {
+        c2.content += fakeDoneBannerFor(c2.content, toolLoop);
       }
     }
 
@@ -3688,8 +3822,8 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     // rewrite that must lead with what the platform actually did and what tools exist.
     {
       const curC = String(finalResponse?.choices?.[0]?.message?.content || "");
-      const claimCant = /i can'?t safely|i can'?t pull live status|no migration ledger .* exists|drop the repo url|what i cannot do from this session|not defined anywhere in (this|the) conversation|no (tool output|live execution)|nothing was fired|cannot reach (fly|supabase|github)|paste[- ]ready|this reply cannot/i.test(curC);
-      if (claimCant && (closureAsk || handoffDoc || estateAsk || executeArtifactsAsk) && !spaceInstructions && timeOk(100_000)) {
+      const claimCant = /i can'?t safely|i can'?t pull live status|no migration ledger .* exists|drop the repo url|what i cannot do from this session|not defined anywhere in (this|the) conversation|no (tool output|live execution)|nothing was fired|cannot reach (fly|supabase|github)|paste[- ]ready|this reply cannot|cannot be executed from (this|the) session/i.test(curC);
+      if (claimCant && (closureAsk || handoffDoc || estateAsk || executeArtifactsAsk || cometAsk) && !spaceInstructions && timeOk(100_000)) {
         try {
           const rr = await fetch(callModelUrl, {
             method: "POST",
@@ -3717,6 +3851,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         .replace(/^\s*[^\w\n]{0,3}\s*(?:web_search|calculator|search_my_context|query_comptrove)\s*\([^\n]*\)?\s*$/gim, "")
         .replace(/[^\w\n]{0,3}(?:web_search|calculator|search_my_context|query_comptrove)\s*\(\s*"[^"]*"\s*\)/g, "")
         .replace(/^[^\n]*(?:tools (?:used|available|called)[^\n]*(?:not available|are unavailable|weren'?t)|answer[^\n]*directly without (?:web search|context tools))[^\n]*\n?/gim, "")
+
         .replace(/^\s*(?:wait|hm+|let me (?:try|check|search|finalize))[^\n]*\n/gim, "")
         .replace(/^[^\n]*\b(?:web_search|query_comptrove|search_my_context)\b[^\n]*\n?/gim, "")
         .replace(/^\s*[^\w\s\n"'\u201c\[(#*>_\-=.:,;!?\u2014\u2013-]{1,8}\s*/u, "")
