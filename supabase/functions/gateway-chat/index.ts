@@ -1934,6 +1934,26 @@ Question: "${userQuery}"`;
     // gets the same 4,000-token ceiling as "extreme" — the old 2,048 cap forced ~3K-char summaries of 13-18K-char asks.
     const clarifierContinuation = isClarifierAnswer(messages);
     if (clarifierContinuation && (intent.complexity === "simple" || intent.complexity === "medium")) intent.complexity = "complex";
+    // v248 MULTI-HOP UPGRADE (FRAMES teardown 2026-11-16: short-but-deep chained questions were
+    // classified "simple" -> one blob search, 0 planner sub-queries -> wrong entity at a hop;
+    // 33/100 FRAMES misses trace to exactly this). Chained-entity / dependency patterns upgrade
+    // the question to "complex" so the planner decomposition + sub-query lane runs, regardless
+    // of question length. Predicates tested against the FRAMES miss set AND negative controls
+    // (plain one-line facts like "What year did the Berlin Wall fall?" stay on the fast path).
+    {
+      const uq8 = String(userQuery || "").trim();
+      const chainHops = (uq8.match(/\b(?:of|for|by|from) the\b/gi) || []).length;
+      const relClauses = (uq8.match(/\b(?:who|that|which|whose)\b/gi) || []).length;
+      const superlatives = (uq8.match(/\b(?:same|first|last|youngest|oldest|most|fewest|initial|only|fewest)\b/gi) || []).length;
+      const depMarkers = (uq8.match(/\b(?:same|while|when|during|as of|on the same day|that same)\b/gi) || []).length;
+      if ((chainHops >= 1 && relClauses >= 2)
+        || (chainHops >= 2 && relClauses >= 1)
+        || (relClauses >= 2 && superlatives >= 1)
+        || (superlatives >= 2 && depMarkers >= 1)
+        || (depMarkers >= 2 && relClauses >= 1)) {
+        if (intent.complexity === "simple" || intent.complexity === "medium") intent.complexity = "complex";
+      }
+    }
     const queryWords = String(userQuery).trim().split(/\s+/).filter(Boolean).length;
     const longMultiPart = intent.complexity === "complex" && (isFollowUpDeliverable(String(userQuery), (messages || []).filter((m: any) => m?.role === "assistant").length) || queryWords >= 60 || (String(userQuery).match(/\?/g) || []).length >= 3 || clarifierContinuation);
     // v237 D4 replay fix (2026-11-15): the 717-prompt replay found 53 D4 truncations on HTTP 200 —

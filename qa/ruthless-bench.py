@@ -123,21 +123,37 @@ def canon_tokens(s):
         toks.append(t)
     return toks
 
+def gold_candidates(gold):
+    """Fair readings of a gold answer: the full string, parentheticals stripped
+    ('Alberto Ginés López (18 at the time)' -> 'Alberto Ginés López'), and each
+    comma/semicolon segment. FRAMES golds often carry explanatory parentheses
+    the answer is not required to repeat."""
+    cands = [gold]
+    stripped = re.sub(r"\s*\([^)]*\)\s*", " ", gold).strip()
+    if stripped: cands.append(stripped)
+    for part in re.split(r"[;,]", gold):
+        p = part.strip()
+        if p: cands.append(p)
+    return cands
+
 def gold_in_answer(gold, answer_text):
     """True if the gold answer is present in the answer under any fair reading:
     exact normalized containment, or full canonical-token multiset coverage
     (e.g. '27 Nov 2023' vs 'Monday, November 27, 2023')."""
-    a_n, g_n = norm(answer_text), norm(gold)
-    if g_n and g_n in a_n:
-        return True
-    gtoks = canon_tokens(gold)
-    if not gtoks or len(gtoks) > 8:  # long golds fall back to containment only
-        return False
-    # all gold tokens must appear in the answer's canonical tokens
-    atoks = canon_tokens(answer_text)
-    from collections import Counter
-    ac, gc = Counter(atoks), Counter(gtoks)
-    return all(ac.get(t, 0) >= c for t, c in gc.items())
+    for g in gold_candidates(gold):
+        a_n, g_n = norm(answer_text), norm(g)
+        if g_n and g_n in a_n:
+            return True
+        gtoks = canon_tokens(g)
+        if not gtoks or len(gtoks) > 8:  # long golds fall back to containment only
+            continue
+        # all gold tokens must appear in the answer's canonical tokens
+        atoks = canon_tokens(answer_text)
+        from collections import Counter
+        ac, gc = Counter(atoks), Counter(gtoks)
+        if all(ac.get(t, 0) >= c for t, c in gc.items()):
+            return True
+    return False
 
 def final_answer(text):
     m = re.findall(r"final answer\s*[:\-]?\s*(.+?)(?:\n|$)", text, re.I)
@@ -207,9 +223,14 @@ def run_bench(bench, n, workers, tok, uid):
     done = set()
     if resfile.exists():
         for line in resfile.read_text().splitlines():
-            try: done.add(json.loads(line)["i"])
+            try:
+                r = json.loads(line)
+                # only successfully-GRADED rows count as done: error rows (402/401/546/timeout)
+                # retry on the next invocation instead of silently deflating the benchmark's n
+                if r.get("verdict") in ("correct", "wrong", "partial"):
+                    done.add(r["i"])
             except Exception: pass
-    items = LOADERS[bench](n + len(done))
+    items = LOADERS[bench](n)   # n is a hard cap: the deterministic sample is ALWAYS the first n
     todo = [(ix, it) for ix, it in enumerate(items) if ix not in done]
     print(f"[{bench}] {len(todo)} to run ({len(done)} done)", flush=True)
     with cf.ThreadPoolExecutor(max_workers=workers) as ex:
