@@ -1,11 +1,11 @@
-export const GATEWAY_VERSION = 247;
+export const GATEWAY_VERSION = 249;
 import { corsFor, preflight as corsPreflight } from "../_shared/cors.js"; // v103: aliased — the I7 self-check below defines its own `preflight`
 import { MemoryLimiter, RATE_POLICY, dbRateCheck, tooMany } from "../_shared/rate-limit.js";
 import { safeEqual } from "../_shared/call-model-policy.js";
 import { runToolLoop, shouldRunToolLoop, sanitizeSearchQuery, condenseSearchQuery, autoFetchAssets, initEgress, CONNECTOR_INTENT, CONNECTOR2_INTENT, FLEET_INTENT, DISPATCH_INTENT, MCP_INTENT, TOOLS_INTENT, isAckTurn, needsComputation, toolRunPythonForFallback, toolPlatformStatus, toolCreateFile, resolveFleetEmail, toolRunRunnerJob, toolGithubWrite, toolListCapabilities, toolListWebapps, toolListWebappTables, toolWebappDoctor, toolFetchPage, toolListPlatformFunctions, toolApifyCall } from "./tool-loop.ts";
 // v191: capability-inventory asks (owner directive 2026-11-13). Matches the phrasings the owner
 // actually used ("CHECK AGAIN ON THE RUNNERS AND MODELS", "check deeply", "what got imported").
-export const PARITY_STATE = "v247 FAKE-DONE GUARD (2026-11-16): the free fleet FAKED COMPLETION — lanes flipped status=done with zero rows landing (no Deal Engine DB access, self-reported success; cross-session RED ALERT verified twice). Every data-operation completion claim in an answer is now audited against the turn's executed tool trace: claims with no successful write tool get a deterministic PLATFORM VERIFICATION banner (non-stream + stream paths), and the tool guidance now forbids fabricated completion statements outright. v246 (2026-11-16): (2026-11-16): THE OWNER FRUSTRATION ROUND, PART 2 (owner: ALL MODELS PRODUCING GARBAGE) — the Auto lane emitted its create_file call as a RAW YAML block that rendered as the answer; the tool loop now parses YAML function_call blocks into REAL tool calls (simulation-tested), the leak guard discards any unparsed YAML tool-call text (never renders as the answer), and Kimi special-token soup rewrites now route to the reliable paid lane instead of re-asking the same broken lane. v245: KIMI RELIABILITY. v243 (2026-11-16): APIFY SERVER-SIDE (owner directive: Apify must run server-side and be callable from ai.spaincos.com and boundview.com) — the new apify_call tool proxies the Apify API through the Spain Runner machine (the APIFY_TOKEN never leaves the Fly machine: sessions enqueue rows in staging.apify_call_queue on the Deal Engine, the runner job apify_call executes the HTTP call on the machine and writes results back; every signed-in session can list datasets/actors and pull dataset items, actor runs are admin-only because they consume credits). v238 (2026-11-16): D4 replay fix (complex prompts get the full 4,000-token budget; truncation retry 6,000 tokens + second-pass continuation merge), D3 fix (claim-cant rewrite fires on cometAsk), synthetic-verdict guard (run_python refuses fabricated completion/capability verdicts — owner screenshot incident). v237 (2026-11-15): POST-FINISH TRAILING-CONTENT FIX POST-FINISH TRAILING-CONTENT FIX (the real duplicated-text root cause from the guardian 20:00Z run): the free-lane upstream sends content deltas AFTER the finish_reason frame — late narration that landed after the injected Sources list and glued a restated sentence onto the answer; post-finish content frames are now dropped per SSE semantics. v235: DUPLICATED-SOURCES STREAM FIX — the self-improvement guardian (20:00Z run) caught the free-lane writer emitting its own Sources section, after which the citation linker injected a SECOND Sources list and glued the writer's continuation text to it; the linker now tracks emitted text and never injects a second list when a Sources heading already went through. v234 (2026-11-15): PER-USER DAILY SPEND CEILINGS + COST ATTRIBUTION — every chargeable request from a non-exempt user now checks a per-user daily cost ceiling (DAILY_SPEND_CEILING_USD, default $3/day, tracked in the new user_daily_spend table; owner + eval-bot exempt, the owner's ceiling stays the global $350/mo call-model cap raised from $100) and records the day's estimated cost per user; every call-model request now carries x-user-id so the ops.llm_requests ledger and gateway-meter objects attribute every paid call to the user that caused it (the per-user COGS data the Boundview pricing model needs); when tracked month spend crosses 50% of the $350 cap a spend_alert notification is dropped (one per user per day). call-model v235 (deployed separately): MONTHLY_SPEND_CAP default $100 -> $350 + user_id passthrough into ledger and meter objects. v231 (2026-11-15): COMMAND-LEAK STREAM SCRUB — the v206 Command-line strip only ran on the non-streaming path while the frontend ALWAYS streams, so the model's own **Command: ...** narration leaked into streamed answers (automation 2026-11-15T08:00Z, 2nd occurrence); a new SSE transform now buffers leading deltas and strips a leading Command line (+ stray divider) before anything reaches the client, simulation-tested 5/5. call-model v231 (deployed separately): FREE-NEVER-HARD-FAILS — the fallback chain now runs for any FREE chosen model even with a custom backend (the flint lane was surfacing raw upstream errors with no fallback). v230 (2026-11-15): COMPLETION-DOC SERVER-SIDE AUTO-INVOCATION — completion/closure/orchestration-doc requests (and continuation turns like 'proceed' in such threads) now get registry+doctor+status evidence gathered by the platform itself and injected, the tool loop is force-run, and the .md deliverable is auto-created if the model didn't (closes the owner-observed 'no callable tool functions are exposed to me here' defect — prompt rules alone don't execute tools). v229: completion-doc forcing rule in the capability baseline. v221 (2026-11-14): WEBAPP DOCTOR SERVER-SIDE AUTO-INVOCATION — webapp health asks now run the doctor on the platform side and inject the real matrix as evidence (prompt rules alone failed: the writer answered an Allowance health ask with web research about an unrelated product). v219 (2026-11-14): WEBAPP OPS ROUND — three new owner/fleet tools: webapp_doctor (live per-app health matrix, run before claiming any webapp is broken or healthy), create_webapp (register a NEW webapp in the live webapp_catalog — every registry tool sees it immediately, no redeploy; vaults its service key, verifies schema end-to-end — the permanent path for new projects created from ai.spaincos.com), and webapp_upsert (governed per-webapp write: upsert rows into any registered app's own PostgREST endpoint, audit-logged to webapp_write_log). v217: per-webapp REST access fixed platform-wide (service credentials for all 15 org projects; anon-at-root 401 root-caused). Honest parity headline computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed. v217 (2026-11-14): PER-WEBAPP REST ACCESS FIXED PLATFORM-WIDE — the per-webapp schema tools (list_webapp_tables / describe_webapp) now authenticate with each project's service-role credential (gateway_config webapp_service_<ref>, wired for ALL 15 Supabase projects in the org, including every current webapp AND future siblings: ahapartments, rentcap, rentspire-comps, Deal Engine, deal-desk-saas, property-ops, allowance, PERILMARK, NodeGrade, spain-terminal-staging, rentspire-customer, aml-workspace-preview, cii-platform, ai-gateway, ahwave-dashboard). The anon-key 401 at the PostgREST root is root-caused (project API settings reject anon at the root); the service credential is used ONLY for the read-only OpenAPI root fetch — schema metadata (table/column names), never row data, never printed. v207: fleet build lanes OPEN (PAT broadened) — mobile/teammates/enterprise builds dispatched; github-ops v5+v6 (default-branch + branch-slash fixes); runner tarball deploy live. v205: call-model tools passthrough FIXED (the root cause of the BUILD MODE failure chain). Honest parity headline is computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed.";
+export const PARITY_STATE = "v249 LATENCY + STREAM-SHIELD ROUND (guardian 2026-11-16T08:00Z: intermittent EMPTY SSE streams — connection silently dying in the dead gap between search-done and writer-first-token; plus 5 straight first-token threshold breaches). The stream pipe is now wrapped in a keepalive+error shield: SSE comment keepalives every 2s until the writer's first content delta (idle intermediaries can never cut the connection), and an upstream mid-stream error now serves the fallback answer + clean [DONE] instead of a dead connection. Latency round: simple-intent questions get a 2,000-char research-context cap (was 6,000) and the intent-analyst wall drops 30s -> 6s (its failure already fails open). v248 MULTI-HOP UPGRADE (2026-11-16, FRAMES teardown: short-but-deep chained questions classified simple got 0 planner sub-queries — the multi-hop failure root cause; a deterministic predicate now upgrades chained-entity/dependency/superlative-stack questions to complex so the planner decomposition runs: 12/12 diagnosed FRAMES misses fire, 0/10 plain-fact false-fires, 12.3% owner-corpus blast radius; deploy gated on benchmark-suite completion, FRAMES-100 re-run measures the before/after). v247 FAKE-DONE GUARD (2026-11-16): the free fleet FAKED COMPLETION — lanes flipped status=done with zero rows landing (no Deal Engine DB access, self-reported success; cross-session RED ALERT verified twice). Every data-operation completion claim in an answer is now audited against the turn's executed tool trace: claims with no successful write tool get a deterministic PLATFORM VERIFICATION banner (non-stream + stream paths), and the tool guidance now forbids fabricated completion statements outright. v246 (2026-11-16): (2026-11-16): THE OWNER FRUSTRATION ROUND, PART 2 (owner: ALL MODELS PRODUCING GARBAGE) — the Auto lane emitted its create_file call as a RAW YAML block that rendered as the answer; the tool loop now parses YAML function_call blocks into REAL tool calls (simulation-tested), the leak guard discards any unparsed YAML tool-call text (never renders as the answer), and Kimi special-token soup rewrites now route to the reliable paid lane instead of re-asking the same broken lane. v245: KIMI RELIABILITY. v243 (2026-11-16): APIFY SERVER-SIDE (owner directive: Apify must run server-side and be callable from ai.spaincos.com and boundview.com) — the new apify_call tool proxies the Apify API through the Spain Runner machine (the APIFY_TOKEN never leaves the Fly machine: sessions enqueue rows in staging.apify_call_queue on the Deal Engine, the runner job apify_call executes the HTTP call on the machine and writes results back; every signed-in session can list datasets/actors and pull dataset items, actor runs are admin-only because they consume credits). v238 (2026-11-16): D4 replay fix (complex prompts get the full 4,000-token budget; truncation retry 6,000 tokens + second-pass continuation merge), D3 fix (claim-cant rewrite fires on cometAsk), synthetic-verdict guard (run_python refuses fabricated completion/capability verdicts — owner screenshot incident). v237 (2026-11-15): POST-FINISH TRAILING-CONTENT FIX POST-FINISH TRAILING-CONTENT FIX (the real duplicated-text root cause from the guardian 20:00Z run): the free-lane upstream sends content deltas AFTER the finish_reason frame — late narration that landed after the injected Sources list and glued a restated sentence onto the answer; post-finish content frames are now dropped per SSE semantics. v235: DUPLICATED-SOURCES STREAM FIX — the self-improvement guardian (20:00Z run) caught the free-lane writer emitting its own Sources section, after which the citation linker injected a SECOND Sources list and glued the writer's continuation text to it; the linker now tracks emitted text and never injects a second list when a Sources heading already went through. v234 (2026-11-15): PER-USER DAILY SPEND CEILINGS + COST ATTRIBUTION — every chargeable request from a non-exempt user now checks a per-user daily cost ceiling (DAILY_SPEND_CEILING_USD, default $3/day, tracked in the new user_daily_spend table; owner + eval-bot exempt, the owner's ceiling stays the global $350/mo call-model cap raised from $100) and records the day's estimated cost per user; every call-model request now carries x-user-id so the ops.llm_requests ledger and gateway-meter objects attribute every paid call to the user that caused it (the per-user COGS data the Boundview pricing model needs); when tracked month spend crosses 50% of the $350 cap a spend_alert notification is dropped (one per user per day). call-model v235 (deployed separately): MONTHLY_SPEND_CAP default $100 -> $350 + user_id passthrough into ledger and meter objects. v231 (2026-11-15): COMMAND-LEAK STREAM SCRUB — the v206 Command-line strip only ran on the non-streaming path while the frontend ALWAYS streams, so the model's own **Command: ...** narration leaked into streamed answers (automation 2026-11-15T08:00Z, 2nd occurrence); a new SSE transform now buffers leading deltas and strips a leading Command line (+ stray divider) before anything reaches the client, simulation-tested 5/5. call-model v231 (deployed separately): FREE-NEVER-HARD-FAILS — the fallback chain now runs for any FREE chosen model even with a custom backend (the flint lane was surfacing raw upstream errors with no fallback). v230 (2026-11-15): COMPLETION-DOC SERVER-SIDE AUTO-INVOCATION — completion/closure/orchestration-doc requests (and continuation turns like 'proceed' in such threads) now get registry+doctor+status evidence gathered by the platform itself and injected, the tool loop is force-run, and the .md deliverable is auto-created if the model didn't (closes the owner-observed 'no callable tool functions are exposed to me here' defect — prompt rules alone don't execute tools). v229: completion-doc forcing rule in the capability baseline. v221 (2026-11-14): WEBAPP DOCTOR SERVER-SIDE AUTO-INVOCATION — webapp health asks now run the doctor on the platform side and inject the real matrix as evidence (prompt rules alone failed: the writer answered an Allowance health ask with web research about an unrelated product). v219 (2026-11-14): WEBAPP OPS ROUND — three new owner/fleet tools: webapp_doctor (live per-app health matrix, run before claiming any webapp is broken or healthy), create_webapp (register a NEW webapp in the live webapp_catalog — every registry tool sees it immediately, no redeploy; vaults its service key, verifies schema end-to-end — the permanent path for new projects created from ai.spaincos.com), and webapp_upsert (governed per-webapp write: upsert rows into any registered app's own PostgREST endpoint, audit-logged to webapp_write_log). v217: per-webapp REST access fixed platform-wide (service credentials for all 15 org projects; anon-at-root 401 root-caused). Honest parity headline computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed. v217 (2026-11-14): PER-WEBAPP REST ACCESS FIXED PLATFORM-WIDE — the per-webapp schema tools (list_webapp_tables / describe_webapp) now authenticate with each project's service-role credential (gateway_config webapp_service_<ref>, wired for ALL 15 Supabase projects in the org, including every current webapp AND future siblings: ahapartments, rentcap, rentspire-comps, Deal Engine, deal-desk-saas, property-ops, allowance, PERILMARK, NodeGrade, spain-terminal-staging, rentspire-customer, aml-workspace-preview, cii-platform, ai-gateway, ahwave-dashboard). The anon-key 401 at the PostgREST root is root-caused (project API settings reject anon at the root); the service credential is used ONLY for the read-only OpenAPI root fetch — schema metadata (table/column names), never row data, never printed. v207: fleet build lanes OPEN (PAT broadened) — mobile/teammates/enterprise builds dispatched; github-ops v5+v6 (default-branch + branch-slash fixes); runner tarball deploy live. v205: call-model tools passthrough FIXED (the root cause of the BUILD MODE failure chain). Honest parity headline is computed by qa/generate-parity-headline.py from qa/parity-items.json — never hand-summed.";
 const CAPABILITY_ASK = /\b(runners?|models?|jobs?|tools?|skills?)\b.{0,50}\b(in ai\.spaincos|imported|available|exist|check|deep|listed|registry|catalog)\b|\b(check|verify|list|show|enumerate|inventory)\b.{0,40}\b(runners?|models?|jobs?|tools?|skills?|capabilities)\b/i;
 // v192: webapp-scoped asks (owner directive 2026-11-13: sessions conflate webapps and their databases).
 // When the question is about a specific webapp, its pages, data, schema, or "the data behind" an app,
@@ -175,6 +175,72 @@ function linkCitationsSSE(body: ReadableStream<Uint8Array>, findings: Array<{ ti
 // `fallback()` (research text, or a reliable-model rewrite) and injects it as a normal content delta
 // (plus a synthetic finish chunk if the model never sent one), so the downstream linker links the
 // [N] markers and appends Sources exactly as for a model answer.
+// v248 KEEPALIVE + ERROR SHIELD (guardian 2026-11-16T08:00Z, 5th straight failing run:
+// "stream cut off at ~11.9s and ~13.0s with NO error text — connection just ends", dying in
+// the dead gap between search-done (~4s) and the writer's first token (12-16s). An idle SSE
+// response with zero bytes for >10s gets killed by intermediaries; when the upstream writer
+// stream errors mid-pipe, the error propagates as a silent connection termination the
+// guardEmptyStream flush path never sees). This wrapper: (1) emits an SSE comment keepalive
+// (":ka\n\n") every 2s while the writer has produced NOTHING yet, so idle intermediaries never
+// cut the connection; (2) on upstream error, serves the fallback + clean [DONE] instead of a
+// dead connection. Applied OUTERMOST so it covers the whole pipe.
+function keepaliveShield(body: ReadableStream<Uint8Array>, fallback: () => Promise<string>): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  const ka = encoder.encode(": ka\n\n");                       // SSE comment: ignored by every parser
+  const mk = (delta: Record<string, unknown>, finish: string | null) =>
+    encoder.encode(`data: ${JSON.stringify({ id: "gw-shield", object: "chat.completion.chunk", choices: [{ index: 0, delta, finish_reason: finish }] })}\n\n`);
+  let sawContent = false;
+  return new ReadableStream<Uint8Array>({
+    // IMPORTANT: start() must NOT await the pump — an async start blocks the stream from
+    // being read until the whole body is consumed, which would hold the keepalives back
+    // (the exact defect this shield exists to fix). The pump runs detached.
+    start(controller) {
+      const tick: ReturnType<typeof setInterval> = setInterval(() => {
+        if (sawContent) return;                                  // writer is streaming: no keepalives needed
+        try { controller.enqueue(ka); } catch { /* closed */ }
+      }, 2_000);
+      const check = (chunk: Uint8Array) => {
+        if (!sawContent) {
+          // cheap scan: any content delta means the writer is alive
+          try {
+            const s = new TextDecoder().decode(chunk.slice(0, 2000));
+            if (/"delta":\{"content":"[^"]/.test(s)) sawContent = true;
+          } catch { /* ignore */ }
+        }
+        return chunk;
+      };
+      const pump = async () => {
+        const reader = body.getReader();
+        try {
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            controller.enqueue(check(value));
+          }
+        } catch (_e) {
+          // upstream died mid-stream (the empty-stream defect): serve the fallback and close CLEANLY
+          try {
+            if (!sawContent) {
+              let text = "";
+              try { text = (await fallback()).trim(); } catch { /* nothing */ }
+              if (text) {
+                controller.enqueue(mk({ role: "assistant", content: text }, null));
+                controller.enqueue(mk({}, "stop"));
+              }
+            }
+            controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          } catch { /* never throw out of the shield */ }
+        } finally {
+          clearInterval(tick);
+          try { controller.close(); } catch { /* already closed */ }
+        }
+      };
+      pump(); // detached: the stream is readable the instant start() returns
+    },
+    cancel(reason) { try { body.cancel(reason); } catch { /* already gone */ } }
+  });
+}
+
 function guardEmptyStream(body: ReadableStream<Uint8Array>, fallback: () => Promise<string>): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -1906,8 +1972,13 @@ Question: "${userQuery}"`;
       const intentRes = await fetch(callModelUrl, {
         method: "POST",
         headers: CM_HEADERS,
+        // v248 LATENCY (guardian 2026-11-16T08:00Z: first token 13.3s simple / 31.5s complex,
+        // 5 straight failing runs): the intent analyst call sat in the pre-draft path with a
+        // 30s wall while everything downstream (search, writer) waited on it. The analyst is
+        // a 300-token classification call on the summary lane — 6s is its whole budget now;
+        // on timeout the v85 fail-open defaults already handle routing.
         body: JSON.stringify({ messages: [{ role: "system", content: "You are an intent analyst. Respond with ONLY valid JSON." }, { role: "user", content: intentPrompt }], purpose: "summary", max_tokens: 300 }),
-        signal: AbortSignal.timeout(30_000)
+        signal: AbortSignal.timeout(6_000)
       });
       const intentData = await intentRes.json();
       const intentText = intentData?.choices?.[0]?.message?.content || "{}";
@@ -2184,7 +2255,12 @@ Question: "${userQuery}"`;
                 // (the old 1,500-char slice cut mid-sentence and the context builder's
                 // first-segment split mangled it further — the writing agent then
                 // reproduced broken text like "the3.7%" and run-on "Follow-ups").
-                perplexityFullText = pText.slice(0, 6000);
+                // v248 LATENCY (guardian 2026-11-16T08:00Z, 5 straight failing runs: first-token
+                // 13.3s simple / 31.5s complex — the writer's prefill on the full 6,000-char
+                // research text + 12-source findings is the dominant gap). SIMPLE-intent
+                // one-fact questions get a capped context; complex/multi-hop keeps the full
+                // text (the v248 multi-hop upgrade routes them there anyway).
+                perplexityFullText = pText.slice(0, intent.complexity === "simple" ? 2000 : 6000);
                 if (answerEntryPresent) findings.push({ title: imageAttach ? "Image analysis (vision)" : "Perplexity Search (live web)", url: pCitations[0]?.url || "https://www.perplexity.ai", extract: pText.slice(0, 4000) });
                 uniqCites.forEach((c) => findings.push({ title: c.title, url: c.url, extract: "" }));
                 perplexityUsed = true; researchLane = "perplexity"; researchSkip = "";
@@ -3416,7 +3492,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         const requiredEndLine = extractEndLine(spaceInstructions);
         const withFollowUps = appendFollowUpsSSE(guarded, (ans, writerSec) => resolveFollowUps(callModelUrl, String(userQuery), ans, writerSec, todayStr), requiredEndLine);
         const linkedStream = researchFindings.length ? linkCitationsSSE(withFollowUps, researchFindings) : withFollowUps;
-        const piped = requiredEndLine ? appendEndLineSSE(linkedStream, requiredEndLine) : linkedStream;
+        const piped = keepaliveShield(requiredEndLine ? appendEndLineSSE(linkedStream, requiredEndLine) : linkedStream, lastResortAnswer); // v248: keepalives + error shield — the empty-stream defect can never reach the client
         // v65: PHASE EVENTS — narrate the work that ACTUALLY happened before the
         // token stream starts, so the client's loading state shows real steps
         // ("Searched the web — 6 sources") instead of a generic spinner.
