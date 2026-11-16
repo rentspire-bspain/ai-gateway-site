@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-6IvjujYG25bhRPtXZchs+loUE7PZXQq2CiseQsGUMWs=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-fMI9WzC4V3RQlCSepJdWY2gVmRir25wTgg25XTnZ1yw=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1827,7 +1827,13 @@ function ensureSlug(t) {
 function threadPath(t) { return "/t/" + encodeURIComponent((t && (t.slug || (t.incognito ? "" : ""))) || (t && t.id) || ""); }
 function threadFromPath(p) {
   const m = /^\/t\/([^\/?#]+)/.exec(p || ""); if (!m) return null; const k = decodeURIComponent(m[1]);
-  return threads.find(t => t.slug === k || t.id === k) || null;
+  // v250 DEEP-LINK SURVIVAL: the server sync re-slugs local-only threads on push (the
+  // server assigns its own deduped slug), which used to orphan a /t/<old-slug> deep link
+  // mid-boot — the boot render found nothing and fell through to the landing page
+  // (pre-launch harness: "thread renders" failed 3 runs straight once the eval account
+  // accumulated 90+ duplicate-title threads). Threads now remember every slug they ever
+  // had, so a deep link keeps resolving across the re-slug.
+  return threads.find(t => t.slug === k || t.id === k || (t.oldSlugs || []).indexOf(k) >= 0) || null;
 }
 function syncUrl(t, replace) {
   try {
@@ -2922,7 +2928,10 @@ async function pushThreadToServer(t) {
   try {
     const row = { id: t.id, title: t.title, user_id: currentUser.id, space_id: t.spaceId || null };
     const { data: up } = await sb.from("threads").upsert(row).select("slug").maybeSingle();
-    if (up && up.slug && up.slug !== t.slug) { t.slug = up.slug; if (currentThreadId === t.id) syncUrl(t, true); }
+    if (up && up.slug && up.slug !== t.slug) {
+      (t.oldSlugs = t.oldSlugs || []).push(t.slug);   // v250: deep links to the old slug must keep resolving
+      t.slug = up.slug; if (currentThreadId === t.id) syncUrl(t, true);
+    }
   } catch (e) { /* offline-tolerant: localStorage still has it */ }
 }
 async function pushThreadMessages(t) {

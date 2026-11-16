@@ -271,9 +271,26 @@ export function needsComputation(query: string, intent?: { needs_data?: boolean;
   return !!(intent?.needs_code || MATH_INTENT.test(String(query || "")));
 }
 
-export function shouldRunToolLoop(opts: { complexity?: string; model: string; stream?: boolean; query: string; intent: { needs_search?: boolean; needs_data?: boolean }; clientOptOut?: boolean }): { run: boolean; reason?: string } {
+export function shouldRunToolLoop(opts: { complexity?: string; model: string; stream?: boolean; query: string; intent: { needs_search?: boolean; needs_data?: boolean }; clientOptOut?: boolean; perplexityUsed?: boolean; researchSources?: number }): { run: boolean; reason?: string } {
   if (!toolLoopEnabled()) return { run: false, reason: "disabled (TOOL_LOOP != 1)" };
   if (opts.clientOptOut) return { run: false, reason: "client opted out" };
+  // v250 FAST-PATH FIX (2026-11-16, pre-launch battery: "current 30-year mortgage rate?"
+  // was marked a data lookup (needs_data) -> the gate opened -> the tool loop re-searched
+  // what the live research lane had already answered: 34s for a one-line fact. The v121
+  // research_sufficient skip inside the gate block never fired for these on live v249
+  // (observed skipped=null, rounds=1 on simple lookups with lane=perplexity, 10 sources).
+  // The skip is now DETERMINISTIC IN THE GATE: a SIMPLE lookup whose only tool-worthy
+  // signal is needs_data/needs_search — no computation, no explicit tool phrasing, no
+  // URL, no capability ask — with the live research lane already back (perplexityUsed +
+  // >= 6 sources) skips the loop with reason "research_sufficient". Explicit
+  // tool-worthy phrasing and multi-hop questions (upgraded to complex by the v248
+  // predicate before this gate) still run the loop.
+  if ((opts.complexity === "simple" || opts.complexity === "medium") && opts.perplexityUsed && (opts.researchSources ?? 0) >= 6
+      && (opts.intent?.needs_data || opts.intent?.needs_search)
+      && !needsComputation(opts.query, opts.intent)
+      && !looksToolWorthy(opts.query, {})) {
+    return { run: false, reason: "research_sufficient" };
+  }
   // v73: "simple" classification must NOT skip the loop when the user explicitly
   // wants browsing/page-reading or pasted a URL — those are tool-worthy by phrasing.
   if (opts.complexity === "simple" && !looksToolWorthy(opts.query, opts.intent)) return { run: false, reason: "simple intent" };
