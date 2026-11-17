@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verify your school email — ai.spaincos.com</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+  /* ai-gateway-site tokens — mirrors the site's dark theme (Neurons v4 family) */
+  :root{--bg:#0c0e14;--bg-elevated:#141824;--border:#232a3a;--border-light:#2c3447;
+        --text:#e8ecf4;--text-muted:#9aa4b8;--text-faint:#66708a;--accent:#5b8cff;
+        --ok:#34d399;--err:#ffb3c0;--radius:14px;--radius-sm:10px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55;display:grid;place-items:center;min-height:100vh;padding:24px}
+  .card{width:min(480px,100%);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:32px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:30px;line-height:1.15;margin:10px 0 8px}
+  .sub{color:var(--text-muted);margin:0 0 24px;font-size:14px}
+  .state{display:none;text-align:left}
+  .state.show{display:block}
+  .row{display:flex;gap:10px;margin-top:16px}
+  .row input{flex:1}
+  input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:16px;padding:12px 14px;outline:none}
+  input:focus{border-color:var(--accent)}
+  button{background:var(--accent);border:0;border-radius:var(--radius-sm);color:#fff;font-size:15px;font-weight:600;padding:12px 20px;cursor:pointer;width:100%}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button.secondary{background:transparent;border:1px solid var(--border);color:var(--text)}
+  .err{display:none;margin-top:14px;background:#2a1a1e;border:1px solid #7f2b3a;color:var(--err);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px}
+  .err.show{display:block}
+  .spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--accent);animation:r 0.8s linear infinite;margin:24px auto}
+  @keyframes r{to{transform:rotate(360deg)}}
+  .check{width:64px;height:64px;border-radius:50%;background:var(--ok);margin:0 auto 14px;display:flex;align-items:center;justify-content:center}
+  .check svg{width:30px;height:30px;stroke:#06281d;stroke-width:3;fill:none}
+  .bonus{display:flex;gap:12px;margin:18px 0}
+  .bonus div{flex:1;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+  .bonus b{display:block;font-size:20px;font-family:Fraunces,Georgia,serif}
+  .bonus span{font-size:12px;color:var(--text-muted)}
+  .fine{font-size:11px;color:var(--text-faint);margin-top:20px;line-height:1.6}
+  .back{display:inline-block;margin-top:18px;color:var(--text-muted);font-size:13px;text-decoration:none}
+  .back:hover{color:var(--text)}
+</style>
+</head>
+<body>
+<div class="card">
+  <p class="eyebrow">Student verification</p>
+
+  <!-- state 1: verifying (auto-runs on load with ?token=) -->
+  <div class="state show" id="st-working">
+    <div class="spin"></div>
+    <h1 style="text-align:center">Verifying your email…</h1>
+    <p class="sub" style="text-align:center">Hang tight — this takes a second.</p>
+  </div>
+
+  <!-- state 2: success -->
+  <div class="state" id="st-done">
+    <div class="check"><svg viewBox="0 0 24 24"><path d="M5 13l5 5 9-11"/></svg></div>
+    <h1 style="text-align:center">You're verified</h1>
+    <p class="sub" id="done-detail" style="text-align:center"></p>
+    <div class="bonus">
+      <div><b id="b1">+1,000</b><span>query credits</span></div>
+      <div><b id="b2">+500</b><span>Neurons</span></div>
+    </div>
+    <button onclick="location.assign('/')">Start asking</button>
+  </div>
+
+  <!-- state 3: needs sign-in -->
+  <div class="state" id="st-signin">
+    <h1>Almost there</h1>
+    <p class="sub">You opened the verification link in a browser that isn't signed in to ai.spaincos.com. Sign in on this device, then come back and open the link again.</p>
+    <button onclick="location.assign('/')">Sign in</button>
+  </div>
+
+  <!-- state 4: paste-a-code fallback (no ?token=) -->
+  <div class="state" id="st-code">
+    <h1>Enter your verification code</h1>
+    <p class="sub">Paste the code from your verification email. Or open the link from the email on this device.</p>
+    <input id="code" placeholder="Paste verification code" autocomplete="one-time-code">
+    <div class="err" id="err"></div>
+    <button id="confirm">Verify</button>
+  </div>
+
+  <!-- state 5: error -->
+  <div class="state" id="st-error">
+    <h1>That didn't work</h1>
+    <p class="sub" id="err-detail"></p>
+    <button onclick="location.reload()">Try again</button>
+    <a class="back" href="/">Back to ai.spaincos.com</a>
+  </div>
+
+  <p class="fine">One bonus per person, ever. Verification disclosures v1 — see the site Terms and Privacy Policy. We never sell your email.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js" integrity="sha384-uteMfOloLDGt042uDz+xHGF3ym63/WQ6rFq7murQRG8Ih7QrXGEGNtWd8688sb4O" crossorigin="anonymous"></script>
+<script>
+  const SUPABASE_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
+  const SUPABASE_ANON = "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const ERRS = {
+    invalid_token: "That code didn't match. Check it and try again, or open the link from your email.",
+    token_expired: "That link expired (they last 24 hours). Request a new one from Settings.",
+    email_already_claimed: "That .edu address already claimed its bonus.",
+    user_already_verified: "You've already claimed your student bonus.",
+    auth: "You need to be signed in to verify."
+  };
+  const $ = id => document.getElementById(id);
+  const show = id => { document.querySelectorAll(".state").forEach(s => s.classList.remove("show")); $(id).classList.add("show"); };
+
+  async function confirmToken(token) {
+    const { data: session } = await sb.auth.getSession();
+    if (!session || !session.session) { show("st-signin"); return; }
+    const res = await fetch(SUPABASE_URL + "/rest/v1/rpc/student_verification_confirm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON,
+        "Authorization": "Bearer " + session.session.access_token
+      },
+      body: JSON.stringify({ p_token: token })
+    });
+    const body = await res.json().catch(() => ({}));
+    if (res.ok && body.ok) {
+      $("done-detail").textContent = (body.institution ? body.institution + " — " : "") +
+        "your student bonus is in your account.";
+      show("st-done");
+    } else if (body.error === "auth required" || res.status === 401) {
+      show("st-signin");
+    } else {
+      $("err-detail").textContent = ERRS[body.error] || "Something went wrong verifying your email. Try again, or request a new link from Settings.";
+      show("st-error");
+    }
+  }
+
+  // Route: /verify?token=<emailed token> — runs immediately.
+  //        /verify (no token) — paste-a-code fallback.
+  const params = new URLSearchParams(location.search);
+  const token = params.get("token");
+  if (token) {
+    confirmToken(token);
+  } else {
+    show("st-code");
+    $("confirm").onclick = () => {
+      const t = $("code").value.trim();
+      if (!t) { $("err").textContent = "Paste the code from your email."; $("err").classList.add("show"); return; }
+      confirmToken(t);
+    };
+  }
+</script>
+</body>
+</html>

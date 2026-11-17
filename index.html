@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-cbj8jXcFOZlYNl/Z+t577kPgAcSD/frvrJekYKTTIfU=' 'sha256-OSRflb80PmZxopGbL0L8mOvX4j9mR+wdOZUm5OodZB8=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-fMI9WzC4V3RQlCSepJdWY2gVmRir25wTgg25XTnZ1yw=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@ html.pre-boot #landing{display:none!important}
 html.pre-boot body::before{content:"";position:fixed;top:72px;left:50%;transform:translateX(-50%);width:min(720px,86vw);height:60vh;border-radius:12px;z-index:5;background:linear-gradient(90deg,rgba(128,128,128,.10) 25%,rgba(128,128,128,.22) 50%,rgba(128,128,128,.10) 75%);background-size:200% 100%;animation:preBootShimmer 1.2s linear infinite}
 @keyframes preBootShimmer{to{background-position:-200% 0}}
 </style>
-<link rel="icon" type="image/webp" href="/favicon.webp">
+<link rel="icon" type="image/png" href="/favicon.png?v=177">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#14646B">
 <meta name="app-version" content="v84">
@@ -35,6 +35,8 @@ html.pre-boot body::before{content:"";position:fixed;top:72px;left:50%;transform
 <link rel="stylesheet" href="/modules/export.css">
 <link rel="stylesheet" href="/modules/docs-panel.css">
 <link rel="stylesheet" href="/modules/voice-convo.css">
+<link rel="stylesheet" href="/modules/tool-chips.css">
+<link rel="stylesheet" href="/modules/onboarding.css">
 <style>
 /* Exact Perplexity fonts — the same variable font files their site serves */
 @font-face { font-family: "pplxSans"; src: url("https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
@@ -92,6 +94,8 @@ body.incognito .question-header::after{content:"";}
   --accent-hover: #56ABAB;
   --accent-btn: #2B7A7A;
   --accent-btn-hover: #246C6C;
+  --send-btn-bg: #E8EDF2;   /* v181: Perplexity-style high-contrast send button (light circle, dark icon) */
+  --send-btn-fg: #0D1117;
   --accent-light: rgba(61, 149, 149, 0.14);
   --citation-bg: rgba(219, 222, 227, 0.06);
   --citation-text: #6BB8B8;
@@ -101,6 +105,7 @@ body.incognito .question-header::after{content:"";}
   --radius-xs: 6px;
   --sidebar-width: 260px;
   --answer-w: 720px;
+  --answer-shift: 96px; /* answer column sits left of true center, like Perplexity */
   --followup-h: 120px;
   --font-sans: "pplxSans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: "pplxSerif", Georgia, serif;
@@ -120,6 +125,8 @@ body.incognito .question-header::after{content:"";}
   --accent-hover: #0F4F55;
   --accent-btn: #14646B;
   --accent-btn-hover: #0F4F55;
+  --send-btn-bg: #1B1F24;   /* v181: light mode = dark circle, white icon */
+  --send-btn-fg: #FFFFFF;
   --accent-light: rgba(61, 149, 149, 0.1);
   --citation-bg: rgba(11, 40, 51, 0.05);
   --citation-text: #14646B;
@@ -163,9 +170,26 @@ a { color: inherit; text-decoration: none; }
 /* Collapsed (desktop): zero width, no negative margin (the old margin-left hack pushed
    the main column 260px off-screen and hid the expand button). */
 .sidebar.collapsed {
-  width: 0; min-width: 0; border-right-width: 0; overflow: hidden;
-  visibility: hidden; transition: width 0.2s ease, visibility 0s 0.2s;
+  /* v180 (owner request 2026-11-12): collapsed rail stays VISIBLE as a narrow
+     icon rail (Perplexity-style) — logo, new-thread, nav icons, avatar — instead
+     of vanishing completely. Text hides; icons stay centered. */
+  width: 52px; min-width: 52px; border-right-width: 1px; overflow: hidden;
+  visibility: visible; transition: width 0.2s ease;
 }
+.sidebar.collapsed .sidebar-header { flex-direction: column; gap: 6px; padding: 10px 0 2px; align-items: center; }
+.sidebar.collapsed .logo { flex-direction: column; gap: 4px; }
+.sidebar.collapsed .logo span { display: none; }
+.sidebar.collapsed .logo img { height: 22px; width: 22px; margin: 0 auto; }
+.sidebar.collapsed .sidebar-actions { flex-direction: column; gap: 2px; }
+.sidebar.collapsed .new-thread-btn { width: 38px; padding: 9px 0; justify-content: center; font-size: 0; gap: 0; margin-left: 7px; margin-right: 7px; }
+.sidebar.collapsed .side-nav { padding: 6px 7px; }
+.sidebar.collapsed .side-nav-btn { justify-content: center; gap: 0; padding: 9px 0; font-size: 0; }
+.sidebar.collapsed .side-nav-btn span { display: none; }
+.sidebar.collapsed .threads-list { display: none; }
+.sidebar.collapsed .sidebar-footer { padding: 6px 7px 8px; }
+.sidebar.collapsed .import-history-btn { display: none; }
+.sidebar.collapsed .user-row { flex-direction: column; gap: 4px; padding: 8px 0; align-items: center; }
+.sidebar.collapsed .user-info { display: none; }
 .sidebar-scrim { display: none; }
 @media (max-width: 768px) {
   /* mobile: overlay drawer, no resize handle */
@@ -267,6 +291,8 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   overflow-x: hidden;
   padding: 0 12px;
 }
+.spaces-head { cursor: pointer; }
+#spaceItems { padding-bottom: 8px; }
 .spaces-head { display: flex; align-items: center; }
 .space-add-btn {
   background: none; border: none; color: var(--text-faint); cursor: pointer;
@@ -280,7 +306,18 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .space-item:hover { background: var(--bg-elevated); color: var(--text); }
 .space-item.active { background: var(--accent-light); color: var(--text); }
 .space-item .space-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.space-item .space-gear, .thread-item .thread-move {
+.space-item .space-gear, .thread-item-snippet {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-faint, #9aa0a6);
+  margin-top: 1px;
+}
+.thread-item .thread-move {
   opacity: 0; background: none; border: none; color: var(--text-faint); cursor: pointer;
   padding: 2px; border-radius: 4px; display: flex; align-items: center; flex-shrink: 0;
 }
@@ -380,9 +417,10 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--accent-light); color: var(--text);
   border: 1px solid var(--border); border-radius: 999px;
-  font-size: 12px; padding: 3px 10px; margin: 6px 0 0; max-width: 100%; overflow-wrap: anywhere;
+  font-size: 12px; padding: 3px 10px; margin: 6px 0 0; max-width: 100%; overflow-wrap: anywhere; overflow: hidden;
 }
 .attach-chip button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 0; line-height: 1; }
+.attach-thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 7px; display: block; flex-shrink: 0; }
 .thread-item svg { flex-shrink: 0; opacity: 0.6; }
 .thread-item span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .thread-item { overflow: hidden; }
@@ -585,13 +623,14 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--accent-btn);
-  color: white;
+  background: var(--send-btn-bg);
+  color: var(--send-btn-fg);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: background 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,.28);
 }
 .search-submit:hover { background: var(--accent-btn-hover); transform: scale(1.05); }
 .search-submit:disabled { opacity: 0.5; cursor: wait; }
@@ -633,6 +672,8 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .searchbar-mini {
   max-width: var(--answer-w, 720px);
   margin: 0 auto;
+  margin-left: max(0px, calc((100% - var(--answer-w, 720px)) / 2 - var(--answer-shift, 0px)));
+  margin-right: auto;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -662,6 +703,8 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   max-width: var(--answer-w, 720px);
   min-width: 0;
   margin: 0 auto;
+  margin-left: max(0px, calc((100% - var(--answer-w, 720px)) / 2 - var(--answer-shift, 0px)));
+  margin-right: auto;
 }
 .results-inner > * { min-width: 0; max-width: 100%; }
 
@@ -801,7 +844,7 @@ a.cite-plain:hover, a.cite-plain:focus-visible { text-decoration:underline!impor
 .searching-query { max-width:100%; margin:2px 0 4px; font-size:13px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; }
 .question-header { scroll-margin-top:12px; }
 /* v95 composer toolbar: one row, stable order, obvious Research state */
-.composer-pills { flex-wrap:nowrap!important; overflow-x:auto; scrollbar-width:none; }
+.composer-pills { flex-wrap:wrap; overflow-x:visible; scrollbar-width:none; }
 .composer-pills::-webkit-scrollbar { display:none; }
 .composer-pills > *, .composer-pills .sources-pill { flex:0 0 auto; }
 #followupPills .pill-txt, #followupPills #incognitoLabel { display:none; }
@@ -840,8 +883,9 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .sources-section { margin-bottom:16px; }
 .sources-head { display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--text-muted); margin:0 0 8px 2px; }
 .sources-head .sh-n { font-weight:500; color:var(--text-faint); }
-.sources-row { scroll-snap-type:x proximity; scrollbar-width:thin; padding:2px 2px 8px; margin:0 -2px; }
-.sources-row .source-card { width:172px; min-height:84px; display:flex; flex-direction:column; gap:6px; padding:9px 10px; text-decoration:none!important; color:var(--text)!important; scroll-snap-align:start; box-sizing:border-box; }
+.sources-row { scroll-snap-type:x proximity; scrollbar-width:none; padding:2px 2px 8px; margin:0 -2px; }
+.sources-row::-webkit-scrollbar { display: none; }   /* v179: Perplexity parity — no visible scrollbar */
+.sources-row .source-card { width:160px; min-height:78px; display:flex; flex-direction:column; gap:5px; padding:8px 9px; text-decoration:none!important; color:var(--text)!important; scroll-snap-align:start; box-sizing:border-box; }
 .sources-row .source-card:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
 .source-card .sc-top { display:flex; align-items:center; gap:6px; min-width:0; }
 .source-card .sc-fav { width:16px; height:16px; border-radius:4px; flex:0 0 16px; background:var(--bg-elevated); object-fit:cover; }
@@ -940,7 +984,30 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .answer-content li { margin-bottom: 6px; }
 .answer-content strong { font-weight: 600; }
 .answer-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 6px 0; }
-.answer-content pre { overflow-x: auto; max-width: 100%; }
+.answer-content pre { overflow-x: auto; max-width: 100%; position: relative; }
+.code-copy-btn { position: absolute; top: 8px; right: 8px; display: flex; align-items: center; gap: 5px; padding: 4px 9px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-elevated); color: var(--text-muted); font-size: 12px; font-family: var(--font-sans); cursor: pointer; opacity: 0; transition: opacity .12s ease, color .12s ease, border-color .12s ease; z-index: 2; }
+.answer-content pre:hover .code-copy-btn, .code-copy-btn:focus-visible { opacity: 1; }
+.code-copy-btn:hover { color: var(--text); border-color: var(--accent); }
+/* v179: "Open" button sits left of Copy when a code block holds a URL */
+.answer-content pre .code-open-btn, .code-open-btn { right: 72px; }
+.code-open-btn.copied { color: var(--accent); border-color: var(--accent); }
+/* v179: parallel "Run all" next-step cards (Perplexity Tasks-style) */
+.parallel-run { margin: 14px 0 6px; display: flex; flex-direction: column; gap: 10px; }
+.parallel-run-head { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--text-muted); }
+.parallel-run-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: parallelPulse 1.2s ease-in-out infinite; }
+.parallel-run-head:not(:has(+ .parallel-card:not(.done))) .parallel-run-dot { animation: none; background: var(--accent); }
+@keyframes parallelPulse { 0%,100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
+.parallel-card { border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px 12px; background: var(--bg-elevated); }
+.parallel-card .parallel-q { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: flex; gap: 8px; align-items: baseline; }
+.parallel-card .parallel-q::before { content: "→"; color: var(--accent); flex: 0 0 auto; }
+.parallel-card.done { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+.parallel-card.failed { border-color: #f87171; }
+.parallel-card .parallel-body { font-size: 13.5px; line-height: 1.55; }
+.parallel-card .parallel-body .answer-content { font-size: 13.5px; }
+.parallel-spin { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: parallelSpin .8s linear infinite; }
+@keyframes parallelSpin { to { transform: rotate(360deg); } }
+.parallel-err { color: #f87171; font-size: 12.5px; }
+.code-copy-btn.copied { opacity: 1; color: var(--accent); border-color: var(--accent); }
 .answer-content table { display: table; width: 100%; max-width: none; }
 .answer-content .table-wrap { overflow-x: auto; max-width: 100%; margin: 0 0 14px; -webkit-overflow-scrolling: touch; }
 .answer-content .table-wrap > table { margin: 0; }
@@ -970,8 +1037,11 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
   line-height: 1.5;
 }
 .answer-content pre code { background: none; padding: 0; font-size: inherit; line-height: inherit; white-space: pre; overflow-wrap: normal; }
-.answer-content table { border-collapse: collapse; width: 100%; margin: 0 0 14px 0; font-size: 14px; }
-.answer-content th, .answer-content td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; overflow-wrap: break-word; }
+.answer-content table { border-collapse: collapse; width: 100%; margin: 0 0 14px 0; font-size: 14px; table-layout: auto; }
+/* v175 wide-table fix: min-widths keep columns readable (no 1-3 char fragments); the
+   table-wrap scroller carries the overflow instead of squeezing the last column. */
+.answer-content th, .answer-content td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; overflow-wrap: break-word; min-width: 72px; }
+.answer-content th:first-child, .answer-content td:first-child { min-width: 34px; }
 .answer-content th { background: var(--bg-elevated); font-weight: 600; }
 .answer-content h1, .answer-content h2, .answer-content h3, .answer-content h4 { margin: 18px 0 10px 0; font-weight: 600; }
 .answer-content h1 { font-size: 20px; } .answer-content h2 { font-size: 18px; } .answer-content h3 { font-size: 16px; } .answer-content h4 { font-size: 15px; }
@@ -1008,6 +1078,8 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
   flex-wrap: wrap;
 }
 /* spacing between conversation turns (a question after an answer) */
+.older-turns-btn { display: block; margin: 0 0 14px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-elevated); color: var(--text-muted); font-size: 13px; cursor: pointer; }
+.older-turns-btn:hover { color: var(--text); border-color: var(--accent); }
 .answer-section + .related-section + .question-header,
 .answer-section + .question-header { margin-top: 28px; }
 .action-btn {
@@ -1158,6 +1230,8 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
   margin-top: 8px;
   text-align: center;
 }
+.auth-link { display:block; width:100%; background:none; border:none; color:var(--accent,#1a6b5a); font:inherit; font-size:12.5px; cursor:pointer; padding:6px 0 0; }
+.auth-link:hover { text-decoration: underline; }
 .auth-note {
   font-size: 12px;
   color: var(--text-faint);
@@ -1203,8 +1277,8 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .followup-box input, .followup-box textarea { flex: 1 1 100px; min-width: 0; font-size: 14.5px; line-height: 1.45; }
 .followup-box textarea { resize: none; overflow-y: auto; min-height: 24px; max-height: 200px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .followup-box { position: relative; }
-.followup-inner { max-width: calc(var(--answer-w, 720px) + 120px); }
-.queued-msg { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(32,128,141,0.12); border: 1px dashed var(--accent); font-size: 13px; color: var(--text-muted); }
+.followup-inner { max-width: var(--answer-w, 720px); margin-left: max(0px, calc((100% - var(--answer-w, 720px)) / 2 - var(--answer-shift, 0px))); margin-right: auto; }
+.queued-msg { flex: none; width: 100%; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(32,128,141,0.12); border: 1px dashed var(--accent); font-size: 13px; color: var(--text-muted); }
 .queued-msg[hidden] { display: none; }
 .queued-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; animation: qpulse 1.2s ease-in-out infinite; }
 @keyframes qpulse { 50% { opacity: .3; } }
@@ -1214,19 +1288,23 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .queued-cancel:hover { color: var(--text); }
 .followup-box input::placeholder { color: var(--text-faint); }
 .followup-send {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: var(--accent-btn);
-  color: white;
+  background: var(--send-btn-bg);
+  color: var(--send-btn-fg);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: background 0.15s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,.28);
 }
 .followup-send:hover { background: var(--accent-btn-hover); }
 .followup-send:disabled { opacity: 0.5; cursor: wait; }
+/* v181: the send button becomes a filled STOP square while a response streams —
+   the user always knows whether pressing it sends or stops. */
+.search-submit.searching, .followup-send.searching { background: var(--send-btn-bg); color: var(--send-btn-fg); cursor: pointer; }
 
 /* Model selector */
 .model-select {
@@ -1444,8 +1522,7 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo">
-        <div class="logo-mark">P</div>
-        <span>ai.spaincos</span>
+        <img src="/spaincos-icon.svg?v=177" alt="Spain Companies" style="height:28px;width:auto;display:block" /><span style="font-weight:700;letter-spacing:.02em">ai.spaincos</span>
       </div>
       <div class="sidebar-actions">
         <button class="icon-btn" id="newThreadIcon" title="New thread">
@@ -1473,15 +1550,16 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
     </div>
     <div class="threads-list" id="threadsList">
       <input class="thread-search" id="threadSearch" placeholder="Search threads..." autocomplete="off">
-      <div class="spaces-head">
+      <div class="threads-label" id="recentLabel">Recent</div>
+      <div id="threadItems"></div>
+      <div class="spaces-head" id="spacesHead" title="Show spaces">
         <div class="threads-label" style="flex:1">Spaces</div>
+        <svg id="spacesChevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transform:rotate(-90deg)"><path d="M6 9l6 6 6-6"/></svg>
         <button class="space-add-btn" id="newSpaceBtn" title="New space">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         </button>
       </div>
       <div id="spaceItems"></div>
-      <div class="threads-label" id="recentLabel">Recent</div>
-      <div id="threadItems"></div>
     </div>
     <div class="sidebar-footer">
       <button class="import-history-btn" id="importHistoryBtn" title="Import your Perplexity history as searchable context">
@@ -1517,15 +1595,26 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
         <select class="model-select" id="modelSel" title="Model — uncensored options answer without hedging">
           <!-- v129: every option carries its one-line "best at" description so the
                choice is self-explanatory in the dropdown itself. -->
-          <option value="general" title="Auto — GLM-5.3, the everyday default. Best all-round quality; free Qwen fallback if the budget cap is hit.">Auto (GLM-5.3)</option>
-          <option value="flint" title="Flint v1.0 — coding and agentic work (free).">Flint v1.0 (free)</option>
-          <option value="summary" title="Qwen3.8-27B — fast summaries (free).">Qwen3.8 (free)</option>
-          <option value="kimi" title="Kimi K3.1 Pro — long-context reasoning.">Kimi K3.1 Pro</option>
-          <option value="deepseek-flash" title="DeepSeek V4.1 Flash — fast generalist.">DeepSeek V4.1 Flash</option>
-          <option value="gpt-oss" title="GPT-OSS 120B — balanced open-weight.">GPT-OSS 120B</option>
-          <option value="llama4" title="Llama 4 Maverick — general chat.">Llama 4 Maverick</option>
-          <option value="venice">Venice Uncensored — blunt, no hedging</option>
-          <option value="dolphin">Dolphin Uncensored 24B — blunt, no hedging</option>
+          <option value="general" title="Auto — GLM-5.3, the everyday default. Best all-round quality; free Qwen fallback if the budget cap is hit.">Auto (GLM-5.3) — best all-round default</option>
+          <option value="flint" title="Flint v1.0 — coding and agentic work (free).">Flint v1.0 (free) — coding + agentic work</option>
+          <option value="summary" title="Qwen3.8-27B — fast summaries (free).">Qwen3.8 (free) — fast summaries</option>
+          <option value="kimi" title="Kimi K3.1 Pro — long-context reasoning.">Kimi K3.1 Pro — long-context + research</option>
+          <option value="deepseek-flash" title="DeepSeek V4.1 Flash — fast generalist.">DeepSeek V4.1 Flash — fast generalist</option>
+          <option value="gpt-oss" title="GPT-OSS 120B — balanced open-weight.">GPT-OSS 120B — balanced open-weight</option>
+          <option value="llama4" title="Llama 4 Maverick — general chat.">Llama 4 Maverick — general chat</option>
+          <option value="venice" title="Venice Uncensored — unfiltered answers, no hedging.">Venice Uncensored — blunt, no hedging</option>
+          <option value="dolphin" title="Dolphin Mistral 24B Uncensored — unfiltered, no hedging.">Dolphin Uncensored 24B — blunt, no hedging</option>
+          <!-- v169 MODEL DROPDOWN EXPANSION: every option below is LIVE-verified
+               against the gateway (2026-11-11, 9-14s round trips, x_routed_model
+               echoed). Closed the "only 2 of 14 models in the dropdown" gap. -->
+          <option value="r1" title="DeepSeek R1 — deliberate chain-of-thought reasoning. Best for hard logic and math.">DeepSeek R1 — hard logic + math</option>
+          <option value="qwen-coder" title="Qwen3 Coder — code generation and review. Best for programming.">Qwen3 Coder — programming</option>
+          <option value="gpt-oss-20b" title="GPT-OSS 20B — the fast, light open-weight sibling. Best for quick answers.">GPT-OSS 20B (fast) — quick answers</option>
+          <option value="gemma4" title="Gemma 4 31B — Google's open-weight generalist. Good all-round chat.">Gemma 4 31B — all-round chat</option>
+          <option value="minimax-m2" title="MiniMax M2 — strong reasoning at speed. Best for analysis.">MiniMax M2 — fast analysis</option>
+          <option value="llama4-scout" title="Llama 4 Scout — the light, quick Llama. Best for fast chat.">Llama 4 Scout — fast chat</option>
+          <option value="glm-air" title="GLM-5.3 Air — the lighter GLM, much faster. Best when speed beats depth.">GLM-5.3 Air (fast) — speed over depth</option>
+          <option value="kimi-flash" title="Kimi K3.1 Flash — Kimi's speed lane. Best for quick reasoning.">Kimi K3.1 Flash — quick reasoning</option>
         </select>
         <button class="width-toggle" id="voiceToggle" title="Read answers aloud">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
@@ -1623,7 +1712,7 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 <div class="auth-overlay" id="authOverlay" style="display:none">
   <div class="auth-modal">
     <div class="auth-logo">
-      <div class="logo-mark" style="width:36px;height:36px;font-size:18px">P</div>
+      <img src="/spaincos-icon.svg?v=177" alt="Spain Companies" style="height:40px;width:auto;display:block" />
     </div>
     <h2 class="auth-title">Welcome to ai.spaincos</h2>
     <p class="auth-subtitle">Sign in to start searching</p>
@@ -1637,6 +1726,17 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
       <button class="auth-btn" id="authPasswordBtn">Sign in with password</button>
       <button class="auth-btn-secondary" id="authSendCode">Send email code instead</button>
       <button class="auth-btn-secondary" id="authPasskeyBtn" style="margin-top:8px">Sign in with passkey</button>
+      <button class="auth-link" id="authSetPass" type="button" style="margin-top:10px">Set or reset my password (email link)</button>
+      <button class="auth-link" id="authForgot" type="button" style="margin-top:2px">Forgot password?</button>
+    </div>
+    <div id="authStep3" style="display:none">
+      <div class="auth-input-group">
+        <input class="auth-input" id="authNewPass" type="password" placeholder="New password (8+ characters)" autocomplete="new-password">
+      </div>
+      <div class="auth-input-group">
+        <input class="auth-input" id="authNewPass2" type="password" placeholder="Repeat new password" autocomplete="new-password">
+      </div>
+      <button class="auth-btn" id="authSavePass">Save password</button>
     </div>
     <div id="authStep2" style="display:none">
       <div class="auth-input-group">
@@ -1650,14 +1750,26 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js" integrity="sha384-uteMfOloLDGt042uDz+xHGF3ym63/WQ6rFq7murQRG8Ih7QrXGEGNtWd8688sb4O" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js" integrity="sha384-XQqX/4yiUGu+oyr87jvWzRuqBUK/adrY0DunhL+tID9m/9dwSpV8h9Fk/Sg6ifVQ" crossorigin="anonymous"></script>
+<script src="/build.js"></script>
 <script>
 const SUPABASE_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
 const SUPABASE_ANON = "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb";
 const GATEWAY = SUPABASE_URL + "/functions/v1";
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  // v240 (owner directive: STOP LOGGING ME OUT): the site also runs inside the Comet
+  // extension's side-panel iframe, sharing the tab's session via the site-bridge mirror.
+  // TWO supabase-js clients refreshing the SAME refresh token race each other — outside the
+  // 10s reuse window Supabase revokes the whole session family and signs the user out
+  // everywhere. In an iframe we NEVER refresh: the bridge mirrors the tab's fresh tokens
+  // into this frame's localStorage every second, so the panel stays signed in without
+  // ever touching the refresh endpoint. Only the top window refreshes.
+  auth: (window.self !== window.top)
+    ? { persistSession: true, autoRefreshToken: false, detectSessionInUrl: false }
+    : { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
 
 // v92: CSP-safe bridge for modules (no eval — the CSP blocks indirect eval).
 // Modules read/write the app's top-level bindings through these getters/setters.
@@ -1715,7 +1827,13 @@ function ensureSlug(t) {
 function threadPath(t) { return "/t/" + encodeURIComponent((t && (t.slug || (t.incognito ? "" : ""))) || (t && t.id) || ""); }
 function threadFromPath(p) {
   const m = /^\/t\/([^\/?#]+)/.exec(p || ""); if (!m) return null; const k = decodeURIComponent(m[1]);
-  return threads.find(t => t.slug === k || t.id === k) || null;
+  // v250 DEEP-LINK SURVIVAL: the server sync re-slugs local-only threads on push (the
+  // server assigns its own deduped slug), which used to orphan a /t/<old-slug> deep link
+  // mid-boot — the boot render found nothing and fell through to the landing page
+  // (pre-launch harness: "thread renders" failed 3 runs straight once the eval account
+  // accumulated 90+ duplicate-title threads). Threads now remember every slug they ever
+  // had, so a deep link keeps resolving across the re-slug.
+  return threads.find(t => t.slug === k || t.id === k || (t.oldSlugs || []).indexOf(k) >= 0) || null;
 }
 function syncUrl(t, replace) {
   try {
@@ -1729,7 +1847,25 @@ window.addEventListener("popstate", () => {
   if (t) loadThread(t.id, true); else { setCurrentThread(null); showLanding(); renderThreads(); }
 });
 let isSearching = false;
-let runAllState = { active: false, stop: false };   // v97: "Run all" follow-ups state
+window.__isSearching = () => isSearching;
+let searchDeadline = 0;   // v156 STUCK-SEARCH WATCHDOG: hard deadline for the current search
+let runAllState = { active: false, stop: false, runId: 0 };   // v97: "Run all" follow-ups state
+// v156: a stalled gateway stream (connection open, no data, never closes) used to leave
+// isSearching true FOREVER — every later Enter queued "in perpetuity" and the composer
+// ate prompts with a blank canvas. This watchdog force-frees the lock after 5 minutes,
+// surfaces a retryable error, and auto-sends the queued follow-up so no typed text is lost.
+setInterval(() => {
+  if (!isSearching || !searchDeadline) return;
+  if (Date.now() < searchDeadline) return;
+  isSearching = false; searchDeadline = 0;
+  try {
+    const ct = document.getElementById("resultsContent");
+    const st = ct && ct.querySelector(".searching-state, .searching");
+    if (st) st.remove();
+    if (ct) renderAnswerError(ct, "This search stalled", "The gateway stopped responding after 5 minutes, so the search was cancelled to unblock the composer. Your follow-up is sending now.", "");
+  } catch (e) {}
+  drainQueue();
+}, 15000);   // v97: "Run all" follow-ups state
 let currentUser = null;
 // v76: one-time thread timestamp backfill (Library date groups / Usage counts)
 (function () {
@@ -2023,7 +2159,7 @@ function setIncognito(on) {
 })();
 
 // ============ THREAD SEARCH (v62) ============
-document.getElementById("threadSearch").addEventListener("input", () => renderThreads());
+document.getElementById("threadSearch").addEventListener("input", (e) => { renderThreads(); historySearchServer(String(e.target.value || "").trim()); });
 
 // ============ SPACES / PROJECTS (v64) ============
 // Perplexity-Projects parity: threads group under a space; each space carries
@@ -2051,9 +2187,17 @@ async function syncSpacesFromServer() {
     renderThreads();
   } catch (e) { /* offline-tolerant */ }
 }
+function applySpacesCollapsed() {
+  const c = document.getElementById("spaceItems"), h = document.getElementById("spacesHead"), ch = document.getElementById("spacesChevron");
+  const collapsed = localStorage.getItem("ai_spaces_collapsed") !== "0";   // default: collapsed (owner directive 2026-11-11)
+  if (c) c.style.display = collapsed ? "none" : "";
+  if (h) h.title = collapsed ? "Show spaces" : "Hide spaces";
+  if (ch) ch.style.transform = collapsed ? "rotate(-90deg)" : "rotate(0deg)";
+}
 function renderSpaces() {
   const container = document.getElementById("spaceItems");
   if (!container) return;
+  applySpacesCollapsed();
   container.innerHTML = "";
   for (const s of spaces) {
     const div = document.createElement("div");
@@ -2061,7 +2205,7 @@ function renderSpaces() {
     div.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
     const name = document.createElement("span");
     name.className = "space-name";
-    name.textContent = s.name;
+    name.textContent = s.name && s.name.trim() ? s.name.trim() : "Untitled space";
     name.title = s.instructions ? s.instructions.slice(0, 200) : "No custom instructions";
     const badge = document.createElement("span");
     badge.className = "space-badge";
@@ -2156,30 +2300,56 @@ document.getElementById("newSpaceBtn").onclick = () => openSpaceModal(null);
 // base64 data URI on the request's `attachment` field — the gateway's
 // Perplexity vision lane analyzes them; the image itself never enters the
 // thread history or the writing agents).
-let pendingAttachment = null; // {kind:"text"|"pdf", name, content} | {kind:"image", name, dataUrl}
+const ATTACH_MAX_FILES = 10, ATTACH_MAX_BYTES = 10_000_000, ATTACH_TEXT_CAP = 1_000_000, ATTACH_PDF_PAGES = 20, ATTACH_PDF_CHARS = 40_000, ATTACH_DOC_CAP = 60_000;
+let pendingAttachments = []; // [{kind:"text"|"pdf"|"docx"|"xlsx"|"pptx", name, content, note?} | {kind:"image", name, dataUrl} | {kind:"unsupported", name, note}]
 const fileInput = document.createElement("input");
 fileInput.type = "file";
-fileInput.accept = ".txt,.md,.csv,.json,.log,.ts,.js,.py,.sql,.yml,.yaml,.html,.css,text/*,.pdf,image/png,image/jpeg,image/webp,image/gif";
+fileInput.multiple = true;
+fileInput.accept = ".txt,.md,.csv,.tsv,.json,.log,.ts,.js,.py,.sql,.yml,.yaml,.html,.css,text/*,.pdf,.docx,.xlsx,.pptx,image/png,image/jpeg,image/webp,image/gif";
 fileInput.style.display = "none";
 document.body.appendChild(fileInput);
+function attachNotice(msg) {
+  for (const id of ["landingAttachChip", "followupAttachChip"]) {
+    const el = document.getElementById(id); if (!el) continue;
+    const n = document.createElement("div");
+    n.className = "attach-notice"; n.setAttribute("role", "status");
+    n.style.cssText = "font-size:12px;color:var(--text-muted);padding:2px 6px";
+    n.textContent = msg; el.appendChild(n);
+    setTimeout(() => n.remove(), 6000);
+  }
+}
 function renderAttachChips() {
   for (const id of ["landingAttachChip", "followupAttachChip"]) {
     const el = document.getElementById(id);
     if (!el) continue;
     el.innerHTML = "";
-    if (!pendingAttachment) continue;
-    const chip = document.createElement("div");
-    chip.className = "attach-chip";
-    const name = document.createElement("span");
-    name.textContent = pendingAttachment.kind === "image"
-      ? "🖼 " + pendingAttachment.name + " (image)"
-      : pendingAttachment.name + " (" + pendingAttachment.content.length + " chars)";
-    const x = document.createElement("button");
-    x.textContent = "×";
-    x.title = "Remove attachment";
-    x.onclick = () => { pendingAttachment = null; renderAttachChips(); };
-    chip.appendChild(name); chip.appendChild(x);
-    el.appendChild(chip);
+    pendingAttachments.forEach((a, idx) => {
+      const chip = document.createElement("div");
+      chip.className = "attach-chip";
+      chip.dataset.kind = a.kind;
+      if (a.kind === "image") {
+        const th = document.createElement("img");
+        th.src = a.dataUrl; th.alt = ""; th.className = "attach-thumb";
+        chip.appendChild(th);
+      } else {
+        const ty = document.createElement("span");
+        ty.className = "attach-type";
+        ty.style.cssText = "font-size:10px;font-weight:600;text-transform:uppercase;opacity:.7";
+        ty.textContent = (a.name.split(".").pop() || a.kind).slice(0, 5);
+        chip.appendChild(ty);
+      }
+      const name = document.createElement("span");
+      name.textContent = a.kind === "image" ? a.name
+        : a.kind === "unsupported" ? a.name + " (unsupported type)"
+        : a.name + " (" + a.content.length + " chars" + (a.note ? ", truncated" : "") + ")";
+      const x = document.createElement("button");
+      x.textContent = "×";
+      x.title = "Remove attachment";
+      x.setAttribute("aria-label", "Remove " + a.name);
+      x.onclick = () => { pendingAttachments.splice(pendingAttachments.indexOf(a), 1); renderAttachChips(); };
+      chip.appendChild(name); chip.appendChild(x);
+      el.appendChild(chip);
+    });
   }
 }
 function fileToDataUrl(f) {
@@ -2215,43 +2385,136 @@ async function extractPdfText(f) {
   const pdfjs = await getPdfjs();
   const doc = await pdfjs.getDocument({ data: await f.arrayBuffer() }).promise;
   let text = "";
-  const pages = Math.min(doc.numPages, 6); // first 6 pages, capped at 3,000 chars
-  for (let p = 1; p <= pages && text.length < 3000; p++) {
+  const pages = Math.min(doc.numPages, ATTACH_PDF_PAGES);
+  for (let p = 1; p <= pages && text.length < ATTACH_PDF_CHARS; p++) {
     const page = await doc.getPage(p);
     const tc = await page.getTextContent();
     text += tc.items.map(it => it.str).join(" ").replace(/\s+/g, " ").trim() + "\n\n";
   }
-  return text.slice(0, 3000);
+  const truncated = doc.numPages > pages || text.length > ATTACH_PDF_CHARS;
+  return { text: text.slice(0, ATTACH_PDF_CHARS), truncated, note: truncated ? "[Truncated: first " + pages + " of " + doc.numPages + " pages, max " + ATTACH_PDF_CHARS + " chars]" : "" };
 }
-async function handleAttachFile(f) {
-  if (!f) return;
-  try {
-    if (/^image\/(png|jpeg|webp|gif)$/.test(f.type)) {
-      if (f.size > 10_000_000) { alert("Image too large (10MB max)"); return; }
-      pendingAttachment = { kind: "image", name: f.name || "pasted-image.png", dataUrl: await prepareImage(f) };
-    } else if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) {
-      const text = await extractPdfText(f);
-      if (!text.trim()) { alert("That PDF has no extractable text (likely a scan) — images of pages aren't supported yet"); return; }
-      pendingAttachment = { kind: "pdf", name: f.name, content: text };
-    } else {
-      if (f.size > 200_000) { alert("File too large (200KB max for text attachments)"); return; }
-      const text = await f.text();
-      if (!text.trim()) { alert("That file has no readable text"); return; }
-      pendingAttachment = { kind: "text", name: f.name, content: text.slice(0, 3000) };
-    }
-    renderAttachChips();
-  } catch (e) { alert("Could not read that file"); }
+// Minimal zip reader (central directory + DecompressionStream) for OOXML files.
+async function zipEntries(bytes, wanted) {
+  const u16 = (o) => bytes[o] | (bytes[o + 1] << 8);
+  const u32 = (o) => (bytes[o] | (bytes[o + 1] << 8) | (bytes[o + 2] << 16) | (bytes[o + 3] << 24)) >>> 0;
+  let e = bytes.length - 22; while (e >= 0 && u32(e) !== 0x06054b50) e--;
+  if (e < 0) throw new Error("Not a zip");
+  const n = u16(e + 10); let off = u32(e + 16);
+  const dec = new TextDecoder(), out = {}, jobs = [];
+  for (let k = 0; k < n; k++) {
+    const meth = u16(off + 10), csz = u32(off + 20), nl = u16(off + 28), xl = u16(off + 30), cl = u16(off + 32), lo = u32(off + 42);
+    const name = dec.decode(bytes.subarray(off + 46, off + 46 + nl)); off += 46 + nl + xl + cl;
+    if (!wanted.test(name)) continue;
+    const ds = lo + 30 + u16(lo + 26) + u16(lo + 28), raw = bytes.subarray(ds, ds + csz);
+    if (meth === 0) out[name] = dec.decode(raw);
+    else if (meth === 8) jobs.push(new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer().then(ab => { out[name] = dec.decode(ab); }));
+  }
+  await Promise.all(jobs);
+  return out;
 }
+function xmlTexts(xml, tagRe) { // concatenated text of matching tags
+  const out = []; let m; const re = new RegExp("<" + tagRe + "(?:\\s[^>]*)?>([^<]*)</" + tagRe + ">", "g");
+  while ((m = re.exec(xml))) out.push(m[1]);
+  return out.join("").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+}
+function xmlDecode(s) { return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&"); }
+async function extractDocx(f) {
+  const files = await zipEntries(new Uint8Array(await f.arrayBuffer()), /^word\/document\.xml$/);
+  const xml = files["word/document.xml"]; if (!xml) throw new Error("no document.xml");
+  const lines = [];
+  // table rows -> tab-separated cells; other paragraphs -> lines
+  const body = xml.replace(/<w:tbl>[\s\S]*?<\/w:tbl>/g, (tbl) => {
+    const rows = (tbl.match(/<w:tr[\s>][\s\S]*?<\/w:tr>/g) || []).map(tr =>
+      (tr.match(/<w:tc[\s>][\s\S]*?<\/w:tc>/g) || []).map(tc => (tc.match(/<w:p[\s>][\s\S]*?<\/w:p>/g) || []).map(p => xmlTexts(p, "w:t")).join(" ")).join("\t"));
+    return "<w:p><w:t>" + rows.map(r => r.replace(/&/g, "&amp;").replace(/</g, "&lt;")).join("\u0001") + "</w:t></w:p>";
+  });
+  for (const p of (body.match(/<w:p[\s>][\s\S]*?<\/w:p>/g) || [])) {
+    const t = xmlTexts(p.replace(/<w:tab\/>/g, "<w:t>\t</w:t>"), "w:t");
+    lines.push(t.replace(/\u0001/g, "\n"));
+  }
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+async function extractPptx(f) {
+  const files = await zipEntries(new Uint8Array(await f.arrayBuffer()), /^ppt\/slides\/slide\d+\.xml$/);
+  const names = Object.keys(files).sort((a, b) => parseInt(a.match(/(\d+)\.xml/)[1]) - parseInt(b.match(/(\d+)\.xml/)[1]));
+  return names.map((nm, i) => {
+    const paras = (files[nm].match(/<a:p[\s>][\s\S]*?<\/a:p>/g) || []).map(p => xmlTexts(p, "a:t")).filter(Boolean);
+    return "--- Slide " + (i + 1) + " ---\n" + paras.join("\n");
+  }).join("\n\n").trim();
+}
+let docsPanelP = null;
+async function getParseXlsx() {
+  if (!(window.ArtifactPanel && window.ArtifactPanel.parseXlsx)) {
+    if (!docsPanelP) docsPanelP = new Promise((res, rej) => { const s = document.createElement("script"); s.src = "modules/docs-panel.js"; s.onload = res; s.onerror = () => rej(new Error("docs-panel load failed")); document.head.appendChild(s); });
+    await docsPanelP;
+  }
+  if (!(window.ArtifactPanel && window.ArtifactPanel.parseXlsx)) throw new Error("xlsx parser unavailable");
+  return window.ArtifactPanel.parseXlsx;
+}
+async function extractXlsx(f) {
+  const parse = await getParseXlsx();
+  const sheets = await parse(new Uint8Array(await f.arrayBuffer()));
+  let trunc = false;
+  const text = sheets.map(sh => {
+    const rows = sh.rows || [];
+    if (rows.length > 60) trunc = true;
+    return "## Sheet: " + sh.name + "\n" + rows.slice(0, 60).map(r => (Array.isArray(r) ? r : Object.values(r)).map(c => c == null ? "" : String(c).replace(/[\t\r\n]+/g, " ")).join("\t")).join("\n") + (rows.length > 60 ? "\n[" + (rows.length - 60) + " more rows omitted]" : "");
+  }).join("\n\n").trim();
+  return { text, truncated: trunc };
+}
+function capText(text, cap) {
+  return text.length > cap ? { text: text.slice(0, cap), truncated: true } : { text, truncated: false };
+}
+async function readOneAttachment(f) {
+  const name = f.name || "pasted-image.png";
+  const ext = (name.split(".").pop() || "").toLowerCase();
+  if (f.size > ATTACH_MAX_BYTES) throw new Error(name + ": too large (10MB max)");
+  if (/^image\/(png|jpeg|webp|gif)$/.test(f.type)) return { kind: "image", name, dataUrl: await prepareImage(f) };
+  if (f.type === "application/pdf" || ext === "pdf") {
+    const r = await extractPdfText(f);
+    if (!r.text.trim()) throw new Error(name + ": no extractable text (likely a scan)");
+    return { kind: "pdf", name, content: r.text, note: r.truncated ? r.note : "" };
+  }
+  if (ext === "docx" || ext === "xlsx" || ext === "pptx") {
+    let raw, kind = ext, trunc = false;
+    if (ext === "docx") raw = await extractDocx(f);
+    else if (ext === "pptx") raw = await extractPptx(f);
+    else { const r = await extractXlsx(f); raw = r.text; trunc = r.truncated; }
+    if (!raw.trim()) throw new Error(name + ": no readable text");
+    const c = capText(raw, ATTACH_DOC_CAP);
+    return { kind, name, content: c.text, note: (trunc || c.truncated) ? "[Truncated: content limited]" : "" };
+  }
+  const isText = /^text\//.test(f.type) || /^(txt|md|markdown|csv|tsv|json|log|ts|js|py|sql|ya?ml|html?|css|xml|rtf)$/.test(ext) || f.type === "application/json";
+  if (!isText) return { kind: "unsupported", name, note: "unsupported type" };
+  const text = await f.text();
+  if (!text.trim()) throw new Error(name + ": no readable text");
+  const c = capText(text, ATTACH_TEXT_CAP);
+  return { kind: "text", name, content: c.text, note: c.truncated ? "[Truncated: first " + ATTACH_TEXT_CAP + " characters]" : "" };
+}
+async function handleAttachFiles(files) {
+  files = [...(files || [])].filter(Boolean);
+  if (!files.length) return;
+  const room = ATTACH_MAX_FILES - pendingAttachments.length;
+  if (files.length > room) attachNotice("Limit is " + ATTACH_MAX_FILES + " files — " + Math.max(0, files.length - room) + " not added.");
+  const results = await Promise.all(files.slice(0, Math.max(0, room)).map(f => readOneAttachment(f).then(a => ({ a }), e => ({ err: (e && e.message) || ((f.name || "file") + ": could not be read") }))));
+  for (const r of results) {
+    if (r.a) { pendingAttachments.push(r.a); if (r.a.kind === "unsupported") attachNotice(r.a.name + ": unsupported type — it will be listed but its contents can't be read."); }
+    else attachNotice(r.err);
+  }
+  renderAttachChips();
+}
+const handleAttachFile = (f) => handleAttachFiles(f ? [f] : []);
 fileInput.onchange = async () => {
-  const f = fileInput.files && fileInput.files[0];
+  const fs = [...(fileInput.files || [])];
   fileInput.value = "";
-  await handleAttachFile(f);
+  await handleAttachFiles(fs);
 };
 // v83 (C6): drag-and-drop anywhere + paste an image into any composer
 (function () {
   const ov = document.createElement("div");
   ov.className = "drop-overlay"; ov.id = "dropOverlay";
-  ov.innerHTML = "<div>Drop a file to attach it to your question</div>";
+  ov.innerHTML = "<div>Drop files to attach them to your question</div>";
   document.body.appendChild(ov);
   let depth = 0;
   const hasFiles = (e) => e.dataTransfer && [...(e.dataTransfer.types || [])].indexOf("Files") !== -1;
@@ -2264,18 +2527,17 @@ fileInput.onchange = async () => {
     depth = 0; ov.classList.remove("show");
     if (inModal(e)) return;
     e.preventDefault();
-    const f = e.dataTransfer.files && e.dataTransfer.files[0];
-    if (f) handleAttachFile(f);
+    const fl = e.dataTransfer.files ? [...e.dataTransfer.files] : [];
+    if (fl.length) handleAttachFiles(fl);
   });
   ["landingInput", "searchbarInput", "followupInput"].forEach((id) => {
     const el = document.getElementById(id); if (!el) return;
     el.addEventListener("paste", (e) => {
       const items = [...((e.clipboardData && e.clipboardData.items) || [])];
-      const it = items.find(x => x.kind === "file" && /^image\//.test(x.type));
-      const f = it ? it.getAsFile() : null;
-      if (!f) return; // plain text paste proceeds normally
+      const fl = items.filter(x => x.kind === "file" && /^image\//.test(x.type)).map(x => x.getAsFile()).filter(Boolean);
+      if (!fl.length) return; // plain text paste proceeds normally
       e.preventDefault();
-      handleAttachFile(f);
+      handleAttachFiles(fl);
     });
   });
 })();
@@ -2615,10 +2877,30 @@ function speakAnswer(text) {
   window.openShortcutsHelp = () => help.classList.add("open"); // v74: used by the account menu
 })();
 function takeAttachment() {
-  const att = pendingAttachment;
-  pendingAttachment = null;
+  const att = pendingAttachments;
+  pendingAttachments = [];
   renderAttachChips();
   return att;
+}
+// Small filename/thumbnail tags under a question header (never the file contents).
+function attachNamesOf(content) {
+  const out = []; const re = /\n\n?\[Attached (?:file|image): ([^\]\n]*)\]/g; let m;
+  while ((m = re.exec(String(content || "")))) out.push(m[1]);
+  return out;
+}
+function appendAttachTags(q, items) {
+  if (!items || !items.length) return;
+  const row = document.createElement("div");
+  row.className = "question-attachments";
+  row.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:12px;font-weight:400;color:var(--text-muted)";
+  for (const it of items) {
+    const tag = document.createElement("span");
+    tag.className = "attach-chip";
+    if (it.dataUrl) { const im = document.createElement("img"); im.src = it.dataUrl; im.alt = ""; im.className = "attach-thumb"; im.style.cssText = "width:24px;height:24px"; tag.appendChild(im); }
+    const t = document.createElement("span"); t.textContent = it.name; tag.appendChild(t);
+    row.appendChild(tag);
+  }
+  q.appendChild(row);
 }
 
 // ============ SIDEBAR ============
@@ -2646,15 +2928,25 @@ async function pushThreadToServer(t) {
   try {
     const row = { id: t.id, title: t.title, user_id: currentUser.id, space_id: t.spaceId || null };
     const { data: up } = await sb.from("threads").upsert(row).select("slug").maybeSingle();
-    if (up && up.slug && up.slug !== t.slug) { t.slug = up.slug; if (currentThreadId === t.id) syncUrl(t, true); }
+    if (up && up.slug && up.slug !== t.slug) {
+      (t.oldSlugs = t.oldSlugs || []).push(t.slug);   // v250: deep links to the old slug must keep resolving
+      t.slug = up.slug; if (currentThreadId === t.id) syncUrl(t, true);
+    }
   } catch (e) { /* offline-tolerant: localStorage still has it */ }
 }
 async function pushThreadMessages(t) {
   if (!t || !currentUser) return;
   try {
+    // v159: single mega-inserts (60+ huge turns) can blow the PostgREST body cap and
+    // drop the whole save. Insert in pages of 20 rows; on failure of any page, keep the
+    // rows that landed so nothing is lost.
     await sb.from("thread_messages").delete().eq("thread_id", t.id);
     const rows = t.messages.map(m => ({ thread_id: t.id, role: m.role, content: m.content, sources: m.sources || null, related: m.related || null }));
-    if (rows.length) await sb.from("thread_messages").insert(rows);
+    const PAGE = 20;
+    for (let i = 0; i < rows.length; i += PAGE) {
+      try { await sb.from("thread_messages").upsert(rows.slice(i, i + PAGE), { onConflict: "thread_id,role,turn_hash" }); } // v190: upsert — server-side turn persistence may have already landed these rows
+      catch (e2) { break; } // partial save beats total loss
+    }
     await sb.from("threads").update({ updated_at: new Date().toISOString() }).eq("id", t.id);
   } catch (e) { /* offline-tolerant */ }
 }
@@ -2715,15 +3007,67 @@ async function syncThreadsFromServer() {
     if (dl && currentThreadId !== dl.id) loadThread(dl.id, true);
     window.__endPreBoot && window.__endPreBoot();
   } catch (e) { window.__endPreBoot && window.__endPreBoot(); /* offline-tolerant */ }
+  try { if (currentUser) wireLiveThreads(); } catch (e) {}
 }
 function saveThreads() {
-  localStorage.setItem("ai_threads", JSON.stringify(threads.filter(t => !t.incognito)));
+  // v157 QUOTA FIX: the owner's 5,647 imported threads (with messages) exceed the ~5MB
+  // localStorage cap. The QuotaExceededError used to escape this function and kill
+  // performSearch with isSearching stuck true (perpetual queue, eaten prompts) and leave
+  // the sidebar list stale. Never throw: on quota failure, keep the 300 most recent
+  // threads with their last 4 messages each (full history lives server-side).
+  const keep = threads.filter(t => !t.incognito);
+  try { localStorage.setItem("ai_threads", JSON.stringify(keep)); }
+  catch (e) {
+    try {
+      localStorage.setItem("ai_threads", JSON.stringify(keep.slice(-300).map(t => ({ ...t, messages: (t.messages || []).slice(-4) }))));
+    } catch (e2) {}
+  }
   try { localStorage.setItem("ai_incognito_threads", JSON.stringify(threads.filter(t => t.incognito && t.expiresAt > Date.now()))); } catch (e) {}
   // v61: mirror the current thread to the server (best-effort, non-blocking) — never for incognito
   const cur = threads.find(t => t.id === currentThreadId);
   if (cur && currentUser && !cur.incognito) {
     pushThreadToServer(cur).then(() => pushThreadMessages(cur)).catch(() => {});
   }
+}
+let hsSeq = 0, hsTimer = null;
+function historySearchServer(q) {
+  // v165: history search parity — the local cache only holds the newest threads, so any
+  // search also hits the server (RLS-scoped: only the signed-in user's own threads+messages).
+  // Hits outside the local cache are injected as thread shells; loadThread() pulls their
+  // messages from the server on open. Stale responses are dropped via hsSeq.
+  clearTimeout(hsTimer);
+  if (!q || q.length < 2 || !currentUser) { window.__historyHits = null; return; }
+  const mySeq = ++hsSeq;
+  hsTimer = setTimeout(async () => {
+    try {
+      const term = q.replace(/[%,()*]/g, " ").trim();
+      if (!term) return;
+      const like = "*" + term + "*";
+      const [tRes, mRes] = await Promise.all([
+        sb.from("threads").select("id,title,slug,updated_at").ilike("title", like).limit(30),
+        sb.from("thread_messages").select("thread_id,content").ilike("content", like).order("created_at", { ascending: false }).limit(60)
+      ]);
+      if (mySeq !== hsSeq) return;
+      const ids = new Set();
+      (tRes.data || []).forEach(r => ids.add(r.id));
+      (mRes.data || []).forEach(r => ids.add(r.thread_id));
+      if (!ids.size) { window.__historyHits = null; renderThreads(); return; }
+      const missing = [...ids].filter(id => !threads.some(t => t.id === id));
+      if (missing.length) {
+        const { data: rows } = await sb.from("threads").select("id,title,slug,updated_at,space_id").in("id", missing);
+        (rows || []).forEach(r => threads.push({ id: r.id, title: r.title, slug: r.slug, spaceId: r.space_id, updatedAt: r.updated_at, messages: [] }));
+      }
+      const snippets = {};
+      (mRes.data || []).forEach(r => {
+        if (r.thread_id && !snippets[r.thread_id]) {
+          const c = String(r.content || ""), p = c.toLowerCase().indexOf(term.toLowerCase());
+          snippets[r.thread_id] = p > -1 ? c.slice(Math.max(0, p - 50), p + 90).replace(/\s+/g, " ") : c.slice(0, 140);
+        }
+      });
+      window.__historyHits = { q, ids: [...ids], snippets };
+      renderThreads();
+    } catch (e) { /* offline-tolerant: local search still works */ }
+  }, 220);
 }
 function renderThreads() {
   var arch = []; try { arch = JSON.parse(localStorage.ai_archived || "[]"); } catch (e) {}
@@ -2734,7 +3078,10 @@ function renderThreads() {
   const q = (document.getElementById("threadSearch")?.value || "").trim().toLowerCase();
   // v64: space filter (clicking a space shows only its threads) + search
   const spaceVisible = activeSpaceId ? threads.filter(t => t.spaceId === activeSpaceId) : threads;
-  let visible = !q ? spaceVisible : spaceVisible.filter(t =>
+  const hits = q && window.__historyHits && window.__historyHits.q === q ? window.__historyHits : null;
+  // v165: with a query, search ALL history (server-backed hits included), not just the active space
+  let visible = !q ? spaceVisible : threads.filter(t =>
+    (hits && hits.ids.includes(t.id)) ||
     t.title.toLowerCase().includes(q) ||
     (t.messages || []).some(m => String(m.content || "").toLowerCase().includes(q))
   );
@@ -2748,6 +3095,13 @@ function renderThreads() {
     const span = document.createElement("span");
     span.textContent = t.title;
     div.appendChild(span);
+    // v165: server-history match snippet under the title (like Perplexity's history results)
+    if (hits && hits.snippets[t.id]) {
+      const sn = document.createElement("div");
+      sn.className = "thread-item-snippet";
+      sn.textContent = hits.snippets[t.id];
+      div.appendChild(sn);
+    }
     // v64: move-to-space button (visible on hover)
     const move = document.createElement("button");
     move.className = "thread-move";
@@ -2833,6 +3187,14 @@ async function loadThread(id, fromNav) {
   }));
 }
 document.getElementById("newThreadBtn").onclick = newThread;
+(function () {
+  const h = document.getElementById("spacesHead");
+  if (h) h.addEventListener("click", function (e) {
+    if (e.target.closest("#newSpaceBtn")) return;   // + button keeps its own behavior
+    localStorage.setItem("ai_spaces_collapsed", localStorage.getItem("ai_spaces_collapsed") === "0" ? "1" : "0");
+    applySpacesCollapsed();
+  });
+})();
 document.getElementById("newThreadIcon").onclick = newThread;
 
 // ============ VIEW SWITCHING ============
@@ -2880,7 +3242,7 @@ const authOverlay = document.getElementById("authOverlay");
 // Sign-out is local-first: it clears all local auth state even when the server session is already gone.
 const AuthGuard = (function () {
   const KEY_RE = /^sb-[a-z0-9]+-auth-token(?:-code-verifier|-user)?$/; // supabase-js keys; the extension bridge mirrors sb-<ref>-auth-token
-  const EXPIRED_MSG = "Your session expired — sign in again.";
+  const EXPIRED_MSG = "Sign in to continue.";
   const nativeFetch = window.fetch.bind(window);
   let expired = false, inflight = null, lastVerify = 0;
   const wait = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
@@ -2914,11 +3276,12 @@ const AuthGuard = (function () {
   function makeError() { const e = new Error(EXPIRED_MSG); e.authExpired = true; return e; }
   // flip the app to signed-out; idempotent, always (re)shows the gate
   function expire(msg) {
-    if (!expired) {
-      expired = true;
-      clearLocal();
-      try { wait(sb.auth.signOut({ scope: "local" }), 1500).catch(() => {}); } catch (e) {} // drop supabase-js' in-memory session (no server dependency)
-    }
+    // v158 (owner directive: GET RID OF AUTO-LOGOUT): this function used to wipe the local
+    // session and sign out on transient auth failures. It now NEVER destroys local state
+    // and NEVER signs out. It only shows the gate when the session is definitively dead
+    // (a refresh was explicitly rejected) — and even then the stored session survives, so
+    // a valid refresh token recovers silently on the next visit.
+    if (!expired) { expired = true; }
     showGate(msg || EXPIRED_MSG);
     return msg || EXPIRED_MSG;
   }
@@ -2940,6 +3303,10 @@ const AuthGuard = (function () {
   }
   // proactive check (init + tab focus): a revoked/expired session must not keep looking signed in
   async function verify(force) {
+    // v240: NEVER refresh from inside an iframe (the Comet side panel) — see the client
+    // creation comment. The bridge mirrors the tab's tokens here; a refresh from this
+    // frame is exactly the double-refresh that got the owner logged out.
+    if (window.self !== window.top) return true;
     if (expired || !currentUser) return true;
     if (!force && Date.now() - lastVerify < 5 * 60 * 1000) return true;
     lastVerify = Date.now();
@@ -2953,6 +3320,8 @@ const AuthGuard = (function () {
     if (rd.dead) { expire(); return false; }
     return true;
   }
+  // v158: a dead-looking gate is RE-CHECKED before trusting it — recoverable sessions
+  // (refresh token still valid server-side) must silently sign back in on the next focus.
   const urlOf = (i) => typeof i === "string" ? i : (i && i.url) || String(i || "");
   window.fetch = async function (input, init) {
     const res = await nativeFetch(input, init);
@@ -2980,7 +3349,7 @@ const AuthGuard = (function () {
       if (currentUser && !expired && r && r.data && !r.data.session) {
         const err = r.error;
         const retryable = err && (err.name === "AuthRetryableFetchError" || /fetch|network/i.test(String(err.message)));
-        if (!retryable) expire();
+        if (!retryable) { const rd = await refreshOrDead(); if (rd.dead) expire(); } // v158: never on transient/unknown
       }
     } catch (e) {}
     return r;
@@ -3023,17 +3392,24 @@ window.AuthGuard = AuthGuard;
 // v91: the allowlist is now LIVE (org_allowlist table, managed from Settings → Team).
 // Invites update it instantly — no code deploy needed to admit someone.
 async function signinAllowed(email) {
-  try {
-    const { data } = await sb.rpc("is_signin_allowed", { p_email: String(email || "").toLowerCase() });
-    return data === true;
-  } catch (e) { return false; }
+  // v158 (owner directive: STOP AUTO-LOGOUTS): a network hiccup on this RPC used to read as
+  // "not on the allowlist" and the app force-signed the owner out. Unknown is NOT denied:
+  // return "unknown" on transient failure — callers only sign out on an explicit false.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const { data } = await sb.rpc("is_signin_allowed", { p_email: String(email || "").toLowerCase() });
+      return data === true;
+    } catch (e) { if (attempt) return null; await new Promise(r => setTimeout(r, 400)); }
+  }
+  return null;
 }
 async function checkAuth() {
   if (/[?&]share=/.test(location.search)) return true; // v79: public read-only share links bypass the login gate (ShareView owns the screen)
   const { data } = await sb.auth.getSession();
   if (data?.session?.user?.email) {
-    if (!(await signinAllowed(data.session.user.email))) {
-      // not on the allowlist — sign them out and keep the site blocked
+    const allowed = await signinAllowed(data.session.user.email);
+    if (allowed === false) {
+      // explicitly removed from the allowlist — sign them out and keep the site blocked
       await AuthGuard.localSignOut();
       const sub = document.querySelector(".auth-subtitle");
       if (sub) sub.textContent = "This site is private. Sign in with an authorized account.";
@@ -3180,10 +3556,11 @@ document.getElementById("authPasskeyBtn").onclick = async () => {
   const err = document.getElementById("authError");
   err.textContent = "";
   try {
-    if (typeof sb.auth.signInWithWebAuthn !== "function") {
+    const pk = sb.auth.signInWithPasskey || sb.auth.signInWithWebAuthn;
+    if (typeof pk !== "function") {
       return err.textContent = "Passkeys aren't supported in this browser yet — use password or email code.";
     }
-    const { data, error: pkErr } = await sb.auth.signInWithWebAuthn();
+    const { data, error: pkErr } = await pk.call(sb.auth);
     if (pkErr) return err.textContent = pkErr.message;
     if (data?.session?.user?.email && !(await signinAllowed(data.session.user.email))) {
       await AuthGuard.localSignOut();
@@ -3201,6 +3578,24 @@ document.getElementById("authSendCode").onclick = async () => {
   const email = document.getElementById("authEmail").value.trim();
   if (!email) return err.textContent = "Enter your email";
   if (!(await signinAllowed(email))) return err.textContent = "This site is invite-only — ask the owner to invite your email.";
+  // v240 (owner directive 2026-11-15: EMAIL CODES NOT WORKING): the Supabase Auth project has
+  // NO SMTP configured, so signInWithOtp returned 200 but the email was never delivered. All
+  // auth email now goes through the auth-email-relay edge function on the project's verified
+  // Resend sender. The built-in path stays as a fallback only if the relay is unreachable.
+  try {
+    const r = await fetch("https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/auth-email-relay", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "send", email })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.ok) {
+      document.getElementById("authStep1").style.display = "none";
+      document.getElementById("authStep2").style.display = "block";
+      return;
+    }
+    if (r.status !== 502 && r.status !== 503 && r.status !== 0) { err.textContent = j.error || "Code send failed — try password sign-in."; err.scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
+    // relay unreachable: try the built-in path (email may not arrive — SMTP unconfigured)
+  } catch (_e) { /* fall through to built-in */ }
   const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
   if (error) {
     // v74: friendly rate-limit message instead of Supabase's raw 429 text
@@ -3225,10 +3620,72 @@ document.getElementById("authVerify").onclick = async () => {
     if (r.error) return err.textContent = r.error.message;
     window.__mfaFactor = null; authOverlay.style.display = "none"; location.reload(); return;
   }
+  // v240: verify through the relay (it mints the session server-side from the admin magic-link
+  // exchange) and hydrate the local session from the returned tokens. Built-in verifyOtp stays
+  // as the fallback for the 8-digit built-in codes.
+  try {
+    const r = await fetch("https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/auth-email-relay", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "verify", email, code })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.ok && j.session?.access_token && j.session?.refresh_token) {
+      await sb.auth.setSession({ access_token: j.session.access_token, refresh_token: j.session.refresh_token });
+      authOverlay.style.display = "none";
+      location.reload();
+      return;
+    }
+    if (r.status !== 502 && r.status !== 503 && r.status !== 0) { err.textContent = j.error || "Verification failed — request a new code."; return; }
+  } catch (_e) { /* fall through to built-in */ }
   const { error } = await sb.auth.verifyOtp({ email, token: code, type: "email" });
   if (error) return err.textContent = error.message;
   authOverlay.style.display = "none";
   location.reload();
+};
+// v240: FORGOT PASSWORD — Supabase's built-in recovery email never delivered (no SMTP), so the
+// recovery link is generated with the admin API and emailed via the relay's Resend sender.
+document.getElementById("authForgot").onclick = async () => {
+  const err = document.getElementById("authError");
+  err.textContent = "";
+  const email = document.getElementById("authEmail").value.trim();
+  if (!email) return err.textContent = "Enter your email first, then tap Forgot password.";
+  try {
+    const r = await fetch("https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/auth-email-relay", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "recovery", email })
+    });
+    const j = await r.json().catch(() => ({}));
+    err.textContent = r.ok && j.ok ? "Password-reset link sent — check your inbox (and spam)." : (j.error || "Could not send the reset email — try again.");
+  } catch (e) { err.textContent = "Could not send the reset email — try again."; }
+};
+// v158: recovery-link landing — the user just clicked "set my password" in their email;
+// show the new-password form once a session exists (supabase-js exchanged the link code).
+(async function recoveryFlow() {
+  try {
+    if (!/[?&]recovery=1/.test(location.search)) return;
+    const s1 = document.getElementById("authStep1"), s3 = document.getElementById("authStep3");
+    s1.style.display = "none"; s3.style.display = "block";
+    const err = document.getElementById("authError");
+    // wait for the code exchange to produce a session (up to 10s)
+    for (let i = 0; i < 20 && !(await sb.auth.getSession()).data?.session; i++) await new Promise(r => setTimeout(r, 500));
+    document.getElementById("authSavePass").onclick = async () => {
+      const p1 = document.getElementById("authNewPass").value, p2 = document.getElementById("authNewPass2").value;
+      if (p1.length < 8) return err.textContent = "Password must be at least 8 characters.";
+      if (p1 !== p2) return err.textContent = "The two passwords don't match.";
+      const { error } = await sb.auth.updateUser({ password: p1 });
+      if (error) return err.textContent = String(error.message || error);
+      err.textContent = "Password saved — signing you in\u2026";
+      setTimeout(() => { authOverlay.style.display = "none"; history.replaceState(null, "", "/"); location.reload(); }, 900);
+    };
+  } catch (e) {}
+})();
+document.getElementById("authSetPass").onclick = async () => {
+  const err = document.getElementById("authError");
+  err.textContent = "";
+  const email = document.getElementById("authEmail").value.trim();
+  if (!email) return err.textContent = "Enter your email first, then press this.";
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/?recovery=1" });
+  err.textContent = error ? String(error.message || error) : "Sent — check your email for the set-password link (valid for one hour).";
 };
 document.getElementById("authBack").onclick = () => {
   document.getElementById("authStep1").style.display = "block";
@@ -3247,14 +3704,28 @@ function cleanQuestionText(content) {
 // a question. showRelatedForLast=false is used while a new question is in flight.
 function renderPriorTurns(content, thread, showRelatedForLast) {
   content.innerHTML = "";
-  const msgs = thread.messages || [];
+  const all = thread.messages || [];
+  // v159 (owner request 2026-11-11): giant threads (60+ turns) used to hit the
+  // gateway's "conversation too large" cap and take minutes to render. Render and
+  // SEND only the most recent turns — everything stays stored server-side and is
+  // fetched back on demand. The model keeps a compact summary of what dropped off.
+  const MAX_TURNS = 40;
+  const msgs = all.length > MAX_TURNS ? all.slice(-MAX_TURNS) : all;
   let lastAssistant = -1;
   msgs.forEach((m, i) => { if (m.role !== "user") lastAssistant = i; });
+  if (all.length > MAX_TURNS) {
+    const more = document.createElement("button");
+    more.className = "older-turns-btn";
+    more.textContent = "Show older turns (" + (all.length - MAX_TURNS) + " more)";
+    more.onclick = () => { renderPriorTurnsFull(content, thread, showRelatedForLast); };
+    content.appendChild(more);
+  }
   msgs.forEach((m, i) => {
     if (m.role === "user") {
       const q = document.createElement("div");
       q.className = "question-header";
       q.textContent = cleanQuestionText(m.content);
+      appendAttachTags(q, attachNamesOf(m.content).map(name => ({ name })));
       content.appendChild(q);
     } else {
       const rel = (showRelatedForLast && i === lastAssistant) ? cleanRelated(m.related) : [];
@@ -3268,9 +3739,57 @@ function renderPriorTurns(content, thread, showRelatedForLast) {
         st.appendChild(mb);
         content.appendChild(st);
       }
-      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council) ? { steps: m.steps || [], council: m.council || null } : null);
+      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council || m.toolChips) ? { steps: m.steps || [], council: m.council || null, toolChips: m.toolChips || null } : null);
     }
   });
+}
+// v160 (owner request 2026-11-11): ACTIVE THREADS — bridge messages and any new
+// messages appear live (no refresh), with an unread badge on the sidebar thread.
+let __liveSub = null;
+function wireLiveThreads() {
+  if (__liveSub || !window.sb || !sb.channel) return;
+  try {
+    __liveSub = sb.channel("live-threads-" + (currentUser?.id || "anon"))
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "thread_messages" }, (payload) => {
+        const row = payload.new || {}; if (!row.thread_id) return;
+        const t = threads.find(x => x.id === row.thread_id); if (!t) return;
+        t.updatedAt = Date.parse(row.created_at) || Date.now();
+        t._unread = (t._unread || 0) + 1; t._live = true;
+        renderThreads();
+        // if the owner has this thread open, render the new message into it live
+        if (currentThreadId === t.id) {
+          const ct = document.getElementById("resultsContent");
+          if (ct && row.role) {
+            const wrap = document.createElement("div");
+            if (row.role === "user") { const q = document.createElement("div"); q.className = "question-header"; q.textContent = String(row.content || "").slice(0, 500); wrap.appendChild(q); }
+            else renderAnswer(ct, String(row.content || ""), [], [], [], null);
+            const sc = document.getElementById("resultsScroll"); if (sc) sc.scrollTop = sc.scrollHeight;
+          }
+          t._unread = 0;
+        }
+      })
+      .subscribe();
+  } catch (e) { /* realtime optional — never break the app */ }
+}
+function renderPriorTurnsFull(content, thread, showRelatedForLast) {
+  content.innerHTML = "";
+  const msgs = thread.messages || [];
+  let lastAssistant = -1;
+  msgs.forEach((m, i) => { if (m.role !== "user") lastAssistant = i; });
+  msgs.forEach((m, i) => {
+    if (m.role === "user") {
+      const q = document.createElement("div");
+      q.className = "question-header";
+      q.textContent = cleanQuestionText(m.content);
+      appendAttachTags(q, attachNamesOf(m.content).map(name => ({ name })));
+      content.appendChild(q);
+    } else {
+      const rel = (showRelatedForLast && i === lastAssistant) ? cleanRelated(m.related) : [];
+      renderAnswer(content, String(m.content || ""), m.sources || [], rel, m.images || [], (m.steps || m.council || m.toolChips) ? { steps: m.steps || [], council: m.council || null, toolChips: m.toolChips || null } : null);
+    }
+  });
+  const sc = document.getElementById("resultsScroll");
+  if (sc) sc.scrollTop = 0;
 }
 function renderSearching(container, query) {
   // v93 AGENTS PILL (owner directive 2026-11-10): every agent working shows up.
@@ -3281,6 +3800,7 @@ function renderSearching(container, query) {
   const q = document.createElement("div");
   q.className = "question-header";
   q.textContent = query;
+  appendAttachTags(q, (typeof pendingAttachments !== "undefined" ? pendingAttachments : []).map(a => ({ name: a.name, dataUrl: a.kind === "image" ? a.dataUrl : null })));
   container.appendChild(q);
   const state = document.createElement("div");
   state.className = "searching-state";
@@ -3509,8 +4029,19 @@ function splitFollowups(answer) {
   if (!m) return { body: text.trim(), section: "" };
   return { body: text.slice(0, m.index).trim(), section: text.slice(m.index) };
 }
+// 34b one-tap chips: the FULL imperative command, untruncated — this string is
+// what a chip tap submits to the gateway, so it must never be cut short (a
+// "…" mid-command is a broken command). tidyFollowup is display-only now.
+function followupCommand(raw) {
+  return String(raw || "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/[*_`]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 // Light cleanup only (the model's wording is used as-is): strip markdown
 // decoration, capitalise the first letter, cut at a WORD boundary if very long.
+// DISPLAY-ONLY (chip labels) — never used for the executed command.
 function tidyFollowup(raw) {
   let t = String(raw || "")
     .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
@@ -3529,7 +4060,7 @@ function extractSuggestedFollowups(text) {
   if (!section) return null;
   const items = section.replace(/^\s+/, "").split(/\n+/).slice(1)
     .map(l => l.replace(/^[\s>*•-]*/, "").replace(/^\d+[.)]\s*/, "").trim())
-    .map(tidyFollowup)
+    .map(followupCommand)
     .filter(l => l.length > 8 && l.length < 200);
   return items.length ? items.slice(0, 4) : null;
 }
@@ -3544,13 +4075,12 @@ function generateRelated(query, answer) {
   // (a) the model's own suggested follow-ups win, used as written
   const suggested = extractSuggestedFollowups(answer);
   if (suggested) return suggested;
-  // (b) fallback: clean, human questions that never echo the raw prompt (an
-  // ALL-CAPS or rambling prompt fragment pasted into a template reads as garbage)
+  // (b) fallback: runnable next-step commands (v179 — actionable, not questions)
   return [
-    "Can you summarize this in a few key points?",
-    "What are the main risks or trade-offs here?",
-    "What should I do next?",
-    "Can you walk me through the exact steps?"
+    "Summarize the key points in a 5-row table",
+    "Rank the main risks and trade-offs by severity",
+    "Build a step-by-step action plan with owners and dates",
+    "Draft a one-page brief from the full answer"
   ];
 }
 
@@ -3912,22 +4442,41 @@ const MODEL_INFO = {
   llama4: { best: "Llama 4 Maverick — Meta's open-weight generalist. Best for general chat and brainstorming." },
   venice: { best: "Venice Uncensored (Dolphin Mistral 24B) — answers bluntly, without hedging or disclaimers." },
   dolphin: { best: "Dolphin Uncensored 24B — answers bluntly, without hedging or disclaimers." },
+  r1: { best: "DeepSeek R1 — deliberate chain-of-thought reasoning. Best for hard logic, math, and multi-step problems." },
+  "qwen-coder": { best: "Qwen3 Coder — code generation and review. Best for programming tasks." },
+  "gpt-oss-20b": { best: "GPT-OSS 20B — the fast, light open-weight sibling. Best for quick answers." },
+  gemma4: { best: "Gemma 4 31B — Google's open-weight generalist. Good all-round chat." },
+  "minimax-m2": { best: "MiniMax M2 — strong reasoning at speed. Best for analysis." },
+  "llama4-scout": { best: "Llama 4 Scout — the light, quick Llama. Best for fast chat." },
+  "glm-air": { best: "GLM-5.3 Air — the lighter GLM, much faster. Best when speed beats depth." },
+  "kimi-flash": { best: "Kimi K3.1 Flash — Kimi's speed lane. Best for quick reasoning." },
 };
 const FRIENDLY_MODEL = (m) => !m ? "" :
+  m.includes("glm-5.3-air") ? "GLM-5.3 Air" :
   m.includes("glm-5.3") ? "GLM-5.3" :
   m.includes("flint") ? "Flint v1.0" :
   m.includes("qwen") ? "Qwen3.8-27B" :
+  m.includes("kimi-k3.1-flash") ? "Kimi K3.1 Flash" :
   m.includes("kimi") ? "Kimi K3.1 Pro" :
+  m.includes("deepseek-r1") ? "DeepSeek R1" :
   m.includes("deepseek") ? "DeepSeek V4.1 Flash" :
+  m.includes("gpt-oss-20b") ? "GPT-OSS 20B" :
   m.includes("gpt-oss") ? "GPT-OSS 120B" :
   (m.includes("llama") || m.includes("maverick")) ? "Llama 4 Maverick" :
   m.includes("dolphin") ? "Dolphin Uncensored 24B" :
+  m.includes("qwen3-coder") ? "Qwen3 Coder" :
+  m.includes("gemma-4") ? "Gemma 4 31B" :
+  m.includes("minimax") ? "MiniMax M2" :
+  m.includes("scout") ? "Llama 4 Scout" :
   String(m).split("/").pop();
 {
   /* keep the select's hover title in sync with the current choice */
   const sel = document.getElementById("modelSel");
   const syncTitle = () => { const i = MODEL_INFO[sel.value]; if (i) sel.title = i.best; };
-  sel.addEventListener("change", syncTitle);
+  // v193 (owner rule 2026-11-13): the chosen model must SURVIVE a refresh — never silently revert to GLM.
+  const persistModel = () => { try { localStorage.setItem("pplx-model", sel.value); } catch (e) {} };
+  sel.addEventListener("change", function () { syncTitle(); persistModel(); });
+  try { const saved = localStorage.getItem("pplx-model"); if (saved && [...sel.options].some(o => o.value === saved)) sel.value = saved; } catch (e) {}
   syncTitle();
 }
 function prettyModel(id) {
@@ -3986,7 +4535,8 @@ function councilFromPhases(phases, x) {
 }
 function renderMeta(container, meta) {
   const steps = ((meta && meta.steps) || []).map(publicPhase);
-  if (!meta || (!steps.length && !meta.council)) return null;
+  const hasChips = !!(window.ToolChips && window.ToolChips.hasChips(meta));
+  if (!meta || (!steps.length && !meta.council && !hasChips)) return null;
   const wrap = document.createElement("div");
   wrap.className = "answer-meta";
   if (meta.council) {
@@ -4011,6 +4561,7 @@ function renderMeta(container, meta) {
       b.addEventListener("click", () => { row.hidden = !row.hidden; b.setAttribute("aria-expanded", String(!row.hidden)); });
     }
   }
+  if (hasChips) window.ToolChips.renderInto(wrap, meta);
   if (steps.length) {
     const d = document.createElement("details"); d.className = "steps-list";
     const sm = document.createElement("summary"); sm.textContent = "Steps · " + steps.length; d.appendChild(sm);
@@ -4077,13 +4628,66 @@ function renderAnswer(container, text, sources, related, images, meta) {
   const content = document.createElement("div");
   content.className = "answer-content";
   // Render with marked (proper markdown: tables, headings, code blocks, lists)
+  // v180: normalize writer-model markdown quirks BEFORE parsing — cheap models
+  // sometimes emit Python-style ''' fences (renders as literal text walls) and
+  // recursively percent-encode URLs (%252525…). Fix both, always.
   try {
+    text = String(text)
+      .replace(/\r\n?/g, "\n")
+      .replace(/'''/g, "```")
+      .replace(/(https?:\/\/[^\s<>"')\]]+)/g, (m, u) => {
+        if (!/(%25){2,}|%2525/.test(u)) return u;
+        let cur = u, guard = 0;
+        try {
+          while (/%25/.test(cur) && guard++ < 12) { const d = decodeURIComponent(cur); if (d === cur) break; cur = d; }
+        } catch (e) {}
+        return cur;
+      });
     const pm = protectMath(text);
     const rawHtml = marked.parse(pm.text, { breaks: true, gfm: true });
     const safeHtml = restoreMath(DOMPurify.sanitize(rawHtml), pm.items);
-    content.innerHTML = safeHtml;
+    // v159: models sometimes leave a space before punctuation after inline code (`x` ,)
+    // — tidy it in the TEXT nodes only, never inside code/pre markup.
+    const tidy = (h) => {
+      const parts = String(h).split(/(<(?:pre|code)\b[^>]*>[\s\S]*?<\/(?:pre|code)>)/);
+      return parts.map((p, i) => i % 2 === 1 ? p : p.replace(/ +([,.;:!?])/g, "$1")).join("");
+    };
+    content.innerHTML = tidy(safeHtml);
+    // v159: code blocks get a hover Copy button (top-right, Perplexity-style)
+    content.querySelectorAll("pre").forEach(pre => {
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.className = "code-copy-btn";
+      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy';
+      btn.setAttribute("aria-label", "Copy code");
+      btn.onclick = () => {
+        const t = (pre.querySelector("code") || pre).textContent || "";
+        const done = () => { btn.classList.add("copied"); btn.lastChild.textContent = "Copied"; setTimeout(() => { btn.classList.remove("copied"); btn.lastChild.textContent = "Copy"; }, 1500); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, done); else done();
+      };
+      pre.appendChild(btn);
+      wireCodeOpen(pre);   // v179: URLs also get an "Open" button (new tab)
+    });
+    // v179: bare URLs in answer text become clickable links (target=_blank)
+    autolinkAnswer(content);
   } catch (e) {
-    content.textContent = text;
+    // v180 (owner report 2026-11-12): NEVER dump raw markdown as a wall of text.
+    // If marked/DOMPurify threw, fall back to a minimal safe renderer that keeps
+    // structure (headings, bold, bullets, code fences, line breaks) instead of
+    // one unbroken paragraph of raw syntax.
+    try {
+      content.textContent = "";
+      const esc = (s) => String(s).replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">");
+      let h = esc(String(text))
+        .replace(/^#{1,6}\s*(.+)$/gm, '<div style="font-weight:700;margin:10px 0 4px">$1</div>')
+        .replace(/\*\*([^*\n]+)\*\*/g, "<b>$1</b>")
+        .replace(/^[-*•]\s+(.+)$/gm, "• $1<br>")
+        .replace(/^(\d+)[.)]\s+(.+)$/gm, "$1. $2<br>")
+        .replace(/```[\s\S]*?```/g, (m) => '<pre style="background:var(--bg-elevated);padding:8px;border-radius:6px;overflow-x:auto">' + m.replace(/^```\w*\n?|```\s*$/g, "") + "</pre>");
+      // lines that aren't inside the pre blocks above become <br>-separated text
+      h = h.replace(/(``[\s\S]*?``)/g, (m) => m); // noop, keep inline code visible
+      content.innerHTML = h.split(/\n{2,}/).map((p) => "<p>" + p.replace(/\n/g, "<br>") + "</p>").join("");
+      autolinkAnswer(content);
+    } catch (e2) { content.textContent = text; }
   }
   // v74: tables fill the answer column; the wrapper owns horizontal scroll
   content.querySelectorAll("table").forEach(tbl => {
@@ -4262,21 +4866,24 @@ function renderAnswer(container, text, sources, related, images, meta) {
   if (related.length) {
     const relSec = document.createElement("div");
     relSec.className = "related-section";
-    relSec.innerHTML = '<div class="related-head"><span class="related-label">Related</span><button type="button" class="related-runall"></button></div><div class="related-list"></div>';
+    relSec.innerHTML = '<div class="related-head"><span class="related-label">Next steps</span><button type="button" class="related-runall"></button></div><div class="related-list"></div>';
     const list = relSec.querySelector(".related-list");
     const runBtn = relSec.querySelector(".related-runall");
     // v97 (owner request 2026-11-10): "Run all" fires every follow-up in sequence — no copy/pasting.
     // Module-level state so the button re-created by each new answer can stop an in-flight run.
     if (typeof runAllState.active === "undefined") runAllState.active = false;
     const paint = () => { runBtn.textContent = runAllState.active ? "Stop" : "Run all"; runBtn.classList.toggle("running", runAllState.active); };
+    // v179 (owner request 2026-11-12): "Run all" fires every next step IN PARALLEL —
+    // each query streams into its own card below the answer (Perplexity Tasks-style);
+    // cards flip from spinner to answer as they land. Stop aborts pending cards.
     runBtn.onclick = async () => {
       if (runAllState.active) { runAllState.stop = true; paint(); return; }
+      // v183: each run owns a unique id; the stop flag is only honoured by the run that is current
+      const myRun = ++runAllState.runId;
       runAllState.active = true; runAllState.stop = false; paint();
-      for (const r of related) {
-        if (runAllState.stop || !document.body.contains(runBtn)) break;
-        try { await performSearch(r); } catch (e) { break; }
-      }
-      runAllState.active = false; paint();
+      try { await runAllParallel(related.slice(), () => runAllState.stop && runAllState.runId === myRun); } catch (e) {}
+      if (runAllState.runId === myRun) { runAllState.active = false; runAllState.stop = false; }
+      paint();
     };
     paint();
     related.forEach(r => {
@@ -4284,9 +4891,13 @@ function renderAnswer(container, text, sources, related, images, meta) {
       item.className = "related-item";
       item.setAttribute("role", "button");
       item.tabIndex = 0;
+      // 34b one-tap chips: the chip RUNS r as the full imperative command; the
+      // label is the tidied/truncated text, the payload is never truncated.
+      item.title = "Run this follow-up: " + r;
+      item.setAttribute("aria-label", "Run this follow-up: " + r);
       item.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>';
       const span = document.createElement("span");
-      span.textContent = r;
+      span.textContent = tidyFollowup(r);
       item.appendChild(span);
       item.onclick = () => submitQuery(r);
       item.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); submitQuery(r); } };
@@ -4341,11 +4952,37 @@ async function performSearch(query) {
   if (isSearching) return;
   try { await performSearchInner(query); } finally { drainQueue(); }
 }
+// v181 (owner request 2026-11-12): Perplexity-style send/stop button. The arrow
+// button is high-contrast in both themes, and while a response streams it becomes
+// a filled STOP square that really aborts the request — the user always knows
+// whether pressing it sends or stops.
+let searchAbort = null;
+function stopSearch() { if (searchAbort) { try { searchAbort.abort(); } catch (e) {} } }
+function syncSendButtons() {
+  const busy = !!isSearching;
+  document.querySelectorAll("#landingSubmit, #followupSend").forEach(btn => {
+    if (!btn) return;
+    const changed = btn.classList.contains("searching") !== busy;
+    btn.classList.toggle("searching", busy);
+    if (changed) {
+      btn.innerHTML = busy
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>';
+      btn.title = busy ? "Stop generating" : "Send";
+      btn.setAttribute("aria-label", busy ? "Stop generating" : "Send");
+    }
+  });
+}
+setInterval(syncSendButtons, 400); syncSendButtons();
 async function performSearchInner(query) {
   if (isSearching || !query.trim()) return;
   try { window.EntityCards && window.EntityCards.questionHint && window.EntityCards.questionHint(query); } catch (e) {}
   isSearching = true;
+  searchAbort = new AbortController();   // v181: the STOP button aborts this search
+  searchDeadline = Date.now() + 300000; // v156 watchdog: no search may hold the composer hostage for more than 5 minutes
   stopSpeaking();
+  try { // v157: this try now covers the WHOLE search — a throw in thread setup or the
+        // (quota-throwing) saveThreads used to escape and leave isSearching stuck true.
   // v83 (G8): offline — show a retryable error card instead of starting a request that cannot succeed
   if (navigator.onLine === false) {
     showResults();
@@ -4418,28 +5055,69 @@ async function performSearchInner(query) {
     "gpt-oss": "openai/gpt-oss-120b",
     llama4: "meta-llama/llama-4-maverick",
     venice: "cognitivecomputations/dolphin-mistral-24b-venice-edition",
-    dolphin: "cognitivecomputations/dolphin-mistral-24b-venice-edition"
+    dolphin: "cognitivecomputations/dolphin-mistral-24b-venice-edition",
+    /* v169: live-verified expansion models (each served 200 OK via gateway-chat) */
+    r1: "deepseek/deepseek-r1",
+    "qwen-coder": "qwen/qwen3-coder",
+    "gpt-oss-20b": "openai/gpt-oss-20b",
+    gemma4: "google/gemma-4-31b",
+    "minimax-m2": "minimax/minimax-m2",
+    "llama4-scout": "meta-llama/llama-4-scout",
+    "glm-air": "z-ai/glm-5.3-air",
+    "kimi-flash": "moonshotai/kimi-k3.1-flash"
   };
   const modelOverride = MODEL_OVERRIDES[purpose] || null;
   // v63: text/PDF attachments splice into the outgoing message; image
   // attachments ride the request's `attachment` field to the gateway's
   // vision lane (never into the thread text or the message cap).
-  const att = takeAttachment();
+  const atts = takeAttachment();
   let fullQuery = query;
-  let attachmentBody = null;
-  if (att) {
-    if (att.kind === "image") {
-      fullQuery = query + "\n\n[Attached image: " + att.name + "]";
-      attachmentBody = { type: "image", data_url: att.dataUrl, name: att.name };
-    } else {
-      fullQuery = query + "\n\n[Attached file: " + att.name + "]\n\"\"\"\n" + att.content + "\n\"\"\"";
+  let attachmentBody = null, attachmentsBody = null;
+  if (atts.length) {
+    const imgs = atts.filter(a => a.kind === "image");
+    const blocks = [];
+    let budget = 600_000; // total spliced text across files (gateway body cap)
+    for (const a of atts) {
+      if (a.kind === "image") blocks.push("[Attached image: " + a.name + "]");
+      else if (a.kind === "unsupported") blocks.push("[Attached file: " + a.name + "]\n\"\"\"\n(Unsupported file type — contents could not be read.)\n\"\"\"");
+      else {
+        let c = a.content, note = a.note || "";
+        if (c.length > budget) { c = c.slice(0, Math.max(0, budget)); note = "[Truncated to fit the message size limit]"; }
+        budget -= c.length;
+        blocks.push("[Attached file: " + a.name + "]\n\"\"\"\n" + c + (note ? "\n" + note : "") + "\n\"\"\"");
+      }
+    }
+    fullQuery = query + "\n\n" + blocks.join("\n\n");
+    if (imgs.length) {
+      attachmentsBody = imgs.slice(0, 6).map(a => ({ type: "image", data_url: a.dataUrl, name: a.name }));
+      attachmentBody = attachmentsBody[0];
     }
   }
   // Send the full conversation history so follow-ups keep context
   // v83 (C10): @-mentions add a context block to the OUTGOING last user message only (not saved in the thread)
   const mx = (window.ComposerX && window.ComposerX.take) ? window.ComposerX.take() : { mentions: [], context: "" };
+  // v159: never let an old giant thread kill the request (server caps at 60 msgs / 400KB).
+  // Keep the first user turn (topic anchor) + the most recent turns; truncate any
+  // single mega-message. Older middle turns drop out first — newest context always wins.
+  const trimHistory = (msgs) => {
+    const capMsg = 50_000, capTotal = 220_000;
+    let h = msgs.map(m => ({ role: m.role, content: String(m.content || "").slice(0, capMsg) }));
+    const firstUser = h.findIndex(m => m.role === "user");
+    const size = () => h.reduce((n, m) => n + m.content.length, 0);
+    if (h.length > 24 || size() > capTotal) {
+      const anchor = firstUser >= 0 && firstUser < h.length - 1 ? [h[firstUser]] : [];
+      h = [...anchor, ...h.slice(Math.max(firstUser + 1, h.length - 22))];
+      while (h.length > (anchor.length + 22) || size() > capTotal) {
+        // drop the oldest non-anchor message until it fits
+        const idx = h.findIndex(m => m !== anchor[0]);
+        if (idx < 0 || h.length <= 2) break;
+        h.splice(idx, 1);
+      }
+    }
+    return h;
+  };
   const history = [
-    ...thread.messages.map(m => ({ role: m.role, content: m.content })),
+    ...trimHistory(thread.messages),
     { role: "user", content: (mx.context || "") + fullQuery },
   ];
   const v83Body = {
@@ -4468,6 +5146,7 @@ async function performSearchInner(query) {
     let revisedText = ""; // v80 (I7 pass-2): full replacement text from a `revision` SSE event
     let servedModel = null;  // v129: the model that ACTUALLY served this response (the gateway's x-model header / x_model body field — the orchestrator's real pick, budget fallbacks included)
     let budgetFallback = false; // v129: the paid cap was hit — a free model took over
+    const toolStream = window.ToolChips ? window.ToolChips.createStream() : null;
     const renderFinal = (answer, revised) => {
       if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
       const answerClean = splitFollowups(answer).body;
@@ -4505,12 +5184,13 @@ async function performSearchInner(query) {
       const related = generateRelated(query, answer);
       const councilInfo = councilOn ? councilFromPhases(lastPhases, councilX) : null;
       const stepsC = compactSteps(withCanonPhase(lastPhases, lastCanon));
-      renderAnswer(content, answerClean, sources, related, imageResults, { steps: stepsC, council: councilInfo });
+      const toolChips = toolStream ? toolStream.finalize({ phases: lastPhases, sources }) : [];
+      renderAnswer(content, answerClean, sources, related, imageResults, { steps: stepsC, council: councilInfo, toolChips, toolStream });
       if (pendingActions.length && window.ConnectorsUI) { try { window.ConnectorsUI.renderActions(content, pendingActions); } catch (_e) {} pendingActions = []; }
       speakAnswer(answerClean);
       thread.messages.push({ role: "user", content: fullQuery });
       thread.updatedAt = Date.now();
-      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(servedModel ? { servedModel } : {}), ...(budgetFallback ? { budgetFallback: true } : {}), ...(revised ? { revised: true } : {}), ...(imageResults.length ? { images: imageResults } : {}), ...(stepsC.length ? { steps: stepsC } : {}), ...(councilInfo ? { council: councilInfo } : {}) });
+      thread.messages.push({ role: "assistant", content: answerClean, sources, related, model: (modelOverride || purpose), ...(servedModel ? { servedModel } : {}), ...(budgetFallback ? { budgetFallback: true } : {}), ...(revised ? { revised: true } : {}), ...(imageResults.length ? { images: imageResults } : {}), ...(stepsC.length ? { steps: stepsC } : {}), ...(councilInfo ? { council: councilInfo } : {}), ...(toolChips.length ? { toolChips } : {}) });
       saveThreads();
       renderThreads();
       // v74: stay where the reader is — jump to the bottom ONLY if they were
@@ -4543,7 +5223,7 @@ async function performSearchInner(query) {
         content.appendChild(liveAnswerEl);
       }
       liveAnswerEl.innerHTML = "";
-      renderAnswer(liveAnswerEl, partial, unifiedSources(lastPhases, lastCanon, partial), [], []);
+      renderAnswer(liveAnswerEl, partial, unifiedSources(lastPhases, lastCanon, partial), [], [], toolStream ? { toolStream } : null);
       if (revisedText) {
         const rv = document.createElement("div");
         rv.className = "search-timer";
@@ -4563,7 +5243,7 @@ async function performSearchInner(query) {
       const drSubmitOnce = () => fetch(GATEWAY + "/gateway-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(incognitoOn || thread.incognito ? { incognito: true } : {}), personalization: persona(), ...getSourcesFilter(), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, deep_research: true, ...(incognitoOn || thread.incognito ? { incognito: true } : {}), personalization: persona(), ...getSourcesFilter(), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       // Upstream rate limit (HTTP 429, Retry-After): show "rate-limited — retrying" and retry instead of failing hard.
       let submit = await drSubmitOnce();
@@ -4599,7 +5279,7 @@ async function performSearchInner(query) {
           if (++pollFails >= 4) throw new Error("Lost contact with the research job (" + (pe && pe.message ? pe.message : pe) + "). It may still be running server-side.");
           continue; // transient network blip: keep polling
         }
-        if (p.status === "completed" && p.answer) { renderFinal(p.answer); break; }
+        if (p.status === "completed" && p.answer) { if (toolStream) toolStream.ingestJSON(p); renderFinal(p.answer); break; }
         if (p.error) throw new Error(p.error);
         if (Date.now() - started > 15 * 60 * 1000) throw new Error("Deep research timed out after 15 minutes");
       }
@@ -4610,8 +5290,9 @@ async function performSearchInner(query) {
       // whenever the response is not an SSE stream.
       const res = await fetchRetry(GATEWAY + "/gateway-chat", {
         method: "POST",
+        signal: searchAbort ? searchAbort.signal : undefined,   // v181: STOP button
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...(currentThreadId ? { thread_id: currentThreadId } : {}), ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       if (res.authExpired) { AuthGuard.expire(); throw AuthGuard.makeError(); }
       if (res.status === 401) throw new Error("The gateway rejected this request as unauthenticated (HTTP 401) although your session is still valid. Retry; if it persists, sign out and back in.");
@@ -4639,6 +5320,7 @@ async function performSearchInner(query) {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
+          searchDeadline = Date.now() + 300000; // v156: stream progress resets the watchdog
           buf += dec.decode(value, { stream: true });
           const lines = buf.split("\n");
           buf = lines.pop() || ""; // keep the trailing partial line for the next chunk
@@ -4648,6 +5330,7 @@ async function performSearchInner(query) {
             if (payload === "[DONE]") continue;
             try {
               const evt = JSON.parse(payload);
+              if (toolStream) toolStream.ingestSSE(evt, state);
               if (Array.isArray(evt?.phases)) { renderPhases(state, evt.phases); degradedPhases = evt.phases.filter(isDegradedPhase); lastPhases = evt.phases; }
               if (Array.isArray(evt?.phases)) { const si = sourcesFromPhases(evt.phases).filter(x => x.canon); if (si.length) lastCanon = si; }
               if (Array.isArray(evt?.sources)) { const si = sourcesFromPhases([{ kind: "search", items: evt.sources }]); if (si.length) lastCanon = si; }
@@ -4673,6 +5356,7 @@ async function performSearchInner(query) {
         renderFinal(revisedText || full, !!revisedText);
       } else {
         const data = await res.json();
+        if (toolStream) toolStream.ingestJSON(data);
         if (typeof data?.x_model === "string" && data.x_model) servedModel = data.x_model; // v129: the non-streaming path carries the served model in the body
         if (data?.x_budget_exceeded === true || data?.x_budget_exceeded === "1") budgetFallback = true;
         if (Array.isArray(data?.images)) imageResults = data.images;
@@ -4699,31 +5383,157 @@ async function performSearchInner(query) {
       return;
     }
     const netFail = /failed to fetch|networkerror|load failed|network request failed/i.test(emsg);
-    renderAnswerError(content, netFail ? "Couldn't reach the gateway" : "Something went wrong", netFail ? "Network request failed (" + emsg + "). Check your connection and retry." : emsg, query);
+    if (/conversation too large/i.test(emsg)) {
+      renderAnswerError(content, "This thread is very long", "This conversation has grown past the context limit. Start a new thread and reference this one (link it with @) — your recent messages are preserved.", query);
+    } else {
+      if (searchAbort && searchAbort.signal.aborted) {
+        // v181: the user pressed STOP — a quiet, non-alarming card, not an error
+        renderAnswerError(content, "Response stopped", "You stopped this response. The partial answer (if any) is preserved above — press the retry icon or ask again to continue.", query);
+      } else {
+        renderAnswerError(content, netFail ? "Couldn't reach the gateway" : "Something went wrong", netFail ? "Network request failed (" + emsg + "). Check your connection and retry." : emsg, query);
+      }
+    }
   } finally {
     if (liveTimer) { clearTimeout(liveTimer); liveTimer = null; }
     isSearching = false;
+    searchAbort = null;   // v181: clear the STOP controller so the next search gets a fresh one
+    searchDeadline = 0;
+  }
+  } catch (e) {
+    // v157: pre-search failures (thread setup, the quota-throwing saveThreads) used to
+    // escape entirely — isSearching stayed true and the composer ate every prompt.
+    isSearching = false; searchDeadline = 0;
+    try {
+      const ctc = document.getElementById("resultsContent");
+      const thc = threads.find(t => t.id === currentThreadId);
+      if (ctc) { renderPriorTurns(ctc, thc, false); const qe = document.createElement("div"); qe.className = "question-header"; qe.textContent = query; ctc.appendChild(qe); renderAnswerError(ctc, "Search failed to start", String(e && e.message ? e.message : e), query); }
+    } catch (e2) {}
   }
 }
 
 // ============ EVENT HANDLERS ============
 // v77: user-submitted queries pass through the (optional) Research Mode hook first
+// v179 (owner request 2026-11-12): "Run all" now runs every next step IN PARALLEL.
+// Each query is an independent gateway-chat SSE call whose answer renders into its
+// own card below the related list — cards flip from spinner to rendered answer as
+// they land, so all N run concurrently (Perplexity Tasks-style) instead of a queue.
+async function runAllParallel(queries, shouldStop) {
+  if (!queries || !queries.length) return;
+  const s = await sb.auth.getSession();
+  const tok = s && s.data && s.data.session && s.data.session.access_token;
+  if (!tok) return;
+  const purpose = document.getElementById("modelSel").value;
+  const content = document.getElementById("resultsContent");
+  if (!content) return;
+  const wrap = document.createElement("div");
+  wrap.className = "parallel-run";
+  wrap.innerHTML = '<div class="parallel-run-head"><span class="parallel-run-dot"></span><span class="parallel-run-title">Running ' + queries.length + ' next steps in parallel…</span></div>';
+  content.appendChild(wrap);
+  wrap.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  const t0 = Date.now();
+  const runOne = async (q) => {
+    const card = document.createElement("div");
+    card.className = "parallel-card";
+    card.innerHTML = '<div class="parallel-q"></div><div class="parallel-body"><span class="parallel-spin" aria-label="running"></span></div>';
+    card.querySelector(".parallel-q").textContent = q;
+    wrap.appendChild(card);
+    const body = card.querySelector(".parallel-body");
+    const ctl = new AbortController();
+    const stopPoll = setInterval(() => { if (shouldStop && shouldStop() === true) { try { ctl.abort(new DOMException('Stopped by user', 'AbortError')); } catch (e) { ctl.abort(); } } }, 300);
+    try {
+      const res = await fetchRetry(GATEWAY + "/gateway-chat", {
+        method: "POST",
+        signal: ctl.signal,
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok },
+        body: JSON.stringify({ messages: [{ role: "user", content: q }], purpose, max_tokens: 2048, stream: true })
+      });
+      if (!res.ok || !(res.headers.get("content-type") || "").includes("text/event-stream")) throw new Error("HTTP " + res.status);
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "", full = "";
+      const pStream = window.ToolChips ? window.ToolChips.createStream() : null;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const lines = buf.split("\n"); buf = lines.pop() || "";
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          const payload = line.slice(5).trim();
+          if (payload === "[DONE]") continue;
+          try {
+            const evt = JSON.parse(payload);
+            if (pStream) pStream.ingestSSE(evt, body);
+            const d = evt && evt.choices && evt.choices[0] && evt.choices[0].delta && evt.choices[0].delta.content;
+            if (typeof d === "string") full += d;
+          } catch (e) {}
+        }
+      }
+      body.innerHTML = "";
+      renderAnswer(body, splitFollowups(full).body || "_(no answer returned)_", [], [], [], pStream ? { toolChips: pStream.finalize(), toolStream: pStream } : null);
+      card.classList.add("done");
+    } catch (e) {
+      body.innerHTML = "";
+      const err = document.createElement("div");
+      err.className = "parallel-err";
+      const wasStopped = ctl.signal.aborted || (e && e.name === "AbortError");
+      err.textContent = wasStopped ? "Stopped — press Run all to run this step again." : "Failed: " + (e && e.message ? e.message : "unknown error");
+      body.appendChild(err);
+      card.classList.add("failed");
+    } finally { clearInterval(stopPoll); }
+  };
+  await Promise.all(queries.map(runOne));
+  const secs = ((Date.now() - t0) / 1000).toFixed(1);
+  wrap.querySelector(".parallel-run-title").textContent = "Ran " + queries.length + " next steps in parallel in " + secs + "s";
+}
 function submitQuery(query) {
   if (isSearching && query && query.trim()) { queuedQuery = query.trim(); showQueued(); return; }
   if (window.SiteAssets && window.SiteAssets.intercept && window.SiteAssets.intercept(query)) return;
   if (window.ResearchMode && window.ResearchMode.intercept && window.ResearchMode.intercept(query)) return;
   performSearch(query);
 }
+// v181 (owner request 2026-11-12): Perplexity-style DRAFTS — composer text
+// survives reloads and thread switches. Saved per thread (landing when no thread),
+// cleared automatically once sent. Restored on focus so the draft reappears when
+// the user returns to the thread.
+function draftKey() { return "ai_draft_" + (currentThreadId || "landing"); }
+function saveDraft() {
+  const el = document.getElementById("followupInput") || document.getElementById("landingInput");
+  if (!el) return;
+  try { if (el.value.trim()) localStorage.setItem(draftKey(), el.value); else localStorage.removeItem(draftKey()); } catch (e) {}
+}
+function loadDraft() {
+  const el = document.getElementById("followupInput") || document.getElementById("landingInput");
+  if (!el || el.value) return;
+  try { const v = localStorage.getItem(draftKey()); if (v) { el.value = v; autosize(el); } } catch (e) {}
+}
+["followupInput", "landingInput"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) { el.addEventListener("input", saveDraft); el.addEventListener("focus", loadDraft); }
+});
 // Composer: auto-growing textarea, Enter sends / Shift+Enter newline, busy => message is queued (not dropped)
 function autosize(el) { el.style.height = "auto"; const sh = el.scrollHeight; if (sh > 8) el.style.height = Math.min(sh, parseFloat(getComputedStyle(el).maxHeight) || 220) + "px"; }
 function wireComposer(inputId, sendId) {
   const el = document.getElementById(inputId), btn = document.getElementById(sendId);
-  const send = () => { const v = el.value; if (!v.trim()) return; el.value = ""; autosize(el); submitQuery(v); };
+  // v182 (owner request 2026-11-12): CLEAR the draft when sent — the input was emptied but
+  // the stored draft survived, so the focus handler restored the just-sent prompt.
+  // v186 (owner request 2026-11-12): image/attachment-only sends — pasting a screenshot
+  // or attaching a doc with no text must still send; a short default prompt rides along
+  // so the thread shows what was asked.
+  const send = () => {
+    const v = el.value;
+    const hasAtt = (typeof pendingAttachments !== "undefined" && pendingAttachments.length > 0);
+    if (!v.trim() && !hasAtt) return;
+    el.value = ""; autosize(el);
+    try { localStorage.removeItem(draftKey()); } catch (e) {}
+    submitQuery(v.trim() ? v : "Analyze this.");
+  };
   el.addEventListener("input", () => autosize(el));
   el.addEventListener("keydown", e => {
     if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); }
   });
-  btn.onclick = send;
+  // v181: the round button STOPS while a response streams (Enter still queues)
+  btn.onclick = () => { if (isSearching) { stopSearch(); return; } send(); };
   autosize(el);
 }
 wireComposer("landingInput", "landingSubmit");
@@ -4831,6 +5641,51 @@ async function loadStatus(force) {
 })();
 
 // ===== v83 (G6/G8): offline banner, service worker, install prompt =====
+// v179 (owner request 2026-11-12): URLs must open directly in a new window —
+// Copy stays for long text, but any code block containing a URL also gets "Open".
+window.wireCodeOpen = function wireCodeOpen(pre) {
+  if (pre.querySelector(".code-open-btn")) return;
+  const t = (pre.querySelector("code") || pre).textContent || "";
+  const m = t.trim().match(/^https?:\/\/[^\s"'<>]+$/i) || t.match(/https?:\/\/[^\s"'<>]+/i);
+  if (!m) return;
+  const ob = document.createElement("button");
+  ob.type = "button"; ob.className = "code-copy-btn code-open-btn";
+  ob.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>Open';
+  ob.setAttribute("aria-label", "Open URL in a new tab");
+  ob.onclick = () => window.open(m[0], "_blank", "noopener,noreferrer");
+  pre.appendChild(ob);
+}
+// v179: bare http(s) URLs left as plain text by the markdown renderer become
+// real anchors that open in a new tab. Walks TEXT nodes only — never touches
+// code blocks, existing links, or attribute values.
+window.autolinkAnswer = function autolinkAnswer(root) {
+  const URL_RE = /https?:\/\/[^\s"'<>)\]]+[^\s"'<>).\],;:!?]/g;
+  const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => {
+      const p = n.parentElement;
+      if (!p || /^(a|pre|code|script|style|button|textarea)$/i.test(p.tagName)) return NodeFilter.FILTER_REJECT;
+      URL_RE.lastIndex = 0;
+      return URL_RE.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  const hits = [];
+  let n; while ((n = walk.nextNode())) hits.push(n);
+  hits.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    let lastIdx = 0, s = node.nodeValue, mm;
+    URL_RE.lastIndex = 0;
+    while ((mm = URL_RE.exec(s))) {
+      if (mm.index > lastIdx) frag.appendChild(document.createTextNode(s.slice(lastIdx, mm.index)));
+      const a = document.createElement("a");
+      a.href = mm[0]; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.textContent = mm[0];
+      frag.appendChild(a);
+      lastIdx = mm.index + mm[0].length;
+    }
+    if (lastIdx < s.length) frag.appendChild(document.createTextNode(s.slice(lastIdx)));
+    node.parentNode.replaceChild(frag, node);
+  });
+};
 (function () {
   const bar = document.createElement("div");
   bar.className = "offline-bar"; bar.id = "offlineBar"; bar.setAttribute("role", "status");
@@ -4838,6 +5693,57 @@ async function loadStatus(force) {
   document.body.appendChild(bar);
   const sync = () => bar.classList.toggle("show", navigator.onLine === false);
   window.addEventListener("offline", sync); window.addEventListener("online", sync); sync();
+  // v156: visible build identity + stale-tab detector. The owner kept hitting "I refreshed and
+  // nothing updated" — now the app says what build it IS, and checks the server for a newer one.
+function wireCodeCopy(scope) {
+  (scope || document).querySelectorAll(".answer-content pre:not([data-copy])").forEach(pre => {
+    pre.setAttribute("data-copy", "1");
+    if (pre.querySelector("pre")) return; // nested — skip
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "code-copy-btn";
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy';
+    btn.setAttribute("aria-label", "Copy code");
+    btn.onclick = () => {
+      const code = pre.querySelector("code");
+      const t = (code || pre).textContent || "";
+      const done = () => { btn.classList.add("copied"); btn.lastChild.textContent = "Copied"; setTimeout(() => { btn.classList.remove("copied"); btn.lastChild.textContent = "Copy"; }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, done);
+      else done();
+    };
+    pre.appendChild(btn);
+    wireCodeOpen(pre);   // v179: URLs also get an "Open" button (new tab)
+  });
+}
+  // v184: window.BUILD now lives in /build.js (external, CSP-safe) — bumping the
+  // build stamp no longer invalidates this script's CSP sha256 hash (v183 regression:
+  // the v183 bump changed the hash, CSP blocked the whole app script, and every user
+  // landed logged-out on the dark default with a dead composer).
+  try { (function () {
+    const acct = document.querySelector(".account, #accountBtn, .sidebar-footer");
+    if (acct) { const b = document.createElement("div"); b.textContent = "build " + window.BUILD;
+      b.style.cssText = "font-size:10px;color:var(--text-faint);padding:1px 10px;opacity:.7"; acct.parentNode.insertBefore(b, acct.nextSibling); }
+  })(); } catch (e) {}
+  function checkFresh() {
+    fetch("/build.json", { cache: "no-store" }).then(r => r.json()).then(j => {
+      const num = (v) => parseInt(String(v || "").replace(/[^0-9]/g, ""), 10) || 0;
+      const pageB = num(window.BUILD), srvB = num(j && j.build);
+      // v177 bugfix: the bar showed forever because build.json had drifted (v163) while the
+      // page was current. Show ONLY when the page is genuinely behind, and always REMOVE
+      // the bar when the page is current — clicking reload now clears it.
+      if (srvB && pageB && srvB > pageB && !document.getElementById("staleBar")) {
+        const bar = document.createElement("div"); bar.id = "staleBar";
+        bar.textContent = "A newer version is available \u2014 reload to update.";
+        bar.style.cssText = "position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:8px 16px;background:var(--accent,#1a6b5a);color:#fff;font:600 13px/1 var(--font-sans,sans-serif);text-align:center;cursor:pointer";
+        bar.onclick = () => { try { localStorage.setItem("staleBarReload", String(Date.now())); } catch (e) {} location.reload(); };
+        document.body.appendChild(bar);
+      }
+      if (document.getElementById("staleBar") && !(srvB && pageB && srvB > pageB)) document.getElementById("staleBar").remove();
+    }).catch(() => {});
+  }
+  window.addEventListener("load", () => { checkFresh(); setInterval(checkFresh, 60000); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) checkFresh(); });
+
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
     window.addEventListener("load", () => {
       // v98 STALE-BROWSER ESCAPE HATCH (owner report 2026-11-11): browsers controlled by the old
@@ -4872,6 +5778,10 @@ async function loadStatus(force) {
   renderThreads();
   renderSpaces();
   positionComposerPills();
+  // v158 INSTANT GATE: if there is no cached session, show the login overlay NOW (synchronously)
+  // instead of after the getSession+allowlist round-trips — the screen appears in 0s, and the
+  // async checkAuth below hides it again if a valid session actually exists.
+  try { if (!localStorage.getItem("sb-bnxermyboeigvwonfrzx-auth-token") && !/[?&]share=/.test(location.search)) authOverlay.style.display = "flex"; } catch (e) {}
   const authP = checkAuth();
   // the module scripts are classic (blocking) scripts that patch renderAnswer etc.; wait for them (DOMContentLoaded)
   // before rendering a restored thread so it goes through the patched path — NOT for the network.
@@ -4884,7 +5794,7 @@ async function loadStatus(force) {
   } catch (e) {}
   try { if (!(/^\/t\/./.test(location.pathname) && !threadFromPath(location.pathname) && !currentThreadId)) window.__endPreBoot && window.__endPreBoot(); } catch (e) {} // else wait for server list / 3s timeout
   const authed = await authP;
-  if (authed && currentUser) {
+  if (authed && currentUser) { authOverlay.style.display = "none";
     document.getElementById("userEmail").textContent = currentUser.email;
     document.getElementById("userAvatar").textContent = (currentUser.email[0] || "?").toUpperCase();
     AuthGuard.verify(true); // background: a revoked/expired server session must not keep looking signed in
@@ -4916,6 +5826,7 @@ async function loadStatus(force) {
 </script>
 <div id="moduleRoot"></div>
 <script src="/modules/settings.js"></script>
+<script src="/modules/connectors.config.js"></script>
 <script src="/modules/connectors.js"></script>
 <script src="/modules/skills.js"></script>
 <script src="/modules/artifacts.js"></script>
@@ -4929,17 +5840,47 @@ async function loadStatus(force) {
 <script src="/modules/composerx.js"></script>
 <script src="/modules/skills-actions.js"></script>
 <script src="/modules/plugins.js"></script>
+<script src="/modules/settings-mcp.js"></script>
+<script src="/modules/settings-billing.js"></script>
+<script src="/modules/settings-neurons.js"></script>
+<script src="/modules/automations.js"></script>
+<script src="/modules/eval-replay.js"></script>
+<script src="/modules/api-docs.js"></script>
+<script src="/modules/shortcuts.js"></script>
+<script src="/modules/student-verify.js"></script>
+<script src="/modules/favicon-live.js"></script>
+<script src="/modules/notify-bell.js"></script>
 <script src="/modules/settings-security.js"></script>
+<script src="/modules/settings-account.js"></script>
+<script src="/modules/settings-premium.js"></script>
+<script src="/modules/settings-models.js"></script>
+<script src="/modules/local-files.js"></script>
 <script src="/modules/settings-org.js"></script>
 <script src="/modules/voice-convo.js"></script>
 <script src="/modules/artifacts-files.js"></script>
 <script src="/modules/artifacts-gallery.js"></script>
 <script src="/modules/docs-panel.js"></script>
+<script src="/modules/artifact-library.js"></script>
+<script src="/modules/webapps.js"></script>
 <script src="/modules/repo-pr.js"></script>
 <script src="/modules/sources.js"></script>
 <script src="/modules/media.js"></script>
 <script src="/modules/export.js"></script>
 <script src="/modules/tabstatus.js"></script>
+<script src="/modules/tool-chips.js"></script>
+<script src="/modules/onboarding.js"></script>
+<script src="/modules/usage.js"></script>
+<script src="/modules/teammates.js"></script>
+<script src="/modules/enterprise-admin.js"></script>
+<script src="/modules/mobile-375.js"></script>
+<script src="/modules/mobile-focus-trap.js"></script>
+<script src="/modules/desktop-notifications.js"></script>
+<script src="/modules/settings-troubleshooting.js"></script>
+<script src="/modules/voice-readaloud.js"></script>
+<link rel="stylesheet" href="/css/mobile-375.css">
+<link rel="stylesheet" href="/css/readaloud.css">
+<script src="/modules/response-diff.js"></script>
+<script src="/modules/command-palette.js"></script>
 <script>
 // perf: on-demand modules + non-blocking stylesheets. These five overlays are only reachable through a click, so
 // their JS (and CSS) is fetched the first time they are opened — and prefetched at idle so the click is instant.
@@ -4994,7 +5935,31 @@ document.getElementById("navDiscover").onclick = function () { openModule("disco
 document.getElementById("navFleet").onclick = function () { openModule("fleet", "FleetUI", "open"); };
 document.getElementById("navHubs").onclick = function () { openModule("hubs", "LiveHubs", "open", "finance"); };
 document.getElementById("navPlugins").onclick = function () { window.PluginsUI && window.PluginsUI.open(); };
+/* Student verification wiring (modules/student-verify.js): register the Settings pane,
+   open it when the banner fires stv:open-settings, boot the banner for signed-in users. */
+(function () {
+  function wireStudentVerify() {
+    if (window.SettingsUI && window.StudentVerifyPane && typeof window.SettingsUI.registerPane === "function") {
+      window.SettingsUI.registerPane({
+        id: "student",
+        label: "Student",
+        icon: '<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>',
+        render: function () { var root = document.createElement("div"); root.className = "stg-pane"; window.StudentVerifyPane(root); return root; },
+        after: "neurons"
+      });
+    }
+    if (window.StudentVerifyBanner) {
+      document.addEventListener("stv:open-settings", function () {
+        if (window.SettingsUI) window.SettingsUI.open("student");
+      });
+      window.StudentVerifyBanner();
+    }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wireStudentVerify);
+  else wireStudentVerify();
+})();
 </script>
 <script>document.addEventListener("visibilitychange",function(){document.body.classList.toggle("pplx-hidden",document.hidden)});</script>
+<script>try { var m = location.search.match(/[?&]ref=([a-z0-9]{4,16})/i); if (m && !localStorage.getItem("refClaimed")) localStorage.setItem("pendingRef", m[1]); } catch (e) {}</script>
 </body>
 </html>

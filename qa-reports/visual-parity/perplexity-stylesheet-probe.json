@@ -1,0 +1,10 @@
+{
+  "url": "https://www.perplexity.ai",
+  "title": "Just a moment...",
+  "stylesheets": [],
+  "fonts": [],
+  "inlineStyles": [
+    "*{box-sizing:border-box;margin:0;padding:0}html{line-height:1.15;-webkit-text-size-adjust:100%;color:#313131;font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\"}body{display:flex;flex-direction:column;height:100vh;min-height:100vh}.main-content{margin:8rem auto;padding-left:1.5rem;max-width:60rem}"
+  ],
+  "conclusion": "No Perplexity application stylesheet links or webfont faces exist in the observed challenge document. CSS extraction from this document cannot recover answer typography."
+}

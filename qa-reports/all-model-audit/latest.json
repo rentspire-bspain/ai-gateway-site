@@ -1,0 +1,1342 @@
+{
+ "ts": "2026-11-16T06:49:23+00:00",
+ "lanes": 17,
+ "scenarios": [
+  "sanity",
+  "tool-use",
+  "leak",
+  "doc-rule"
+ ],
+ "repeat": 2,
+ "total": 136,
+ "failed": 36,
+ "results": [
+  {
+   "lane": "deepseek-flash",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 69.0,
+   "chars": 7809,
+   "x_files": 2,
+   "ok": false,
+   "why": "evidence + artifact delivery; PROSE DUMP in chat",
+   "preview": "**Claim check:** deployed \u2014 no tool evidence in this turn; verified status unknown.\n\n---\n\n**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 2 file(s)\n\n---\n"
+  },
+  {
+   "lane": "deepseek-flash",
+   "scenario": "doc-rule",
+   "http": 546,
+   "seconds": 56.0,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "deepseek-flash",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 71.6,
+   "chars": 4378,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "deepseek-flash",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 71.7,
+   "chars": 7234,
+   "x_files": 2,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "deepseek-flash",
+   "scenario": "sanity",
+   "http": 546,
+   "seconds": 19.3,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "deepseek-flash",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 12.4,
+   "chars": 300,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "deepseek-flash",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 10.7,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "deepseek-flash",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 30.3,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "dolphin",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 27.4,
+   "chars": 2188,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n## Tonight\u2019s completion\n\n**Closure:** 100% (1000 of 1000 items closed)  \n**Overall status"
+  },
+  {
+   "lane": "dolphin",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 25.4,
+   "chars": 2099,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n## Tonight\u2019s completion document\n\n**Status:** Pending verification  \n**Scope:** [project,"
+  },
+  {
+   "lane": "dolphin",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 42.9,
+   "chars": 3751,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "dolphin",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 30.5,
+   "chars": 909,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "dolphin",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 18.6,
+   "chars": 300,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "dolphin",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 18.7,
+   "chars": 300,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "dolphin",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 34.6,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "dolphin",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 35.9,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "flint",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 69.6,
+   "chars": 6688,
+   "x_files": 2,
+   "ok": false,
+   "why": "evidence + artifact delivery; PROSE DUMP in chat",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 2 file(s)\n\n---\n\n**The provided snapshot reports closure at 1,000 of 1,000 fleet dispatches done and 0 pen"
+  },
+  {
+   "lane": "flint",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 48.0,
+   "chars": 2902,
+   "x_files": 2,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 2 file(s)\n\n---\n\n# Tonight's Completion Document \u2014 2026-11-16\n\n**Closure verdict: NOT ASSESSABLE \u2014 no proj"
+  },
+  {
+   "lane": "flint",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 45.5,
+   "chars": 4711,
+   "x_files": 2,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "flint",
+   "scenario": "leak",
+   "http": 546,
+   "seconds": 14.5,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "flint",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 20.8,
+   "chars": 597,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "flint",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 18.8,
+   "chars": 661,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "flint",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 29.5,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "flint",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 26.9,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "gemma4",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 15.8,
+   "chars": 2559,
+   "x_files": 2,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 2 file(s)\n\n---\n\nI can\u2019t calculate tonight\u2019s closure percentage or identify verified items without the pro"
+  },
+  {
+   "lane": "gemma4",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 14.1,
+   "chars": 1644,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n## Tonight\u2019s completion document\n\n**Status:** Not verified; the available information doe"
+  },
+  {
+   "lane": "gemma4",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 22.3,
+   "chars": 740,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "gemma4",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 21.9,
+   "chars": 863,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "gemma4",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 11.3,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "gemma4",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 13.1,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "gemma4",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 33.2,
+   "chars": 1226,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "gemma4",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 12.7,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "general",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 66.6,
+   "chars": 4191,
+   "x_files": 2,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 2 file(s)\n\n---\n\n**Closure percent: not calculable tonight \u2014 no item ledger is in scope, so the document b"
+  },
+  {
+   "lane": "general",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 55.5,
+   "chars": 6917,
+   "x_files": 1,
+   "ok": false,
+   "why": "evidence + artifact delivery; PROSE DUMP in chat",
+   "preview": "**Claim check:** deployed \u2014 no tool evidence in this turn; verified status unknown.\n**Claim check:** fixed \u2014 no tool evidence in this turn; verified status unknown.\n\n---\n\n**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane "
+  },
+  {
+   "lane": "general",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 64.4,
+   "chars": 3139,
+   "x_files": 2,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "general",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 79.0,
+   "chars": 3355,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "general",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 20.2,
+   "chars": 721,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "general",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 23.1,
+   "chars": 1146,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "general",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 58.4,
+   "chars": 2636,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "general",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 66.7,
+   "chars": 3393,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "glm-air",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 15.6,
+   "chars": 1658,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n# Tonight\u2019s completion document\n\n**Closure: Not yet calculable.** No project, work-item l"
+  },
+  {
+   "lane": "glm-air",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 14.3,
+   "chars": 1469,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\nI can\u2019t calculate a meaningful closure percentage or list verified items and code referen"
+  },
+  {
+   "lane": "glm-air",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 30.8,
+   "chars": 309,
+   "x_files": 0,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "glm-air",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 19.9,
+   "chars": 758,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "glm-air",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 11.7,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "glm-air",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 11.7,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "glm-air",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 16.8,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "glm-air",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 33.1,
+   "chars": 1070,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "gpt-oss",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 37.5,
+   "chars": 1279,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n**Date:** Monday, November\u202f16,\u202f2026  \n**Scope / project:** TBD (user to insert project na"
+  },
+  {
+   "lane": "gpt-oss",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 21.7,
+   "chars": 960,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\nClosure\u202f%:\u202fnot assessable (no work\u2011item list or evidence provided)  \n\n\ud83d\udd0d **Verified items*"
+  },
+  {
+   "lane": "gpt-oss",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 24.1,
+   "chars": 759,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "gpt-oss",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 21.7,
+   "chars": 1090,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "gpt-oss",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 17.5,
+   "chars": 581,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "gpt-oss",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 17.7,
+   "chars": 578,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "gpt-oss",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 25.3,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "gpt-oss",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 32.8,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "gpt-oss-20b",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 16.7,
+   "chars": 1943,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n## Tonight\u2019s completion document\n\n**Closure percentage:** Not determinable from the infor"
+  },
+  {
+   "lane": "gpt-oss-20b",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 16.5,
+   "chars": 1994,
+   "x_files": 2,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 2 file(s)\n\n---\n\nNo project-specific records or codebase details were provided, so a verified closure perc"
+  },
+  {
+   "lane": "gpt-oss-20b",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 20.5,
+   "chars": 820,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "gpt-oss-20b",
+   "scenario": "leak",
+   "http": 546,
+   "seconds": 18.9,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "gpt-oss-20b",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 13.8,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "gpt-oss-20b",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 18.6,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "gpt-oss-20b",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 8.5,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "gpt-oss-20b",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 48.3,
+   "chars": 1012,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 74.2,
+   "chars": 4392,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Claim check:** resolved \u2014 no tool evidence in this turn; verified status unknown.\n\n---\n\n**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "doc-rule",
+   "http": 546,
+   "seconds": 26.8,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 90.4,
+   "chars": 3604,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 78.8,
+   "chars": 1945,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 27.9,
+   "chars": 727,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "sanity",
+   "http": 546,
+   "seconds": 11.9,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 32.4,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "kimi",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 25.8,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "kimi-flash",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 14.2,
+   "chars": 1935,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n## Tonight\u2019s completion document\n\n**Status: Not verifiable from the information provided."
+  },
+  {
+   "lane": "kimi-flash",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 15.8,
+   "chars": 2839,
+   "x_files": 2,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 2 file(s)\n\n---\n\nI can\u2019t calculate a factual closure percentage or list verified items and code references"
+  },
+  {
+   "lane": "kimi-flash",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 17.4,
+   "chars": 810,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "kimi-flash",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 20.8,
+   "chars": 707,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "kimi-flash",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 11.2,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "kimi-flash",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 14.8,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "kimi-flash",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 29.2,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "kimi-flash",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 31.3,
+   "chars": 1039,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "llama4",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 32.4,
+   "chars": 2837,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n## Completion Document for Tonight\n### Status: Unable to Verify Completion\nThe completion"
+  },
+  {
+   "lane": "llama4",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 33.7,
+   "chars": 1475,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n## Completion Document for November 16, 2026\n\n### Closure Percentage\n- **Total items in s"
+  },
+  {
+   "lane": "llama4",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 61.7,
+   "chars": 3837,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "llama4",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 49.0,
+   "chars": 4101,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "llama4",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 19.1,
+   "chars": 1448,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "llama4",
+   "scenario": "sanity",
+   "http": 546,
+   "seconds": 11.3,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "llama4",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 11.3,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "llama4",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 28.4,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "llama4-scout",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 21.5,
+   "chars": 1766,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\nThere isn\u2019t enough project data to calculate tonight\u2019s closure percentage or identify ver"
+  },
+  {
+   "lane": "llama4-scout",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 14.7,
+   "chars": 1572,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n## Tonight\u2019s completion document\n\n**Closure: not assessable (no project or item data prov"
+  },
+  {
+   "lane": "llama4-scout",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 26.7,
+   "chars": 744,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "llama4-scout",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 28.0,
+   "chars": 755,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "llama4-scout",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 12.1,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "llama4-scout",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 11.3,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "llama4-scout",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 27.6,
+   "chars": 1175,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "llama4-scout",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 34.2,
+   "chars": 1234,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "minimax-m2",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 15.9,
+   "chars": 1859,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\nThere isn\u2019t enough project-specific information to calculate a closure percentage or iden"
+  },
+  {
+   "lane": "minimax-m2",
+   "scenario": "doc-rule",
+   "http": 546,
+   "seconds": 12.4,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "minimax-m2",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 19.0,
+   "chars": 725,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "minimax-m2",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 20.0,
+   "chars": 827,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "minimax-m2",
+   "scenario": "sanity",
+   "http": 546,
+   "seconds": 9.4,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "minimax-m2",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 13.0,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "minimax-m2",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 32.5,
+   "chars": 1249,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "minimax-m2",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 28.8,
+   "chars": 1227,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "qwen-coder",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 14.4,
+   "chars": 2019,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n## Tonight\u2019s completion document\n\n**Status: Incomplete \u2014 closure percentage and verified "
+  },
+  {
+   "lane": "qwen-coder",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 14.1,
+   "chars": 2133,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\nI don\u2019t have tonight\u2019s task list, verification evidence, or codebase, so I can\u2019t calculat"
+  },
+  {
+   "lane": "qwen-coder",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 15.3,
+   "chars": 1562,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "qwen-coder",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 16.8,
+   "chars": 768,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "qwen-coder",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 11.7,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "qwen-coder",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 12.2,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "qwen-coder",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 21.8,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "qwen-coder",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 27.7,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "r1",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 14.4,
+   "chars": 1946,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\nThere isn\u2019t enough project-specific information to calculate a defensible closure percent"
+  },
+  {
+   "lane": "r1",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 15.7,
+   "chars": 2218,
+   "x_files": 2,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 2 file(s)\n\n---\n\nThere\u2019s no project-specific status or evidence in the information provided, so tonight\u2019s "
+  },
+  {
+   "lane": "r1",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 19.2,
+   "chars": 779,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "r1",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 19.9,
+   "chars": 749,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "r1",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 22.5,
+   "chars": 3256,
+   "x_files": 1,
+   "ok": false,
+   "why": "answer: **Commands executed this turn (2)**\n\n**Command: retrieval decision** \u2014 skipped (agent_failed)\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n- **Question** \u2014 A question is an utterance which serves as a "
+  },
+  {
+   "lane": "r1",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 11.5,
+   "chars": 299,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "r1",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 35.6,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "r1",
+   "scenario": "tool-use",
+   "http": 200,
+   "seconds": 39.6,
+   "chars": 1142,
+   "x_files": 1,
+   "ok": true,
+   "why": "doctor evidence present"
+  },
+  {
+   "lane": "summary",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 51.9,
+   "chars": 5431,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Claim check:** deployed \u2014 no tool evidence in this turn; verified status unknown.\n\n---\n\n**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n"
+  },
+  {
+   "lane": "summary",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 38.9,
+   "chars": 3833,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n# Tonight's Completion Document \u2014 16 November 2026\n\n**Closure: not verifiable \u2014 no defens"
+  },
+  {
+   "lane": "summary",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 55.4,
+   "chars": 4275,
+   "x_files": 2,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "summary",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 77.1,
+   "chars": 1940,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "summary",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 16.2,
+   "chars": 688,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "summary",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 22.0,
+   "chars": 684,
+   "x_files": 1,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "summary",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 26.9,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "summary",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 24.9,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "venice",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 34.0,
+   "chars": 1660,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\n**Closure:** Not calculated \u2014 numerator and total scope are unavailable.\n- **Verified ite"
+  },
+  {
+   "lane": "venice",
+   "scenario": "doc-rule",
+   "http": 200,
+   "seconds": 22.0,
+   "chars": 1556,
+   "x_files": 1,
+   "ok": true,
+   "why": "evidence + artifact delivery",
+   "preview": "**Commands executed this turn (2)**\n\n**Command: run live web research** \u2014 lane perplexity, 0 sub-queries, 10 sources\n**Command: attach files** \u2014 1 file(s)\n\n---\n\nTonight\u2019s completion document is **unverified**. No project, work-item list, verification"
+  },
+  {
+   "lane": "venice",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 41.7,
+   "chars": 914,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "venice",
+   "scenario": "leak",
+   "http": 200,
+   "seconds": 17.5,
+   "chars": 1188,
+   "x_files": 1,
+   "ok": true,
+   "why": "no token-syntax leak, complete answer"
+  },
+  {
+   "lane": "venice",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 18.8,
+   "chars": 300,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "venice",
+   "scenario": "sanity",
+   "http": 200,
+   "seconds": 19.3,
+   "chars": 300,
+   "x_files": 0,
+   "ok": true,
+   "why": "answer mentions Paris"
+  },
+  {
+   "lane": "venice",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 41.8,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  },
+  {
+   "lane": "venice",
+   "scenario": "tool-use",
+   "http": 546,
+   "seconds": 35.9,
+   "ok": false,
+   "why": "HTTP 546: {\"code\":\"WORKER_RESOURCE_LIMIT\",\"message\":\"Function failed due to not having enough compute resources (please check logs)\"}"
+  }
+ ]
+}

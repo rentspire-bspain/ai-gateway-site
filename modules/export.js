@@ -282,7 +282,7 @@
   function createLink(c) {
     var th = c.thread; if (!th) return Promise.reject(new Error("Nothing to share yet"));
     var msgs = (th.messages || []).map(function (m) { return { role: m.role === "user" ? "user" : "assistant", content: String(m.content || ""), sources: normSources(m.sources) }; });
-    return call({ action: "create", title: th.title || c.question || "Shared thread", messages: msgs }, true).then(function (r) {
+    return call({ action: "create", title: th.title || c.question || "Shared thread", messages: msgs, thread_id: th.id, card_variant: "standard" }, true).then(function (r) {
       setShare(th.id, r.id); return APP + "?share=" + r.id;
     });
   }

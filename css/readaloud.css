@@ -1,0 +1,7 @@
+.readaloud-btn {
+  background: transparent; border: 1px solid var(--border, #ccc); border-radius: 8px;
+  padding: 4px 8px; cursor: pointer; font-size: 14px; line-height: 1; margin-left: 8px;
+  color: inherit; opacity: .7;
+}
+.readaloud-btn:hover { opacity: 1; }
+@media (max-width: 480px) { .readaloud-btn { min-height: 44px; min-width: 44px; } }

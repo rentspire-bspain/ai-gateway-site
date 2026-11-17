@@ -16,6 +16,12 @@ import argparse, json, os, re, sys, time, urllib.request, urllib.error
 from pathlib import Path
 
 BASE = "https://ai.spaincos.com"
+# Vercel Protection Bypass for Automation (x-vercel-protection-bypass). Owner creates the
+# secret in Vercel Dashboard -> Project -> Settings -> Deployment Protection; a system
+# bypass rule is the equivalent edge-only fix. This keeps benchmark and pre-launch
+# traffic from being treated as an unverified bot. Set env VERCEL_PROTECTION_BYPASS
+# (kept out of the repo so the secret never lands in source or a log).
+VERCEL_BYPASS = os.environ.get("VERCEL_PROTECTION_BYPASS")
 SB = "https://bnxermyboeigvwonfrzx.supabase.co"
 ANON = ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJueGVybXlib2VpZ3Z3b25mcnp4Iiwi"
         "cm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMTk5NTUsImV4cCI6MjEwODc5NTk1NX0.Xj3QP2IFsxzfFLJG8t6RpQlzLWFxpC6BcdGsXn-70CY")
@@ -42,14 +48,30 @@ def write_report(base):
         f.write(json.dumps({"ts": rec["ts"], "passed": rec["passed"], "failed": rec["failed"], "exit": rec["exit"]}) + "\n")
     return rec
 
-def http(url, timeout=20, data=None, headers=None):
-    req = urllib.request.Request(url, data=data, headers=headers or {}, method="POST" if data else "GET")
-    t0 = time.time()
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return r.status, r.read(), round(time.time() - t0, 1)
-    except urllib.error.HTTPError as e:
-        return e.code, e.read(), round(time.time() - t0, 1)
+# x-vercel-mitigated: challenge is Vercel edge mitigation (a JS challenge a script
+# cannot pass). It is transient for known-good QA traffic, so retry a bounded number
+# of times rather than letting a whole harness pass be recorded as failed. A
+# protection-bypass or system-bypass rule is the permanent fix; this is the fallback.
+def http(url, timeout=20, data=None, headers=None, _retries=4):
+    last = (0, b"", 0.0)
+    for attempt in range(_retries):
+        h = dict(headers or {})
+        if VERCEL_BYPASS and "x-vercel-protection-bypass" not in h:
+            h["x-vercel-protection-bypass"] = VERCEL_BYPASS
+        req = urllib.request.Request(url, data=data, headers=h, method="POST" if data else "GET")
+        t0 = time.time()
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.status, r.read(), round(time.time() - t0, 1)
+        except urllib.error.HTTPError as e:
+            body = e.read()
+            mitigated = (e.headers.get("x-vercel-mitigated") == "challenge")
+            last = (e.code, body, round(time.time() - t0, 1))
+            if mitigated and attempt + 1 < _retries:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            return last
+    return last
 
 def mint():
     st, body, _ = http(f"{SB}/auth/v1/token?grant_type=password", 20,
@@ -119,13 +141,27 @@ def integrity(base):
         if live != local.read_bytes():
             stale.append(f"{s}: live != repo")
     check("all deployed modules match repo", not stale, "; ".join(stale[:4]))
+    # stale-tab detector contract: /build.json must equal the BUILD constant shipped to the
+    # browser. v184 moved window.BUILD out of index.html into the external CSP-safe
+    # /build.js, so read the stamp there (fall back to index.html for older deploys).
+    try:
+        bj = json.loads(http(base + "/build.json", 20)[1]).get("build")
+        mb = re.search(r'window\.BUILD = "([^"]+)"', http(base + "/build.js", 20)[1].decode("utf-8", "replace"))
+        if not mb:
+            mb = re.search(r'window\.BUILD = "([^"]+)"', html)
+        check("build.json matches shipped BUILD (stale-tab detector armed)", bool(mb) and mb.group(1) == bj, f"build.js={mb and mb.group(1)} build.json={bj}")
+    except Exception as e:
+        check("build.json matches shipped BUILD (stale-tab detector armed)", False, str(e)[:100])
 
 # ---------------- frontend E2E ----------------
 def frontend(base):
     print("FRONTEND E2E")
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
-        b = p.chromium.launch()
+        # localhost QA runs must bypass the sandbox HTTP proxy (chromium would ERR_FAILED on 127.0.0.1)
+        import urllib.parse as _up
+        _local = _up.urlparse(BASE).hostname in ("localhost", "127.0.0.1")
+        b = p.chromium.launch(args=(["--no-proxy-server"] if _local else []))
         ctx = b.new_context(viewport={"width": 1440, "height": 900})
         pg = ctx.new_page()
         errs = []
@@ -157,13 +193,25 @@ def frontend(base):
                     "expires_in": m.get("expires_in", 3600), "expires_at": m.get("expires_at") or int(time.time()) + 3600,
                     "token_type": m.get("token_type", "bearer"), "user": m.get("user")}
             pg.evaluate("s => localStorage.setItem('sb-bnxermyboeigvwonfrzx-auth-token', JSON.stringify(s))", sess)
-        thread = {"id": f"pre{int(time.time())}", "slug": "prelaunch", "title": "Prelaunch", "incognito": False,
+        # unique slug per run: reusing a fixed slug accumulated ~50 duplicate
+        # "Prelaunch" threads on the eval account and the app's slug-dedup resync
+        # (rename loop prelaunch-1..-N + redirect) grew slower than this suite's
+        # render wait — a test-hygiene leak, not a prod regression (v208 finding)
+        slug = f"prelaunch-{int(time.time())}"
+        thread = {"id": f"pre{int(time.time())}", "slug": slug, "title": "Prelaunch", "incognito": False,
                   "messages": [{"role": "user", "content": "master doc please"},
                                {"role": "assistant", "content": "Here:\n\n```markdown\n# Prelaunch Doc\n\n## Section\n\n    git clone https://example.com/repo.git\n    pip install -r requirements.txt\n\n| Gate | Criterion |\n|---|---|\n| G0 | Runs cleanly |\n\nBody text here.\n```",
                                 "related": ["First follow-up about the registry lanes", "Second question about schedules"]}]}
         pg.evaluate("t => localStorage.setItem('ai_threads', JSON.stringify([t]))", thread)
-        pg.goto(f"{base}/t/prelaunch", wait_until="networkidle", timeout=45000)
-        pg.wait_for_timeout(2000)
+        pg.goto(f"{base}/t/{slug}", wait_until="networkidle", timeout=45000)
+        # wait for the render instead of a fixed sleep: the eval account's thread list
+        # keeps growing (one per run), so server-sync + render time creeps upward —
+        # a fixed 2s wait races near the boundary (v209 finding; the unique-slug fix
+        # removed the rename loop but not the render race)
+        try:
+            pg.wait_for_selector(".question-header", timeout=15000)
+        except Exception:
+            pass
         pg.screenshot(path=str(SHOTS / "thread.png"))
         check("thread renders", pg.locator(".question-header").count() >= 1)
         # the owner-reported killer: on /t/<slug> routes every lazily-loaded module resolved
@@ -174,18 +222,39 @@ def frontend(base):
         chips = pg.locator(".related-item").count()
         check("follow-up chips render", chips >= 1, str(chips))
         check("Run-all button present", pg.locator(".related-runall").count() == 1)
-        if chips:
-            pg.locator(".related-item").first.click()
-            pg.wait_for_timeout(3000)
-            check("follow-up chip submits (search state)", pg.locator(".searching-state").count() >= 1 or pg.locator(".question-header").count() >= 2)
-        # doc panel
+        # doc panel — v163 (owner directive): NO auto-open. The chip is the entry point;
+        # the panel opens only on explicit click. Verify chip present, click it, then check rendering.
+        chip = pg.locator(".doc-chip, .dp-row .dp-card").first
+        chip_ok = chip.count() >= 1
+        check("doc chip present (no auto-open)", chip_ok)
+        if chip_ok:
+            chip.click()
+            # deterministic open wait (v209: fixed 700ms raced with re-renders)
+            try:
+                pg.wait_for_function("() => document.body.classList.contains('dp-open')", timeout=8000)
+            except Exception:
+                pass
         dp = pg.evaluate("() => ({open: document.body.classList.contains('dp-open'), h1: (h => h ? getComputedStyle(h).fontSize : 'x')(document.querySelector('.dp-panel .dp-md h1')), code: !!document.querySelector('.dp-panel .dp-codebar button'), mono: (c => c ? getComputedStyle(c).fontFamily.includes('monospace') : false)(document.querySelector('.dp-panel .dp-code pre code'))})")
-        check("doc panel auto-opens", dp["open"])
+        check("doc panel opens on chip click", dp["open"])
         check("doc h1 heading scale (20-28px)", dp["open"] and dp["h1"] != "x" and 20 <= float(str(dp["h1"]).replace("px", "")) <= 28, str(dp))
         check("doc code monospace + copy", dp["code"] and dp["mono"])
         check("doc-chip collapses raw markdown", pg.locator(".doc-chip").count() >= 1)
         check("raw doc pre is hidden in chat",
               pg.evaluate("() => { const pres = [...document.querySelectorAll('.answer-content pre')]; const hit = pres.find(p => /Prelaunch Doc|Gate|Criterion/.test(p.innerText || '')); return hit ? getComputedStyle(hit).display === 'none' : pres.length === 0; }"))
+        # Settings > Connectors
+        pg.evaluate("() => { window.SettingsUI && window.SettingsUI.open(); }")
+        try:
+            pg.wait_for_selector("[role=dialog] button, .st-tab, .settings button", timeout=8000)
+        except Exception:
+            pass
+        pg.evaluate("() => { const t = [...document.querySelectorAll('button')].find(x => /connector/i.test(x.textContent || '')); if (t) t.click(); }")
+        conn_ok = False
+        for _ in range(6):  # panel content loads async (connector list fetch) — poll, don't race
+            pg.wait_for_timeout(800)
+            if pg.evaluate("() => document.body.innerText.toLowerCase().includes('google')"):
+                conn_ok = True; break
+        pg.screenshot(path=str(SHOTS / "connectors.png"))
+        check("Connectors panel renders", conn_ok)
         # Fleet page
         pg.evaluate("() => document.getElementById('navFleet') && document.getElementById('navFleet').click()")
         pg.wait_for_timeout(2500)
@@ -197,13 +266,16 @@ def frontend(base):
         qa_txt = pg.evaluate("() => { const w = document.querySelector('.fl-wrap'); return w ? w.innerText : ''; }")
         check("Fleet QA tab shows fleet report", "pre-launch regression fleet" in qa_txt.lower() and ("all green" in qa_txt.lower() or "failed" in qa_txt.lower()), qa_txt[:120])
         pg.screenshot(path=str(SHOTS / "fleet-qa.png"))
-        # Settings > Connectors
-        pg.evaluate("() => { window.SettingsUI && window.SettingsUI.open(); }")
-        pg.wait_for_timeout(800)
-        pg.evaluate("() => { const t = [...document.querySelectorAll('button')].find(x => /connector/i.test(x.textContent || '')); if (t) t.click(); }")
-        pg.wait_for_timeout(1200)
-        pg.screenshot(path=str(SHOTS / "connectors.png"))
-        check("Connectors panel renders", pg.evaluate("() => document.body.innerText.toLowerCase().includes('google')"))
+        if chips:
+            try:  # close any open overlays (Fleet panel, Settings modal) — they intercept clicks on the thread below
+                pg.evaluate("""() => { const x = document.querySelector('.fl-x'); if (x) x.click();
+                    const sm = document.querySelector('[role=dialog] .stg-x, .st-close, [aria-label=Close]');
+                    document.querySelectorAll('[role=dialog]').forEach(d => d.remove()); }""")
+                pg.wait_for_timeout(600)
+            except Exception: pass
+            pg.evaluate("() => { const c = document.querySelector('.related-item'); if (c) c.click(); }")  # DOM click — immune to overlay interception
+            pg.wait_for_timeout(3000)
+            check("follow-up chip submits (search state)", pg.locator(".searching-state").count() >= 1 or pg.locator(".question-header").count() >= 2)
         check("zero JS/CSP errors", len([e for e in errs if "404" not in e]) == 0, "; ".join(errs[:3]))
         b.close()
 
@@ -213,11 +285,27 @@ def _safe(fn, *a):
     except Exception as e:  # a crashing stage is itself a FAIL — never a silent pass, never an abort
         check(f"{fn.__name__} completed without crashing", False, f"{type(e).__name__}: {str(e)[:140]}")
 
+def gospel():
+    """BENCHMARK GOSPEL BINDING (owner directive 2026-11-17): the standing performance law
+    (qa/BENCHMARK_GOSPEL.md) must exist on master and its enforcement tool must be intact.
+    This gates EVERY push and deploy — if the gospel or its enforcer is missing or
+    modified off-master, the launch blocks. The benchmarks are the gospel on performance."""
+    p = Path(__file__).resolve().parent
+    g = p / "BENCHMARK_GOSPEL.md"
+    _gt = g.read_text().lower() if g.exists() else ""
+    ok = "owner directive" in _gt[:400] and "reproducible gains only" in _gt and "never game the grader" in _gt
+    check("benchmark gospel present and unaltered", ok, "qa/BENCHMARK_GOSPEL.md missing or modified — restore from master")
+    e = p / "gospel-check.py"
+    check("gospel enforcer present", e.exists() and e.stat().st_size > 2000, "qa/gospel-check.py missing or gutted")
+    b = p / "ruthless-bench.py"
+    check("benchmark harness gospel-bound", b.exists() and "BENCHMARK_GOSPEL" in b.read_text()[:2500], "ruthless-bench.py docstring lost the gospel reference")
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default=BASE)
     a = ap.parse_args()
     print(f"PRE-LAUNCH REGRESSION FLEET -> {a.base}")
+    _safe(gospel)
     _safe(backend)
     if os.environ.get("PRELAUNCH_SKIP_INTEGRITY") != "1": _safe(integrity, a.base)
     _safe(frontend, a.base)
