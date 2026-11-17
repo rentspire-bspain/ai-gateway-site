@@ -251,8 +251,12 @@ def failure_class(q, content, bench):
 # ---------- run ----------
 def run_one(bench, item, ix):
     uid, tok = SESS["uid"], SESS["tok"]
+    # v253 TRUNCATION FIX: the v252 clean baseline showed truncation as the DOMINANT failure
+    # (BrowseComp 47/93, DSQA 49/100, FRAMES 21/100, SimpleQA 4) — 2,048 tokens cannot hold a
+    # multi-hop research answer + the FINAL ANSWER line. 6,000 matches the gateway's own D4
+    # truncation-retry budget; anything less measures the token cap, not the model.
     body = {"thread_id": f"bench-{bench}-{ix}-{int(time.time()*1000)%99991}", "user_id": uid,
-            "purpose": "general", "max_tokens": 2048, "stream": False,
+            "purpose": "general", "max_tokens": 6000, "stream": False,
             "messages": [{"role": "user", "content": ASK.format(q=item["q"][:6000])}]}
     st, txt, dt = http(GW, body, {"Authorization": "Bearer " + tok, "apikey": ANON, "Content-Type": "application/json"})
     tries = 0
