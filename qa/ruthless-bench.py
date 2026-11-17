@@ -35,18 +35,30 @@ OUT.mkdir(parents=True, exist_ok=True)
 ASK = ("Answer the question below. Be concise; do your research, then end your "
        "reply with a final line of exactly: FINAL ANSWER: <your answer>\n\n{q}")
 
+# v252 HARD WATCHDOG: four workers hung 60+ minutes on a sandbox network stall — the
+# socket timeout did not fire (HTTP 0, s=3619 on 4 rows), freezing the whole run. Every
+# request now runs under a HARD wall deadline in a sacrificial thread: if it misses the
+# deadline the request is abandoned (the worker returns immediately and the row retries).
+_HTTP_POOL = cf.ThreadPoolExecutor(max_workers=16, thread_name_prefix="bench-http")
 def http(url, body=None, headers=None, timeout=280):
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(url, data=data, headers=headers or {"Content-Type": "application/json"},
                                  method="POST" if data else "GET")
     t0 = time.time()
+    def _do():
+        try:
+            r = urllib.request.urlopen(req, timeout=timeout)
+            return r.status, r.read().decode("utf-8", "replace"), round(time.time() - t0, 1)
+        except urllib.error.HTTPError as e:
+            return e.code, e.read().decode("utf-8", "replace"), round(time.time() - t0, 1)
+        except Exception as e:
+            return 0, f"EXC {e}", round(time.time() - t0, 1)
+    fut = _HTTP_POOL.submit(_do)
     try:
-        r = urllib.request.urlopen(req, timeout=timeout)
-        return r.status, r.read().decode("utf-8", "replace"), round(time.time() - t0, 1)
-    except urllib.error.HTTPError as e:
-        return e.code, e.read().decode("utf-8", "replace"), round(time.time() - t0, 1)
-    except Exception as e:
-        return 0, f"EXC {e}", round(time.time() - t0, 1)
+        return fut.result(timeout=timeout + 30)   # hard wall: socket timeout + grace
+    except Exception:
+        fut.cancel()
+        return 0, "EXC hard-deadline watchdog", round(time.time() - t0, 1)
 
 def mint():
     # reuse the fleet's fresh session if present (avoids password-grant rate limits

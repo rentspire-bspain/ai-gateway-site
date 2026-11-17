@@ -2025,6 +2025,23 @@ Question: "${userQuery}"`;
         if (intent.complexity === "simple" || intent.complexity === "medium") intent.complexity = "complex";
       }
     }
+    // v253 SET-AGGREGATION UPGRADE (DSQA teardown 2026-11-16: multi-constraint filtered-set
+    // questions — "which states had X AND Y, ranked" — got 0 planner sub-queries because the
+    // v248 chained-entity predicate never fired on them (30 of 63 bench set questions stayed
+    // simple; 17/43 partials + 8 zero-found misses trace to exactly this). A filtered-set
+    // predicate now upgrades them to complex so the planner decomposes ONE SUB-QUERY PER
+    // CONSTRAINT and the SET-ANSWER COMPLETENESS guidance applies. Tested: 52/63 bench set
+    // questions fire (was 33), 0 new SimpleQA false-fires, +4 DSQA single (also
+    // multi-constraint, benefit equally).
+    {
+      const uq9 = String(userQuery || "").trim();
+      const setLead = /\b(which|list|name|identify|determine|find|extract|show|give)\b/i.test(uq9);
+      const pluralNear = /(?:which|list|name|identify|determine|find|extract|show|give)[^?]{0,80}\b\w{4,}(?:ies|es|s)\b/i.test(uq9);
+      const setCons = (uq9.match(/\b(\d+(?:\.\d+)?\s*%|percent\w*|or (?:higher|more|greater|less|fewer)|at least|at most|more than|fewer than|above|below|\bover\b|\bunder\b|top \d+|in order|ranked|ranking|between .{2,40}? and|from .{2,40}? to|the highest|the lowest|the most|the fewest|the largest|the smallest|all of|each of|every one of|double.?digit)\b/gi) || []).length;
+      if (setLead && pluralNear && setCons >= 2) {
+        if (intent.complexity === "simple" || intent.complexity === "medium") intent.complexity = "complex";
+      }
+    }
     const queryWords = String(userQuery).trim().split(/\s+/).filter(Boolean).length;
     const longMultiPart = intent.complexity === "complex" && (isFollowUpDeliverable(String(userQuery), (messages || []).filter((m: any) => m?.role === "assistant").length) || queryWords >= 60 || (String(userQuery).match(/\?/g) || []).length >= 3 || clarifierContinuation);
     // v237 D4 replay fix (2026-11-15): the 717-prompt replay found 53 D4 truncations on HTTP 200 —
