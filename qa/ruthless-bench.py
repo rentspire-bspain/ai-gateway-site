@@ -241,8 +241,11 @@ def failure_class(q, content, bench):
         return "dead-end"
     if re.search(r"^(?:i can(?:'|no)t|i cannot|i'm unable)\b", content.strip(), re.I):
         return "refusal"
-    tail = content.rstrip()[-60:]
-    if not re.search(r"[.!?`)]\s*(?:\*\*)?$|[.!?]\s*$", content.rstrip()) or tail.count("```") % 2 == 1:
+    # v254: the platform format ends answers with a Suggested-Follow-ups bullet section — an
+    # answer ending there is COMPLETE. Only a body cut mid-sentence (after stripping trailing
+    # bullets) or an unclosed code fence is a truncation.
+    body = re.sub(r"(?:\n\s*[-*\d.)]\s+[^\n]*)+\s*$", "", content.rstrip())
+    if (not body or not re.search(r"[.!?`):'\"\u201d\u2019]\s*(?:\*\*)?$", body)) or content.count("```") % 2 == 1:
         return "truncated"
     if (bench in ("browsecomp", "dsqa", "frames")) and "http" not in content.lower():
         return "no-sources"
