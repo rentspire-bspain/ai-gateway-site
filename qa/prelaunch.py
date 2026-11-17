@@ -285,11 +285,27 @@ def _safe(fn, *a):
     except Exception as e:  # a crashing stage is itself a FAIL — never a silent pass, never an abort
         check(f"{fn.__name__} completed without crashing", False, f"{type(e).__name__}: {str(e)[:140]}")
 
+def gospel():
+    """BENCHMARK GOSPEL BINDING (owner directive 2026-11-17): the standing performance law
+    (qa/BENCHMARK_GOSPEL.md) must exist on master and its enforcement tool must be intact.
+    This gates EVERY push and deploy — if the gospel or its enforcer is missing or
+    modified off-master, the launch blocks. The benchmarks are the gospel on performance."""
+    p = Path(__file__).resolve().parent
+    g = p / "BENCHMARK_GOSPEL.md"
+    _gt = g.read_text().lower() if g.exists() else ""
+    ok = "owner directive" in _gt[:400] and "reproducible gains only" in _gt and "never game the grader" in _gt
+    check("benchmark gospel present and unaltered", ok, "qa/BENCHMARK_GOSPEL.md missing or modified — restore from master")
+    e = p / "gospel-check.py"
+    check("gospel enforcer present", e.exists() and e.stat().st_size > 2000, "qa/gospel-check.py missing or gutted")
+    b = p / "ruthless-bench.py"
+    check("benchmark harness gospel-bound", b.exists() and "BENCHMARK_GOSPEL" in b.read_text()[:2500], "ruthless-bench.py docstring lost the gospel reference")
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default=BASE)
     a = ap.parse_args()
     print(f"PRE-LAUNCH REGRESSION FLEET -> {a.base}")
+    _safe(gospel)
     _safe(backend)
     if os.environ.get("PRELAUNCH_SKIP_INTEGRITY") != "1": _safe(integrity, a.base)
     _safe(frontend, a.base)
