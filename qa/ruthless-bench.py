@@ -140,11 +140,33 @@ import unicodedata
 def deaccent(s):
     return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
 
+# v256 FAIR-READING GRADER (2026-11-17, v254 teardown): two graded-wrong rows were
+# semantically correct — '75.5 cubic feet per second' vs gold '75.5 cubic ft/s', and
+# 'Major-General' vs gold 'Major General was the rank of Thomas Brisbane.' Unit-phrase
+# synonyms are now expanded on the raw lowercase string BEFORE charset stripping
+# (the '/' was destroyed by norm, so post-hoc token fixes never fired), and hyphens
+# split to tokens so 'Major-General' == 'Major General'. No tolerance added: wrong
+# numbers (74.9 vs 75.5) and unit changes (107 minutes vs 1.78 hours) stay wrong.
+UNIT_SUB = [
+    (r"\bcfs\b", "cubic feet per second"),
+    (r"\bfps\b", "feet per second"),
+    (r"\bmph\b", "miles per hour"),
+    (r"\bkph\b", "kilometers per hour"),
+    (r"\bft\s*/\s*s\b", "feet per second"),
+    (r"\bkm\s*/\s*h\b", "kilometers per hour"),
+    (r"\bm\s*/\s*s\b", "meters per second"),
+]
+UNIT_TOK = {"kg": "kilograms", "km": "kilometers", "ft": "feet",
+            "cm": "centimeters", "lbs": "pounds", "lb": "pounds"}
+
 def norm(s):
     s = deaccent(str(s).lower())
+    for pat, rep in UNIT_SUB:
+        s = re.sub(pat, rep, s)
     s = re.sub(r"[\$%€£]", "", s)
     s = re.sub(r"(\d),(\d{3})", r"\1\2", s)
     s = re.sub(r"[^a-z0-9.,\- ]", " ", s)
+    s = s.replace("-", " ")
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
@@ -162,6 +184,7 @@ def canon_tokens(s):
         if not t or t in WEEKDAYS or t in STOPWORDS:
             continue
         t = MONTHS.get(t, NUMWORDS.get(t, t))
+        t = UNIT_TOK.get(t, t)
         toks.append(t)
     return toks
 
@@ -184,6 +207,12 @@ def gold_candidates(gold):
     for part in re.split(r"[;,]", gold):
         p = part.strip()
         if p: cands.append(p)
+    # v256: sentence-style golds ('Major General was the rank of Thomas Brisbane.')
+    # also match on the answer-bearing core before the copular clause.
+    m = re.match(r"^(.{2,60}?)\s+(?:was|is|were|are|had|has)\s+the\s+"
+                 r"(?:rank|name|title|year|date|age|person|answer)\b", gold.strip(), re.I)
+    if m and m.group(1):
+        cands.append(m.group(1))
     return cands
 
 def gold_in_answer(gold, answer_text):
