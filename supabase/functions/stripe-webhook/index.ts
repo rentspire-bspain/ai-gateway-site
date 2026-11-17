@@ -1,6 +1,6 @@
-// stripe-webhook — grants credits on Stripe subscription events (v172).
+// stripe-webhook — grants credits on Stripe subscription events (v172 + four-tier ladder).
 // POST (raw body from Stripe) — signature-verified with STRIPE_WEBHOOK_SECRET.
-//   checkout.session.completed  -> first-month credits (core 2,500 / max 25,000)
+//   checkout.session.completed  -> first-month credits (starter 2,500 / pro 10,000 / unlimited 25,000)
 //   invoice.paid                -> renewal credits (same amounts)
 // Idempotent: ref = 'stripe-' + event.id (unique constraint on credits_ledger blocks replays).
 // Always 200 to Stripe except signature failures (400) so Stripe never retries forever.
@@ -10,7 +10,9 @@ const SB_URL = Deno.env.get("SUPABASE_URL") ?? "https://bnxermyboeigvwonfrzx.sup
 const SVC = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 let _cors: Record<string, string> = {};
 const json = (o: unknown, status = 200) => new Response(JSON.stringify(o), { status, headers: { ..._cors, "Content-Type": "application/json" } });
-const PLANS: Record<string, number> = { core: 2500, max: 25000 };
+// Credits granted per subscription event. Four-tier ladder (master doc §32.6): starter/pro/unlimited.
+// Legacy core/max kept so pre-ladder subscribers keep their grant amounts.
+const PLANS: Record<string, number> = { starter: 2500, pro: 10000, unlimited: 25000, core: 2500, max: 25000 };
 
 // constant-time compare (lengths are public: 64 hex chars)
 function ctEq(a: string, b: string): boolean {
