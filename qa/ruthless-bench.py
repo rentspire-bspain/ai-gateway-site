@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """ai.spaincos.com PUBLIC-BENCHMARK RUTHLESS TEARDOWN (owner directive 2026-11-16).
 
+GOVERNED BY qa/BENCHMARK_GOSPEL.md (owner directive 2026-11-17): the benchmarks are the
+gospel on performance. Every answer-quality change to the gateway must be measured by a
+full round; gains must be reproducible beyond noise; regressions are fixed within one
+round; the grader grades fairly and is never loosened to inflate scores; no overfitting
+to question content. Round archives live under results-vNNN/ and every improvement claim
+comes from row-by-row flip analysis against the prior round.
+
 Runs the LIVE ai.spaincos.com gateway against public research benchmarks
 (SimpleQA, BrowseComp, FRAMES, DeepSearchQA) and grades it as its own
 worst critic. Grading is deliberately STRICT (normalized string containment,
