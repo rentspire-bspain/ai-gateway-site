@@ -1,0 +1,86 @@
+# BENCHMARK GOSPEL — the standing performance law of ai.spaincos.com / BoundView.com
+
+**Owner directive, codified 2026-11-17 by Brett Spain. These rules are binding on every agent,
+guardian, automation, build lane, and subagent working on ai.spaincos.com, BoundView.com, or any
+sibling in the Spain Companies platform. They are version-controlled in this repo and may only be
+changed by owner directive.**
+
+## The creed
+
+**The benchmarks are the gospel on performance.** SimpleQA, FRAMES, DSQA, and BrowseComp — strict
+grading, fair-reading grader (v256+) — are the ONLY accepted measure of answer-quality improvement.
+There is no other claim of "better" that counts.
+
+## The law (binding rules)
+
+1. **Measure everything.** Any change that can affect answer quality (gateway, tool loop, research
+   lanes, writer prompts, retry logic, model routing) MUST be measured by a full benchmark round
+   before it is called an improvement. No exceptions. A change with no round behind it is
+   "unmeasured", never "an improvement".
+
+2. **Reproducible gains only.** A lever counts as an improvement only if its gain is reproducible —
+   held across at least two rounds, or clearly beyond run noise. Noise floors (binomial, strict
+   grading): SimpleQA n=200 ±2%, FRAMES n=100 ±4.3%, DSQA ±5%, BrowseComp ±4.7%. A one-round jump
+   inside the noise band is a draw, not a win. Cite the noise floor with every reported delta.
+
+3. **Regressions are fixed within one round.** If a round regresses beyond noise (the v255 case:
+   SimpleQA 98.0 → 95.5, DSQA 43.4 → 38.0), the lever is fixed or reverted and re-measured in the
+   very next round. Never ship a regression and move on.
+
+4. **Never game the grader.** The grader grades fairly and only fairly: fair readings of gold
+   (unit synonyms, hyphenation, gold-cores) are added; nothing that inflates scores. Every grader
+   change must be verified offline against the archived results with zero regressions on
+   previously-correct rows before it merges (PR #209 is the precedent and the pattern).
+
+5. **No overfitting.** No dataset-specific hacks: no gold answers or benchmark phrasings in
+   prompts, no per-question special cases. Levers must be general rules that fire on question
+   SHAPE (multi-constraint, narrative-chain, set-aggregation), never on question content. Every
+   predicate is tested offline against all four corpora for false-fires (SimpleQA 0 false-fires
+   is the bar) before it ships.
+
+6. **Archive and compare every round.** Every round is archived (`qa-private/bench/results-vNNN/`)
+   and committed as a PR with the full row-by-row grid (✅/🟡/🔴 icons, Gold and Verdict/Fail
+   filled on every row). Improvement claims are made from row-by-row flip analysis, not headline
+   arithmetic.
+
+7. **The headline is computed, never hand-summed.** Parity completion percentages come from
+   `qa/generate-parity-headline.py` against `qa/parity-items.json`. Benchmark strict scores come
+   from `qa/ruthless-bench.py --report`. No human or agent arithmetic in any report.
+
+8. **Resource discipline.** Benchmark rounds NEVER run concurrently with the pre-launch harness
+   or audit loads (546 WORKER_RESOURCE_LIMIT). One suite at a time.
+
+9. **Cadence.** The suite runs on every gateway deploy that touches the answer path, and on a
+   standing cadence during active improvement campaigns (nightly while iterating). The
+   self-improvement guardians run on schedule between rounds and every defect they catch becomes
+   a deterministic, versioned rule in the gateway.
+
+10. **Miss-mode accounting.** Every round's misses are classified (truncation, entity-binding,
+    retrieval-depth, gold-conflict, knowledge-miss) and every miss class either has an owner-lever
+    or is parked with a reason in the completion doc. No unexplained misses.
+
+11. **Honest ceilings.** The goal is the honest ceiling for each benchmark — SimpleQA toward 100%,
+    FRAMES/DSQA/BrowseComp toward their SOTA-relative ceilings — never at the cost of honesty.
+    Data-conflict golds (where the dataset answer conflicts with retrievable sources) are audited
+    as dataset errors, not model failures, and reported as such.
+
+12. **Cost rule stays.** Benchmark egress and the agent fleet run free models; paid lanes only
+    through the product's own spend caps (per-user daily ceilings, global monthly cap,
+    fail-closed allowlist). A performance lever that triples spend (the v258 council) must carry
+    its cost math in the change record.
+
+## Enforcement (how this law polices itself)
+
+- **The PR gate**: every benchmark-round PR carries the grid, the flip analysis vs the prior
+  round, and the noise-floor statement. A PR without them does not merge.
+- **PARITY_STATE**: every gateway change is recorded in the versioned PARITY_STATE log with root
+  cause + measured effect. The log is the audit trail.
+- **The grader is version-controlled**: grader changes are PRs with offline verification.
+- **The guardians**: scheduled self-improvement runs catch quality regressions between rounds;
+  each caught defect becomes a permanent rule.
+
+## Change record
+
+| Date | Change | By |
+|---|---|---|
+| 2026-11-17 | Gospel codified from owner directive (this session, rounds 1-6) | Brett Spain (directive) / parity session |
