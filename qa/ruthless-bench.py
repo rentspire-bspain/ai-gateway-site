@@ -265,6 +265,10 @@ def run_one(bench, item, ix):
     # had every gold item present yet scored partial). Strip it before grading.
     if c.startswith("**Commands executed this turn"):
         c = re.sub(r"^.*?\n---\s*\n?", "", c, count=1)
+    # v252: the platform's trailing "## Sources" citation list is also metadata — grading it as
+    # answer text let incidental source-title mentions inflate set recall. The answer is the
+    # prose above it.
+    c = re.split(r"\n## Sources\b", c)[0]
     rec["chars"] = len(c)
     rec["sources"] = len(j.get("x_sources") or [])
     g = grade(item, c, bench)
