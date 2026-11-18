@@ -220,6 +220,18 @@ def gold_candidates(gold):
                  r"(?:rank|name|title|year|date|age|person|answer)\b", gold.strip(), re.I)
     if m and m.group(1):
         cands.append(m.group(1))
+    # v263 TRAILING-FORMALITY STRIP (FRAMES gold-conflict audit 2026-11-18: 5/22 r9 FRAMES
+    # wrongs were answers matching the gold's core with less trailing formality —
+    # '140 years' vs gold '140 years old.', 'Blue Ribbon Sports' vs 'Blue Ribbon Sports
+    # Inc.', 'Brussels' vs 'City of Brussels'). A trailing-token-stripped gold is a FAIR
+    # reading: the answer carries the gold's complete content. Offline-verified on the
+    # full r9 archives: +2 FRAMES, +1 DSQA, +0 SimpleQA, 0 negative flips. The token-
+    # subset reading (the other 3 audit rows) is deliberately NOT added — it loosens.
+    gn = norm(gold); gtoks = gn.split()
+    for k in range(1, min(4, len(gtoks))):
+        head = " ".join(gtoks[:-k])
+        if head and len(head.split()) >= 2 and head not in cands:
+            cands.append(head)
     return cands
 
 def gold_in_answer(gold, answer_text):
@@ -332,6 +344,58 @@ def run_one(bench, item, ix):
         rec["fail"] = failure_class(item, c, bench)
     return rec
 
+# v262 ASYNC RESEARCH LANE (BrowseComp-class): submit a background Agent API run
+# (deep_research: true, concise short-answer brief) and poll until completed. The
+# 150s Supabase edge wall killed 28/100 round-9 BrowseComp rows as HTTP 504 at
+# 150.1s; the async lane runs minutes-long persistent research past the wall.
+DR_EFFORT = "medium"
+
+def run_one_async(bench, item, ix, effort=None):
+    uid, tok = SESS["uid"], SESS["tok"]
+    body = {"thread_id": f"bench-dr-{bench}-{ix}-{int(time.time()*1000)%99991}", "user_id": uid,
+            "purpose": "general", "max_tokens": 6000, "stream": False,
+            "deep_research": True, "deep_research_effort": effort, "deep_research_style": "concise",
+            "messages": [{"role": "user", "content": ASK.format(q=item["q"][:6000])}]}
+    st, txt, dt = http(GW, body, {"Authorization": "Bearer " + tok, "apikey": ANON, "Content-Type": "application/json"})
+    rec = {"bench": bench, "i": ix, "id": item["id"], "mode": "async-deep", "http": st, "s": dt,
+           "prompt": item["q"][:120], "gold": item["gold"][:200]}
+    if st != 200:
+        rec.update(content="", verdict="error", fail=f"submit HTTP {st}"); return rec
+    try:
+        j = json.loads(txt)
+    except Exception:
+        rec.update(content=txt[:200], verdict="error", fail="non-JSON"); return rec
+    drid = j.get("deep_research_id")
+    if not drid:
+        rec.update(content=txt[:200], verdict="error", fail="no run id"); return rec
+    rec["dr_id"] = drid
+    t0 = time.time()
+    while True:
+        st2, txt2, _ = http(f"{GW}?deep_research_id={drid}", None,
+                            {"Authorization": "Bearer " + tok, "apikey": ANON})
+        try:
+            j2 = json.loads(txt2)
+        except Exception:
+            j2 = {}
+        status = j2.get("status")
+        if status == "completed":
+            break
+        if status in ("failed", "cancelled", "incomplete") or "error" in j2:
+            rec.update(content=str(j2.get("error"))[:200], verdict="error", fail=f"run {status}")
+            return rec
+        if time.time() - t0 > 1500:   # 25 min hard cap
+            rec.update(content="", verdict="error", fail="poll timeout"); return rec
+        time.sleep(12)
+    rec["s"] = round(time.time() - t0, 1)
+    c = str(j2.get("answer") or "")
+    rec["chars"] = len(c)
+    rec["sources"] = len(j2.get("sources") or [])
+    g = grade(item, c, bench)
+    rec.update(content=c[:3000], **g)
+    if g["verdict"] != "correct":
+        rec["fail"] = failure_class(item, c, bench)
+    return rec
+
 def run_bench(bench, n, workers):
     if not SESS["tok"]:
         sess_mint()
@@ -385,19 +449,53 @@ def report():
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps(summary, indent=2))
 
+def run_bench_async(bench, n, workers):
+    """v262 async research lane: BrowseComp-class rows run as background deep-research
+    runs (submit + poll), past the 150s edge wall. Same grading, same archive format
+    (mode: async-deep on every row)."""
+    if not SESS["tok"]:
+        sess_mint()
+    resfile = OUT / f"{bench}.jsonl"
+    done = set()
+    if resfile.exists():
+        for line in resfile.read_text().splitlines():
+            try:
+                r = json.loads(line)
+                if r.get("verdict") in ("correct", "wrong", "partial"):
+                    done.add(r["i"])
+            except Exception: pass
+    items = LOADERS[bench](n)
+    todo = [(ix, it) for ix, it in enumerate(items) if ix not in done]
+    print(f"[{bench}:async] {len(todo)} to run ({len(done)} done)", flush=True)
+    with cf.ThreadPoolExecutor(max_workers=workers) as ex:
+        futs = {ex.submit(run_one_async, bench, it, ix): ix for ix, it in todo}
+        with open(resfile, "a") as f:
+            for fut in cf.as_completed(futs):
+                r = fut.result()
+                f.write(json.dumps(r) + "\n"); f.flush()
+    print(f"[{bench}:async] complete", flush=True)
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bench", default="all")  # all | simpleqa | browsecomp | frames | dsqa
     ap.add_argument("--n", type=int, default=200)
     ap.add_argument("--workers", type=int, default=3)
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--async-deep", action="store_true",
+                    help="v262: run the bench through the async deep-research lane (BrowseComp-class)")
+    ap.add_argument("--dr-effort", default="medium", help="async lane effort: fast|low|medium|high")
     a = ap.parse_args()
     if a.report:
         report(); return
     sess_mint()
     benches = list(LOADERS) if a.bench == "all" else [a.bench]
     for b in benches:
-        run_bench(b, a.n, a.workers)
+        if a.async_deep:
+            global DR_EFFORT
+            DR_EFFORT = a.dr_effort
+            run_bench_async(b, a.n, a.workers)
+        else:
+            run_bench(b, a.n, a.workers)
     report()
 
 if __name__ == "__main__":

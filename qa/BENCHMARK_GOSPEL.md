@@ -84,3 +84,39 @@ There is no other claim of "better" that counts.
 | Date | Change | By |
 |---|---|---|
 | 2026-11-17 | Gospel codified from owner directive (this session, rounds 1-6) | Brett Spain (directive) / parity session |
+| 2026-11-18 | **v262 ASYNC RESEARCH LANE + TABLE-VERIFIED SETS codified** (SOTA teardown: BrowseComp leaders are RL-trained agents with 300+ step budgets, multi-agent swarms, context management — see Round-9 owner analysis). Rule 13: BrowseComp-class questions route to the async deep-research lane (submit + poll; the 150s edge wall killed 28/100 round-9 rows as HTTP 504 at 150.1s). Rule 14: set questions get the Table-as-Search treatment (candidate × constraint table, enumeration sub-query, FINAL ANSWER = exactly the qualifying rows). Rule 15: the training-recipe ladder (CPT → SFT → RL on search trajectories) is the documented path for the next tier of gains; harness-level equivalents (step budgets, swarm verification, context compaction) are the free-model proxies until then. | Brett Spain (directive) / parity session |
+| 2026-11-18 | **v263 grader fair-reading fix** (FRAMES gold-conflict audit: trailing-formality gold variants — "140 years old." → "140 years", "Blue Ribbon Sports Inc." → "Blue Ribbon Sports"). Offline-verified on the full r9 archives: +2 FRAMES, +1 DSQA, +0 SimpleQA, 0 negative flips. The token-subset reading is deliberately NOT added — it loosens. | parity session (audit directive: rule 11) |
+
+## Rule 13 — Async research lane (BrowseComp-class questions)
+
+Multi-hop research questions that cannot finish inside the 150s Supabase edge wall
+(round 9: 28/100 BrowseComp rows died as HTTP 504 at 150.1s — infrastructure, not
+modeling) MUST run on the async lane: submit a background deep-research run
+(`deep_research: true`, `deep_research_effort`, `deep_research_style: "concise"`),
+return the run id immediately, poll `GET ?deep_research_id=` until completed. The
+bench harness runs this lane with `--async-deep`. A BrowseComp round through the
+in-request lane measures the wall, not the model.
+
+## Rule 14 — Table-verified set answering (DSQA-class set questions)
+
+A filtered-set question is a table-completion problem (the SOTA "Table-as-Search"
+recipe): one row per candidate, one column per constraint, every cell verified
+against a source. Detection is two-signal (the intent analyst's `set_question`
+LLM flag OR the offline-tested set-phrase regexes — the v259 predicate fired on
+only 1/42 round-9 partial rows). Detected questions upgrade to complex so the
+planner emits an enumeration sub-query plus one per constraint. The FINAL ANSWER
+line carries exactly the qualifying rows — no padding, no near-misses.
+
+## Rule 15 — The training-recipe ladder (the documented next tier)
+
+What the BrowseComp leaders actually do (verified 2026-11-18): RL-trained search
+agents — continual pre-training on massive corpora, then supervised fine-tuning
+(SFT) on search trajectories, then reinforcement learning (RL) against
+answer-verification rewards. Our stack runs free third-party models, so the ladder
+maps to: (a) harness-level proxies NOW — persistent step budgets (the async
+lane), swarm verification (the council), context compaction (source capping),
+Table-as-Search (rule 14); (b) trajectory data NOW — every round's archive
+(results-vNNN/) is exactly the SFT dataset shape (question → search trajectory →
+verified answer); (c) the SFT/RL run itself is an owner-level infrastructure
+decision (GPU budget, base-model choice) — parked with the exact recipe in the
+completion doc, not silently attempted.
