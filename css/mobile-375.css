@@ -121,3 +121,25 @@
   /* one sticky layer max — nothing else may pin */
   [class*="sticky"]:not([data-sticky]) { position: static !important; }
 }
+
+/* Keep these controls hidden even where the sidebar button class uses display:flex. */
+#pwaInstall[hidden], #pwaInstallHelp[hidden] { display: none; }
+#pwaInstallHelp { margin: 0 0 12px; color: var(--text-muted); font-size: 14px; }
+.sidebar.collapsed #pwaInstall, .sidebar.collapsed #pwaInstallHelp { display: none; }
+
+@media (max-width: 420px) {
+  body.m375-open .sidebar.collapsed #pwaInstall:not([hidden]) { display: flex; }
+  body.m375-open .sidebar.collapsed #pwaInstallHelp:not([hidden]) { display: block; }
+}
+
+@media (max-width: 768px) {
+  /* Safari can zoom focused controls below 16px. Override the 420px text floor. */
+  #landingInput, #followupInput {
+    font-size: 16px !important;
+    max-height: min(160px, 30dvh);
+  }
+  #landingSubmit, #followupSend, .search-box .attach-btn, .followup-box .attach-btn, .m375-burger {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

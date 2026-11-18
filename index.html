@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-fMI9WzC4V3RQlCSepJdWY2gVmRir25wTgg25XTnZ1yw=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>ai.spaincos.com — Where knowledge begins</title>
 <script src="/spa-restore.js"></script>
 <style>
@@ -19,7 +19,9 @@ html.pre-boot body::before{content:"";position:fixed;top:72px;left:50%;transform
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ai.spaincos">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<script defer src="/modules/pwa-install.js"></script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://frontend-cdn.perplexity.ai" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2" crossorigin>
@@ -1562,6 +1564,8 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
       <div id="spaceItems"></div>
     </div>
     <div class="sidebar-footer">
+      <button type="button" class="import-history-btn" id="pwaInstall" hidden>Install app</button>
+      <p id="pwaInstallHelp" hidden>In Safari, open Share, choose Add to Home Screen, then tap Add.</p>
       <button class="import-history-btn" id="importHistoryBtn" title="Import your Perplexity history as searchable context">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
         Import Perplexity history
