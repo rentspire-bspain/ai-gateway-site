@@ -2924,7 +2924,9 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     // real browser. "In Comet" / "in the browser" / "in the extension" is real work —
     // it forces the tool loop (private-tool intent, added below) and is added to the
     // writer's never-refuse rules, same pattern as the v220 webapp-tools fix.
-    const cometAsk = /\b(in|via|through|using|with) (comet|the extension|the browser|your browser|the side ?panel|browser extension)\b|\bcomet\b/i.test(String(userQuery));
+    // Regression cases: "HANDLE WHATEVER ELSE IS REMAINING YOURSELF AND IN COMET",
+    // "do it in comet", "handle the rest in the browser/extension", "finish it in browser".
+    const cometAsk = /\b(in|via|through|using|with) (comet|the extension|the browser|your browser|the side ?panel|browser extension)\b|\bcomet\b|\b(?:handle|do|finish)\b[^.!?;\r\n]*?\s+in\s+(?:(?:the|your)\s+)?(?:comet|browser(?:\s+extension)?|extension|side\s?panel)\b/i.test(String(userQuery));
     const runnerAsk = /\b(spain-runner|runner job|run [a-z0-9_]+ job|launch [a-z0-9_]+ job|execute [a-z0-9_]+ job|pdi_spine_check|policy_radar|comptrove_raw_scale_health|scheduler_backstop_report|digest_dead_man|permits_progress_check|traffic_anomaly_alert|run_runner_job)\b/i.test(String(userQuery));
     // v192: broadened — "commit these artifacts to the repos", "apply these to SHMT",
     // "open a PR with this SQL" all got claim-can't answers ("what I cannot do from this
