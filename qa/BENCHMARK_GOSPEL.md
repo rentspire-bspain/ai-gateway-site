@@ -85,6 +85,7 @@ There is no other claim of "better" that counts.
 |---|---|---|
 | 2026-11-17 | Gospel codified from owner directive (this session, rounds 1-6) | Brett Spain (directive) / parity session |
 | 2026-11-18 | **v262 ASYNC RESEARCH LANE + TABLE-VERIFIED SETS codified** (SOTA teardown: BrowseComp leaders are RL-trained agents with 300+ step budgets, multi-agent swarms, context management — see Round-9 owner analysis). Rule 13: BrowseComp-class questions route to the async deep-research lane (submit + poll; the 150s edge wall killed 28/100 round-9 rows as HTTP 504 at 150.1s). Rule 14: set questions get the Table-as-Search treatment (candidate × constraint table, enumeration sub-query, FINAL ANSWER = exactly the qualifying rows). Rule 15: the training-recipe ladder (CPT → SFT → RL on search trajectories) is the documented path for the next tier of gains; harness-level equivalents (step budgets, swarm verification, context compaction) are the free-model proxies until then. | Brett Spain (directive) / parity session |
+| 2026-11-18 | **v264 ASYNC-EVERYWHERE (rounds 12-14)**: the async research lane rolled across all research suites — BrowseComp 38.9→87.0 (4 confirming runs), DSQA 41.7→77.8 (confirmed 83.3), FRAMES 77.3→89.0 (confirmed 96.7). SPEND_CEILING_USD raised 50→200 (owner-approved). Rule 16 added: research benchmarks run the async lane; the in-request lane is the legacy path. SFT export tool shipped (qa/sft-export.py, 466 verified examples). | Brett Spain (directive) / parity session |
 | 2026-11-18 | **v263 grader fair-reading fix** (FRAMES gold-conflict audit: trailing-formality gold variants — "140 years old." → "140 years", "Blue Ribbon Sports Inc." → "Blue Ribbon Sports"). Offline-verified on the full r9 archives: +2 FRAMES, +1 DSQA, +0 SimpleQA, 0 negative flips. The token-subset reading is deliberately NOT added — it loosens. | parity session (audit directive: rule 11) |
 
 ## Rule 13 — Async research lane (BrowseComp-class questions)
@@ -120,3 +121,12 @@ Table-as-Search (rule 14); (b) trajectory data NOW — every round's archive
 verified answer); (c) the SFT/RL run itself is an owner-level infrastructure
 decision (GPU budget, base-model choice) — parked with the exact recipe in the
 completion doc, not silently attempted.
+
+## Rule 16 — Research benchmarks run the async lane (2026-11-18, rounds 12-14)
+
+SimpleQA (single-fact lookups) may run in-request; FRAMES, DSQA and BrowseComp rounds
+run through the async research lane (`--async-deep`, medium effort) — the in-request
+lane's 150s wall and clock-pressured writer are a structural cap (proven: DSQA 41.7%
+in-request vs 77.8% async with 100% FINAL-ANSWER compliance on the same sample and
+grader). A benchmark score from the in-request lane measures the wall, not the model
+(extends rule 13).
