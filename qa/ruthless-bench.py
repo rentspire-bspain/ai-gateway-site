@@ -359,6 +359,10 @@ def run_one_async(bench, item, ix, effort=None):
     st, txt, dt = http(GW, body, {"Authorization": "Bearer " + tok, "apikey": ANON, "Content-Type": "application/json"})
     rec = {"bench": bench, "i": ix, "id": item["id"], "mode": "async-deep", "http": st, "s": dt,
            "prompt": item["q"][:120], "gold": item["gold"][:200]}
+    if st == 429:
+        # v263: submit 429 — one patient retry after the rate-limit window.
+        time.sleep(45)
+        st, txt, dt = http(GW, body, {"Authorization": "Bearer " + tok, "apikey": ANON, "Content-Type": "application/json"})
     if st != 200:
         rec.update(content="", verdict="error", fail=f"submit HTTP {st}"); return rec
     try:
@@ -370,21 +374,33 @@ def run_one_async(bench, item, ix, effort=None):
         rec.update(content=txt[:200], verdict="error", fail="no run id"); return rec
     rec["dr_id"] = drid
     t0 = time.time()
+    backoff = 12
     while True:
         st2, txt2, _ = http(f"{GW}?deep_research_id={drid}", None,
                             {"Authorization": "Bearer " + tok, "apikey": ANON})
+        j2 = {}
         try:
             j2 = json.loads(txt2)
         except Exception:
-            j2 = {}
+            pass
+        # v263 RATE-LIMIT ROBUSTNESS: a 429 (or any transient poll failure) means the
+        # poll was refused, NOT that the run died — the background run is still alive
+        # upstream. Back off and keep polling; never fail the row on a poll 429.
+        if st2 == 429 or (st2 != 200 and not j2.get("status")):
+            backoff = min(backoff * 2, 90)
+            if time.time() - t0 > 1500:
+                rec.update(content="", verdict="error", fail="poll timeout (429)"); return rec
+            time.sleep(backoff)
+            continue
         status = j2.get("status")
         if status == "completed":
             break
-        if status in ("failed", "cancelled", "incomplete") or "error" in j2:
+        if status in ("failed", "cancelled", "incomplete"):
             rec.update(content=str(j2.get("error"))[:200], verdict="error", fail=f"run {status}")
             return rec
         if time.time() - t0 > 1500:   # 25 min hard cap
             rec.update(content="", verdict="error", fail="poll timeout"); return rec
+        backoff = 12
         time.sleep(12)
     rec["s"] = round(time.time() - t0, 1)
     c = str(j2.get("answer") or "")
