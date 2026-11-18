@@ -124,6 +124,7 @@
 .stg-desc { font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5; }
 .stg-desc .stg-note { color: var(--text-faint); }
 .stg-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+#teammates-pane [hidden], #enterprise-admin-pane [hidden] { display: none !important; }
 .stg-row-block { display: block; }
 .stg-row-block .stg-controls { margin-top: 10px; justify-content: flex-start; flex-wrap: wrap; }
 

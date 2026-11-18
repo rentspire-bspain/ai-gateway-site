@@ -34,3 +34,39 @@ test("isAdminRole gates the pane correctly", () => {
   assert.equal(h.isAdminRole("member"), false);
   assert.equal(h.isAdminRole(""), false);
 });
+
+test("audit CSV quotes delimiters and neutralizes spreadsheet formulas", () => {
+  const csv = h.auditCsv([
+    { action: "login", detail: 'device, "name"', created_at: "2026-11-14" },
+    { action: " =SUM(1)", detail: "@cmd", created_at: null }
+  ]);
+  assert.equal(csv, 'action,detail,created_at\r\n"login","device, ""name""","2026-11-14"\r\n"\' =SUM(1)","\'@cmd",""');
+});
+
+test("Enterprise uses the current session and never requests admin data for members", async () => {
+  const vm = require("node:vm");
+  for (const role of [null, "member", "admin"]) {
+    const calls = [];
+    function element() {
+      return {
+        appendChild() {}, remove() {}, setAttribute() {}, addEventListener() {}
+      };
+    }
+    const window = { sb: { auth: { getSession: async () => ({
+      data: { session: role ? { access_token: "current-token" } : null }
+    }) } } };
+    vm.runInNewContext(src, {
+      window,
+      document: { getElementById: element, createElement: element },
+      fetch: async (url, options) => {
+        assert.equal(options.headers.Authorization, "Bearer current-token");
+        const key = options.body ? JSON.parse(options.body).action : url.split("/").pop().split("?")[0];
+        calls.push(key);
+        return { ok: true, json: async () => key === "whoami" ? { role } : key === "members" ? { members: [] } : [] };
+      }
+    });
+    window.EnterpriseAdminPane.render();
+    await new Promise(setImmediate);
+    assert.deepEqual(calls, role === "admin" ? ["whoami", "members", "fleet_dispatch", "audit_logs"] : role ? ["whoami"] : []);
+  }
+});

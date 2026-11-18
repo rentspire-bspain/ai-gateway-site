@@ -58,52 +58,102 @@
     pane.appendChild(who);
 
     // invite row
-    var inviteEmail = input("teammate@company.com");
+    var inviteEmail = input("teammate@company.com", "email");
     var roleSel = el("select", "stg-input");
+    inviteEmail.setAttribute("aria-label", "Teammate email");
+    roleSel.setAttribute("aria-label", "Invitation role");
     ["member", "admin"].forEach(function (r) {
       var o = el("option", "", r); o.value = r; roleSel.appendChild(o);
     });
     var inviteBtn = btn("Invite", "");
     var inviteMsg = el("div", "stg-desc", "");
+    inviteMsg.setAttribute("role", "status");
     var inviteRow = el("div", "stg-controls");
     inviteRow.appendChild(inviteEmail);
     inviteRow.appendChild(roleSel);
     inviteRow.appendChild(inviteBtn);
-    pane.appendChild(el("div", "stg-group-label", "Invite a teammate"));
+    var inviteTitle = el("div", "stg-group-label", "Invite a teammate");
+    inviteTitle.hidden = inviteRow.hidden = true;
+    pane.appendChild(inviteTitle);
     pane.appendChild(inviteRow);
     pane.appendChild(inviteMsg);
 
     // member list (with role controls when permitted)
     var list = el("div", "");
+    var filter = input("Search by name, email, or role", "search");
+    filter.setAttribute("aria-label", "Search teammates");
+    filter.hidden = true;
     pane.appendChild(el("div", "stg-group-label", "Members"));
+    pane.appendChild(filter);
     pane.appendChild(list);
 
-    function renderList(members, canManage) {
+    var roster = [], myRole = "";
+    function renderList() {
       list.innerHTML = "";
-      if (!Array.isArray(members) || !members.length) {
-        list.appendChild(el("p", "stg-empty-note", "No teammates yet."));
+      var q = filter.value.trim().toLowerCase();
+      var members = roster.filter(function (m) {
+        return [m.name, m.full_name, m.email, m.role].join(" ").toLowerCase().includes(q);
+      });
+      if (!members.length) {
+        list.appendChild(el("p", "stg-empty-note", q ? "No teammates match your search." : "No teammates yet."));
         return;
       }
       members.forEach(function (m) {
         var row = el("div", "stg-row");
         var left = el("div", "stg-row-left");
-        var nm = el("div", "stg-row-label", String(m.name || m.email || "member") + (String(m.status) === "invited" ? " (invited)" : ""));
+        var nm = el("div", "stg-row-label", String(m.name || m.full_name || m.email || "Member") + (String(m.status) === "invited" ? " (invited)" : ""));
         left.appendChild(nm);
         left.appendChild(el("div", "stg-desc", String(m.email || "") + " · " + String(m.role || "member")));
+        var dateText = window.TeammatesPane && window.TeammatesPane.fmtLastActive;
+        if (dateText) {
+          var activity = dateText(m.last_active || m.last_seen);
+          var joined = dateText(m.created_at);
+          left.appendChild(el("div", "stg-desc", "Added: " + joined + " · Last active: " + activity));
+        }
         row.appendChild(left);
-        if (canManage && m.role !== "owner") {
+        if (myRole === "owner" && m.email && (m.role === "member" || m.role === "admin")) {
+          var role = el("select", "stg-input");
+          role.setAttribute("aria-label", "Role for " + m.email);
+          ["member", "admin"].forEach(function (value) {
+            var option = el("option", "", value === "admin" ? "Admin" : "Member");
+            option.value = value;
+            option.selected = value === m.role;
+            role.appendChild(option);
+          });
+          role.addEventListener("change", function () {
+            var next = role.value;
+            role.disabled = true;
+            team("set_role", { email: m.email, role: next }).then(function () {
+              m.role = next;
+              inviteMsg.textContent = "Role updated for " + m.email + ".";
+              renderList();
+            }).catch(function (e) {
+              role.value = m.role;
+              role.disabled = false;
+              inviteMsg.textContent = String(e.message || e).slice(0, 140);
+            });
+          });
+          row.appendChild(role);
+        }
+        if (m.email && (m.role === "member" ? myRole === "admin" || myRole === "owner" : m.role === "admin" && myRole === "owner")) {
           var rm = btn("Remove", "danger");
+          rm.setAttribute("aria-label", "Remove " + m.email);
           rm.addEventListener("click", function () {
             if (!confirm("Remove " + (m.email || "this member") + "?")) return;
-            team("remove_member", { user_id: m.id }).then(function () { refresh(); }).catch(function (e) { inviteMsg.textContent = String(e.message || e).slice(0, 120); });
+            rm.disabled = true;
+            team("remove_member", { email: m.email }).then(refresh).catch(function (e) {
+              rm.disabled = false;
+              inviteMsg.textContent = String(e.message || e).slice(0, 120);
+            });
           });
           row.appendChild(rm);
         }
         list.appendChild(row);
       });
     }
+    filter.addEventListener("input", renderList);
     function refresh() {
-      team("whoami").then(function (w) {
+      return team("whoami").then(function (w) {
         if (!w || !w.role) {
           // not on a team yet — honest state, not an error
           who.textContent = "You're not on a team yet — ask an owner to invite you.";
@@ -112,9 +162,19 @@
           return;
         }
         var canManage = w.role === "owner" || w.role === "admin";
+        myRole = w.role;
+        inviteTitle.hidden = inviteRow.hidden = !canManage;
         who.textContent = "Your role: " + w.role + (canManage ? " — you can manage teammates." : " — view only.");
-        return team("members").then(function (d) { renderList(d && d.members, canManage); });
+        return team("members").then(function (d) {
+          roster = d && Array.isArray(d.members) ? d.members.filter(Boolean) : [];
+          filter.hidden = !roster.length;
+          renderList();
+        });
       }).catch(function (e) {
+        myRole = "";
+        roster = [];
+        inviteTitle.hidden = inviteRow.hidden = filter.hidden = true;
+        list.innerHTML = "";
         who.textContent = "Team data unavailable right now.";
       });
     }

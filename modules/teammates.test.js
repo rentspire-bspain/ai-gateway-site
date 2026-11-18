@@ -32,3 +32,55 @@ test("fmtLastActive: date, unparseable, and empty", () => {
   assert.equal(h.fmtLastActive("not-a-date"), "—");
   assert.equal(h.fmtLastActive(null), "—");
 });
+test("Settings roster searches locally and only owners can change a teammate's role", async () => {
+  const vm = require("node:vm");
+  const settings = require("node:fs").readFileSync(__dirname + "/settings-premium.js", "utf8");
+  function element(tag) {
+    return {
+      tag, children: [], attrs: {}, events: {}, value: "",
+      set innerHTML(value) { this.children = []; },
+      appendChild(node) { this.children.push(node); },
+      setAttribute(key, value) { this.attrs[key] = value; },
+      addEventListener(key, value) { this.events[key] = value; }
+    };
+  }
+  const all = (node) => [node, ...node.children.flatMap(all)];
+  for (const role of ["owner", "admin", "member"]) {
+    const calls = [];
+    const window = { TeammatesPane: h, sb: { auth: { getSession: async () => ({
+      data: { session: { access_token: "current-token" } }
+    }) } } };
+    vm.runInNewContext(settings, {
+      window, document: { createElement: element, getElementById: () => null },
+      fetch: async (_url, options) => {
+        const body = JSON.parse(options.body);
+        calls.push(body);
+        return { ok: true, json: async () => body.action === "whoami" ? { role } : {
+          members: [{ full_name: "Ada Example", email: "ada@example.com", role: "member", created_at: "2026-01-12" }]
+        } };
+      }
+    });
+    const pane = window.SettingsTeammatesPane.render();
+    await new Promise(setImmediate);
+    const nodes = all(pane);
+    assert.ok(nodes.some((n) => n.textContent === "Ada Example"));
+    assert.ok(nodes.some((n) => /^Added: \d.+Last active:/.test(n.textContent)));
+    assert.equal(nodes.find((n) => n.textContent === "Invite a teammate").hidden, role === "member");
+    const select = nodes.find((n) => n.attrs["aria-label"] === "Role for ada@example.com");
+    assert.equal(Boolean(select), role === "owner");
+    const search = nodes.find((n) => n.type === "search");
+    search.value = "missing";
+    search.events.input();
+    assert.ok(all(pane).some((n) => n.textContent === "No teammates match your search."));
+    assert.equal(calls.length, 2);
+    if (select) {
+      search.value = "";
+      search.events.input();
+      const current = all(pane).find((n) => n.attrs["aria-label"] === "Role for ada@example.com");
+      current.value = "admin";
+      current.events.change();
+      await new Promise(setImmediate);
+      assert.deepEqual(calls.at(-1), { action: "set_role", email: "ada@example.com", role: "admin" });
+    }
+  }
+});
