@@ -5,7 +5,7 @@ import { safeEqual } from "../_shared/call-model-policy.js";
 import { runToolLoop, shouldRunToolLoop, sanitizeSearchQuery, condenseSearchQuery, autoFetchAssets, initEgress, CONNECTOR_INTENT, CONNECTOR2_INTENT, FLEET_INTENT, DISPATCH_INTENT, MCP_INTENT, TOOLS_INTENT, isAckTurn, needsComputation, toolRunPythonForFallback, toolPlatformStatus, toolCreateFile, resolveFleetEmail, toolRunRunnerJob, toolGithubWrite, toolListCapabilities, toolListWebapps, toolListWebappTables, toolWebappDoctor, toolFetchPage, toolListPlatformFunctions, toolApifyCall } from "./tool-loop.ts";
 // v191: capability-inventory asks (owner directive 2026-11-13). Matches the phrasings the owner
 // actually used ("CHECK AGAIN ON THE RUNNERS AND MODELS", "check deeply", "what got imported").
-export const PARITY_STATE = "v263 TABLE-VERIFIED SETS ANSWER-FIRST (2026-11-18, round 10 DSQA: 38.8 vs 36.4 r9 - inside noise; the v262 table rule lengthened bodies past the 6000-token cap and 42/98 rows lost the FINAL ANSWER line to truncation. v263: the FINAL ANSWER line now opens the reply (answer-first), the table is capped at 12 rows and the whole reply at ~700 words - the deliverable can no longer be crowded out. Async research lane and two-signal set detection (v262) unchanged and live: round 10 set rows ran with planner sub-queries where round 9 ran 0.";
+export const PARITY_STATE = "v264 FA-ENFORCEMENT QA RETRY + CEILING RAISE (2026-11-18, owner-approved: SPEND_CEILING_USD default 50->200 — the account-level secrets API is 403; QA check 0b: a response missing the user-required FINAL ANSWER line is rewritten with it — round-11 teardown showed 58/98 truncated-class rows and FA on only 41% of graded rows; the async BrowseComp lane (v262) is the biggest gain in program history: 38.9->86.0, confirmed 90 on the 30-row re-run).";
 const CAPABILITY_ASK = /\b(runners?|models?|jobs?|tools?|skills?)\b.{0,50}\b(in ai\.spaincos|imported|available|exist|check|deep|listed|registry|catalog)\b|\b(check|verify|list|show|enumerate|inventory)\b.{0,40}\b(runners?|models?|jobs?|tools?|skills?|capabilities)\b/i;
 // v192: webapp-scoped asks (owner directive 2026-11-13: sessions conflate webapps and their databases).
 // When the question is about a specific webapp, its pages, data, schema, or "the data behind" an app,
@@ -1018,7 +1018,7 @@ async function runSubQuery(apiKey: string, q: string, effort: string, timeoutMs:
 // deep-research submits are refused with a clear error — the key never burns
 // past the ceiling. Estimated per-request costs by effort level are
 // conservative: fast $0.02, low $0.05, medium $0.15, high $0.50.
-const SPEND_CEILING_USD = Number(Deno.env.get("SPEND_CEILING_USD") || "50");
+const SPEND_CEILING_USD = Number(Deno.env.get("SPEND_CEILING_USD") || "200");   // v264: raised 50->200 (owner-approved 2026-11-18 — the async BrowseComp round recorded $45.18 of the old $50; the account-level secrets API is 403 so the default is the source of truth)
 const EFFORT_COST: Record<string, number> = { fast: 0.02, low: 0.05, medium: 0.15, high: 0.5 };
 async function usageState(userToken: string, svc?: { key: string; uid: string }): Promise<{ requests: number; cost: number }> {
   const url = Deno.env.get("SUPABASE_URL") ?? "https://bnxermyboeigvwonfrzx.supabase.co";
@@ -3904,6 +3904,31 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       } catch (e) { /* retry failed — keep the original answer, never 500 */ }
     }
     
+    // QA check 0b (v264): the user's message explicitly required a FINAL ANSWER line and the
+    // response does not carry it — rewrite with the line. Round-11 DSQA teardown: 58/98 rows
+    // truncated-class, FINAL ANSWER present on only 41% of graded rows; the deliverable line
+    // is the single highest-value token in the whole answer. Never 500s; keeps the original on any failure.
+    {
+      const faReq = /final answer\s*[:-]?/i.test(String((messages || []).filter((m: any) => m?.role === "user").slice(-1)[0]?.content || ""));
+      const cur = String(finalResponse?.choices?.[0]?.message?.content || content || "");
+      if (faReq && cur.length > 0 && !/FINAL ANSWER\s*:/i.test(cur) && timeOk(70_000)) {
+        try {
+          const faRes = await fetch(callModelUrl, {
+            method: "POST",
+            headers: CM_HEADERS,
+            body: JSON.stringify({ messages: [...capped, { role: "user", content: "QA REVIEW (BINDING): your previous response is missing the final line the user explicitly required. Re-issue the SAME answer, complete, with every section and citation intact, and END it with a final line of exactly 'FINAL ANSWER: <the complete final answer>' — for list questions the full comma-separated list. This line is mandatory; without it the answer is unusable." }], purpose, model: finalModel, reasoning_effort: reasoningEffort(intent.complexity), max_tokens: 6000 }),
+            signal: AbortSignal.timeout(70_000)
+          });
+          const faData = await faRes.json();
+          const faContent = String(faData?.choices?.[0]?.message?.content || "");
+          if (faContent && /FINAL ANSWER\s*:/i.test(faContent)) {
+            finalResponse = faData;
+            content = faContent;
+          }
+        } catch (e) { /* keep original */ }
+      }
+    }
+
     // QA check 1: too short for complex questions (guarded — failed QA retries never 500)
     // (v83: skipped for EMPTY content — check 0 already retried; the last-resort stage below handles it — and when the clock is short)
     if (content.length > 0 && content.length < 300 && intent.complexity !== "simple" && timeOk()) {
