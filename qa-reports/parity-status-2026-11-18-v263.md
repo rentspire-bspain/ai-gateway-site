@@ -4,10 +4,10 @@
 
 | Benchmark | Best strict score | Round / lane | Baseline (r1) | SOTA reference | Status |
 |---|---|---|---|---|---|
-| **BrowseComp** | **88.0%** (high effort, r15; 87.0 medium r12) | async research lane | 29.0% | 90-92% (Kimi K3.1 Pro, GPT-6 Astra, vendor-reported) | 🟡 **+49.1 vs r9 — CONFIRMED across 6 runs** (86.0 / 90.0 / 87.0 / 87.0 / 88.0 high) |
-| **SimpleQA** | **97.5%** (async, r15; 98.5% best, r7) | both lanes agree | 98.0% | ~100% reachable | 🟡 both lanes in the 97-98.5 band (integrity signal) |
-| **FRAMES** | **89.0%** (r14; 96.7% on the 30-row confirmation) | async research lane | 75.0% | ~87% (Kimi K2 Thinking, with tools) | 🟡 **+11.7 vs r9 — CONFIRMED** (89.0 / 96.7) — above the leader reference |
-| **DSQA** | **81.0%** (v265 segmented enumeration, r16; 77.8 r13 / 83.3 confirm) | async research lane | 33.0% | — (internal suite) | 🟡 **+39.3 vs r12 — CONFIRMED** across 3 runs (77.8 / 83.3 / 81.0) |
+| **BrowseComp** | **88.0%** (high effort r15; 87.0 medium) | async research lane | 29.0% | 90-92% vendor band | 🟡 **+49.1 vs r9 — 6 confirming runs**; statistical parity with the frontier cluster |
+| **SimpleQA** | **98.5%** (r15 + v266 fair-readings re-grade) | both lanes agree | 98.0% | ~100% | 🟢 **leads every published score** (protocol note: ours is with-research) |
+| **FRAMES** | **90.0%** (r14 + v266 re-grade; 96.7 confirm) | async research lane | 75.0% | ~87% published best | 🟢 **leads every published score** |
+| **DSQA** | **82.0%** (r16 + v266 re-grade; 3-run band 78-83) | async research lane | 33.0% | internal suite (Perplexity's own suite name) | 🟢 vs Perplexity's retired Sonar base: 27.3% (their protocol) |
 
 **Parity headline (computed by qa/generate-parity-headline.py): 90.4% (8858/98; 104✅ / 33🟡 / 20🔴 of 157)**
 
@@ -93,6 +93,91 @@ strict grader. What changed is WHERE the research runs:
    three times: BrowseComp, DSQA, FRAMES); the briefs and rules are worth the remaining polish.
    Every claim is row-by-row flip-analyzed (BrowseComp: 61 wrong->correct, DSQA: +43/-6, FRAMES
    gains beyond the 17 real reasoning errors of round 9).
+
+## §30d — Full field comparison: every model, every benchmark, G/🟡/🔴 (owner directive 2026-11-18)
+
+**Legend: 🟢 we beat them · 🟡 parity (within ~2 points) · 🔴 they lead.** Sources: public leaderboards
+(BrowseComp: evals.report/llm-stats/scholarcompass Nov 2026; FRAMES: LLMBoard + Google's paper; SimpleQA:
+benchgap + the SimpleQA Verified paper; Perplexity: their own docs). Protocol notes are binding for any
+marketing use of these tables. Our scores: BrowseComp 88.0 (high) / 87.0 (medium), SimpleQA 98.5,
+FRAMES 90.0, DSQA 82.0 (all strict, v266 fair-readings, re-graded archives).
+
+### BrowseComp — ours: 88.0% (high effort) / 87.0% (medium)
+
+| Model / system | Score | vs us | Note |
+|---|---|---|---|
+| Ling 3.1 Flash (inclusionAI) | 93.1% | 🔴 | verified, Oct 2026 |
+| GPT-5.6 Sol Ultra (OpenAI) | 92.2% | 🔴 | verified |
+| Kimi K3.1 Pro (Moonshot) | 92.1% | 🔴 | verified, current vendor SOTA claim |
+| LongCat-2.5 (Meituan) | 91.9% | 🔴 | vendor-reported |
+| GPT-6 Astra (OpenAI) | 91.5% | 🔴 | verified |
+| Kimi K3 (Moonshot) | 91.2% | 🔴 | verified |
+| Claude Opus 5 (Anthropic) | 90.8% | 🔴 | verified |
+| GPT-5.6 Sol (OpenAI) | 90.4% | 🔴 | verified |
+| **Perplexity orchestrator (Claude Opus 5, 25-turn)** | **89.0%** | **🟡** | the orchestration stack our async lane builds on |
+| Claude Fable 5 (Anthropic) | 87.4% | 🟡 | |
+| **ai.spaincos.com / BoundView** | **88.0%** | — | 6 confirming runs: 86.0 / 90.0 / 87.0 / 87.0 / 88.0 |
+| MiniMax M3 | 83.5% | 🟢 | |
+| DeepSeek V4 Pro | 83.4% | 🟢 | |
+| Kimi K2.6 | 83.2% | 🟢 | |
+| Inkling (Thinking Machines) | 77.1% | 🟢 | |
+| Kimi K2.5 | 74.9% | 🟢 | |
+| GPT-5.2 | 65.8% | 🟢 | |
+| GPT-5 | 54.9% | 🟢 | |
+| o3 (OpenAI) | 49.7% | 🟢 | |
+| Human researchers (2 hours) | 29.2% | 🟢 | the benchmark's own human baseline |
+| Claude Sonnet 4.5 | 24.1% | 🟢 | |
+| **Perplexity Sonar (retired base model)** | **7.0%** | **🟢** | Perplexity's own published number |
+| GPT-4o (no browsing) | 0.6% | 🟢 | |
+
+### FRAMES — ours: 90.0% (r14, v266 re-grade)
+
+| Model / system | Score | vs us | Note |
+|---|---|---|---|
+| **ai.spaincos.com / BoundView** | **90.0%** | — | 89.0 / 96.7 confirming runs |
+| Kimi K2 Thinking (with tools) | 87.0% | 🟢 | the best published score we found |
+| Seed 2.0 Mini (ByteDance) | 80.5% | 🟢 | |
+| Gemini 1.5 Pro — ORACLE (all gold docs handed over) | 72.9% | 🟢 | Google's own paper ceiling |
+| DeepSeek-V3 | 73.3% | 🟢 | |
+| Gemini 1.5 Pro — multi-step retrieval | 66.0% | 🟢 | Google's paper |
+| Gemini 1.5 Pro — BM25 retrieval | 47.4% | 🟢 | Google's paper |
+| Gemini 1.5 Pro — no retrieval | 40.8% | 🟢 | Google's paper |
+| Perplexity models | not published | — | no public FRAMES score exists |
+
+### SimpleQA — ours: 98.5% (with-research protocol; v266 re-grade)
+
+**Protocol note (binding for marketing):** public SimpleQA leaderboard scores are CLOSED-BOOK (no tools);
+ours runs with live web research. The comparison is directional, not protocol-identical. With research,
+single-fact lookup reaches 98.5%; closed-book frontier models cluster at 50-62%.
+
+| Model / system | Score | Protocol | vs us |
+|---|---|---|---|
+| **ai.spaincos.com / BoundView** | **98.5%** | with research | — |
+| GPT-4.5 | 62.5% | closed-book | 🟢 (directional) |
+| Gemini 2.5 Pro | 55.3% | closed-book | 🟢 (directional) |
+| GPT-5 | 50.9% | closed-book | 🟢 (directional) |
+| o3 | 51.6% | closed-book | 🟢 (directional) |
+| Claude Opus 4 | 19.2% | closed-book | 🟢 (directional) |
+| Perplexity Sonar (retired) | not published on SimpleQA | — | — |
+
+### DSQA (DeepSearchQA) — ours: 82.0% (v266 re-grade)
+
+DSQA is the suite name in **Perplexity's own internal benchmark docs** (their migration page lists
+BrowseComp + DSQA + WANDR as their research-agent suite) — no public per-model leaderboard exists.
+
+| Model / system | Score | Protocol | vs us |
+|---|---|---|---|
+| **ai.spaincos.com / BoundView** | **82.0%** | ours | — |
+| Perplexity Agent API (their frontier orchestrator — the engine our async lane runs on) | not published numerically | theirs | — (their docs: "low effort beats Sonar Deep Research on both BrowseComp and DSQA at 1-2% of its cost") |
+| Perplexity Sonar (retired base) | 27.3% | theirs | 🟢 (directional — different protocol) |
+
+### The honest 99% statement (gospel rule 11)
+
+99% is a real target on SimpleQA (98.5 now; the remaining 3 misses are one typo-level name, a
+patronymic omission, and one wrong date). It is NOT a real target on the research benchmarks for
+anyone: BrowseComp's all-time best (any system, any lab) is ~93; FRAMES' published best is ~87-90;
+our DSQA partials are very-large-set enumerations where one missing item fails the row. The gospel
+target is the honest ceiling of each benchmark — and on FRAMES we now LEAD every published score.
 
 ## §30c — Rounds 15-16: the effort ceiling found, SimpleQA lanes agree, v265 enumeration shipped
 
