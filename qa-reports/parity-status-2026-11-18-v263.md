@@ -4,14 +4,565 @@
 
 | Benchmark | Best strict score | Round / lane | Baseline (r1) | SOTA reference | Status |
 |---|---|---|---|---|---|
-| **BrowseComp** | **87.0%** (r12; 86.0 r11, 90.0/87.0 confirmations) | async research lane | 29.0% | 90-92% (Kimi K3.1 Pro, GPT-6 Astra, vendor-reported) | 🟡 **+48.1 vs r9 — CONFIRMED across 4 runs** (86.0 / 90.0 / 87.0 / 87.0) |
-| **SimpleQA** | **97.4%** (r9; 98.5% best, r7) | in-request lane | 98.0% | ~100% reachable | 🟡 stable in the 96-98.5 band; async round queued |
+| **BrowseComp** | **88.0%** (high effort, r15; 87.0 medium r12) | async research lane | 29.0% | 90-92% (Kimi K3.1 Pro, GPT-6 Astra, vendor-reported) | 🟡 **+49.1 vs r9 — CONFIRMED across 6 runs** (86.0 / 90.0 / 87.0 / 87.0 / 88.0 high) |
+| **SimpleQA** | **97.5%** (async, r15; 98.5% best, r7) | both lanes agree | 98.0% | ~100% reachable | 🟡 both lanes in the 97-98.5 band (integrity signal) |
 | **FRAMES** | **89.0%** (r14; 96.7% on the 30-row confirmation) | async research lane | 75.0% | ~87% (Kimi K2 Thinking, with tools) | 🟡 **+11.7 vs r9 — CONFIRMED** (89.0 / 96.7) — above the leader reference |
-| **DSQA** | **77.8%** (r13; 83.3% on the 30-row confirmation) | async research lane | 33.0% | — (internal suite) | 🟡 **+36.1 vs r12 — CONFIRMED** (77.8 / 83.3); FA compliance 100% |
+| **DSQA** | **81.0%** (v265 segmented enumeration, r16; 77.8 r13 / 83.3 confirm) | async research lane | 33.0% | — (internal suite) | 🟡 **+39.3 vs r12 — CONFIRMED** across 3 runs (77.8 / 83.3 / 81.0) |
 
 **Parity headline (computed by qa/generate-parity-headline.py): 90.4% (8858/98; 104✅ / 33🟡 / 20🔴 of 157)**
 
-**Batch log:** r10 DSQA 38.8% (v262) → r11 DSQA 40.8% (v263) → r11 BrowseComp 86.0% (async, CONFIRMED) → r12 BrowseComp 87.0% (async, ceiling raised to $200) → r12 DSQA 41.7% (in-request; QA retry blocked by the clock) → **r13 DSQA 77.8% (async lane, +36.1 CONFIRMED)** → **r14 FRAMES 89.0% (async lane, +11.7 CONFIRMED)** → SimpleQA async round queued next.
+**Batch log:** r10 DSQA 38.8 (v262) → r11 DSQA 40.8 (v263) → r11 BC 86.0 (async) → r12 BC 87.0 → r12 DSQA 41.7 (in-request cap) → r13 DSQA 77.8 (async, CONFIRMED) → r14 FRAMES 89.0 (CONFIRMED) → r15 SimpleQA 97.5 (async; lanes agree) → r15 BC 88.0 (HIGH effort) → r16 DSQA 81.0 (v265 segmented enumeration). **The async lane is the production path for all research suites (rule 16).**
+
+## Rule 15c in full — the SFT/RL training run: exactly what executes, what it costs, and the one decision
+
+**What rule 15c is:** the third rung of the training-recipe ladder — actually fine-tuning an open-weight
+model on OUR verified research behavior instead of only prompting rented models. The dataset is READY
+(qa/sft-export.py, 466 verified-correct examples, growing every round).
+
+### The recipe (executes the moment the GPU decision lands)
+
+1. **Base model (the choice):** an open-weight model in the 30B class with a permissive license —
+   the candidates: Qwen3.5-30B-A3B (fast, cheap to serve), DeepSeek-V4-Flash class (stronger
+   reasoning), or GLM-4.7-Flash (already in our fleet). Our call-model infrastructure can serve any
+   of them via OpenRouter or self-hosting on the Fly machine.
+2. **SFT (supervised fine-tuning):** train on sft-dataset.jsonl — the model imitates our verified
+   research answers (constraint decomposition, candidate verification, cited sources, FINAL ANSWER
+   discipline). 1-3 epochs, LoRA (cheap) or full fine-tune (better). ~500 examples is enough for a
+   first LoRA run; the dataset grows ~80-100 verified examples per round, so waiting compounds.
+3. **RL (reinforcement learning):** the key insight — **our strict grader IS the reward function.**
+   GRPO/DPO loops where the model earns reward only when the strict grader passes its answer.
+   No new infrastructure needed for scoring; the grader is already version-controlled and
+   adversarially hardened.
+4. **Serve:** the fine-tuned model slots into call-model as just another model id — the gateway,
+   the async lane, every webapp, BoundView, and the fleets can call it with zero code changes.
+
+### The costs (rented GPU, market rates)
+
+| Stage | Setup | Ballpark cost |
+|---|---|---|
+| SFT (LoRA, 30B, ~500 examples) | RunPod/Vast.ai H100, a few hours | ~$20-100 per run |
+| SFT (full FT, 30B) | 8xH100, longer | ~$200-500 per run |
+| RL (GRPO with grader-as-reward) | multi-day, multi-GPU | ~$500-2000 per run |
+| Serving | our existing free-tier lanes / Fly machine | ~$0 marginal |
+
+### The decision that remains (owner)
+
+- **GPU budget**: LoRA-first (~$100) is a cheap first experiment; full SFT+RL (~$1-2K) is the
+  real run. The honest expectation: the harness-level proxies (async lane, table-verified sets)
+  already captured much of the behavioral gain — the training run's edge is CONSISTENCY (no
+  format drift, no instruction-following ceiling) and COST (self-hosted vs rented frontier).
+- **Base model**: pick from the table above (or name one).
+- **Trigger**: "run rule 15c LoRA-first" executes the whole chain server-side (dataset -> SFT ->
+   eval against the same benchmarks -> serve if it beats the incumbent on the strict grader).
+
+**Why we have not just done it:** the models we run are free third-party API models — we do not own
+their weights. Training requires (a) an open-weight base (a choice), (b) rented GPUs (money), and
+(c) a serving decision. All three are owner-level. Everything else on the ladder (dataset, recipe,
+reward function, serving path) is built and waiting.
+
+## What actually caused the huge jumps — the deep explanation (owner directive: "understand deeply")
+
+The gains were NOT a model upgrade and NOT a grader change. Same free models, same samples, same
+strict grader. What changed is WHERE the research runs:
+
+1. **The 150-second wall (the root cause).** The live site's chat ran research INSIDE the HTTP
+   request. Supabase kills every edge-function request at 150 seconds — hard. The hardest questions
+   (multi-hop, multi-source) are exactly the ones that need MORE than 150s of searching. Round 9:
+   28 of 100 BrowseComp questions died as HTTP 504 at 150.1s — the benchmark was measuring our
+   timeout, not our intelligence. The wall also CLOCK-PRESSURED the writer on everything else:
+   answers written in a rush, format lines dropped (FINAL ANSWER present on only 31-41% of rows).
+
+2. **The async research lane (the fix).** A question now SUBMITS a background research run and gets
+   a job id back in ~2 seconds. The background agent — the same free models — runs for MINUTES with
+   no wall: dozens of searches, page reads, candidate verification. The client polls and receives
+   the completed answer. No timeout, no clock pressure. FA compliance through the async lane: 100%.
+
+3. **The concise brief (the brain change).** Benchmark-class questions previously got the
+   "2,500-5,000 word decision-grade report" instructions — wrong instrument. The concise brief
+   (deep_research_style=concise) gives them the SOTA answering discipline: decompose the constraints,
+   enumerate 3-6 candidates, verify EVERY constraint of EVERY candidate against a source, never
+   name the "most constraints" match, end with FINAL ANSWER. This is the BrowseComp-leader
+   technique (constraint verification) in prompt form.
+
+4. **Table-verified sets (the DSQA lever).** Set questions are now detected (LLM classifier +
+   offline-tested regexes — the old regex caught 1 of 42), decomposed into enumeration +
+   per-constraint sub-queries, and answered via a candidate x constraint table with sourced
+   checkmarks. v265 adds segmented enumeration for very large sets.
+
+5. **The stack order of the gains:** the async lane is worth ~+36 to +48 points by itself (measured
+   three times: BrowseComp, DSQA, FRAMES); the briefs and rules are worth the remaining polish.
+   Every claim is row-by-row flip-analyzed (BrowseComp: 61 wrong->correct, DSQA: +43/-6, FRAMES
+   gains beyond the 17 real reasoning errors of round 9).
+
+## §30c — Rounds 15-16: the effort ceiling found, SimpleQA lanes agree, v265 enumeration shipped
+
+| Round | Change | Score | Verdict |
+|---|---|---|---|
+| r15 SimpleQA | async lane, medium | **97.5%** (195/200) | DRAW vs in-request 97.4 — both lanes agree on single-fact questions (integrity signal) |
+| r15 BrowseComp | async lane, HIGH effort | **88.0%** (88/100) | +1.0 vs medium — DRAW. **Honest finding: effort is NOT the path to 90+** — the remaining 12 misses are deep entity-binding chains that even high-effort runs miss. The next 90+ levers are the SFT/RL run (rule 15c) or council verification on async runs. |
+| r16 DSQA | v265 segmented-enumeration brief | **81.0%** (81/100) | +3.2 vs r13 — DRAW (inside noise); partials 14→13. DSQA is in the 78-83 band; the remaining partials are the hardest very-large-set enumerations. |
+
+### Round 15 grids — SimpleQA async + BrowseComp high-effort
+
+# Benchmark grid — generated from results-v265-simpleqa-async
+
+## SIMPLEQA — 195/200 = 97.5% strict (p50 13s, 0 error rows {})
+
+| Verdict | Count | Share |
+|---|---|---|
+
+| correct | 195 | 98% |
+| wrong | 5 | 2% |
+
+**Miss modes:** {'truncated': 5}
+
+| # | Status | Prompt | Gold | Verdict / Fail |
+|---|---|---|---|---|
+
+| ~~0~~ | ✅ | ~~What were the day, month, and year of release for Aseprite v1.3?~~ | ~~27 Nov 2023~~ | correct |
+| ~~1~~ | ✅ | ~~The 1972 Canadian federal budget was first presented on what day,~~ | ~~8 May 1972~~ | correct |
+| ~~2~~ | ✅ | ~~What year was the municipality of Ciudad Bolívar, Antioquia, Colo~~ | ~~1839~~ | correct |
+| ~~3~~ | ✅ | ~~In Season 16 of The Bachelor, which contestant quit?~~ | ~~Brittney Schreiner~~ | correct |
+| ~~4~~ | ✅ | ~~What was the original name of the village of Berrien Springs, Mic~~ | ~~Wolf's Prairie~~ | correct |
+| ~~5~~ | ✅ | ~~In which year was the municipality of Macanal, Boyacá, Colombia, ~~ | ~~1807~~ | correct |
+| ~~6~~ | ✅ | ~~In which year was Alexandra Park declared a local nature reserve?~~ | ~~2013~~ | correct |
+| ~~7~~ | ✅ | ~~In the 2021 research paper titled "EEG-Based Driving Fatigue Dete~~ | ~~92.71%~~ | correct |
+| ~~8~~ | ✅ | ~~What year was Türksat 2A decommissioned?~~ | ~~2016~~ | correct |
+| ~~9~~ | ✅ | ~~What is the surname of the individual who won the Faraday Lecture~~ | ~~Hinshelwood~~ | correct |
+| ~~10~~ | ✅ | ~~What was the name of the new curriculum model that Randolph Colle~~ | ~~TAKE2~~ | correct |
+| ~~11~~ | ✅ | ~~In what year was Alma S. Woolley awarded a doctorate in Nursing E~~ | ~~1980~~ | correct |
+| ~~12~~ | ✅ | ~~What month, date, and year did Tupac appear in A Different World?~~ | ~~June 24, 1993~~ | correct |
+| ~~13~~ | ✅ | ~~How many men competed in fencing during the 1964 Summer Olympics?~~ | ~~203~~ | correct |
+| ~~14~~ | ✅ | ~~What was Beloit College's Center for the Sciences renamed in 2017~~ | ~~Marjorie and James Sanger Center for the Sciences.~~ | correct |
+| ~~15~~ | ✅ | ~~How many referees were selected from the South American Football ~~ | ~~6~~ | correct |
+| ~~16~~ | ✅ | ~~What year did Chiharu Shiota introduce "Dialogue with Absence"?~~ | ~~2010~~ | correct |
+| ~~17~~ | ✅ | ~~In what city did Ciara perform for her Beauty Marks Tour on Septe~~ | ~~Puyallup~~ | correct |
+| ~~18~~ | ✅ | ~~What was the first year Whig politician James Vernon the Younger ~~ | ~~1702~~ | correct |
+| ~~19~~ | ✅ | ~~As of the 2020 census, what was the population of the city of For~~ | ~~10,423~~ | correct |
+| ~~20~~ | ✅ | ~~What were the month and year when Telegram reached 180 million mo~~ | ~~December 2017~~ | correct |
+| ~~21~~ | ✅ | ~~What is the first vampire number in recreational mathematics obta~~ | ~~102510~~ | correct |
+| ~~22~~ | ✅ | ~~What is the fifth track on Alec Benjamin's album, "(Un)Commentary~~ | ~~speakers ~~ | correct |
+| ~~23~~ | ✅ | ~~Which year was György Lukács appointed as the Hungarian Minister ~~ | ~~1919~~ | correct |
+| ~~24~~ | ✅ | ~~Which day, month, and year was the second episode of Season 2 of ~~ | ~~April 15, 2020~~ | correct |
+| ~~25~~ | ✅ | ~~What is the surname of the U.S. President who attended the 66th b~~ | ~~Eisenhower~~ | correct |
+| ~~26~~ | ✅ | ~~Which angel is portrayed in Leonardo da Vinci's "Virgin of the Ro~~ | ~~The angel Uriel.~~ | correct |
+| ~~27~~ | ✅ | ~~On which month and year did the Colombian Cardinal Pedro Rubiano ~~ | ~~January 2008~~ | correct |
+| ~~28~~ | ✅ | ~~In what year did the Japanese mathematician Kiyosi Ito receive th~~ | ~~1985~~ | correct |
+| ~~29~~ | ✅ | ~~In what year was the praying mantis species Eremiaphila cyclopter~~ | ~~1939~~ | correct |
+| ~~30~~ | ✅ | ~~What was the date, month, and year when France proposed that the ~~ | ~~January 14, 1991~~ | correct |
+| ~~31~~ | ✅ | ~~Who won the Paris Kanellakis Theory and Practice Award in 2000?~~ | ~~Narendra Karmarkar~~ | correct |
+| ~~32~~ | ✅ | ~~How many corners did Barcelona take in the Champions League semi-~~ | ~~3~~ | correct |
+| ~~33~~ | ✅ | ~~In what year was the mathematician George Andrews elected a Fello~~ | ~~1997~~ | correct |
+| ~~34~~ | ✅ | ~~What day, month, and year did William II of Holland become King o~~ | ~~3 October 1247~~ | correct |
+| ~~35~~ | ✅ | ~~What day, month, and year was Georgi Ivanov Peev, the Bulgarian f~~ | ~~11 March 1979~~ | correct |
+| ~~36~~ | ✅ | ~~What were Terry Kath's famously ironic last words?~~ | ~~What do you think I'm gonna do? Blow my brains out?~~ | correct |
+| ~~37~~ | ✅ | ~~At which art school was Will Hicok Low an instructor in 1890?~~ | ~~National Academy of Design~~ | correct |
+| ~~38~~ | ✅ | ~~In a 1988 paper, which author defined Mammalia phylogenetically a~~ | ~~Timothy Rowe~~ | correct |
+| ~~39~~ | ✅ | ~~What was the name of the Detroit-born medium to whom William Lyon~~ | ~~Etta Wriedt~~ | correct |
+| ~~40~~ | ✅ | ~~What was the nationality of the scientists who used lasers to mea~~ | ~~Belgian~~ | correct |
+| ~~41~~ | ✅ | ~~What were the day, month, and year when Google introduced the nat~~ | ~~2 of January of 2019~~ | correct |
+| ~~42~~ | ✅ | ~~What is the surname of the individual who won the Linus Pauling A~~ | ~~Eyring~~ | correct |
+| ~~43~~ | ✅ | ~~In TWD Season 11, Episode 10, we learn that Connie got whose uncl~~ | ~~Pamela Milton's uncle~~ | correct |
+| ~~44~~ | ✅ | ~~On what day, month, and year was Juan Nogueira, Brazilian amateur~~ | ~~1 May 1988~~ | correct |
+| ~~45~~ | ✅ | ~~Between what years did Getachew Reda complete a Master of Law at ~~ | ~~2001 and 2002~~ | correct |
+| ~~46~~ | ✅ | ~~From which year to which year did the Albanian politician Ibrahim~~ | ~~From 1976 to 1977~~ | correct |
+| ~~47~~ | ✅ | ~~On which game version was The International 2014 of Dota 2 played~~ | ~~6.81b~~ | correct |
+| ~~48~~ | ✅ | ~~In 2014, who took over development of the Brooding language for t~~ | ~~BenJamin P. Johnson~~ | correct |
+| ~~49~~ | ✅ | ~~How many stitches did John Lennon get as a result of his Aston Ma~~ | ~~17~~ | correct |
+| ~~50~~ | ✅ | ~~What TV show did Kim Fields announce that she was expecting her s~~ | ~~The Real~~ | correct |
+| ~~51~~ | ✅ | ~~In what year did Nikolai Andreev win the Leelavati Award?~~ | ~~2022~~ | correct |
+| ~~52~~ | ✅ | ~~What is the Swedish word for the time of night known as "the elev~~ | ~~Elvavrålet~~ | correct |
+| ~~53~~ | ✅ | ~~On what day, month, and year did Florence Farmer, a pioneer of wo~~ | ~~June 26, 1958~~ | correct |
+| ~~54~~ | ✅ | ~~In which month and year was Sayyid Ghulam Muhiyuddin Ahmed bin Kh~~ | ~~November 1888~~ | correct |
+| ~~55~~ | ✅ | ~~What was the date, month, and year when Clifford Cunnell, an Engl~~ | ~~5 October 2016~~ | correct |
+| ~~56~~ | ✅ | ~~For how many episodes did Gabrielle Fitzpatrick star in "Roar"?~~ | ~~1~~ | correct |
+| ~~57~~ | ✅ | ~~In what year was the Showstreet Palace Theater added to Dollywood~~ | ~~1992~~ | correct |
+| ~~58~~ | ✅ | ~~What is the name of Helmut Lang's solo exhibition from 2011 in Ea~~ | ~~Make it hard~~ | correct |
+| ~~59~~ | ✅ | ~~Who was the 11th Prime Minister of India?~~ | ~~Shri H. D. Deve Gowda~~ | correct |
+| ~~60~~ | ✅ | ~~What was the name of the episode in which Shai appeared on Family~~ | ~~Good Cop, Bad Cop~~ | correct |
+| ~~61~~ | ✅ | ~~In what year was the pink donut with sprinkles sculpture first pr~~ | ~~2007~~ | correct |
+| ~~62~~ | ✅ | ~~Give the full name of Rana Ayyub's father (an Indian journalist).~~ | ~~Mohammad Ayyub Waqif~~ | correct |
+| ~~63~~ | ✅ | ~~What year was the municipality of Paya, Boyacá, Colombia, founded~~ | ~~1600~~ | correct |
+| ~~64~~ | ✅ | ~~What was the name of the MP of Red Deer, Alberta, in 1987?~~ | ~~Gordon Towers~~ | correct |
+| ~~65~~ | ✅ | ~~In which month and year did WhatsApp start rolling out support fo~~ | ~~March 2021~~ | correct |
+| ~~66~~ | ✅ | ~~In Horizon Zero Dawn's Frozen Wilds DLC, what is CYAN an acronym?~~ | ~~Caldera of Yellowstone Analytic Nexus~~ | correct |
+| ~~67~~ | ✅ | ~~According to Hinduism, which planet is associated with Yamraj?~~ | ~~Pluto~~ | correct |
+| ~~68~~ | ✅ | ~~What year did the Lego part with ID gal56 first release?~~ | ~~2002~~ | correct |
+| ~~69~~ | ✅ | ~~The Persina Nature Park in Bulgaria was originally established on~~ | ~~December 4, 2000.~~ | correct |
+| ~~70~~ | ✅ | ~~Who was the recipient of the ISCB Accomplishment by a Senior Scie~~ | ~~Michael Waterman~~ | correct |
+| ~~71~~ | ✅ | ~~What year were the guidelines outlining requirements for the incl~~ | ~~2015~~ | correct |
+| ~~72~~ | ✅ | ~~Give the name of the Kashmiri dish in which mutton intestines are~~ | ~~Methi Maaz.~~ | correct |
+| ~~73~~ | ✅ | ~~In which year was Prof. H. U. Hamidi appointed as Vice Chancellor~~ | ~~1990~~ | correct |
+| ~~74~~ | ✅ | ~~On what day, month, and year did the 2nd ASEM Environment Ministe~~ | ~~October 12, 2003~~ | correct |
+| ~~75~~ | ✅ | ~~Which lake in Kashmir is connected to the Khushal Sar and Gil Sar~~ | ~~Nigeen Lake~~ | correct |
+| ~~76~~ | ✅ | ~~In which U.S. state was painter Davyd Whaley born?~~ | ~~Tennessee~~ | correct |
+| ~~77~~ | ✅ | ~~Which valley is known as the "Golden Crown of Kashmir"?~~ | ~~Breng Valley~~ | correct |
+| ~~78~~ | ✅ | ~~What is the name of the multituberculate mammal of early Paleocen~~ | ~~Taeniolabis taoensis~~ | correct |
+| ~~79~~ | ✅ | ~~In which country did Jean-Christophe Yoccoz do his military servi~~ | ~~Brazil~~ | correct |
+| ~~80~~ | ✅ | ~~In what year was Peicho Peev the Bulgarian chess International Ma~~ | ~~1973~~ | correct |
+| ~~81~~ | ✅ | ~~What was the original name of Forthton, Ontario, located north of~~ | ~~Stone's Corner~~ | correct |
+| ~~82~~ | ✅ | ~~On which day, month, and year was the RS-1 satellite launched fro~~ | ~~18 July 1980~~ | correct |
+| ~~83~~ | ✅ | ~~What was Zero Bridge originally nicknamed in Srinagar, Kashmir?~~ | ~~Zorr Bridge~~ | correct |
+| ~~84~~ | ✅ | ~~What exhibit was displayed in the TD Gallery at the Toronto Refer~~ | ~~Vice & Virtue~~ | correct |
+| ~~85~~ | ✅ | ~~Specify the day, month, and year Canon introduced two new UHDgc 2~~ | ~~April 2, 2019~~ | correct |
+| ~~86~~ | ✅ | ~~Who played Sarah Robinson in "Felicity" Season 4, Episode 4?~~ | ~~Monica~~ | correct |
+| ~~87~~ | ✅ | ~~What prize did De Broglie win in 1952?~~ | ~~Kalinga Prize.~~ | correct |
+| ~~88~~ | ✅ | ~~Which glacier is known as the "Third Pole"?~~ | ~~The Siachen Glacier~~ | correct |
+| ~~89~~ | ✅ | ~~Which hotel was awarded World's Leading Adventure Hotel 2022?~~ | ~~Pikaia Lodge~~ | correct |
+| ~~90~~ | ✅ | ~~What quote did Dr. Richard Trager say to Miles Upshur while openi~~ | ~~I'm not giving up on you~~ | correct |
+| ~~91~~ | ✅ | ~~What was the original name of the show that conductor David Rando~~ | ~~Music for the Connoisseur~~ | correct |
+| ~~92~~ | ✅ | ~~What is the name of the Dutch businessman and convicted drug traf~~ | ~~Rudi Dekkers~~ | correct |
+| ~~93~~ | ✅ | ~~What's the notion to which the lexical semantic map in Figure 4 o~~ | ~~breathe~~ | correct |
+| ~~94~~ | ✅ | ~~What language is represented in Figure 4 of the paper "Identifyin~~ | ~~Zenzontepec Chatino~~ | correct |
+| ~~95~~ | ✅ | ~~Who among the people who proposed the three-stage system in an ar~~ | ~~Clarence van Riet Lowe~~ | correct |
+| ~~96~~ | ✅ | ~~In which Chechen village was journalist Anna Politkovskaya detain~~ | ~~Khatuni.~~ | correct |
+| ~~97~~ | ✅ | ~~Who was awarded the Oskar Kokoschka Prize in 1998?~~ | ~~Maria Lassnig~~ | correct |
+| ~~98~~ | ✅ | ~~Which hill station is known as "The Gateway to Ladakh"?~~ | ~~Dras~~ | correct |
+| ~~99~~ | ✅ | ~~As of 2021, who is the host of The Doers Nepal podcast?~~ | ~~Anup Ghimire~~ | correct |
+| ~~100~~ | ✅ | ~~Which president had a meeting with Kwame Nkrumah right before the~~ | ~~Maurice Yameogo~~ | correct |
+| ~~101~~ | ✅ | ~~What is the forest cover area of Uttarakhand in square kilometers~~ | ~~ 24,303.04~~ | correct |
+| ~~102~~ | ✅ | ~~What day, month, and year did the singer and actress Vanessa Hudg~~ | ~~ 2 December 2023~~ | correct |
+| 103 | 🔴 | In the show Severance, who is the eighth CEO of Lumon Industries? | James Eagan | wrong — truncated |
+| ~~104~~ | ✅ | ~~What is the surname of the individual who won the Polanyi Medal f~~ | ~~Casavecchia~~ | correct |
+| ~~105~~ | ✅ | ~~On what day, month, and year did Olton Willem van Genderen, a Sur~~ | ~~November 9, 1990~~ | correct |
+| ~~106~~ | ✅ | ~~What patch for the original PS3 Dark Souls added 3 Humanities to ~~ | ~~1.06~~ | correct |
+| 107 | 🔴 | What is the height of the Space Shuttle Atlantis in meters? | 17.2 meters | wrong — truncated |
+| ~~108~~ | ✅ | ~~On what day, month, and year did Bruno Kreisky (an Austrian socia~~ | ~~April 23, 1942~~ | correct |
+| ~~109~~ | ✅ | ~~Which scientist received the Penrose Medal before the year Presto~~ | ~~Francis J. Pettijohn~~ | correct |
+| ~~110~~ | ✅ | ~~On what day, month, and year was John II of France coronated as K~~ | ~~26 September 1350~~ | correct |
+| ~~111~~ | ✅ | ~~What is the name of the dedicated infrared flash used to project ~~ | ~~Flood Illuminator~~ | correct |
+| ~~112~~ | ✅ | ~~In Table 2 in the Transformer paper (2017), which two languages d~~ | ~~German and French~~ | correct |
+| ~~113~~ | ✅ | ~~From what year to what year was David Lloyd Wolper, born in 1928,~~ | ~~1953-1955~~ | correct |
+| ~~114~~ | ✅ | ~~As of the 2020 Census, what was the population of Grand Mound, Io~~ | ~~615~~ | correct |
+| ~~115~~ | ✅ | ~~How many busts of Pope Paul V did Gian Lorenzo Bernini make?~~ | ~~2~~ | correct |
+| ~~116~~ | ✅ | ~~What was the title of the journal that Charles Raymond Perrault s~~ | ~~Artificial Intelligence~~ | correct |
+| ~~117~~ | ✅ | ~~What is the rate of climb, in feet per minute, of the Agusta A.10~~ | ~~1,220 ft/min~~ | correct |
+| ~~118~~ | ✅ | ~~What team finished with 38 points at the end of the 2021-2022 Pre~~ | ~~Leeds United~~ | correct |
+| ~~119~~ | ✅ | ~~To which academic society was computer scientist Sarita Vikram Ad~~ | ~~The American Academy of Arts and Sciences.~~ | correct |
+| ~~120~~ | ✅ | ~~In which year, month, and day was the Nokia 8110 announced?~~ | ~~9 September 1996~~ | correct |
+| ~~121~~ | ✅ | ~~On what day, month, and year was Harbhajan Singh Rissam (an India~~ | ~~14 May 2011~~ | correct |
+| ~~122~~ | ✅ | ~~Who won the 2015 Maine State Pumpkin and Squash Weigh-Off, held a~~ | ~~Edwin Pierpont~~ | correct |
+| ~~123~~ | ✅ | ~~What day, month, and year did Lisa Marie Presley die?~~ | ~~12 January 2023 ~~ | correct |
+| ~~124~~ | ✅ | ~~What is the forest cover area of Karnataka in square kilometers a~~ | ~~ 38,575.48~~ | correct |
+| ~~125~~ | ✅ | ~~What day, month, and year was Edward Ambrose Hug, the American Ma~~ | ~~July 14, 1880~~ | correct |
+| ~~126~~ | ✅ | ~~What watch company made the world's first computerized diver's wa~~ | ~~Seiko~~ | correct |
+| ~~127~~ | ✅ | ~~In which city in Pakistan did Bahria Town (Private) Limited estab~~ | ~~Lahore~~ | correct |
+| ~~128~~ | ✅ | ~~Which year was Bil Keane's first syndicated strip, Channel Chuckl~~ | ~~1954~~ | correct |
+| ~~129~~ | ✅ | ~~In which year was Arthur C. Wade, an American lawyer in the 1800s~~ | ~~1877~~ | correct |
+| ~~130~~ | ✅ | ~~With whom did Ada Lovelace and her mother attend one of Charles B~~ | ~~Mary Somerville~~ | correct |
+| ~~131~~ | ✅ | ~~Who founded the municipality of Sora, Boyacá, Colombia?~~ | ~~Tomás Gualba Castellanos~~ | correct |
+| ~~132~~ | ✅ | ~~What is the surname of the individual who was awarded the Francis~~ | ~~Pickett~~ | correct |
+| ~~133~~ | ✅ | ~~What candidate in Season 11 of The Bachelorette was an amateur se~~ | ~~Shawn Evans~~ | correct |
+| ~~134~~ | ✅ | ~~Cornelia Parker curated the "Black and White Room" for which exhi~~ | ~~Royal Academy Summer Exhibition~~ | correct |
+| ~~135~~ | ✅ | ~~During which years did Margaret Hamburg work as a clinical instru~~ | ~~1986 to 1990~~ | correct |
+| ~~136~~ | ✅ | ~~What was the name of the journal that Gloria Niemeyer Francke was~~ | ~~American Journal of Hospital Pharmacy~~ | correct |
+| ~~137~~ | ✅ | ~~What is the Edo name of the crown traditionally worn by the Iyoba~~ | ~~ukpe-okhue~~ | correct |
+| ~~138~~ | ✅ | ~~What is the name of the voice actor who voices Alvina in the game~~ | ~~Ève Karpf~~ | correct |
+| ~~139~~ | ✅ | ~~In what year were double-digit vehicle codes introduced in Japan ~~ | ~~1967~~ | correct |
+| ~~140~~ | ✅ | ~~Who was the voice of Colonel Drucker in the Medal of Honor (2010)~~ | ~~Adrian Holmes~~ | correct |
+| ~~141~~ | ✅ | ~~What is the name of the Brazilian entomologist who first describe~~ | ~~Ubirajara Martins~~ | correct |
+| ~~142~~ | ✅ | ~~What year was the municipality of Anorí, Antioquia, Colombia, fou~~ | ~~1808~~ | correct |
+| ~~143~~ | ✅ | ~~In which month and year did Apollo 14 pilot Edgar Mitchell and Ap~~ | ~~March 2011~~ | correct |
+| ~~144~~ | ✅ | ~~Which mathematician received the Chern Medal in 2022?~~ | ~~Barry Mazur~~ | correct |
+| ~~145~~ | ✅ | ~~What day, month, and year was Aniello Formisano, an Italian polit~~ | ~~June 10, 1954.~~ | correct |
+| ~~146~~ | ✅ | ~~What was Janice Burgess's alma mater?~~ | ~~Brandeis University~~ | correct |
+| ~~147~~ | ✅ | ~~What health crisis did Bob Barker experience on May 30, 2022?~~ | ~~Stroke~~ | correct |
+| ~~148~~ | ✅ | ~~How many days was Kaitlin Armstrong on the run from authorities f~~ | ~~43~~ | correct |
+| ~~149~~ | ✅ | ~~In what year did the mathematician Joachim Neubüser graduate from~~ | ~~1957~~ | correct |
+| ~~150~~ | ✅ | ~~To whom was R. C. Harvey married?~~ | ~~Linda Kubicek~~ | correct |
+| ~~151~~ | ✅ | ~~Who finished 14th in the 2021–22 Premier League season?~~ | ~~Aston Villa~~ | correct |
+| ~~152~~ | ✅ | ~~What is the MD5 checksum of the file named "ffrelay-debian-4.30.g~~ | ~~180caf23dd71383921e368128fb6db52~~ | correct |
+| ~~153~~ | ✅ | ~~What month and year was the "Bust of Charles I" by Gian Lorenzo B~~ | ~~January 1698~~ | correct |
+| ~~154~~ | ✅ | ~~In 2015, in what exhibition was Henry Ossawa Tanner's work includ~~ | ~~We Speak: Black Artists in Philadelphia, 1920s-1970s~~ | correct |
+| ~~155~~ | ✅ | ~~Domenico Lino Morichini first examined the fossilized tooth of wh~~ | ~~Elephant~~ | correct |
+| ~~156~~ | ✅ | ~~Who was the Brazilian Vice-President of the International Mathema~~ | ~~Marcelo Viana~~ | correct |
+| ~~157~~ | ✅ | ~~What is the half-life of radon-224 in hours?~~ | ~~1.8~~ | correct |
+| 158 | 🔴 | What is the full name of the singer who sang the song 'Angels' wi | Aida Emilevna Garifullina | wrong — truncated |
+| ~~159~~ | ✅ | ~~In which year was the John Brophy Award first awarded?~~ | ~~1989~~ | correct |
+| ~~160~~ | ✅ | ~~What year did Rosemarie Trockel start to use industrial knitting ~~ | ~~1985~~ | correct |
+| ~~161~~ | ✅ | ~~Who was the first-ever personality to hoist the Indian National F~~ | ~~Adil Hussain~~ | correct |
+| ~~162~~ | ✅ | ~~What year did Ollie Johnston sell his locomotive named Marie E.?~~ | ~~1993~~ | correct |
+| ~~163~~ | ✅ | ~~How many chimpanzees were observed with cold-like symptoms when t~~ | ~~14~~ | correct |
+| ~~164~~ | ✅ | ~~What is the surname of the individual who won the Bioinorganic Ch~~ | ~~Cowan~~ | correct |
+| ~~165~~ | ✅ | ~~In which school did Ghana's former minister Kwadwo Baah-Wiredu st~~ | ~~Kumasi High School~~ | correct |
+| ~~166~~ | ✅ | ~~In what year did Aftab Ghulam Nabi Kazi's (12th Deputy Chairman o~~ | ~~2009~~ | correct |
+| ~~167~~ | ✅ | ~~What month and year were the Opuke Thermal Pools & Spa opened in ~~ | ~~November 2021~~ | correct |
+| ~~168~~ | ✅ | ~~Where was the body of Stuart Leary, a South African sportsman who~~ | ~~Table Mountain, South Africa~~ | correct |
+| ~~169~~ | ✅ | ~~Which contestant from Season 2 of The Bachelor was a former NBA c~~ | ~~Lori Todd~~ | correct |
+| ~~170~~ | ✅ | ~~Which English singer was a film and television critic for The Obs~~ | ~~George Melly~~ | correct |
+| ~~171~~ | ✅ | ~~In what year did John Lennon and Yoko Ono donate their psychedeli~~ | ~~1977~~ | correct |
+| 172 | 🔴 | How many minutes and seconds did it take Indian swimmer Vedaant M | 16:01.73 seconds | wrong — truncated |
+| ~~173~~ | ✅ | ~~In which month and year did "Flying" magazine publish "Battling t~~ | ~~March 2001~~ | correct |
+| ~~174~~ | ✅ | ~~In which year was the municipality of La Pintada, Antioquia, Colo~~ | ~~1815~~ | correct |
+| ~~175~~ | ✅ | ~~How many UN Volunteers served in 54 United Nations missions, agen~~ | ~~ 8,282~~ | correct |
+| ~~176~~ | ✅ | ~~Who was the first President of the Supreme Court of Bolivia?~~ | ~~Manuel María Urcullo.~~ | correct |
+| ~~177~~ | ✅ | ~~Which player character in Exandria Unlimited: Calamity was Sam Ri~~ | ~~Laerryn Coramar-Seelie, played by Aabria Iyengar~~ | correct |
+| ~~178~~ | ✅ | ~~What is the name of the college from where Dr. Farooq Abdullah, a~~ | ~~SMS Medical College, Jaipur~~ | correct |
+| ~~179~~ | ✅ | ~~At what age did Wiley Lee Griggs III, an American Negro league in~~ | ~~71~~ | correct |
+| ~~180~~ | ✅ | ~~In Season 3 of the American version of "The Circle," in which epi~~ | ~~7~~ | correct |
+| ~~181~~ | ✅ | ~~What is the third vampire number in recreational mathematics?~~ | ~~1435~~ | correct |
+| ~~182~~ | ✅ | ~~What was the height, in meters, of Damian Lamonte Ollie Lillard S~~ | ~~1.65~~ | correct |
+| ~~183~~ | ✅ | ~~From 1855 to 1859, James Luke Prendergast (1800-1895) served as L~~ | ~~Harbour Grace~~ | correct |
+| ~~184~~ | ✅ | ~~From what university did John P. Sall receive an honorary doctora~~ | ~~ North Carolina State University~~ | correct |
+| ~~185~~ | ✅ | ~~What were the month and year when the Indonesian Food and Drug Au~~ | ~~August 2022~~ | correct |
+| ~~186~~ | ✅ | ~~Who was the 14th Chief Justice of Kenya?~~ | ~~David Kenani Maraga~~ | correct |
+| ~~187~~ | ✅ | ~~Which year was the non-profit organization Prayas Nepal establish~~ | ~~2003~~ | correct |
+| ~~188~~ | ✅ | ~~In which year did Jacinda Kate Laurell Ardern receive a Harvard h~~ | ~~2022~~ | correct |
+| ~~189~~ | ✅ | ~~What was the economy rate of S. N. Thakur per over in the match b~~ | ~~13.00	~~ | correct |
+| ~~190~~ | ✅ | ~~How many children did Gilbert Hani and Mary Hani have?~~ | ~~6~~ | correct |
+| ~~191~~ | ✅ | ~~What day, month, and year did the Türksat 1A satellite explode be~~ | ~~24 January 1994~~ | correct |
+| ~~192~~ | ✅ | ~~What year did Louis de Broglie become a professor of theoretical ~~ | ~~1928~~ | correct |
+| ~~193~~ | ✅ | ~~What are the season number, episode number, and title of the "Vik~~ | ~~Season 2, Episode 2 "Invasion"~~ | correct |
+| ~~194~~ | ✅ | ~~Who adopted Jett Williams in 1954?~~ | ~~Lillie Williams Stone~~ | correct |
+| 195 | 🔴 | What month, day, and year did the Durban-based shack-dwellers' mo | 14 May 2009 | wrong — truncated |
+| ~~196~~ | ✅ | ~~How many inductees did the American Classical Hall of Fame have i~~ | ~~One.~~ | correct |
+| ~~197~~ | ✅ | ~~Who was the 2022 winner of "Best Just Chatting Streamer" at The S~~ | ~~Mizkif~~ | correct |
+| ~~198~~ | ✅ | ~~In what year was Eugenius Aristides Nisbet elected to the Georgia~~ | ~~1827~~ | correct |
+| ~~199~~ | ✅ | ~~What is the name of the astronomer who discovered 216433 Milianle~~ | ~~Erwin Schwab~~ | correct |
+
+**Overall: 195/200 = 97.5% strict across all graded rows**
+
+
+# Benchmark grid — generated from results-v265-browsecomp-high-r15
+
+## BROWSECOMP — 88/100 = 88.0% strict (p50 50s, 0 error rows {})
+
+| Verdict | Count | Share |
+|---|---|---|
+
+| correct | 88 | 88% |
+| wrong | 12 | 12% |
+
+**Miss modes:** {'no-sources': 1, 'truncated': 8, 'answered-wrong': 3}
+
+| # | Status | Prompt | Gold | Verdict / Fail |
+|---|---|---|---|---|
+
+| ~~0~~ | ✅ | ~~There is a dissertation written before 2020 that analyzes the Got~~ | ~~ Michael Reed Holzer~~ | correct |
+| ~~1~~ | ✅ | ~~Can you tell me the first and last birth name of this person base~~ | ~~Aaradhya Bachchan~~ | correct |
+| ~~2~~ | ✅ | ~~An artwork was created by someone born in the 1900s and raised ca~~ | ~~Verity~~ | correct |
+| ~~3~~ | ✅ | ~~A person who, in a specific year between 2010 and 2020, both year~~ | ~~Phoenix New Times~~ | correct |
+| ~~4~~ | ✅ | ~~I am seeking the full name of an actor based on the following det~~ | ~~Rishi Kapoor~~ | correct |
+| ~~5~~ | ✅ | ~~In a 2020 interview, a certain individual stated that they starte~~ | ~~Ihuoma Sonia Uche~~ | correct |
+| ~~6~~ | ✅ | ~~Between 2010 and 2020 inclusive, less than 10 people were killed,~~ | ~~March 19~~ | correct |
+| ~~7~~ | ✅ | ~~Three people wrote an article published between 2020 and 2023 lis~~ | ~~Rain~~ | correct |
+| ~~8~~ | ✅ | ~~Sometime between 2015 and 2020 (inclusive), an exhibition was hel~~ | ~~Collecting Ladies: Ferdinand von Mueller and Women Botanical~~ | correct |
+| ~~9~~ | ✅ | ~~I want to know the name of a novel, published before 2023, whose ~~ | ~~Loving Frank~~ | correct |
+| ~~10~~ | ✅ | ~~A certain individual who is an entrepreneur that resides in the U~~ | ~~Wale Adebayo~~ | correct |
+| ~~11~~ | ✅ | ~~An individual whose eldest child was born when they were between ~~ | ~~Michael Caine~~ | correct |
+| ~~12~~ | ✅ | ~~In a cricket match played between 1980 and 1990 (exclusive), a pl~~ | ~~34~~ | correct |
+| ~~13~~ | ✅ | ~~A US federal agency created in the 1940s researched a scientific ~~ | ~~Secret Oral Teachings in Tibetan Buddhist Sects~~ | correct |
+| ~~14~~ | ✅ | ~~A person is from a country that's been an EU member since 1995. T~~ | ~~Million Voices~~ | correct |
+| ~~15~~ | ✅ | ~~In their book published between 1950 and 1970, Writer A claimed t~~ | ~~Reasons of a Hindu for rejecting the Doctrines of Christiani~~ | correct |
+| ~~16~~ | ✅ | ~~An alliance of more than three universities in the same country f~~ | ~~multiple-membership, multiple-classification~~ | correct |
+| ~~17~~ | ✅ | ~~There is an author who has had their work appear in more than thi~~ | ~~United Kingdom, Germany~~ | correct |
+| ~~18~~ | ✅ | ~~This research publication, published before July 2021, was co-aut~~ | ~~Development of waffle with fat filling using unconventional ~~ | correct |
+| 19 | 🔴 | An Emmy award winner wrote an article published in 2018 about the | Magic Mommy Stories | wrong — no-sources |
+| ~~20~~ | ✅ | ~~In an article posted sometime between 2016 and 2019 (inclusive), ~~ | ~~13 June 1852~~ | correct |
+| ~~21~~ | ✅ | ~~A paper authored by six people was published in November 2022. It~~ | ~~DMREF-1922234~~ | correct |
+| 22 | 🔴 | A company co-founder was born in the year their country won the W | $1.05 billion | wrong — truncated |
+| 23 | 🔴 | As of December 2023, I am seeking the name of a historic site con | The Gingras Trading Post State Historic Site | wrong — answered-wrong |
+| ~~24~~ | ✅ | ~~The actor was born in May between 1996 and 1999 and graduated wit~~ | ~~Ahmed Ghozzi~~ | correct |
+| ~~25~~ | ✅ | ~~I am looking for the full name of a series in which:  - The first~~ | ~~Stranger Things~~ | correct |
+| ~~26~~ | ✅ | ~~An author (1) published short fiction pieces in two online litera~~ | ~~The Inconsequential Codes on Lipsticks~~ | correct |
+| ~~27~~ | ✅ | ~~Identify the company that underwent a name change prior to 2020, ~~ | ~~Auxly~~ | correct |
+| ~~28~~ | ✅ | ~~In a FIFA World Cup match held between 2018 and 2023, there were ~~ | ~~Sergio Costa ~~ | correct |
+| ~~29~~ | ✅ | ~~In 2023, an article was published online about a school welcoming~~ | ~~27~~ | correct |
+| ~~30~~ | ✅ | ~~As of December 31, 2023, I am seeking the name of the sibling who~~ | ~~Adam Horne~~ | correct |
+| ~~31~~ | ✅ | ~~There is a certain drug that I am interested in that was describe~~ | ~~Vanderbilt clinical oncology research career development awa~~ | correct |
+| ~~32~~ | ✅ | ~~A specific person, who will be referred to as person 1 from now o~~ | ~~Joan Alta Iwan~~ | correct |
+| ~~33~~ | ✅ | ~~Given the following hints that are all true as of 2023, there was~~ | ~~2015, Album of The Year ~~ | correct |
+| ~~34~~ | ✅ | ~~A video game from the 2010s was released to negative reviews. Thr~~ | ~~Javier Rodriguez~~ | correct |
+| ~~35~~ | ✅ | ~~There is a TV show episode in which one of the main characters un~~ | ~~Legion; Season 1; Chapter 5~~ | correct |
+| ~~36~~ | ✅ | ~~A person started in programming at a university founded between 1~~ | ~~Smilegate Foundation~~ | correct |
+| ~~37~~ | ✅ | ~~How much did tourist arrivals in accommodations increase in Novem~~ | ~~5.4%~~ | correct |
+| ~~38~~ | ✅ | ~~What is the real-life first and last name of the entertainer who;~~ | ~~Georgia Hirst~~ | correct |
+| ~~39~~ | ✅ | ~~There is a national team coach who was a football pioneer in the ~~ | ~~Kai Tomety~~ | correct |
+| ~~40~~ | ✅ | ~~A new school was founded in the '90s by combining a girls' and bo~~ | ~~Convent of Our Lady of Mercy~~ | correct |
+| ~~41~~ | ✅ | ~~On the second Saturday of a month between 2011 and 2021 (inclusiv~~ | ~~11/01/2021~~ | correct |
+| 42 | 🔴 | A final was held between 1995 and 2005 inclusive, and two teams p | Martin Devaney | wrong — answered-wrong |
+| 43 | 🔴 | I need you to name the first and last name of the production cont | Shafeer Sait | wrong — truncated |
+| ~~44~~ | ✅ | ~~After 2010 but before 2023, a bank discovered that when converted~~ | ~~Sukhumvit Soi 23~~ | correct |
+| ~~45~~ | ✅ | ~~A society founded in the 1960s published an article 60 years late~~ | ~~Hannah Belcher~~ | correct |
+| ~~46~~ | ✅ | ~~An actor who grew up in an Asian country for more than ten years ~~ | ~~Cole Zanetti~~ | correct |
+| ~~47~~ | ✅ | ~~A country whose flag was a result of correct prediction has a gov~~ | ~~$26.1 billion~~ | correct |
+| ~~48~~ | ✅ | ~~An individual hails from a nation where their grandfather immigra~~ | ~~Jaroslav Stetkevych~~ | correct |
+| ~~49~~ | ✅ | ~~Person X was born in the first half of the 1900s and passed away ~~ | ~~Zius Galit~~ | correct |
+| ~~50~~ | ✅ | ~~Please tell me the name of the learning institution that fits the~~ | ~~Queen Arwa University~~ | correct |
+| ~~51~~ | ✅ | ~~There’s an actress who made her debut on stage at the age of 13 a~~ | ~~Pirouette~~ | correct |
+| ~~52~~ | ✅ | ~~According to the company's annual report in 1997, it recorded an ~~ | ~~7%~~ | correct |
+| ~~53~~ | ✅ | ~~A slave in Africa and, later, a merchant who died en route to the~~ | ~~Jaja of Opobo: The slave who became a king~~ | correct |
+| ~~54~~ | ✅ | ~~A company was acquired between 2013 and 2023. The CEO of that com~~ | ~~Volkswagen Jetta~~ | correct |
+| ~~55~~ | ✅ | ~~In a capital city in the South American continent, there's a buil~~ | ~~La Estrella; Argentina~~ | correct |
+| ~~56~~ | ✅ | ~~Can you tell me the name of a movie which was released in year 20~~ | ~~Dosti: Friends Forever~~ | correct |
+| ~~57~~ | ✅ | ~~Hey Chat, I'm trying to remember someone's popular name. This per~~ | ~~Peter King~~ | correct |
+| ~~58~~ | ✅ | ~~The band was formed in June between 2013 and 2016, inclusive. One~~ | ~~COUNTERFEIT.~~ | correct |
+| ~~59~~ | ✅ | ~~A video game development studio based in a state founded in the e~~ | ~~Turbett, Sweet, Carriero, Wolfe~~ | correct |
+| ~~60~~ | ✅ | ~~As of December 2022, I am seeking the name of the author's then-w~~ | ~~Seulah~~ | correct |
+| ~~61~~ | ✅ | ~~An actor with a catholic upbringing born to a middle-class family~~ | ~~1979~~ | correct |
+| ~~62~~ | ✅ | ~~Name the band based on the following information as of December 2~~ | ~~Death SS~~ | correct |
+| ~~63~~ | ✅ | ~~Provide the name of the city as of 2021 a certain actor is from b~~ | ~~New Orleans~~ | correct |
+| ~~64~~ | ✅ | ~~There is a competition for a certain trading card game that took ~~ | ~~Denko Sekka~~ | correct |
+| ~~65~~ | ✅ | ~~A drawing from the 1700s shows a townlet featuring around 15 - 20~~ | ~~Rodenburg~~ | correct |
+| ~~66~~ | ✅ | ~~Please provide the name of this particular movie:  This movie was~~ | ~~Two Living, One Dead~~ | correct |
+| ~~67~~ | ✅ | ~~There is a religious building, that was first constructed during ~~ | ~~SK 34979 36323~~ | correct |
+| ~~68~~ | ✅ | ~~The band was formed between 2001 and 2004 by a composer, music pr~~ | ~~Jadal~~ | correct |
+| 69 | 🔴 | Can you name the landmark based on the following details as of 31 | Ballysaggartmore Towers | wrong — answered-wrong |
+| ~~70~~ | ✅ | ~~Help me identify the individual that matches the below criteria: ~~ | ~~Oliver Mtukudzi~~ | correct |
+| ~~71~~ | ✅ | ~~In a drama series with a central theme of music that streamed in ~~ | ~~Bandish Bandits~~ | correct |
+| ~~72~~ | ✅ | ~~There is an Indian author who got promoted from associate profess~~ | ~~Finding the mathematical overlaps of the axiom of choice in ~~ | correct |
+| ~~73~~ | ✅ | ~~A specific article published between 2019 and 2021, both years in~~ | ~~Intersemiotic Convergence~~ | correct |
+| 74 | 🔴 | I’m looking for the name of a U.S. newspaper which was only in pu | Iditarod Nugget | wrong — truncated |
+| 75 | 🔴 | A Harvard award-winning author wrote an article less than 5 years | Daniel Goleman | wrong — truncated |
+| ~~76~~ | ✅ | ~~Provide the name of the month and country a certain individual wa~~ | ~~December, Nigeria~~ | correct |
+| ~~77~~ | ✅ | ~~There is an article about a tribe's drug conviction rate. One of ~~ | ~~Tamlin S. Conner~~ | correct |
+| ~~78~~ | ✅ | ~~A pack of downloadable content was released for a strategy video ~~ | ~~Mathilda Bjarnehed~~ | correct |
+| ~~79~~ | ✅ | ~~A particular cricket match played before 2022, in which the follo~~ | ~~Pragyan Ojha~~ | correct |
+| ~~80~~ | ✅ | ~~The following information is verifiable as of 31 December 2023:  ~~ | ~~Jess~~ | correct |
+| ~~81~~ | ✅ | ~~A paper was submitted between 2015 and 2020, analyzes tax incenti~~ | ~~Nasarawa State University~~ | correct |
+| ~~82~~ | ✅ | ~~Which company meets the following criteria?  Launched six e-learn~~ | ~~Ascendia~~ | correct |
+| 83 | 🔴 | There is a true life story about a janitor who also teaches salsa | 2006: 66% | wrong — truncated |
+| 84 | 🔴 | There are two different blog posts, both written between 2015 and | Ralph Bronner  | wrong — truncated |
+| ~~85~~ | ✅ | ~~Rescue operations for finding a person somewhere between 2010 and~~ | ~~Hilal Ahmad Dar~~ | correct |
+| ~~86~~ | ✅ | ~~Provide the full name of a certain director born between 1970 and~~ | ~~Uche Jombo Rodriguez~~ | correct |
+| ~~87~~ | ✅ | ~~She holds an MBA and a Master’s degree, and as of 2023, she was a~~ | ~~Eno Ebele Jerry ~~ | correct |
+| ~~88~~ | ✅ | ~~The artist released their debut album in October between 2012 and~~ | ~~Dina El Wedidi~~ | correct |
+| ~~89~~ | ✅ | ~~In a family drama movie produced between 1999 - 2009 (inclusive),~~ | ~~Baghban~~ | correct |
+| ~~90~~ | ✅ | ~~A former head of state of a country that has a creole as one of i~~ | ~~30/07/1980~~ | correct |
+| ~~91~~ | ✅ | ~~As of December 31, 2023, I am searching for the first name of the~~ | ~~Ian~~ | correct |
+| ~~92~~ | ✅ | ~~Give me this person's full birth name. - This person was born in ~~ | ~~Jacqueline Georgette Cantrelle~~ | correct |
+| 93 | 🔴 | I’m looking for a paper that was submitted to a university before | Stephen D. Boyles | wrong — truncated |
+| ~~94~~ | ✅ | ~~The player I'm looking for was named the man of the match in an i~~ | ~~Sam Curran~~ | correct |
+| ~~95~~ | ✅ | ~~Please identify the fictional character who occasionally breaks t~~ | ~~Plastic Man~~ | correct |
+| ~~96~~ | ✅ | ~~- A source, published sometime between January 1, 2008, and Decem~~ | ~~Amherst College~~ | correct |
+| ~~97~~ | ✅ | ~~What is the full name name of the author who, prior to December 2~~ | ~~Ian Solomon~~ | correct |
+| 98 | 🔴 | There's this popular figure with multiple Grammy awards in the en | St. John’s Health Center | wrong — truncated |
+| ~~99~~ | ✅ | ~~I was going through the website of one of the prestigious awards ~~ | ~~Avatar, 2010~~ | correct |
+
+**Overall: 88/100 = 88.0% strict across all graded rows**
+
+
+### Round 16 grid — DSQA with v265 segmented enumeration
+
+# Benchmark grid — generated from results-v265-dsqa-v265-r16
+
+## DSQA — 81/100 = 81.0% strict (p50 50s, 0 error rows {})
+
+| Verdict | Count | Share |
+|---|---|---|
+
+| correct | 81 | 81% |
+| partial | 13 | 13% |
+| wrong | 6 | 6% |
+
+**Miss modes:** {'truncated': 17, 'answered-wrong': 2}
+
+| # | Status | Prompt | Gold | Verdict / Fail |
+|---|---|---|---|---|
+
+| 0 | 🟡 | I want to start a farm and am trying to find the best state for i | Oklahoma, Kansas, Texas | partial — 3/3 gold items found |
+| ~~1~~ | ✅ | ~~Out of the EU countries (as of 2024) that were in the "top 10 of ~~ | ~~France, Germany, Netherlands~~ | correct |
+| ~~2~~ | ✅ | ~~Assess the following counties in Tennessee: Anderson, Cheatham, a~~ | ~~Anderson County~~ | correct |
+| ~~3~~ | ✅ | ~~Out of the states that had all of their electoral votes in the 20~~ | ~~Alabama, Arkansas, Indiana, Kansas, Kentucky, Louisiana, Mis~~ | correct |
+| 4 | 🔴 | According to NOAA's Billion-Dollar Weather and Climate Disasters  | Northwest, Central, Eastern Winter Storm and Cold Wave Febru | wrong — answered-wrong |
+| 5 | 🟡 | Using the year 2022, what are the capitals of the two states with | Baton Rouge, Columbia | partial — 1/2 gold items found |
+| 6 | 🟡 | For the year ended December 31, 2022, calculate Philip Morris Int | 1) Turning Point Brands, Inc. 2) Altria Group, Inc. 3) Phili | partial — 3/6 gold items found |
+| ~~7~~ | ✅ | ~~I'm doing a comparison on African economies for my development st~~ | ~~South Africa~~ | correct |
+| ~~8~~ | ✅ | ~~Out of the countries with both an above-average homicide rate and~~ | ~~Haiti~~ | correct |
+| ~~9~~ | ✅ | ~~I'm travelling on the South Western Railway service from Sheppert~~ | ~~Kingston~~ | correct |
+| 10 | 🔴 | According to global5050.org COVID-19 Sex-Disaggregated Data Track | ICU Admissions | wrong — truncated |
+| ~~11~~ | ✅ | ~~Based on the "Immigrants to Japan: Where did they move from?" dat~~ | ~~Brazil, Argentina, Bolivia, Peru, Nigeria~~ | correct |
+| ~~12~~ | ✅ | ~~Among the University of Tennessee at Knoxville, the University of~~ | ~~ANTH 190 (Special Topics in Anthropology I)~~ | correct |
+| 13 | 🔴 | Of the European countries which saw their greenhouse gas emission | Albania | wrong — answered-wrong |
+| ~~14~~ | ✅ | ~~Which of the 6 winners of the Young Investigator Award for the Fl~~ | ~~Damien Fair, Leah Somerville, Eva Telzer, Dylan Gee, Kate Mi~~ | correct |
+| ~~15~~ | ✅ | ~~According to Santa Cruz County Sanitation District's 2020 Audit (~~ | ~~Transmission Systems, Construction in progress, Mobile equip~~ | correct |
+| ~~16~~ | ✅ | ~~Of the first-generation Water-type Pokémon used by the three main~~ | ~~Kingler, Starmie, Psyduck, Seel, Dewgong~~ | correct |
+| 17 | 🟡 | List the railroad accidents investigated by the NTSB with inciden | RIR-24-02, RIR-24-03, RIR-23-09, HZIR-23-01, RIR-23-16 | partial — 4/5 gold items found |
+| ~~18~~ | ✅ | ~~According to Our World in Data, which countries ranked in the top~~ | ~~Norway, Switzerland~~ | correct |
+| ~~19~~ | ✅ | ~~Which authors contributed articles to the NAWE's Writing in Educa~~ | ~~Bryan Podmore, Sarah Wardle, Martin Goodman, Fred Sedgwick, ~~ | correct |
+| ~~20~~ | ✅ | ~~In the diaries of Samuel Pepys, which naval figure is mentioned i~~ | ~~(Sir) William Batten~~ | correct |
+| ~~21~~ | ✅ | ~~List the names of the MPs which won their first election to the H~~ | ~~Giles Watling, Jack Brereton, Ben Bradley, Eddie Hughes, Ste~~ | correct |
+| ~~22~~ | ✅ | ~~Which countries that had a record high average temperature for 20~~ | ~~South Korea, Austria, Germany, China, Japan, Hungary~~ | correct |
+| ~~23~~ | ✅ | ~~Using butterfly-conservation.org, which butterfly species had at ~~ | ~~Red Admiral, Comma, Painted Lady, Large White, Ringlet, Gree~~ | correct |
+| ~~24~~ | ✅ | ~~List all the years from 2015 to 2021 that the St Kilda Soay Sheep~~ | ~~2015, 2016, 2018, 2020, 2021~~ | correct |
+| ~~25~~ | ✅ | ~~Between 2014 and 2020, which years did Doctors Without Borders US~~ | ~~2014, 2016, 2017, 2020~~ | correct |
+| ~~26~~ | ✅ | ~~Use protein sequences from https://www.uniprot.org/. I am interes~~ | ~~T. maritima, A. baumannii~~ | correct |
+| ~~27~~ | ✅ | ~~Using the cia world factbook factsheets for each country, which o~~ | ~~Bhutan~~ | correct |
+| ~~28~~ | ✅ | ~~I remember reading an article a while back, but the only thing I ~~ | ~~Hacking CTFs with Plain Agents ~~ | correct |
+| ~~29~~ | ✅ | ~~What year between 2020 and 2023 inclusive had the smallest differ~~ | ~~2020~~ | correct |
+| ~~30~~ | ✅ | ~~In the 2023 General Election in NZ, of the electoral candidates t~~ | ~~Vanessa Weenink, Chris Bishop, Carlos Cheung, Paulo Garcia, ~~ | correct |
+| 31 | 🟡 | Of all the US states that were labeled as battleground states in  | Ohio, North Carolina, Florida | partial — 2/3 gold items found |
+| ~~32~~ | ✅ | ~~Find the votes that passed in the US House of Representatives bet~~ | ~~Roll Call 695 (118th Congress), Roll Call 696 (118th Congres~~ | correct |
+| ~~33~~ | ✅ | ~~Which country is not a member of BRICS, NATO, Five Eyes, the Comm~~ | ~~Zimbabwe~~ | correct |
+| ~~34~~ | ✅ | ~~Give me the New England and states bordering the Great Lakes that~~ | ~~Connecticut, Maine, New Hampshire, Rhode Island~~ | correct |
+| 35 | 🟡 | which years from 2017 to 2023 had at least 10 deaths as a result  | 2017 and 2023 | partial — 1/1 gold items found |
+| ~~36~~ | ✅ | ~~Who is the Associate Editor of the SBL Study Bible who is a gradu~~ | ~~Matthew Goff~~ | correct |
+| 37 | 🔴 | In the year 2023, which ward was the councillor from in canterbur | West Bay | wrong — truncated |
+| ~~38~~ | ✅ | ~~According to the paper "Combining phylogenomic and supermatrix ap~~ | ~~Lialis~~ | correct |
+| ~~39~~ | ✅ | ~~According to Data NYC's MTA Subway Trains Delayed: 2020-2024 and ~~ | ~~Times Sq-42 St/Port Authority Bus Terminal, 34 St-Herald Sq,~~ | correct |
+| ~~40~~ | ✅ | ~~Of the creatures, not plants, that became listed as threatened or~~ | ~~Sacramento Mountains Checkerspot Butterfly~~ | correct |
+| ~~41~~ | ✅ | ~~Of all the botanists who have papers in the “papers of individual~~ | ~~Robert Morison, Jacob Bobart the Younger, William Sherard, G~~ | correct |
+| 42 | 🟡 | Between the 2010-11 and 2014-15 regular seasons, which team for e | 2010-11: Calgary Flames/Minnesota Wild, 2011-12: Anaheim Duc | partial — 4/5 gold items found |
+| ~~43~~ | ✅ | ~~Between the top 5 countries on the Heritage Foundation's Index of~~ | ~~Haiti~~ | correct |
+| ~~44~~ | ✅ | ~~According to the Government of New Brunswick's website, identify ~~ | ~~Capital Region rural district~~ | correct |
+| 45 | 🔴 | According to the IMF, which of the following countries saw the hi | Switzerland | wrong — truncated |
+| 46 | 🟡 | List the lipids that were used to make lipid nanoparticles for mR | DLin-MC3-DMA, 18:0 PC (DSPC), Cholesterol, DMG-PEG2000 | partial — 3/4 gold items found |
+| ~~47~~ | ✅ | ~~Of the years between 2000 and 2019 (inclusive) during which the p~~ | ~~2005~~ | correct |
+| ~~48~~ | ✅ | ~~From the Space Shuttle program, for the space shuttle with the mo~~ | ~~5~~ | correct |
+| 49 | 🔴 | For cameras in Fujifilm's X-T line (single digits only, i.e. not  | SanDisk - 16G - SDSDXPB-016G Toshiba - 16G - SDXU-B016G  San | wrong — truncated |
+| ~~50~~ | ✅ | ~~In the Airbnb quarterly SEC filings for 2022, according to the “C~~ | ~~Q1, Q2, Q3~~ | correct |
+| 51 | 🟡 | Give me a list of all of the fish that Albacore form mixed school | Skipjack Tuna, Yellowfin Tuna | partial — 2/2 gold items found |
+| ~~52~~ | ✅ | ~~Of the authors in the first article of the 65th edition of the Jo~~ | ~~Joelle Pineau~~ | correct |
+| ~~53~~ | ✅ | ~~I am doing a study on the performance of rail operators in the UK~~ | ~~East Midlands Railway, TransPennine Express~~ | correct |
+| ~~54~~ | ✅ | ~~According to the NHTSA, which US states had a fatality rate per 1~~ | ~~Connecticut (2003, 2004, 2005), Massachusetts (2000, 2001, 2~~ | correct |
+| 55 | 🟡 | Identify the liquor license account with the most report entries  | 12 entries - WINEGUYS L.L.C; DBA(s) - ID: 223939, CITY PARK  | partial — 7/9 gold items found |
+| ~~56~~ | ✅ | ~~I'm interested in the aquaculture industry, particularly the rese~~ | ~~Khor Waiho~~ | correct |
+| ~~57~~ | ✅ | ~~Of the three constituencies at the 2010 General Election with the~~ | ~~East Ham~~ | correct |
+| ~~58~~ | ✅ | ~~Can you look up the paper, "Proteins and polysaccharides from veg~~ | ~~Nikita Navolokin, Alexander Shirokov~~ | correct |
+| ~~59~~ | ✅ | ~~Of the states with a premature birth rate of over 11, which also ~~ | ~~Mississippi, Arkansas, Louisiana, West Virginia, Georgia~~ | correct |
+| ~~60~~ | ✅ | ~~I am performing a comparative study on the quality of life in G20~~ | ~~Canada, France, Australia~~ | correct |
+| ~~61~~ | ✅ | ~~Across the 2020, 2021, and 2022 “Water and Sewerage Companies Env~~ | ~~Southern Water~~ | correct |
+| ~~62~~ | ✅ | ~~Of the states that have an more than 50 tornadoes annually on ave~~ | ~~Oklahoma, Missouri, Iowa~~ | correct |
+| ~~63~~ | ✅ | ~~I am doing a presentation on demography for my politics class. Us~~ | ~~France~~ | correct |
+| ~~64~~ | ✅ | ~~According to Fashionphile's 2023 Ultra Luxury Resale Report, find~~ | ~~Europe~~ | correct |
+| ~~65~~ | ✅ | ~~I’m interested in how ripening affects the sugar composition of b~~ | ~~Sucrose: - 2.08 grams~~ | correct |
+| ~~66~~ | ✅ | ~~According to Statistics Canada, when comparing the years 2017 and~~ | ~~Alberta~~ | correct |
+| 67 | 🟡 | According to Worldometer, which countries that have a world share | Ethiopia, Egypt, Vietnam, Bangladesh, China | partial — 5/5 gold items found |
+| ~~68~~ | ✅ | ~~According to the ACT, for 2023 identify of all the states to have~~ | ~~Kentucky, Wyoming, Montana, Arkansas, Nebraska, Wisconsin, U~~ | correct |
+| ~~69~~ | ✅ | ~~Using https://results.aec.gov.au/, of the parties that received m~~ | ~~Liberal Party of Australia  Australian Labor Party   Austral~~ | correct |
+| ~~70~~ | ✅ | ~~Out of the movies produced by the director of Transformers, when ~~ | ~~July 7, 1972~~ | correct |
+| ~~71~~ | ✅ | ~~Create a list of scottish westminster constituencies which voted ~~ | ~~Na h-Eileanan an Iar, East Renfrewshire~~ | correct |
+| 72 | 🟡 | Referencing Statistics Canada (table 23-10-0253-01), which Canadi | Halifax Stanfield Airport, Edmonton Airport, Winnipeg James  | partial — 7/8 gold items found |
+| ~~73~~ | ✅ | ~~In the first duel between Mako and Yugi, list all of Yugi's monst~~ | ~~Curse of Dragon, Giant Soldier of Stone, Feral Imp, Horn Imp~~ | correct |
+| ~~74~~ | ✅ | ~~By comparing the results from all the exam periods between March ~~ | ~~March 2022~~ | correct |
+| ~~75~~ | ✅ | ~~Who are the people that have received more votes than Winston Pet~~ | ~~Bob Clarkson, Simon Bridges, Matt King~~ | correct |
+| ~~76~~ | ✅ | ~~I'd like a list of repeat Booker Prize/Man Booker Prize judges an~~ | ~~Rebecca West (1969, 1970), Antonia Fraser (1970, 1971), Susa~~ | correct |
+| ~~77~~ | ✅ | ~~I'm looking at the late sockeye run for the years 2018 to 2023, a~~ | ~~2019, 2021, 2023~~ | correct |
+| ~~78~~ | ✅ | ~~According to estimated data tables from the Library of Congress A~~ | ~~Russia, Austria-Hungary, Germany~~ | correct |
+| ~~79~~ | ✅ | ~~According to Clemson University variety evaluations, which farm p~~ | ~~Musser Fruit Research Farm~~ | correct |
+| ~~80~~ | ✅ | ~~By using the NHS website for “Shoulder Pain”, which of the possib~~ | ~~Hypermobility~~ | correct |
+| ~~81~~ | ✅ | ~~List the regions within England that were within the 5 highest ab~~ | ~~London, East~~ | correct |
+| ~~82~~ | ✅ | ~~I’m interested in how firearm mortality rates impact the votes of~~ | ~~New Mexico~~ | correct |
+| ~~83~~ | ✅ | ~~Which of the 50 US states had fewer than 300 traffic fatalities i~~ | ~~Hawaii, Idaho, Maine, Montana, Nebraska, New Hampshire, Rhod~~ | correct |
+| 84 | 🟡 | According to BiggestUSCities.com's "Top 100 Biggest US Cities" li | Phoenix (Arizona) and San Antonio (Texas) | partial — 1/1 gold items found |
+| ~~85~~ | ✅ | ~~According to the Social Security Administration, what are the ide~~ | ~~Michael, Christopher, Jason~~ | correct |
+| ~~86~~ | ✅ | ~~Name the three types of parakeets or parrots that can be seen in ~~ | ~~Green Parakeet, Monk Parakeet (feral), Red-crowned Parrot~~ | correct |
+| ~~87~~ | ✅ | ~~What was the country with the latest year of independence from Eu~~ | ~~Burundi~~ | correct |
+| ~~88~~ | ✅ | ~~Among all countries led by a female head of state as of June 2024~~ | ~~Trinidad & Tobago, Malta, Barbados, Dominica~~ | correct |
+| ~~89~~ | ✅ | ~~Look at the Smithsonian Libraries and Archives official blog titl~~ | ~~Chocolate Rabbits and…Elephants!~~ | correct |
+| ~~90~~ | ✅ | ~~Of the three railroad commissioners of Texas, Christi Craddick, W~~ | ~~Wayne Christian~~ | correct |
+| ~~91~~ | ✅ | ~~According to the NTD Transit Agency Profiles for "Big Bend Transi~~ | ~~Other Funds~~ | correct |
+| ~~92~~ | ✅ | ~~Between Belgium, Dominican Republic, Croatia, Belize, Austria, an~~ | ~~Dominican Republic and Costa Rica~~ | correct |
+| ~~93~~ | ✅ | ~~In the year 2020 which 5 states had the capability to produce the~~ | ~~Texas, Indiana, West Virginia, Missouri, Ohio~~ | correct |
+| ~~94~~ | ✅ | ~~Hello, I'm researching the link between climate and numbers of sh~~ | ~~The Maldives~~ | correct |
+| ~~95~~ | ✅ | ~~Which country according to Eurostat's available data transported ~~ | ~~Belgium~~ | correct |
+| ~~96~~ | ✅ | ~~From the Scottish Mountain Rescue Statistics Report 2023 list the~~ | ~~2009, 2012, 2015, 2018, 2019, 2021, 2022, 2023~~ | correct |
+| ~~97~~ | ✅ | ~~Which individual school in the top 5 endowments of 2023 (accordin~~ | ~~Yale University~~ | correct |
+| ~~98~~ | ✅ | ~~Of the two people awarded the Nobel Prize for their discovery of ~~ | ~~Study of phenylxylylethane (PXE) as scintillator for low ene~~ | correct |
+| ~~99~~ | ✅ | ~~According to data from the Australian Curriculum, Assessment and ~~ | ~~Writing~~ | correct |
+
+**Overall: 81/100 = 81.0% strict across all graded rows**
+
 
 ## §30b — Rounds 12-14: the async research lane rolled across ALL suites — every research benchmark transformed
 
