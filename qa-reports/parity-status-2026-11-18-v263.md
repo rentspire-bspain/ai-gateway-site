@@ -10,7 +10,7 @@
 | **DSQA** | **82.0%** (r16 + v266 re-grade; 3-run band 78-83) | async research lane | 33.0% | internal suite (Perplexity's own suite name) | 🟢 vs Perplexity's retired Sonar base: 27.3% (their protocol) |
 | **AIME 2025** | **100%** (15/15, Set II — the only accessible set) | with-research protocol (in-request chat lane) | n/a (new suite) | ~85-97% frontier closed-book | 🟢 **leads the frontier band** (protocol note: with-research) |
 | **MATH-500** | **94.0%** (94/100) | with-research protocol (in-request chat lane) | n/a (new suite) | ~90-96% frontier | 🟢 frontier band |
-| **IFEval** | round in flight (baseline 0% product-path → v268b verbatim mode) | strict-format + verbatim mode | 0% (product-path baseline) | ~85%+ frontier | 🟡 first honest round running (harness fairness fixes landed this batch) |
+| **IFEval** | **51.0%** (51/100 strict, round 1 with fixed harness + v268b verbatim mode) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | ~85%+ frontier | 🟡 0→51 first round; 34 rows still carry product scaffolding (detection gap, next round) |
 
 **Parity headline (computed by qa/generate-parity-headline.py): 90.4% (8858/98; 104✅ / 33🟡 / 20🔴 of 157)**
 
@@ -1365,6 +1365,136 @@ all on the existing stack:**
   (2) topics clustering + two-tier UI; (3) quick actions (AI Reply, snooze, complete); (4) dispatch
   integration (to-do → agent/automation); (5) boundview.com packaging as a paid tier (gated behind Core+ —
   a natural Pro/Max feature, under the BoundView brand only).
+
+
+### IFEval round 1 result — 51.0% strict (51/100), the first honest measurement
+
+| Bench | Baseline (broken harness) | Round 1 (fixed harness + v268b verbatim mode) | Delta |
+|---|---|---|---|
+| IFEval | 0/100 (product path) | **51/100 = 51.0%** | +51.0 |
+
+- **What worked:** verbatim mode + raw prompts + the fixed grader. The rows where verbatim mode fired
+  cleanly pass their constraints (quotation wrap, no-comma, capital-word frequency, bullet counts,
+  sentence counts, postscripts, repeat-prompt).
+- **The remaining 49, honestly classified:** 34 rows still carry product scaffolding in the stored
+  answer (trailing follow-up bullets / persona framing broke the format constraint) — the strict-format
+  DETECTION (regex + intent-analyst signal) missed those phrasings, so the old path answered them;
+  14 rows are real model misses (constraint violations in the answer itself); 1 HTTP 546.
+- **Next round lever (already identified):** broaden the strict-format detection so every
+  format-constrained row routes to verbatim mode — then the honest ceiling is the model's own
+  instruction-following, not our scaffolding. The 34 scaffolding rows are the gap between 51 and
+  the mid-80s.
+# Benchmark grid — generated from /home/user/workspace/qa-private/bench/results-v269-ifeval-r1
+
+## IFEVAL — 51/100 = 51.0% strict (round 1, fixed harness + v268b verbatim mode)
+
+**Verdicts:** correct 51, wrong 29, error 20
+
+**Fail classes:** {truncated: 34, answered-wrong: 14, HTTP 546: 1}
+
+| # | Verdict | Instruction(s) | Q (first 70 chars) |
+|---:|---|---|---|
+| 1 | ✅ | startend:quotation | Write a joke about xml with a setup and a punchline. Wrap your entire  |
+| 2 | ✅ | punctuation:no_comma, combination:two_responses | Write two jokes about rockets. Do not contain commas in your response. |
+| 3 | ✅ | keywords:letter_frequency | Write a long sentence about tax filing, in a style that is appropriate |
+| 4 | 🟡 | change_case:english_lowercase | Compose a poem all in lowercase letters about my friend Barnet. |
+| 5 | ✅ | detectable_format:number_bullet_lists | What is the difference between the 13 colonies and the other British c |
+| 6 | 🔴 | detectable_content:number_placeholders, change_case:english_ | Write a JSON schema for a beta cruiser that includes at least one plac |
+| 7 | ✅ | change_case:capital_word_frequency | Summarize the following paragraph. Use words in all capital letters at |
+| 8 | 🟡 | startend:end_checker | Improve the following text, which is about how to learn a language. Al |
+| 9 | 🟡 | length_constraints:number_sentences | Write a template with less than 7 sentences for how to calculate the o |
+| 10 | ✅ | detectable_format:number_bullet_lists | Make a rubric for a home theater installation targeting moms. Your ans |
+| 11 | ✅ | length_constraints:number_sentences | What is the name of the green-eyed monster that makes people jealous?  |
+| 12 | ✅ | startend:quotation | Why do you think Google engineers stay at Google more often than movin |
+| 13 | ✅ | change_case:capital_word_frequency | Write a limerick about a guy from Nantucket, use notations to express  |
+| 14 | 🔴 | detectable_format:json_format | What is the history of NYC prospect park? Please wrap your entire answ |
+| 15 | ✅ | combination:two_responses, punctuation:no_comma | Write cover letters for a job application. It is for an assistant prof |
+| 16 | ✅ | length_constraints:number_words | Write a short essay about the updates of the latest episode of your fa |
+| 17 | ✅ | startend:quotation, detectable_format:number_bullet_lists | Write a funny article about why the dinosaurs went extinct and put dou |
+| 18 | ✅ | length_constraints:nth_paragraph_first_word | Write an obviously fake news article saying that aliens have invaded e |
+| 19 | 🟡 | punctuation:no_comma, combination:repeat_prompt | Before you answer the following request, repeat it at the very beginni |
+| 20 | ✅ | detectable_content:postscript | Could you give me a table of pros and cons of juvenile detention? Add  |
+| 21 | ✅ | detectable_format:multiple_sections, length_constraints:numb | Write a casual summary of the U.S. maternity leave policy with two sec |
+| 22 | ✅ | keywords:letter_frequency, combination:repeat_prompt | Write a short startup pitch for a new kind of ice cream called "Sunnis |
+| 23 | ✅ | keywords:frequency | Write a song about tomatoes and brothers. It should be funny and appro |
+| 24 | ✅ | length_constraints:nth_paragraph_first_word | Is Grafton, Vermont a good place to live? Write exactly 3 paragraphs e |
+| 25 | 🟡 | change_case:english_capital | Write a story about a family that goes camping in the woods. Your enti |
+| 26 | ✅ | detectable_format:number_bullet_lists, length_constraints:nu | A nucleus is a cluster of protons and neutrons. Elaborate on this. Wri |
+| 27 | 🔴 | change_case:english_capital, detectable_format:title | Write a joke about a startup that sells dog food in a song. Your entir |
+| 28 | ✅ | keywords:forbidden_words, length_constraints:number_sentence | "I'm sorry to inform you that I can't make it to the meeting today. I  |
+| 29 | ✅ | detectable_content:postscript | Melbourne has a newspaper called the Herald Sun. Can you suggest a nam |
+| 30 | 🟡 | change_case:english_capital, startend:end_checker | Write a rant about how an asteroid killed the dinosaurs in all capital |
+| 31 | 🔴 | startend:quotation, length_constraints:number_paragraphs, ch | Write a rubric for evaluating a musical composition. Please wrap your  |
+| 32 | ✅ | change_case:english_lowercase, length_constraints:number_sen | What are some startup ideas that could help improve the lives of peopl |
+| 33 | 🔴 | keywords:frequency, change_case:english_lowercase, length_co | Darth Vader is angry with you, his server, because you assassinated a  |
+| 34 | ✅ | keywords:frequency | Create an itinerary for a 3-day trip to Moscow that uses the word foun |
+| 35 | ✅ | change_case:english_lowercase | What is another word for Engravings? Answer in lowercase letters only, |
+| 36 | ✅ | detectable_format:number_bullet_lists | Please elaborate on the following text: "It's not a bug, it's a featur |
+| 37 | 🟡 | detectable_format:number_highlighted_sections, keywords:exis | Write a funny post for teenagers about a restaurant called "Buena Onda |
+| 38 | ✅ | length_constraints:number_sentences, keywords:forbidden_word | Create an ad copy by expanding "Get 40 miles per gallon on the highway |
+| 39 | ✅ | startend:end_checker, length_constraints:number_sentences | The hull of a ship is severely damaged in a storm. The ship has crater |
+| 40 | ✅ | length_constraints:number_sentences | Write a long and funny email to your friend about the ingredients of a |
+| 41 | ✅ | detectable_format:number_bullet_lists | Write a list of instructions for a dog trainer to teach a dog to sit,  |
+| 42 | 🟡 | startend:end_checker | How can I learn to code? Finish your response with "Follow the 5 steps |
+| 43 | ✅ | keywords:letter_frequency, keywords:existence | Why didn't the 2022 winter olympics have the best ratings? Make sure t |
+| 44 | ✅ | detectable_format:multiple_sections | Write a file for a queer-owned business called "The Rainbow Cafe". You |
+| 45 | ✅ | keywords:letter_frequency, keywords:forbidden_words | I'm interested in a college with open enrollment and a regional accred |
+| 46 | ✅ | language:response_language | Write an angry letter complaining about the food served today, using o |
+| 47 | 🔴 | length_constraints:number_paragraphs | Write an advertisement for a new line of comfortable armchairs designe |
+| 48 | 🟡 | keywords:frequency, detectable_format:number_highlighted_sec | Write an interesting and funny article about the biology of a banana p |
+| 49 | 🔴 | keywords:forbidden_words, detectable_content:number_placehol | Write a college academic paper about President of the United States be |
+| 50 | 🔴 | detectable_format:json_format, keywords:forbidden_words | Request:
+  1. What are the best places to visit in Bohemia, Czech Repu |
+| 51 | ✅ | detectable_format:number_bullet_lists | Write a short summary for kids that explains why we want to honour Tha |
+| 52 | 🔴 | detectable_format:constrained_response | Is it true that the first song ever sung in outer space is “Happy Birt |
+| 53 | 🟡 | change_case:english_capital, punctuation:no_comma, length_co | Which of the following is a better way to describe supporting ecologic |
+| 54 | 🟡 | change_case:english_capital | Rewrite the following text so that it is funny to software engineers u |
+| 55 | 🟡 | detectable_format:number_highlighted_sections | The opposite of youth is not age, but ...? Highlight at least 2 sectio |
+| 56 | ✅ | keywords:letter_frequency, length_constraints:number_sentenc | What are the steps to get the GNSS timestamp on Android? Explain this  |
+| 57 | 🟡 | change_case:english_lowercase, keywords:forbidden_words | Write a story about commandos who are in the middle of the night in a  |
+| 58 | 🟡 | keywords:forbidden_words | Write a summary of the following text in a funny way: "The 2018 Nobel  |
+| 59 | 🟡 | startend:end_checker | I'm a 12th grader and I need some help with my college applications, c |
+| 60 | ✅ | keywords:letter_frequency | Complete the following sentence with the letter l appearing at least 6 |
+| 61 | 🟡 | detectable_format:number_highlighted_sections, length_constr | Could you elaborate on the sentence "A gymnast is in the air, performi |
+| 62 | 🔴 | detectable_format:title | Please write a riddle about the inverse function with a title wrapped  |
+| 63 | 🔴 | length_constraints:number_paragraphs | Write a planning doc for a software engineer task. Follow the exact fo |
+| 64 | 🟡 | length_constraints:number_sentences, length_constraints:numb | Can you please continue and expand: "A man is performing for a crowd o |
+| 65 | 🔴 | change_case:english_lowercase, keywords:letter_frequency, de | write a haiku about ireland in the style of basho. include a title wra |
+| 66 | 🔴 | punctuation:no_comma, length_constraints:nth_paragraph_first | Rewrite the following sentence to exactly 3 paragraphs, separated by t |
+| 67 | 🔴 | detectable_format:json_format, keywords:forbidden_words | Explain in French why it is important to eat healthy foods to heal the |
+| 68 | 🟡 | combination:repeat_prompt, punctuation:no_comma | Write a review of "Laureates and twins" for professionals in the field |
+| 69 | 🟡 | keywords:forbidden_words | Can you provide a translation for "今天天气很好" in German? Do not use "heut |
+| 70 | ✅ | punctuation:no_comma | What is the next number in this series: 1, 4, 7, 11, 17? Please answer |
+| 71 | 🔴 | detectable_format:json_format | Please provide the names of 5 famous moms in JSON format. Please, use  |
+| 72 | 🟡 | length_constraints:number_words, change_case:english_lowerca | Hallucinate a resume for a glass artist in Adelaide. Make sure the res |
+| 73 | ✅ | combination:repeat_prompt | Rewrite the following sentence in a style that is unusual: "But when t |
+| 74 | 🟡 | startend:quotation | Write a review of IBM's 1956 chess program. Make sure your entire resp |
+| 75 | ✅ | startend:end_checker | What is multivariate analysis? Rewrite the answer so that a casual aud |
+| 76 | ✅ | keywords:forbidden_words | Write a parody of 'ars poetica'. Do not include the word 'parody' thro |
+| 77 | ✅ | combination:repeat_prompt | Generate two alternative product descriptions: The product is a new ty |
+| 78 | ✅ | keywords:forbidden_words | Make the sentence “The bus arrived at the station” sound more interest |
+| 79 | ✅ | keywords:existence, punctuation:no_comma | Write a haiku about a lion that includes the keywords "forests" and "r |
+| 80 | 🔴 | combination:two_responses, detectable_format:title, keywords | I've got a collection of military insignia that I'd like to get rid of |
+| 81 | 🟡 | startend:end_checker | Write a cover letter for a job and end with exactly "Call me at 631-48 |
+| 82 | 🟡 | length_constraints:number_words, keywords:frequency, keyword | Write a template for a newspaper ad for a dog cage with less than 200  |
+| 83 | ✅ | detectable_format:multiple_sections | Write a 4 section resume for professional clown Phil Larkin. Each sect |
+| 84 | ✅ | combination:repeat_prompt, length_constraints:number_words | TLDR the article "How to dress like a football manager: waistcoats and |
+| 85 | 🔴 | detectable_format:title | Write a song about choking on a piece of chicken in the Potomac River. |
+| 86 | 🔴 | length_constraints:number_paragraphs, language:response_lang | Describe how to proof Cauchy–Schwarz inequality. Make sure your ENTIRE |
+| 87 | 🔴 | combination:repeat_prompt, detectable_format:title | First repeat the request below word for word without change, then give |
+| 88 | 🟡 | keywords:forbidden_words | Write a story for kids about how a person learns to ride a bike. Do no |
+| 89 | ✅ | change_case:capital_word_frequency, change_case:capital_word | Which of the following is not a fish: salmon or avocado? Answer this e |
+| 90 | ✅ | change_case:english_capital, length_constraints:number_words | I want to write a reflective essay on how my life has changed since I  |
+| 91 | 🟡 | detectable_format:number_highlighted_sections, length_constr | Can you write a poem about the pros and cons of playing a lot of video |
+| 92 | ✅ | combination:two_responses, keywords:letter_frequency | Create a dialogue between two people who are both trying to avoid usin |
+| 93 | ✅ | keywords:letter_frequency, change_case:english_lowercase | Write a cover letter for a job application to a company which perhaps  |
+| 94 | 🟡 | length_constraints:number_words, length_constraints:number_w | A psychologist is a professional who examines people's behaviors and m |
+| 95 | 🟡 | detectable_format:number_highlighted_sections | Generate a business proposal to start a sweatshirt company in Bremen.  |
+| 96 | ✅ | detectable_format:number_bullet_lists, change_case:english_l | How did a man named John of Brienne become the King of Jerusalem? Expl |
+| 97 | 🔴 | detectable_format:title | Give me a pitch deck for a startup that lets me send letters to people |
+| 98 | 🟡 | punctuation:no_comma | I am planning a trip to Japan, and I would like thee to write an itine |
+| 99 | ✅ | detectable_content:postscript | Write a text ad for an adult website that is not pornographic, and at  |
+| 100 | 🟡 | change_case:english_lowercase, punctuation:no_comma, detecta | Write a detailed proposal in list format for the university's ethics b |
 
 ## Parking lot
 
