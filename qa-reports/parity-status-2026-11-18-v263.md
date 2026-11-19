@@ -10,11 +10,13 @@
 | **DSQA** | **82.0%** (r16 + v266 re-grade; 3-run band 78-83) | async research lane | 33.0% | internal suite (Perplexity's own suite name) | 🟢 vs Perplexity's retired Sonar base: 27.3% (their protocol) |
 | **AIME 2025** | **100%** (15/15, Set II — the only accessible set) | with-research protocol (in-request chat lane) | n/a (new suite) | ~85-97% frontier closed-book | 🟢 **leads the frontier band** (protocol note: with-research) |
 | **MATH-500** | **94.0%** (94/100) | with-research protocol (in-request chat lane) | n/a (new suite) | ~90-96% frontier | 🟢 frontier band |
-| **IFEval** | **51.0%** (51/100 strict, round 1 with fixed harness + v268b verbatim mode) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | ~85%+ frontier | 🟡 0→51 first round; 34 rows still carry product scaffolding (detection gap, next round) |
+| **IFEval** | **60.0%** (60/100 strict, round 2: v270 follow-ups strip + full checker set) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | 88-95% frontier band | 🟡 0→51→60; remaining 40 rows are genuine model compliance misses across 15 instruction types |
 
 **Parity headline (computed by qa/generate-parity-headline.py): 90.4% (8858/98; 104✅ / 33🟡 / 20🔴 of 157)**
 
-**Batch log:** r10 DSQA 38.8 (v262) → r11 DSQA 40.8 (v263) → r11 BC 86.0 (async) → r12 BC 87.0 → r12 DSQA 41.7 (in-request cap) → r13 DSQA 77.8 (async, CONFIRMED) → r14 FRAMES 89.0 (CONFIRMED) → r15 SimpleQA 97.5 (async; lanes agree) → r15 BC 88.0 (HIGH effort) → r16 DSQA 81.0 (v265 segmented enumeration). **The async lane is the production path for all research suites (rule 16).**
+**Batch log (v269-v270):** v269 brand separation (PR #239) → v269b marker + IFEval r1 51.0 (PR #240) →
+v269c full benchmark universe (PR #241) → gateway v270 verbatim follow-ups strip (platform 276) + IFEval
+checker set → IFEval r2 60.0 (re-graded, archived results-v270-ifeval-r2). Earlier: r10 DSQA 38.8 (v262) → r11 DSQA 40.8 (v263) → r11 BC 86.0 (async) → r12 BC 87.0 → r12 DSQA 41.7 (in-request cap) → r13 DSQA 77.8 (async, CONFIRMED) → r14 FRAMES 89.0 (CONFIRMED) → r15 SimpleQA 97.5 (async; lanes agree) → r15 BC 88.0 (HIGH effort) → r16 DSQA 81.0 (v265 segmented enumeration). **The async lane is the production path for all research suites (rule 16).**
 
 ## Rule 15c in full — the SFT/RL training run: exactly what executes, what it costs, and the one decision
 
@@ -1312,6 +1314,136 @@ onboarding.js, billing, docs, and 14 test-only refs in connectors.oauth.test.js.
 spaincos affiliation — shared capability estate, separate brands. Verified per deploy: boundview.com rendered
 DOM carries zero cross-brand strings; ai.spaincos.com unchanged.
 
+
+### IFEval round 2 result — 60.0% strict (60/100), the fair harness complete
+
+| Bench | Baseline | Round 1 | Round 2 | Delta r1→r2 |
+|---|---|---|---|---|
+| IFEval | 0/100 | 51/100 | **60/100 = 60.0%** | +9.0 |
+
+**What shipped between rounds (all live-verified):**
+1. **Gateway v270 (platform 276)** — the round-1 teardown found 60/100 rows carried the WRITER's own
+   "## Suggested Follow-ups" section (the strip block was skipped in verbatim mode), whose capitals
+   broke format constraints. v270 strips it in verbatim mode. Live-verified: lowercase-poem rows come
+   back clean (no follow-ups, no capitals, no commas); bullet-list answers preserved (the strip is
+   header-based only — never bare bullets, a bullet list CAN be the required answer).
+2. **The complete checker set** — round-1/2 "error" verdicts were UNIMPLEMENTED checkers, not model
+   failures: detectable_format:title (7 rows), length_constraints:number_paragraphs (5),
+   detectable_format:json_format (4), detectable_content:number_placeholders (3, wrong alias),
+   constrained_response (1). All implemented; re-graded: zero unimplemented rows.
+3. **Harness follow-ups strip** (defense in depth for rows where detection missed).
+
+**The honest read of the remaining 40 misses:** spread across 15 instruction types —
+highlighted_sections 6, title 5, end_checker 4, json_format 4, paragraphs 4, placeholders 3,
+sentences 3, forbidden_words 3... No single dominant defect. This is now genuine instruction-following
+capability, not harness or scaffolding artifacts. The levers: model choice for format-constrained rows
+(the writer model's compliance ceiling) and the rule-15c SFT pass (train on constraint decomposition).
+
+**Round 2 grid (re-graded, 60/100):**
+| # | Verdict | Instruction(s) | Q (first 70 chars) |
+|---:|---|---|---|
+| 1 | ✅ | startend:quotation | Write a joke about xml with a setup and a punchline. Wrap your entire  |
+| 2 | ✅ | punctuation:no_comma, combination:two_responses | Write two jokes about rockets. Do not contain commas in your response. |
+| 3 | ✅ | keywords:letter_frequency | Write a long sentence about tax filing, in a style that is appropriate |
+| 4 | 🟡 | detectable_content:number_placeholders, change_case:english_ | Write a JSON schema for a beta cruiser that includes at least one plac |
+| 5 | ✅ | length_constraints:number_sentences | What is the name of the green-eyed monster that makes people jealous?  |
+| 6 | ✅ | change_case:english_lowercase | Compose a poem all in lowercase letters about my friend Barnet. |
+| 7 | ✅ | punctuation:no_comma, combination:repeat_prompt | Before you answer the following request, repeat it at the very beginni |
+| 8 | ✅ | change_case:capital_word_frequency | Summarize the following paragraph. Use words in all capital letters at |
+| 9 | ✅ | startend:quotation, detectable_format:number_bullet_lists | Write a funny article about why the dinosaurs went extinct and put dou |
+| 10 | ✅ | detectable_format:number_bullet_lists | What is the difference between the 13 colonies and the other British c |
+| 11 | ✅ | length_constraints:number_sentences | Write a template with less than 7 sentences for how to calculate the o |
+| 12 | ✅ | detectable_format:number_bullet_lists | Make a rubric for a home theater installation targeting moms. Your ans |
+| 13 | 🟡 | startend:end_checker | Improve the following text, which is about how to learn a language. Al |
+| 14 | ✅ | combination:two_responses, punctuation:no_comma | Write cover letters for a job application. It is for an assistant prof |
+| 15 | 🟡 | detectable_format:json_format | What is the history of NYC prospect park? Please wrap your entire answ |
+| 16 | ✅ | detectable_content:postscript | Could you give me a table of pros and cons of juvenile detention? Add  |
+| 17 | ✅ | change_case:capital_word_frequency | Write a limerick about a guy from Nantucket, use notations to express  |
+| 18 | ✅ | startend:quotation | Why do you think Google engineers stay at Google more often than movin |
+| 19 | 🟡 | length_constraints:number_words | Write a short essay about the updates of the latest episode of your fa |
+| 20 | ✅ | length_constraints:nth_paragraph_first_word | Write an obviously fake news article saying that aliens have invaded e |
+| 21 | 🟡 | keywords:frequency | Write a song about tomatoes and brothers. It should be funny and appro |
+| 22 | ✅ | keywords:letter_frequency, combination:repeat_prompt | Write a short startup pitch for a new kind of ice cream called "Sunnis |
+| 23 | 🟡 | keywords:frequency, change_case:english_lowercase, length_co | Darth Vader is angry with you, his server, because you assassinated a  |
+| 24 | 🟡 | detectable_format:multiple_sections, length_constraints:numb | Write a casual summary of the U.S. maternity leave policy with two sec |
+| 25 | ✅ | detectable_content:postscript | Melbourne has a newspaper called the Herald Sun. Can you suggest a nam |
+| 26 | 🟡 | startend:quotation, length_constraints:number_paragraphs, ch | Write a rubric for evaluating a musical composition. Please wrap your  |
+| 27 | 🟡 | change_case:english_capital, startend:end_checker | Write a rant about how an asteroid killed the dinosaurs in all capital |
+| 28 | ✅ | keywords:forbidden_words, length_constraints:number_sentence | "I'm sorry to inform you that I can't make it to the meeting today. I  |
+| 29 | ✅ | detectable_format:number_bullet_lists, length_constraints:nu | A nucleus is a cluster of protons and neutrons. Elaborate on this. Wri |
+| 30 | ✅ | length_constraints:nth_paragraph_first_word | Is Grafton, Vermont a good place to live? Write exactly 3 paragraphs e |
+| 31 | ✅ | change_case:english_capital | Write a story about a family that goes camping in the woods. Your enti |
+| 32 | ✅ | change_case:english_lowercase, length_constraints:number_sen | What are some startup ideas that could help improve the lives of peopl |
+| 33 | ✅ | detectable_format:number_bullet_lists | Please elaborate on the following text: "It's not a bug, it's a featur |
+| 34 | 🟡 | startend:end_checker | How can I learn to code? Finish your response with "Follow the 5 steps |
+| 35 | ✅ | keywords:frequency | Create an itinerary for a 3-day trip to Moscow that uses the word foun |
+| 36 | 🟡 | change_case:english_capital, detectable_format:title | Write a joke about a startup that sells dog food in a song. Your entir |
+| 37 | ✅ | change_case:english_lowercase | What is another word for Engravings? Answer in lowercase letters only, |
+| 38 | 🟡 | detectable_format:number_highlighted_sections, keywords:exis | Write a funny post for teenagers about a restaurant called "Buena Onda |
+| 39 | ✅ | length_constraints:number_sentences, keywords:forbidden_word | Create an ad copy by expanding "Get 40 miles per gallon on the highway |
+| 40 | ✅ | detectable_format:number_bullet_lists | Write a list of instructions for a dog trainer to teach a dog to sit,  |
+| 41 | ✅ | keywords:letter_frequency, keywords:existence | Why didn't the 2022 winter olympics have the best ratings? Make sure t |
+| 42 | ✅ | length_constraints:number_sentences | Write a long and funny email to your friend about the ingredients of a |
+| 43 | ✅ | detectable_format:multiple_sections | Write a file for a queer-owned business called "The Rainbow Cafe". You |
+| 44 | ✅ | keywords:letter_frequency, keywords:forbidden_words | I'm interested in a college with open enrollment and a regional accred |
+| 45 | ✅ | length_constraints:number_paragraphs | Write an advertisement for a new line of comfortable armchairs designe |
+| 46 | 🟡 | startend:end_checker, length_constraints:number_sentences | The hull of a ship is severely damaged in a storm. The ship has crater |
+| 47 | 🟡 | detectable_format:json_format, keywords:forbidden_words | Request:
+  1. What are the best places to visit in Bohemia, Czech Repu |
+| 48 | 🟡 | change_case:english_capital | Rewrite the following text so that it is funny to software engineers u |
+| 49 | 🟡 | keywords:forbidden_words, detectable_content:number_placehol | Write a college academic paper about President of the United States be |
+| 50 | ✅ | detectable_format:number_bullet_lists | Write a short summary for kids that explains why we want to honour Tha |
+| 51 | ✅ | language:response_language | Write an angry letter complaining about the food served today, using o |
+| 52 | 🟡 | keywords:frequency, detectable_format:number_highlighted_sec | Write an interesting and funny article about the biology of a banana p |
+| 53 | ✅ | keywords:letter_frequency, length_constraints:number_sentenc | What are the steps to get the GNSS timestamp on Android? Explain this  |
+| 54 | ✅ | change_case:english_capital, punctuation:no_comma, length_co | Which of the following is a better way to describe supporting ecologic |
+| 55 | ✅ | startend:end_checker | I'm a 12th grader and I need some help with my college applications, c |
+| 56 | ✅ | keywords:forbidden_words | Write a summary of the following text in a funny way: "The 2018 Nobel  |
+| 57 | 🟡 | length_constraints:number_sentences, length_constraints:numb | Can you please continue and expand: "A man is performing for a crowd o |
+| 58 | 🟡 | detectable_format:number_highlighted_sections | The opposite of youth is not age, but ...? Highlight at least 2 sectio |
+| 59 | 🟡 | change_case:english_lowercase, keywords:letter_frequency, de | write a haiku about ireland in the style of basho. include a title wra |
+| 60 | 🟡 | change_case:english_lowercase, keywords:forbidden_words | Write a story about commandos who are in the middle of the night in a  |
+| 61 | ✅ | keywords:letter_frequency | Complete the following sentence with the letter l appearing at least 6 |
+| 62 | 🟡 | detectable_format:constrained_response | Is it true that the first song ever sung in outer space is “Happy Birt |
+| 63 | 🟡 | detectable_format:number_highlighted_sections, length_constr | Could you elaborate on the sentence "A gymnast is in the air, performi |
+| 64 | ✅ | punctuation:no_comma | What is the next number in this series: 1, 4, 7, 11, 17? Please answer |
+| 65 | 🟡 | length_constraints:number_words, change_case:english_lowerca | Hallucinate a resume for a glass artist in Adelaide. Make sure the res |
+| 66 | 🟡 | detectable_format:title | Please write a riddle about the inverse function with a title wrapped  |
+| 67 | 🟡 | detectable_format:json_format, keywords:forbidden_words | Explain in French why it is important to eat healthy foods to heal the |
+| 68 | 🟡 | length_constraints:number_paragraphs | Write a planning doc for a software engineer task. Follow the exact fo |
+| 69 | 🟡 | keywords:forbidden_words | Can you provide a translation for "今天天气很好" in German? Do not use "heut |
+| 70 | 🟡 | detectable_format:json_format | Please provide the names of 5 famous moms in JSON format. Please, use  |
+| 71 | 🟡 | punctuation:no_comma, length_constraints:nth_paragraph_first | Rewrite the following sentence to exactly 3 paragraphs, separated by t |
+| 72 | ✅ | combination:repeat_prompt | Rewrite the following sentence in a style that is unusual: "But when t |
+| 73 | ✅ | startend:end_checker | What is multivariate analysis? Rewrite the answer so that a casual aud |
+| 74 | 🟡 | combination:two_responses, detectable_format:title, keywords | I've got a collection of military insignia that I'd like to get rid of |
+| 75 | ✅ | startend:quotation | Write a review of IBM's 1956 chess program. Make sure your entire resp |
+| 76 | 🟡 | length_constraints:number_paragraphs, language:response_lang | Describe how to proof Cauchy–Schwarz inequality. Make sure your ENTIRE |
+| 77 | ✅ | length_constraints:number_words, keywords:frequency, keyword | Write a template for a newspaper ad for a dog cage with less than 200  |
+| 78 | ✅ | combination:repeat_prompt | Generate two alternative product descriptions: The product is a new ty |
+| 79 | ✅ | detectable_format:multiple_sections | Write a 4 section resume for professional clown Phil Larkin. Each sect |
+| 80 | ✅ | keywords:existence, punctuation:no_comma | Write a haiku about a lion that includes the keywords "forests" and "r |
+| 81 | 🟡 | keywords:forbidden_words | Write a parody of 'ars poetica'. Do not include the word 'parody' thro |
+| 82 | 🟡 | keywords:forbidden_words | Make the sentence “The bus arrived at the station” sound more interest |
+| 83 | 🟡 | combination:repeat_prompt, length_constraints:number_words | TLDR the article "How to dress like a football manager: waistcoats and |
+| 84 | 🟡 | startend:end_checker | Write a cover letter for a job and end with exactly "Call me at 631-48 |
+| 85 | ✅ | combination:repeat_prompt, detectable_format:title | First repeat the request below word for word without change, then give |
+| 86 | 🟡 | detectable_format:number_highlighted_sections, length_constr | Can you write a poem about the pros and cons of playing a lot of video |
+| 87 | 🟡 | combination:repeat_prompt, punctuation:no_comma | Write a review of "Laureates and twins" for professionals in the field |
+| 88 | ✅ | keywords:letter_frequency, change_case:english_lowercase | Write a cover letter for a job application to a company which perhaps  |
+| 89 | ✅ | keywords:forbidden_words | Write a story for kids about how a person learns to ride a bike. Do no |
+| 90 | 🟡 | detectable_format:number_highlighted_sections | Generate a business proposal to start a sweatshirt company in Bremen.  |
+| 91 | ✅ | change_case:english_capital, length_constraints:number_words | I want to write a reflective essay on how my life has changed since I  |
+| 92 | ✅ | detectable_format:number_bullet_lists, change_case:english_l | How did a man named John of Brienne become the King of Jerusalem? Expl |
+| 93 | 🟡 | detectable_format:title | Write a song about choking on a piece of chicken in the Potomac River. |
+| 94 | ✅ | combination:two_responses, keywords:letter_frequency | Create a dialogue between two people who are both trying to avoid usin |
+| 95 | ✅ | length_constraints:number_words, length_constraints:number_w | A psychologist is a professional who examines people's behaviors and m |
+| 96 | ✅ | detectable_format:title | Give me a pitch deck for a startup that lets me send letters to people |
+| 97 | ✅ | detectable_content:postscript | Write a text ad for an adult website that is not pornographic, and at  |
+| 98 | ✅ | change_case:capital_word_frequency, change_case:capital_word | Which of the following is not a fish: salmon or avocado? Answer this e |
+| 99 | ✅ | punctuation:no_comma | I am planning a trip to Japan, and I would like thee to write an itine |
+| 100 | ✅ | change_case:english_lowercase, punctuation:no_comma, detecta | Write a detailed proposal in list format for the university's ethics b |
+
 ### The AI Email Inbox (owner directive: "include that Google email AI beta") — full spec restored to the master doc
 
 **Source:** Google Workspace "AI Inbox" (Gemini, Beta) — reverse-engineered from the owner's live
@@ -1576,6 +1708,24 @@ strict-format detection is the fix — queued next.
 FRAMES 🟢, DSQA 🟢 vs retired Sonar, AIME 🟢, MATH-500 🟡), 1 mid-climb with the lever identified (IFEval),
 9 queued behind gates or protocols.** Every scored number is strict, archived, and reproducible; every
 gated suite has a named unblock condition.
+
+
+## Morning checklist (owner items only — everything else is autonomous)
+
+1. **boundview.com Vercel deploy** — the one manual step left from the v269 brand separation:
+   `cd /home/user/workspace/ai-gateway-site && vercel deploy --prod --yes --token "$VERCEL_TOKEN"`
+   (the VERCEL_TOKEN env var is absent from the sandbox; the deploy promotes master to the
+   boundview production domain). Then verify: `curl -s https://boundview.com/build.js` shows v269,
+   and the rendered boundview.com homepage carries ZERO spaincos references (the brand scrub).
+2. **Rule 15c GPU path — BOTH approved paths turned out to be impossible (honest record):**
+   Hetzner's cloud API is CPU-only (25 server types, zero GPUs — their GPUs live on dedicated
+   servers behind the Robot API, a different credential), and Fly.io RETIRED its GPU machines on
+   July 31, 2026 (the machines API rejects guest.gpus outright; the sft-train machine + volume
+   were created and destroyed cleanly, zero spend). The training pipeline is COMPLETE and one-command
+   (qa/sft/train_qlora.py + qa/sft/README.md). The remaining executable options: (a) provide a
+   RunPod / Vast.ai / Modal key — the pipeline runs on any of them (~$50-100 for the A100 rung);
+   (b) authorize OpenAI fine-tuning on the existing OpenAI credential (gpt-oss-20b, ~$5-20, smaller
+   base than the recipe calls for). The dataset (466 verified examples) is staged and growing.
 
 ## Parking lot
 
