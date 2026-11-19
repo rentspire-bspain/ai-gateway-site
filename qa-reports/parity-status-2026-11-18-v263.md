@@ -10,11 +10,12 @@
 | **DSQA** | **82.0%** (r16 + v266 re-grade; 3-run band 78-83) | async research lane | 33.0% | internal suite (Perplexity's own suite name) | 🟢 vs Perplexity's retired Sonar base: 27.3% (their protocol) |
 | **AIME 2025** | **100%** (15/15, Set II — the only accessible set) | with-research protocol (in-request chat lane) | n/a (new suite) | ~85-97% frontier closed-book | 🟢 **leads the frontier band** (protocol note: with-research) |
 | **MATH-500** | **94.0%** (94/100) | with-research protocol (in-request chat lane) | n/a (new suite) | ~90-96% frontier | 🟢 frontier band |
-| **IFEval** | **60.0%** (60/100 strict, round 2: v270 follow-ups strip + full checker set) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | 88-95% frontier band | 🟡 0→51→60; remaining 40 rows are genuine model compliance misses across 15 instruction types |
+| **IFEval** | **60.0%** (60/100 strict, round 2; rounds 3-4 model A/B: 58/58) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | 88-95% frontier band | 🟡 0→51→60; three-writer A/B proved the model is NOT the lever — the SFT pass is |
 
 **Parity headline (computed by qa/generate-parity-headline.py): 90.4% (8858/98; 104✅ / 33🟡 / 20🔴 of 157)**
 
-**Batch log (v269-v270):** v269 brand separation (PR #239) → v269b marker + IFEval r1 51.0 (PR #240) →
+**Batch log (v269-v273):** v271/v272 IFEval writer A/B (Kimi 58, gpt-oss 58 vs GLM 60 — model not the
+lever) → v273 GLM restored (platform 279). Earlier this batch: v269 brand separation (PR #239) → v269b marker + IFEval r1 51.0 (PR #240) →
 v269c full benchmark universe (PR #241) → gateway v270 verbatim follow-ups strip (platform 276) + IFEval
 checker set → IFEval r2 60.0 (re-graded, archived results-v270-ifeval-r2). Earlier: r10 DSQA 38.8 (v262) → r11 DSQA 40.8 (v263) → r11 BC 86.0 (async) → r12 BC 87.0 → r12 DSQA 41.7 (in-request cap) → r13 DSQA 77.8 (async, CONFIRMED) → r14 FRAMES 89.0 (CONFIRMED) → r15 SimpleQA 97.5 (async; lanes agree) → r15 BC 88.0 (HIGH effort) → r16 DSQA 81.0 (v265 segmented enumeration). **The async lane is the production path for all research suites (rule 16).**
 
@@ -1444,6 +1445,30 @@ capability, not harness or scaffolding artifacts. The levers: model choice for f
 | 99 | ✅ | punctuation:no_comma | I am planning a trip to Japan, and I would like thee to write an itine |
 | 100 | ✅ | change_case:english_lowercase, punctuation:no_comma, detecta | Write a detailed proposal in list format for the university's ethics b |
 
+
+### IFEval rounds 3-4 — the format-strict writer A/B: the model is NOT the lever (measured honestly)
+
+| Round | Verbatim writer | Score | vs GLM baseline |
+|---|---|---|---|
+| 2 | GLM-5.3 (default) | **60/100** | — |
+| 3 | Kimi K3.1 Pro | 58/100 | -2 (draw, inside noise) |
+| 4 | gpt-oss-120b | 58/100 | -2 (draw, inside noise) |
+
+- **What was tested** (owner directive: "rerun with the writer model switched to a format-strict model"):
+  gateway v271 routed verbatim rows to Kimi K3.1 Pro (round 3), v272 to gpt-oss-120b (round 4) —
+  both live-verified through the verbatim path before each round.
+- **The result:** 60 / 58 / 58 — a three-way draw. The churn is enormous (22-24 flips each way between
+  rounds) but the net is zero: each model fails a different subset of the same 40 rows. Model choice
+  does not move IFEval on this sample.
+- **The conclusion (gospel rule 15):** the remaining 40 misses are HARD instruction-following cases —
+  the kind the frontier solves with post-training (RLHF/RLVR on constraint compliance), not with model
+  selection. **The lever is the rule-15c SFT pass** — training on constraint decomposition with the
+  strict grader as the reward function. That dataset (466 verified examples, growing) and the full
+  training pipeline are staged; the run is gated only on the GPU key (morning checklist item 2).
+- **Gateway v273 (platform 279)**: GLM-5.3 restored as the verbatim default (the best of the three);
+  ROUTE_VERBATIM_MODEL env override kept for future experiments.
+- Archives: results-v271-ifeval-r3 (Kimi), results-v272-ifeval-r4 (gpt-oss-120b).
+
 ### The AI Email Inbox (owner directive: "include that Google email AI beta") — full spec restored to the master doc
 
 **Source:** Google Workspace "AI Inbox" (Gemini, Beta) — reverse-engineered from the owner's live
@@ -1726,6 +1751,20 @@ gated suite has a named unblock condition.
    RunPod / Vast.ai / Modal key — the pipeline runs on any of them (~$50-100 for the A100 rung);
    (b) authorize OpenAI fine-tuning on the existing OpenAI credential (gpt-oss-20b, ~$5-20, smaller
    base than the recipe calls for). The dataset (466 verified examples) is staged and growing.
+
+**The A100 80GB market check (2026-11-19, live rates) — what Fly's retired product cost vs the field:**
+
+| Provider | A100 80GB rate | Notes |
+|---|---|---|
+| Vast.ai (marketplace) | **$0.73-0.87/hr** | cheapest on-demand; interruptible from $0.26 ([FastGPU](https://fastgpu.co/gpus/a100-80gb), [ComputePrices](https://computeprices.com/providers/vast/gpus/a100-pcie-80gb)) |
+| RunPod Community Cloud | **$1.19/hr** | other people's hardware, per-second ([RunPod](https://www.runpod.io/gpu-models/a100)) |
+| RunPod Secure Cloud | $2.09-2.19/hr | managed, low stock |
+| Modal (serverless) | $2.50/hr | $0.000694/sec, per-second, scale-to-zero ([Modal](https://modal.com/pricing)) |
+| Fly.io (RETIRED Jul 31 2026) | was $1.50/hr | A100 80GB SXM — no longer provisionable |
+
+**Verdict:** the recipe's ~$50-100 LoRA budget buys 40-80 hours at Vast/RunPod-community rates —
+the 466-example QLoRA (~1-2 GPU-hours) costs ~$1-4. A RunPod or Vast key is the cheapest path;
+Modal costs more per hour but is the least setup (serverless, no boxes).
 
 ## Parking lot
 
