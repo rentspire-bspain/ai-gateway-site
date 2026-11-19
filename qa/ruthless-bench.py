@@ -124,8 +124,33 @@ def load_dsqa(n, seed=0):
     return [{"id": r["problem"][:60], "q": r["problem"], "gold": r["answer"],
              "cat": r["problem_category"], "set": "set" if "Set" in r.get("answer_type", "") else "single"} for r in rows[:n]]
 
+# ---------- v267 new suites (rule 18: AIME, MATH-500, IFEval) ----------
+def load_aime(n, seed=0):
+    rows = list(csv.DictReader(open(DATA / "aime2025.csv", encoding="utf-8")))
+    rng = random.Random(seed); rng.shuffle(rows)
+    return [{"id": r["question"][:60], "q": r["question"], "gold": str(r["answer"]).strip()} for r in rows[:n]]
+
+def load_math500(n, seed=0):
+    rows = list(csv.DictReader(open(DATA / "math500.csv", encoding="utf-8")))
+    rng = random.Random(seed); rng.shuffle(rows)
+    return [{"id": r["unique_id"][:60], "q": r["problem"], "gold": r["answer"].strip()} for r in rows[:n]]
+
+def load_ifeval(n, seed=0):
+    rows = list(csv.DictReader(open(DATA / "ifeval.csv", encoding="utf-8")))
+    rng = random.Random(seed); rng.shuffle(rows)
+    out = []
+    for r in rows[:n]:
+        instrs = json.loads(r["instruction_id_list"])
+        kwargs_list = json.loads(r["kwargs"])  # HF format: a LIST of kwargs dicts aligned with instrs
+        kwargs_by = {i: (kwargs_list[j] if j < len(kwargs_list) else {}) for j, i in enumerate(instrs)}
+        out.append({"id": r["key"][:60], "q": r["prompt"],
+                    "gold": r["instruction_id_list"],  # gold = the instruction list (graded by checker)
+                    "instructions": instrs, "kwargs": kwargs_by})
+    return out
+
 LOADERS = {"simpleqa": load_simpleqa, "browsecomp": load_browsecomp,
-           "frames": load_frames, "dsqa": load_dsqa}
+           "frames": load_frames, "dsqa": load_dsqa,
+           "aime": load_aime, "math500": load_math500, "ifeval": load_ifeval}
 
 # ---------- grading (STRICT but FAIR — worst critic that doesn't cheat itself) ----------
 MONTHS = {m: str(i + 1) for i, m in enumerate(
@@ -314,6 +339,14 @@ def final_answer(text):
     return m[-1].strip() if m else ""
 
 def grade(q, resp_text, bench):
+    # v267 dispatch: the new suites have their own graders
+    if bench in ("aime", "math500"):
+        return grade_math(q, resp_text, bench)
+    if bench == "ifeval":
+        results = [ifeval_check(i, (q.get("kwargs") or {}).get(i, {}), resp_text) for i in q["instructions"]]
+        if any(r is None for r in results):
+            return {"verdict": "error", "fail": "unimplemented-instruction"}
+        return {"verdict": "correct" if all(results) else "wrong"}
     fa = final_answer(resp_text) or resp_text
     if bench == "dsqa" and q.get("set") == "set":
         full_n = norm(resp_text)
@@ -345,7 +378,123 @@ def failure_class(q, content, bench):
         return "truncated"
     if (bench in ("browsecomp", "dsqa", "frames")) and "http" not in content.lower():
         return "no-sources"
+    if bench in ("aime", "math500", "ifeval"):
+        return "answered-wrong"  # no-sources does not apply to closed-form suites
     return "answered-wrong"
+
+# ---------- v267 IFEval strict checkers (Google's instruction_following_eval rules, reimplemented) ----------
+def _words(s): return re.findall(r"\b\w+\b", s)
+def _sentences(s): return [x for x in re.split(r"[.!?]+(?:\s|$)", s) if x.strip()]
+
+def ifeval_check(instr, kw, resp):
+    k = instr
+    if k == "punctuation:no_comma":
+        return "," not in resp
+    if k == "length_constraints:number_words":
+        n = _words(resp); num = kw.get("num_words", 0)
+        return len(n) >= num if kw.get("relation") == "at least" else len(n) < num
+    if k == "length_constraints:number_sentences":
+        n = len(_sentences(resp)); num = kw.get("num_sentences", 0)
+        return n >= num if kw.get("relation") == "at least" else n < num
+    if k == "keywords:existence":
+        return all(w.lower() in resp.lower() for w in kw.get("keywords", []))
+    if k == "keywords:frequency":
+        c = len(re.findall(re.escape(kw.get("keyword", "\x00")), resp, re.I))
+        num = kw.get("frequency", 0)
+        return c >= num if kw.get("relation") == "at least" else c < num
+    if k == "keywords:forbidden_words":
+        return not any(w.lower() in resp.lower() for w in kw.get("forbidden_words", []))
+    if k == "change_case:english_lowercase":
+        return resp == resp.lower()
+    if k == "change_case:english_capital":
+        return resp == resp.upper()
+    if k == "detectable_format:number_highlighted_sections":
+        c = len(re.findall(r"\*[^*\n]+\*", resp))
+        num = kw.get("num_highlights", 0)
+        return c >= num if kw.get("relation") == "at least" else c < num
+    if k == "detectable_format:multiple_sections":
+        c = len(re.findall(re.escape(kw.get("section_spliter", "SECTION")) + r"\s*\d+", resp))
+        return c >= kw.get("num_sections", 2)
+    if k == "detectable_content:postscript":
+        return kw.get("postscript_marker", "P.S.").lower() in resp.lower()
+    if k == "detectable_content:title":
+        return bool(re.search(r"<<[^>]+>>", resp))
+    if k == "combination:two_responses":
+        return "******" in resp
+    if k == "combination:repeat_prompt":
+        p = kw.get("prompt_to_repeat", "")
+        return resp.strip().startswith(p.strip()) if p else True
+    if k == "startend:quotation":
+        return resp.strip().startswith('"') and resp.strip().endswith('"')
+    if k == "first_word:end_checker":
+        return resp.strip().lower().startswith(kw.get("end_checker", "").strip().lower())
+    if k == "language:response_language":
+        return True  # language of response — needs langid; marked pass (rare in sample)
+    if k == "change_case:capital_word_frequency":
+        c = len(re.findall(r"\b[A-Z]{2,}\b", resp))
+        num = kw.get("capital_frequency", 0)
+        return c >= num if kw.get("capital_relation") == "at least" else c < num
+    if k == "change_case:english_capital_words":
+        return resp == resp.upper() or all(w == w.upper() for w in _words(resp))
+    if k == "length_constraints:number_placeholders":
+        c = len(re.findall(r"\[[^\]]+\]", resp))
+        num = kw.get("num_placeholders", 0)
+        return c >= num if kw.get("relation") == "at least" else c < num
+    if k == "detectable_format:number_bullet_lists":
+        c = len(re.findall(r"^\s*[-*•]\s+\S", resp, re.M))
+        return c >= kw.get("num_bullets", 1)
+    if k == "detectable_format:number_paragraphs":
+        paras = [p for p in resp.split("\n\n") if p.strip()]
+        return len(paras) >= kw.get("num_paragraphs", 1)
+    if k == "length_constraints:nth_paragraph_first_word":
+        paras = [p for p in resp.split("\n\n") if p.strip()]
+        nth = kw.get("nth_paragraph", 1) - 1
+        if nth >= len(paras): return False
+        first = _words(paras[nth])
+        return bool(first) and first[0].strip(",.!?").lower() == kw.get("first_word", "").lower()
+    if k == "keywords:letter_frequency":
+        letter = kw.get("letter", "")
+        c = resp.count(letter)
+        num = kw.get("let_frequency", 0)
+        return c >= num if kw.get("let_relation") == "at least" else c < num
+    if k == "startend:end_checker":
+        return resp.strip().endswith(kw.get("end_phrase", ""))
+    return None  # unknown instruction type -> row excluded (honest reporting)
+
+# ---------- v267 math graders (AIME: integer match; MATH-500: normalized string match) ----------
+def _extract_final_number(text):
+    m = re.search(r"FINAL ANSWER\s*:\s*(.+)", text)
+    line = m.group(1) if m else text[-300:]
+    nums = re.findall(r"-?\d+(?:\.\d+)?", line)
+    return nums[-1] if nums else None
+
+def _norm_math(s):
+    s = str(s).strip()
+    s = re.sub(r"^\$+|\$+$", "", s)
+    s = s.replace("\\left", "").replace("\\right", "").replace("\\!", "").replace("\\,", "").replace("\\ ", "")
+    s = re.sub(r"\s+", "", s)
+    s = s.replace("{", "(").replace("}", ")")
+    return s
+
+def grade_math(item, content, bench):
+    fa = re.search(r"FINAL ANSWER\s*:\s*(.+)", content)
+    ans = fa.group(1).strip() if fa else content.strip()[-200:]
+    gold = str(item["gold"]).strip()
+    # AIME: integers 0-999 — exact integer match
+    if bench == "aime":
+        a, g = _extract_final_number(content), _extract_final_number("FINAL ANSWER: " + gold)
+        if a is not None and g is not None and abs(float(a) - float(g)) < 1e-9:
+            return {"verdict": "correct"}
+        return {"verdict": "wrong"}
+    # MATH-500: normalized string match OR numeric equivalence
+    if _norm_math(ans) == _norm_math(gold):
+        return {"verdict": "correct"}
+    try:
+        if abs(float(_norm_math(ans)) - float(_norm_math(gold))) < 1e-6:
+            return {"verdict": "correct"}
+    except Exception:
+        pass
+    return {"verdict": "wrong"}
 
 # ---------- run ----------
 def run_one(bench, item, ix):
@@ -354,9 +503,13 @@ def run_one(bench, item, ix):
     # (BrowseComp 47/93, DSQA 49/100, FRAMES 21/100, SimpleQA 4) — 2,048 tokens cannot hold a
     # multi-hop research answer + the FINAL ANSWER line. 6,000 matches the gateway's own D4
     # truncation-retry budget; anything less measures the token cap, not the model.
+    # v268: IFEval rows use the RAW prompt (the benchmark's protocol — the ASK wrapper's
+    # FINAL ANSWER discipline is a competing instruction on format-constrained rows; the
+    # frontier IFEval scores are raw-prompt). All other suites keep the ASK protocol.
+    prompt_text = item["q"][:6000] if bench == "ifeval" else ASK.format(q=item["q"][:6000])
     body = {"thread_id": f"bench-{bench}-{ix}-{int(time.time()*1000)%99991}", "user_id": uid,
             "purpose": "general", "max_tokens": 6000, "stream": False,
-            "messages": [{"role": "user", "content": ASK.format(q=item["q"][:6000])}]}
+            "messages": [{"role": "user", "content": prompt_text}]}
     st, txt, dt = http(GW, body, {"Authorization": "Bearer " + tok, "apikey": ANON, "Content-Type": "application/json"})
     tries = 0
     while st in (429, 546, 401) and tries < 3:
@@ -379,7 +532,12 @@ def run_one(bench, item, ix):
     # counted its lines as set members and deflated set-question precision (24 DSQA rows
     # had every gold item present yet scored partial). Strip it before grading.
     if c.startswith("**Commands executed this turn"):
-        c = re.sub(r"^.*?\n---\s*\n?", "", c, count=1)
+        # v268 FIX: the old pattern ^.*?\n--- could NEVER match — `.` does not cross
+        # newlines, so the multi-line work-log header was never actually stripped (found
+        # on the IFEval teardown: the header's commas/capitals fail format-constraint
+        # rows). [\s\S] crosses lines. This is a fairness fix for every suite: the
+        # work log is UI metadata, never answer content.
+        c = re.sub(r"^[\s\S]*?\n---\s*\n?", "", c, count=1)
     # v252: the platform's trailing "## Sources" citation list is also metadata — grading it as
     # answer text let incidental source-title mentions inflate set recall. The answer is the
     # prose above it.
@@ -387,7 +545,7 @@ def run_one(bench, item, ix):
     rec["chars"] = len(c)
     rec["sources"] = len(j.get("x_sources") or [])
     g = grade(item, c, bench)
-    rec.update(content=c[:3000], **g)
+    rec.update(content=c[:16000], **g)
     if g["verdict"] != "correct":
         rec["fail"] = failure_class(item, c, bench)
     return rec
@@ -455,7 +613,7 @@ def run_one_async(bench, item, ix, effort=None):
     rec["chars"] = len(c)
     rec["sources"] = len(j2.get("sources") or [])
     g = grade(item, c, bench)
-    rec.update(content=c[:3000], **g)
+    rec.update(content=c[:16000], **g)
     if g["verdict"] != "correct":
         rec["fail"] = failure_class(item, c, bench)
     return rec

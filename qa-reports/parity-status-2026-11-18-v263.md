@@ -94,6 +94,48 @@ strict grader. What changed is WHERE the research runs:
    Every claim is row-by-row flip-analyzed (BrowseComp: 61 wrong->correct, DSQA: +43/-6, FRAMES
    gains beyond the 17 real reasoning errors of round 9).
 
+## §30e — Perplexity Agent API / frontier-orchestrator parity (owner directive 2026-11-18: "roll it in")
+
+**What our stack is, honestly:** the ai.spaincos.com/BoundView async research lane is BUILT ON the
+Perplexity Agent API — their frontier orchestrator — with OUR orchestration layered on top. The
+parity claim is precise: we did not build a rival engine; we built the best possible harness AROUND
+the engine, and our scores measure engine + harness.
+
+### What we adopted from the Perplexity Agent API (their published orchestration architecture)
+
+| Perplexity Agent API feature | Our implementation | Status |
+|---|---|---|
+| Background runs (`background: true`) — minutes-long research past any request wall | The async research lane (v262): submit + poll, `deep_research_id` | ✅ live, all research benchmarks run through it (rule 16) |
+| Effort levels (fast / low / medium / high / xhigh) | `deep_research_effort` param — bench runs medium; round 15 measured high (88.0 BrowseComp) | ✅ live |
+| web_search tool | Native to the agent runs (all 30 sources/answer) | ✅ live |
+| Their per-request cost discipline | Our spend caps: per-user monthly ceiling (raised 50→200, owner-approved), per-user daily ceiling, cost recorded per actual effort (v263 fix) | ✅ live |
+| Sonar→Agent API migration (their docs) | Our deep-research path uses the Agent API endpoint natively | ✅ live |
+
+### What we added ON TOP (our orchestration — the part that is ours)
+
+1. **The concise constraint-verified brief** (`deep_research_style=concise`) — their Deep Research path ships
+   a report-grade brief; ours adds the SOTA answering discipline (decompose constraints, enumerate
+   candidates, verify every constraint, never accept the most-constraints match, FINAL ANSWER line).
+2. **Two-signal set detection + table-verified sets** (v262) — their docs list DSQA in their suite; our
+   harness adds the Table-as-Search treatment their base models lack (their retired Sonar: 27.3% DSQA
+   on their protocol; ours: 82.0%).
+3. **Segmented enumeration** (v265) and the **FA-enforcement retry** (v264).
+4. **The strict grader discipline** (gospel) — every score reproducible, flip-analyzed, honest.
+
+### The parity scoreboard (public data)
+
+| System | BrowseComp | DSQA | Notes |
+|---|---|---|---|
+| Perplexity Sonar (retired base) | 7.0% | 27.3% | their own published numbers ([Perplexity docs](https://docs.perplexity.ai/docs/agent-api/migrate-from-sonar/benchmarks)) |
+| Perplexity orchestrator (Claude Opus 5, 25-turn) | 89.0% | — | the frontier orchestration result ([OpenRouter](https://openrouter.ai/benchmarks/browsecomp)) |
+| **ai.spaincos.com / BoundView (Agent API + our orchestration)** | **88.0%** (6 confirming runs) | **82.0%** | parity with their frontier orchestrator; +81/+55 over their base model |
+| Their Agent API low effort (per their docs) | "beats Sonar Deep Research on both BrowseComp and DSQA at 1-2% of its cost" | — | directional |
+
+**The honest statement for marketing:** our stack is the Perplexity frontier orchestrator plus a
+hardened research harness (the gospel), delivered at our pricing. Where the frontier vendors publish
+orchestrator scores (89.0), we are at parity; where their base models score (7.0/27.3), we are
++81/+55. The harness is the moat: it is version-controlled, benchmark-governed, and reproducible.
+
 ## §30d — Full field comparison: every model, every benchmark, G/🟡/🔴 (owner directive 2026-11-18)
 
 **Legend: 🟢 we beat them · 🟡 parity (within ~2 points) · 🔴 they lead.** Sources: public leaderboards
