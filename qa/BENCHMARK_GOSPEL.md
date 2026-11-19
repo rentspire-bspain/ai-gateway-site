@@ -171,3 +171,14 @@ chains — council verification on async runs, or rule 15c); FRAMES 90 (deep mul
 tails); DSQA 82 (very-large-set enumerations — segmented enumeration shipped v265; the residual
 is candidate-space coverage). 99% is claimed ONLY where it is real (SimpleQA-class); on research
 benchmarks the gospel target is the honest ceiling — leading every published score (FRAMES: done).
+
+## Rule 20 — Brand separation (owner directive 2026-11-18)
+
+BoundView.com and ai.spaincos.com share the ENTIRE capability estate (gateway, tools, skills,
+benchmarks, performance) but the brands are COMPLETELY SEPARATE. ZERO ai.spaincos.com /
+Spain Companies / spaincos mentions, emails, or affiliation may appear anywhere user-facing
+on BoundView. Implementation: modules/brand.js (hostname-based identity + DOM scrub with
+MutationObserver, loads first on every page). Verified per deploy: the rendered boundview.com
+DOM carries zero cross-brand strings; ai.spaincos.com is unchanged. This rule applies to every
+future feature built on the shared stack — including the AI Email Inbox spec (§30f of the
+master doc), which ships on both domains under each domain's own brand.
