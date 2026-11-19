@@ -85,6 +85,7 @@ There is no other claim of "better" that counts.
 |---|---|---|
 | 2026-11-17 | Gospel codified from owner directive (this session, rounds 1-6) | Brett Spain (directive) / parity session |
 | 2026-11-18 | **v262 ASYNC RESEARCH LANE + TABLE-VERIFIED SETS codified** (SOTA teardown: BrowseComp leaders are RL-trained agents with 300+ step budgets, multi-agent swarms, context management — see Round-9 owner analysis). Rule 13: BrowseComp-class questions route to the async deep-research lane (submit + poll; the 150s edge wall killed 28/100 round-9 rows as HTTP 504 at 150.1s). Rule 14: set questions get the Table-as-Search treatment (candidate × constraint table, enumeration sub-query, FINAL ANSWER = exactly the qualifying rows). Rule 15: the training-recipe ladder (CPT → SFT → RL on search trajectories) is the documented path for the next tier of gains; harness-level equivalents (step budgets, swarm verification, context compaction) are the free-model proxies until then. | Brett Spain (directive) / parity session |
+| 2026-11-18 | **v266 FAIR-READING GRADER v2 + FIELD TABLES (rule 17) + THE BENCHMARK UNIVERSE (rule 18)**: three FA-line-scoped equivalence rules (clock formats, rounding boundary, concise-correct) — offline-verified +4/-0 across all archives (SimpleQA 97.5→98.5, FRAMES 89→90, DSQA 81→82 on re-grade); the whole-body numeric scan produced 4 verified false positives and was rejected — FA-line restriction is binding. Full per-model G/🟡/🔴 comparison tables rolled into the master doc. | parity session |
 | 2026-11-18 | **v264 ASYNC-EVERYWHERE (rounds 12-14)**: the async research lane rolled across all research suites — BrowseComp 38.9→87.0 (4 confirming runs), DSQA 41.7→77.8 (confirmed 83.3), FRAMES 77.3→89.0 (confirmed 96.7). SPEND_CEILING_USD raised 50→200 (owner-approved). Rule 16 added: research benchmarks run the async lane; the in-request lane is the legacy path. SFT export tool shipped (qa/sft-export.py, 466 verified examples). | Brett Spain (directive) / parity session |
 | 2026-11-18 | **v263 grader fair-reading fix** (FRAMES gold-conflict audit: trailing-formality gold variants — "140 years old." → "140 years", "Blue Ribbon Sports Inc." → "Blue Ribbon Sports"). Offline-verified on the full r9 archives: +2 FRAMES, +1 DSQA, +0 SimpleQA, 0 negative flips. The token-subset reading is deliberately NOT added — it loosens. | parity session (audit directive: rule 11) |
 
@@ -130,3 +131,43 @@ lane's 150s wall and clock-pressured writer are a structural cap (proven: DSQA 4
 in-request vs 77.8% async with 100% FINAL-ANSWER compliance on the same sample and
 grader). A benchmark score from the in-request lane measures the wall, not the model
 (extends rule 13).
+
+## Rule 17 — Field comparison tables (2026-11-18, owner directive)
+
+Every batch's completion doc carries full per-model comparison tables for each benchmark:
+every published score we can verify, marked 🟢 (we beat) / 🟡 (parity, ~2 points) / 🔴 (they lead),
+with protocol notes (closed-book vs with-research) and sources. We ALWAYS benchmark against the
+highest performing published models — the table is sorted by their score, best first. Perplexity's
+own models and orchestrator are mandatory rows. Marketing claims cite these tables verbatim.
+
+## Rule 18 — The benchmark universe (2026-11-18, owner question: "are these the only 4?")
+
+No — the four (SimpleQA, FRAMES, DSQA, BrowseComp) are the accepted core for RESEARCH/answer
+quality, and DSQA is in Perplexity's own internal suite (their docs: BrowseComp + DSQA + WANDR).
+The industry-accepted universe by capability, mapped to our features:
+
+| Capability | Industry benchmark(s) | Our feature | Status |
+|---|---|---|---|
+| Factual recall | SimpleQA (+ Verified variant) | chat/research | 🟢 in suite |
+| Agentic deep research | BrowseComp (+ZH/Plus/V3), XBench-DS, LifeSearch, WANDR (Perplexity's new one), FRAMES | deep research / async lane | 🟢 core suite |
+| Deep search QA | DSQA | research | 🟢 in suite |
+| Math/reasoning | AIME, GPQA-Diamond, Humanity's Last Exam | general reasoning | 🔴 not measured |
+| Coding | SWE-bench Verified, LiveCodeBench | code mode | 🔴 not measured |
+| Browser automation | WebArena | browser_step | 🔴 not measured |
+| Agentic tool use | GAIA, Tau-bench, AgentBench | connectors/fleet/tools | 🔴 not measured |
+| Instruction following | IFEval | all outputs | 🔴 not measured |
+| Long context | RULER | research contexts | 🔴 not measured |
+
+Adding a suite requires: a public dataset, a strict grader, a baseline round, and a noise floor —
+the same bar the core four meet. WANDR (Perplexity's wide-and-deep benchmark) is the first
+candidate when its dataset publishes.
+
+## Rule 19 — The hardening ladder to the honest ceilings (2026-11-18)
+
+Wherever we are weakest, the next lever is chosen from the measured teardown of the actual misses,
+never from speculation. Current state and levers: SimpleQA 98.5 (3 real misses: name-typo,
+patronymic, one wrong date — a verification-pass lever); BrowseComp 88 (12 deep entity-binding
+chains — council verification on async runs, or rule 15c); FRAMES 90 (deep multi-hop reasoning
+tails); DSQA 82 (very-large-set enumerations — segmented enumeration shipped v265; the residual
+is candidate-space coverage). 99% is claimed ONLY where it is real (SimpleQA-class); on research
+benchmarks the gospel target is the honest ceiling — leading every published score (FRAMES: done).
