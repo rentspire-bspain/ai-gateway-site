@@ -119,10 +119,88 @@ Every example below was tested this batch: server-side (live probes against prod
 
 ---
 
+---
+
+## PART D — PARTNER-MONETIZATION CHANNEL LANDSCAPE (v261, added 2026-11-19)
+
+The complete umbrella of "partner income from free users" — every channel class, the players, and where it plugs into the model.
+
+### D1. Offer walls — CPA networks (the $1.10/user channel)
+
+| Provider | Notes | Status for boundview |
+|---|---|---|
+| **Adscend** | Phase 1 pick; strong web/webview support | 🔴 owner signup (tomorrow per owner) |
+| **ayeT-Studios** | German; web wall + survey wall + rewarded video; monthly payouts, 30-day terms | ✅ **pre-wired as wall #2** (2026-11-19, below) |
+| **OfferToro / Torox** | ~2-hour integration, signed postbacks | 🔴 endpoint already accepts it; needs account + secret |
+| BitLabs | surveys + games + receipts + cashback; Net-30, $100 min; signed reward + reconciliation callbacks | candidate wall #3 |
+| AdGem (AdAction) | 1.1B+ offerwall interactions; REST + GraphQL, signed POST postbacks | candidate |
+| AdGate Media (Prodege) | offerwall + rewarded video + **content locking** (gate premium content behind an offer) | candidate — content-locking is a distinctive lever |
+| Tapjoy (Unity Offerwall) | has a Web Offerwall; AdMob mediation adapter deprecated Oct 2026 | candidate |
+| Digital Turbine (DT, ex-Fyber) · adjoe Playtime ($1B+ rewards paid) · Moonetix · RevU (no-SDK web, white-label API) · Lootably · TyrAds · MyChips (Mistplay) · TimeWall · Notik · Monlix · Wannads · GemiAd | the long tail; all S2S postbacks | backlog |
+| **Google AdSense Offerwall** | GA since April 2026 — offer walls went mainstream for web publishers | watch item |
+
+Landscape notes: the market is consolidating (Prodege owns AdGate + Pollfish + Swagbucks; Unity owns Tapjoy; the top-5 platforms hold ~47% of revenue); running **2-3 walls in rotation is standard** and typically lifts total revenue 20-40% over a single wall.
+
+### D2. Survey walls (highest per-action payouts, $0.50-$3.00/completion)
+
+Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain** (URL/iframe/API; rewards even on partial attempts) · CPX Research (payouts from $25) · TheoremReach · TapResearch (pays on disqualifications too) · BitLabs surveys (native qualification embedding). Surveys are the growth format as Apple cracked down on incentivized installs.
+
+### D3. The other model channels (mapped to the $3.00/engaged-user stack)
+
+- **Rewarded ads ($0.05):** embedded in most walls; standalone via ayeT/BitLabs/AdGem.
+- **Affiliate referrals ($0.90):** the Gig Hub ladder — see D5.
+- **First-party microtasks ($0.80):** Comptrove validation work, quality-gated — 100% margin, no network cut.
+- **Data monetization ($0.15):** Gig Pay Index, provenance-labeled.
+- **NEW — Cashback & receipts (6th channel, not yet in the model):** BitLabs Magic Receipts / cashback offers — users upload receipts or shop via partner links for neurons. Worth adding to the pricing model as a small increment.
+
+### D4. ayeT-Studios pre-wired as wall #2 (2026-11-19, live-verified)
+
+- ✅ Generated HMAC secret stored in `offerwall_secrets` for `ayet` (in-database `gen_random_bytes`; value never leaves the DB) — the endpoint's signature gate is now ACTIVE for both providers.
+- ✅ Live verification: unsigned ayet postback → `0` (gate live); **signed** postback → verified, 150 N minted; accidental duplicate (fired twice by the test) → `0`, exactly one ledger row — idempotency intact.
+- ✅ Test rows cleaned (0 leftover postbacks/ledger/caps).
+- ✅ Migration file added for repo parity (`_migrations/2026-11-19-offerwall-secrets.md`).
+- Remaining: ayeT publisher account (owner) → replace the generated secret with their production secret (one SQL update) → wall #2 live.
+- Note: the pre-wired secret is a placeholder gate — when the real ayeT account exists, the secret is swapped in the same deny-all table with no code change.
+
+### D5. Gig Hub affiliate referral ladder — Phase 2 draft (grounded in the Gig Hub spec, session f9a239a1)
+
+**Design principle:** users get neurons only for VERIFIED activity through disclosed referral links — never for clicks. boundview is discovery, tooling, and rewards; the work happens on the platforms. FTC disclosure on every link.
+
+| Tier | User action | Neurons (user) | Our revenue | Verification |
+|---|---|---|---|---|
+| T0 — Discover | Browse the Gig Directory | 0 (trust layer — no referral on first exposure) | 0 | — |
+| T1 — Get Gig-Ready | Quest chain: build profile → 3 proposals → first GigFinder search → first check-in | **+2,000 N** total | 0 (retention investment) | quest completion events |
+| T2 — First signup | Register on a platform via a disclosed referral link | **+250 N** | $0-$15 (some programs pay per signup) | platform partner dashboard reconciliation |
+| T3 — First verified payout | First earnings milestone through the link | **+500 N** | **$10-$100 per activated user** (the CPA core) | monthly reconciliation vs partner dashboard |
+| T4 — Sustained | 5th verified payout | **+1,500 N** | recurring share where offered | reconciliation |
+| T5 — Advocate | Refers another gig worker to boundview | **+250 N** (+500 N on their activation) | near-zero CAC | existing referral catalog rows (referral_signup/referral_activation — already live) |
+
+**Math check:** at T3, a $10-100 activation bounty against ~2,500 N awarded across the ladder (~$0.25 display value of credits; ~$0.02-0.10 marginal AI COGS) — the ladder pays for itself on the first conversion.
+**Guardrails (unchanged from the spec):** neurons earn-only, never cash-out; no earnings guarantees — all pay figures as reported ranges with sources; self-reported data labeled; milestone neurons only on verified activity.
+**Sequencing:** Phase 2 starts when the offer-wall run-rate hits the **$500/mo gate**. Directory (T0) and quests (T1) can ship first — they carry no partner dependency.
+
+### D6. Idea backlog — MORE IDEAS (v261 brainstorm; unvetted, not commitments)
+
+1. **Content-locked premium answers** — one premium-quality answer per day gated behind an offer (AdGate content locking). Converts the highest-value AI action into a monetization surface.
+2. **Sponsored quest chains** — networks sponsor "complete 3 surveys this week" meta-quests with bonus neurons; the network pays for placement.
+3. **Neuron staking for peak-hour premium** — users stake neurons for priority routing at peak times; reduces peak COGS AND deepens the sink.
+4. **Receipts channel** — BitLabs Magic Receipts: upload any receipt, earn neurons (the 6th channel, D3).
+5. **Season rewards mall** — partners buy placement in a neuron-redemption mall (discounts on tools gig workers use: invoicing, courses, gear) — partners pay, users spend neurons, zero cash-out (the credit-card-rewards-mall pattern).
+6. **White-label the neuron economy** — license the whole earn/ledger/caps stack to other products (RentSpire validation work, future SpainCos products) — B2B licensing of infrastructure already built.
+7. **Gig Pay Index sponsorship** — a labor-data partner sponsors the public index page (Phase 4 candidate, already in the plan — the idea is to pre-sell it before launch).
+8. **Employer-paid task bounties** — companies post first-party microtasks with bounties (Comptrove validation class of work) — boundview takes a marketplace cut on both sides.
+9. **Neuron-backed API tier** — free-tier users convert offer-wall earnings into boundview API credits — developer acquisition with partner-funded COGS.
+10. **Streak multipliers on partner actions** — 7-day streak boosts offer payouts (retention lever that directly raises partner revenue per user).
+11. **Local merchant flash drops** — coworking/coffee discounts for check-in streaks (already specced as Phase D of Gig Hub) — merchants pay for foot traffic.
+12. **Second-network A/B** — once ayeT is live, run Adscend vs ayeT head-to-head per user cohort; auto-shift traffic to the higher eCPM wall monthly (wall arbitrage).
+
+
+
 ## PART C — OWNER-ONLY BLOCKERS (the complete list)
 
 1. **Adscend publisher signup** (the only Phase 1 blocker) — checklist delivered this batch; approval 1-3 business days.
-2. Point Adscend postback URL (5 min after approval; secret + IP allowlist paste → I finish wiring).
-3. Broaden fine-grained PAT · register OAuth apps (Slack/Dropbox/Outlook/Box) · apply 4 SQL migrations · Supabase auth_config_write (passkeys) · Twilio credentials · SHMT PR #3889 approve+merge + redeploy runner · passkey e2e · .edu student-verify e2e · OpenRouter auto-top-up · low-balance credit alert.
+2. **ayeT-Studios publisher signup** (wall #2 — endpoint pre-wired, secret gate live; swap in their production secret when the account exists).
+3. Point Adscend postback URL (5 min after approval; secret + IP allowlist paste → I finish wiring).
+4. Broaden fine-grained PAT · register OAuth apps (Slack/Dropbox/Outlook/Box) · apply 4 SQL migrations · Supabase auth_config_write (passkeys) · Twilio credentials · SHMT PR #3889 approve+merge + redeploy runner · passkey e2e · .edu student-verify e2e · OpenRouter auto-top-up · low-balance credit alert.
 
-**Session record (v260):** prelaunch 12/13 (env-only miss), free-agent suite 6/6, Tasks tab built + demo deployed, master doc merged from v239/v252-v257/v259 + scale model. PR #215 (v259) merged earlier this session; this doc follows the same verify-gated path.
+**Session record (v261, 2026-11-19):** ayeT pre-wired as wall #2 (secret gate live, signed+idempotency verified, test rows cleaned); Part D added — full channel landscape, Phase 2 affiliate ladder draft (D5), 12-item idea backlog (D6). Prior (v260, 11-17): prelaunch 12/13 (env-only miss), free-agent suite 6/6, Tasks tab built + demo deployed, doc merged from v239/v252-v257/v259 + scale model (PR #215, #217).
