@@ -1932,6 +1932,105 @@ store presence: (a) Android Play Store via TWA (Trusted Web Activity — wraps t
 domain-ownership asset + a one-time $25 developer account); (b) iOS App Store via Capacitor
 wrapper (Apple developer account, $99/yr). Both are wrapper-level work, no app rewrite.
 
+## §30i — OWNER ACTION LIST, in numerical order (owner directive 2026-11-20: "step by step in numerical order for things I need to do")
+
+**Everything else is handled autonomously. Each item below is a ~5-10 minute console task that unblocks a tracked workstream.**
+
+### 1. RunPod GPU key (unlocks rule 15c SFT — the single biggest benchmark lever)
+
+1. Go to https://www.runpod.io and click **Sign Up** (email or Google login).
+2. Add a payment method and deposit **$5-10** (Billing → Add credits).
+3. Click your account icon (top right) → **Settings** → **API Keys**.
+4. Click **Generate API Key**, name it "sft", copy it.
+5. Paste the key into this chat (or approve it when the credentials card appears). I take it from there — the SFT pipeline (466 examples, one command, ~$1-4 of GPU time) runs the moment the key lands.
+
+*(Vast.ai works identically — https://vast.ai → account → API Keys — and is cheaper per hour: $0.73-0.87 vs RunPod community $1.19.)*
+
+### 2. Google OAuth app registration (unlocks EMAIL READS — your confirmation question: not yet set up)
+
+1. Go to https://console.cloud.google.com and sign in with bspain@spaincos.com.
+2. Top-left project picker → **New Project** → name it "ai-spaincos-connectors" → Create.
+3. Left menu → **APIs & Services** → **OAuth consent screen**:
+   - User type: **External** → Create.
+   - App name: "ai.spaincos.com", user support email: yours.
+   - Add the scope **Gmail Read-Only** (`gmail.readonly` or the newer `mail.readonly`); add any others you want (Calendar, Drive read).
+   - Add yourself as a **test user** (bspain@spaincos.com).
+   - Click **Publish App** (publishing removes the 100-test-user cap; Google may ask for verification for Gmail scopes — it is a short form; while unverified, the app still works for your own test users).
+4. Left menu → **APIs & Services** → **Credentials** → **+ Create Credentials** → **OAuth client ID**:
+   - Application type: **Web application**.
+   - Authorized redirect URIs — add BOTH:
+     - `https://ai.spaincos.com/api/oauth-callback`
+     - `https://boundview.com/api/oauth-callback`
+   - Create. Copy the **Client ID** and **Client secret**.
+5. Send me the Client ID and Client secret (paste in chat or the credentials card). I set the env vars on the host — the callback handler and Settings > Connectors UI are already built and waiting; email reads go live immediately after.
+
+### 3. Microsoft/Outlook OAuth app (email reads for BoundView external users)
+
+1. Go to https://entra.microsoft.com (Microsoft Entra) → sign in.
+2. **App registrations** → **New registration** → name "ai-spaincos-outlook".
+3. Redirect URI: Web → `https://ai.spaincos.com/api/oauth-callback` (add boundview.com's too).
+4. **Certificates & secrets** → New client secret → copy the secret.
+5. **API permissions** → Microsoft Graph → Delegated → `Mail.Read` → Grant admin consent.
+6. Send me the Application (client) ID + secret.
+
+### 4. GitHub OAuth app (repo reads)
+
+1. Go to https://github.com/settings/developers → **OAuth Apps** → **New OAuth App**.
+2. Name: "ai.spaincos"; Homepage: https://ai.spaincos.com; Callback: `https://ai.spaincos.com/api/oauth-callback`.
+3. Register → copy the Client ID → generate a Client secret.
+4. Send me both.
+
+### 5. Twilio (unlocks the Voice category — 4 pts)
+
+1. Go to https://www.twilio.com → sign up / log in.
+2. Console → get the **Account SID** and **Auth Token** (dashboard home).
+3. Send me both (a trial account is fine to start).
+
+### 6. Google Play Console account (Android app presence — optional, $25 one-time)
+
+1. Go to https://play.google.com/console → pay the $25 one-time fee with your account.
+2. Send me the confirmation; the TWA wrapper work (which I build) then has a store to ship to.
+
+### 7. Apple Developer account (iOS app presence — optional, $99/yr)
+
+1. Go to https://developer.apple.com → Account → enroll as an Organization.
+2. Send me the confirmation; the Capacitor wrapper ships to the App Store from there.
+
+**Status of everything else: the engineering is done and verified — OAuth callback handlers, Connectors UI, SFT pipeline, PWA, brand kits are all built and live; the items above are the console registrations only I cannot do for you.**
+
+## §30j — The full-field feature audit (owner directive 2026-11-20: "double-check documentation on Claude, OpenAI, Perplexity — not missing any single feature")
+
+**Sources audited (2026-11-20):** the Perplexity Help Center (features collection, Projects/Spaces, Pro plan, file uploads, connectors, assets overview), docs.perplexity.ai (API platform + changelog), the Claude Help Center (artifacts, plans), claude.com/features, and the OpenAI Help Center + learn.chatgpt.com (capabilities overview, Projects, deep research, release notes, DevDay 2026).
+
+### What the audit found: features NOT in our 157-item tracker (the honest gap list)
+
+| # | Feature | Who has it | Maps to category | Status |
+|---|---|---|---|---|
+| 1 | **Project "Brain"** — self-improving per-project memory that studies files/sessions between tasks | Perplexity | Features | 🟡 we have project context + memory; the self-updating Brain loop is not tracked |
+| 2 | **Project automations** — recurring tasks (hourly/daily/weekly), source monitoring, auto-published summaries | Perplexity | Features | 🟡 our fleet runs scheduled jobs server-side; the in-product automation builder is not tracked |
+| 3 | **Create files and apps: XLSX, PPTX, HTML apps** with edit history, preview, sharing, Drive export | Perplexity | Features/Premium | 🟡 DOCX/PDF covered; spreadsheet/deck/app creation not tracked |
+| 4 | **Learn Mode** | Perplexity | Features | 🔴 not tracked |
+| 5 | **Model Council** (multi-model deliberation mode) | Perplexity | Models | 🟡 we have writer A/B infra; council mode not tracked |
+| 6 | **Personal Computer for Windows** (desktop app) | Perplexity | Desktop | 🟡 tracked as "Desktop app" generally; Windows-native build not itemized |
+| 7 | **Audio/video transcription + speaker labeling** in uploads | Perplexity | Features | 🔴 not tracked |
+| 8 | **File connectors sync** (Google Docs/Slides/Sheets live sync) | Perplexity | Connectors | 🟡 covered by the Google OAuth item |
+| 9 | **API: Decisions API, Monitor API, Context API** (we track Search/Agent API parity in §30e) | Perplexity | API | 🔴 the three newer API surfaces not tracked |
+| 10 | **Artifacts space with MCP + persistent storage** (embed AI into artifacts) | Claude | Features | 🔴 not tracked |
+| 11 | **Claude Motion** (animated explainers) | Claude | Premium | 🔴 not tracked |
+| 12 | **Whiteboards / Sheets / Data templates** (beta artifact types) | Claude | Features | 🔴 not tracked |
+| 13 | **Incognito chats** | Claude | Privacy | 🔴 not tracked |
+| 14 | **Dots** (always-on goal-driven agents across connected apps) | OpenAI | Teammates/Features | 🔴 not tracked |
+| 15 | **ChatGPT Space** (Pages + files + sharing hub) | OpenAI | Features | 🔴 not tracked |
+| 16 | **ChatGPT Work** (long-job agent producing docs/decks/sites) | OpenAI | Features | 🔴 not tracked |
+| 17 | **MCP Events** (monitor external servers, act on events) | OpenAI | API/Connectors | 🔴 not tracked |
+| 18 | **Scheduled Tasks** (one-time/recurring with push/email) | OpenAI | Features | 🟡 our automations cover the server side; in-product task scheduling not tracked |
+| 19 | **Parental Controls** | OpenAI | Account | 🔴 not tracked |
+| 20 | **Custom GPTs / publishable assistants** | OpenAI | Teammates | 🟡 Teammates tracked; publishable-to-others not itemized |
+
+**Verified-covered (sample):** Projects/Spaces, file uploads (PDF/image), image generation, deep research, voice mode, Projects with files/instructions, web search, memory, connectors (Slack/Dropbox live), Canvas-equivalents via document creation, Skills (Teammates-adjacent), Reasoning mode, API Search/Agent parity (§30e).
+
+**The honest read:** the 20 items above are the complete not-tracked set from the three vendors' current documentation. They are feature-DECISION items (each needs a build/no-build call), not defects — the tracker's 157 items were scoped to the ai.spaincos.com parity program; these extend the scope to full-field coverage. Recommended: adopt #1, #2, #3, #10, #14 as the highest-value additions (they define the 2026 product surface); the rest are tier-2.
+
 ## Morning checklist (owner items only — everything else is autonomous)
 
 1. ~~boundview.com Vercel deploy~~ — **DONE 2026-11-19**: deployed via the Vercel CLI to v275;
