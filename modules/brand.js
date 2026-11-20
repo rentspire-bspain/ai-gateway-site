@@ -56,8 +56,15 @@
   }
   function scrubAll(root) {
     if (!root) return;
-    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, null, false);
-    while (walker.nextNode()) scrubNode(walker.currentNode);
+    // v274 FIX: the walker never visits the ROOT node itself — dynamically-set text
+    // (modules writing textContent on existing elements) arrived as added TEXT-node
+    // roots and escaped the scrub (live-verified: "Welcome to ai.spaincos" survived
+    // on boundview.com). Scrub the root first, then its descendants.
+    scrubNode(root);
+    if (root.nodeType === 1) {
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, null, false);
+      while (walker.nextNode()) scrubNode(walker.currentNode);
+    }
   }
   function start() {
     scrubAll(document.documentElement);
