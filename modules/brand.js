@@ -27,7 +27,9 @@
     [/spaincos\.com/gi, "boundview.com"],
     [/@spaincos/gi, "@boundview"],
     [/you@boundview\.com/gi, "you@boundview.com"],
-    [/\bspaincos\b/gi, "BoundView"]
+    [/\bspaincos\b/gi, "BoundView"],
+    // cosmetic final pass: "ai.spaincos" -> "ai.BoundView" reads awkward; it's just "BoundView"
+    [/ai\.BoundView\b/gi, "BoundView"]
   ];
   function scrubText(t) {
     var out = t;
