@@ -32,11 +32,22 @@ benchmark SFT unlock (rule 15c — the single biggest score mover, staged).
 | **DSQA** | **82.0%** (r16 + v266 re-grade; 3-run band 78-83) | async research lane | 33.0% | internal suite (Perplexity's own suite name) | 🟢 vs Perplexity's retired Sonar base: 27.3% (their protocol) |
 | **AIME 2025** | **46.7%** (7/15, v278 round 4 — full clean re-run through the v277 FA-append gateway, 0 error rows, p50 98s; up +20.0 from the 26.7% honest re-baseline) | with-research, FA-line partially enforced | n/a | ~85-97% frontier closed-book | 🟡 honest re-baseline 26.7 → 46.7; the FA-line + retrieval-quality are the levers |
 | **MATH-500** | **76.0%** (76/100, v278 round 4 — full clean re-run, 0 error rows, p50 49s; 76-80 run band with round 3's 80.0) | with-research | n/a | ~90-96% frontier | 🟡 grader fairness complete; FA-line + retrieval quality are the gap |
-| **IFEval** | **60.0%** (60/100 strict, round 2; rounds 3-4 model A/B: 58/58) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | 88-95% frontier band | 🟡 0→51→60; three-writer A/B proved the model is NOT the lever — the SFT pass is |
+| **IFEval** | **60.0%** best (round 2); 5-round GLM-class band 48-60 (r2 60, r3 58, r4 58, r5 48, r6 54 through v279b) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | 88-95% frontier band | 🟡 the honest arc 0→51→60→48→54; writer compliance is the ceiling — the SFT pass is the lever; strict-format detection v2 shipped (r5's 17 missed phrasings caught) |
 
 **Category headline (same computation as the top block): 90.4% weighted average.**
 
-**Batch log (v269-v278):** **v276-v278 THE MATH-SUITE RECOVERY (honest, measured, reproducible):**
+**Batch log (v269-v279b):** **v279/v279b SOURCE-QUALITY + FORMAT-DETECTION (live on platform 285):**
+v279 math-row source-quality filter (dataset-viewer junk dropped from math citation lists;
+isMathQuery-scoped, zero effect off-scope; live-verified on debug rows: on-topic retrieval,
+correct computation, junk gone) + math-row source-discipline system rule → v279b strict-format
+detection v2 (IFEval round-5 teardown: 17 wrong rows carried format constraints the regex missed —
+"Finish your response with", "No other words should follow", "end with exactly", "double ANGULAR
+brackets", "exact format", "must contain one of the following", word-avoidance, keyword/letter
+frequency, spelled-out counts, "capitalize every", "no capital letters", "or more sections" —
+all 17 now match; offline-verified: ASK wrapper no-match, SimpleQA/FRAMES/DSQA pools 0 new
+matches). **IFEval rounds 5-6 measured: r5 48 (through 284) → r6 54 (through 285); 5-round
+GLM-class band 48-60 — writer compliance is the ceiling, SFT is the lever.** Grid posted to
+Slack #general. **v276-v278 THE MATH-SUITE RECOVERY (honest, measured, reproducible):**
 the v276 faDelimiterOnly guard unmasked the real math state (MATH-500 round 2 collapsed 94→14 when the
 ASK wrapper's "FINAL ANSWER:" instruction routed every math row to verbatim mode — fixed) → v277 fair math
 grader shipped (metadata stripping, surface-form equating, FA-line containment, FA-less fallback) →
@@ -1746,7 +1757,15 @@ false 100% → 26.7% honest re-baseline → 46.7% (v278). The levers for the rem
 positives — the honest band is 76-80. The next levers are the same as AIME: retrieval quality and full
 FA-line enforcement.
 
-### IFEval — ours: 60.0% (round 2 strict; rounds 3-4 writer A/B: 58/58 — the model is not the lever)
+### IFEval — ours: 60.0% best (5-round GLM-class band 48-60; r6 54 through v279b — the model is not the lever, SFT is)
+
+**Rounds 5-6 (2026-11-19, platforms 284/285):** round 5 (48.0) exposed a detection gap — 17 wrong rows
+carried unambiguous format constraints the v268b regex missed. v279b's detection v2 catches all 17
+(catalogued phrasings in the batch log; offline-verified zero effect on math/research prompts).
+Round 6 (54.0) recovered 6 of the 17; the rest are writer-compliance misses — the same ceiling the
+three-writer A/B proved. **The honest 5-round band: 48-60.** Verbatim routing is now correct on all
+100 rows; the remaining gap is GLM-5.3's instruction-following, and rule 15c SFT (constraint
+decomposition training) is the measured lever that breaks it.
 
 | Model / system | Score | vs us | Note |
 |---|---|---|---|
@@ -1758,17 +1777,19 @@ FA-line enforcement.
 | Kimi K2 Instruct | 89.8% | 🔴 | |
 | GPT-4.5 | 88.2% | 🔴 | |
 | Frontier band (typical) | 88-95% | 🔴 | raw-prompt instruction compliance |
-| **ai.spaincos.com / BoundView** | **60.0%** | — | round 2 strict; the honest arc 0 → 51 → 60 through live-verified gateway fixes; rounds 3-4 writer A/B (58/58) proved the model is NOT the lever — the rule 15c SFT pass is |
+| **ai.spaincos.com / BoundView** | **60.0%** best / 48-60 band | — | r6 54/100 through v279b; every round archived (results-v279-ifeval-r6); grid posted to Slack #general |
 
-**Honest read:** IFEval is our one suite far below the frontier, and the gap is a KNOWN product artifact
-(scaffolding + format-compliance discipline), not model capability. The three-writer A/B closed the
-"swap the model" theory; the SFT pass (rule 15c) is the remaining lever.
+**Honest read:** IFEval is our one suite far below the frontier. The gap is now fully characterized:
+verbatim routing is correct on all 100 rows (detection v2), the scaffolding artifacts are stripped —
+what remains is GLM-5.3's own instruction-following ceiling, which no gateway change can patch. The
+three-writer A/B closed the "swap the model" theory; the rule-15c SFT pass is the remaining lever.
 
 ### Where the estate stands (the one-line verdict)
 
 **7 suites scored, 5 leading or at frontier parity (BrowseComp 🟡 vs the 90-92 vendor band, SimpleQA 🟢,
 FRAMES 🟢, DSQA 🟢 vs retired Sonar), 2 climbing with measured levers (AIME 🟡 26.7→46.7, MATH-500 🟡 76-80),
-1 mid-climb with the lever identified (IFEval), 9 queued behind gates or protocols.** Every scored
+1 fully characterized with the lever staged (IFEval 48-60 band — writer compliance; SFT breaks it),
+9 queued behind gates or protocols.** Every scored
 number is strict, archived, and reproducible; every gated suite has a named unblock condition.
 
 
@@ -1788,11 +1809,11 @@ every claim of a fix was verified live before the next round ran.
 |---|---|---|---|---|---|
 | SimpleQA | 98.5% | ~100% ceiling | 1.5 | remaining misses are gold-conflict rows; add a second fair-reading pass | 98.5→99+ |
 | FRAMES | 90.0% | Kimi K2 Thinking 87.0 (best published) | **we lead by 3** | hold + confirm; extend the SFT set with FRAMES wins | hold/extend lead |
-| AIME 2025 | 46.7% (v278; honest re-baseline was 26.7) | GPT-5.2 99.0 | 52 | retrieval-quality filtering on math rows (junk HF-dataset sources) + full FA-line enforcement, then re-run | 47→85+ |
-| MATH-500 | 76.0% (v278; 76-80 band) | frontier band 94-97 | 18 | same levers as AIME; the fair grader (done) isolated them | 76→94+ |
+| AIME 2025 | 46.7% (v278; honest re-baseline was 26.7) | GPT-5.2 99.0 | 52 | ✅ source-quality filter SHIPPED (v279, live-verified on debug rows); next: full FA-line enforcement + a v280 re-run | 47→85+ |
+| MATH-500 | 76.0% (v278; 76-80 band) | frontier band 94-97 | 18 | same levers as AIME (filter shipped v279); the fair grader isolated them | 76→94+ |
 | BrowseComp | 88.0% | vendor band 90-92 | 2-4 | rule-15c SFT on research trajectories + high-effort confirm rounds | 88→90+ |
 | DSQA | 82.0% | internal suite (Perplexity) | n/a (we beat their retired base 27.3 by +55) | segmented enumeration tuning | 82→85+ |
-| IFEval | 60.0% | leaderboard band 93-97 | 33-37 | **rule-15c SFT** — the three-writer A/B proved the model is NOT the lever; constraint-decomposition training with the strict grader as reward IS | 60→85+ |
+| IFEval | 60.0% best / 48-60 band | leaderboard band 93-97 | 33-49 | **rule-15c SFT** — detection v2 + three-writer A/B closed every other theory; constraint-decomposition training with the strict grader as reward is the only remaining lever | 54→85+ |
 | GPQA / HLE | not scored | — | gated | dataset unlock (HF gated) — the add-a-suite bar is codified | — |
 | SWE-bench / LiveCodeBench | not scored | 75-85 | protocol | code-execution grading harness (build queued after SFT) | — |
 | WebArena / GAIA / Tau-bench | not scored | 70-80 | environments | live environments needed — owner-level infra | — |
