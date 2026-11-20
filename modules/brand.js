@@ -68,8 +68,40 @@
       while (walker.nextNode()) scrubNode(walker.currentNode);
     }
   }
+  // ---- v281 BOUNDVIEW BRAND ASSETS: swap the static brand links (favicon set,
+  // apple-touch-icon, PWA manifest, og:image) to the BoundView kit. Same runtime
+  // pattern as the icon swap — the files ship in the repo; only boundview.com
+  // requests them. Crawler note: social previews read og:image without JS, so
+  // boundview.com's og:image also needs the Vercel headers pass (see doc §30h).
+  function swapLinks() {
+    try {
+      var links = document.head ? document.head.getElementsByTagName("link") : [];
+      for (var i = 0; i < links.length; i++) {
+        var l = links[i];
+        var rel = (l.getAttribute("rel") || "").toLowerCase();
+        var href = l.getAttribute("href") || "";
+        if (/icon|apple-touch|manifest/.test(rel)) {
+          if (/(spaincos|favicon\.png|favicon\.webp|apple-touch-icon\.png|icons\/icon-|manifest\.webmanifest)/i.test(href)) {
+            if (/apple-touch/.test(rel)) l.setAttribute("href", "/icons/boundview-apple-touch-icon.png");
+            else if (/manifest/.test(rel)) l.setAttribute("href", "/boundview-manifest.webmanifest");
+            else if (/\.png/i.test(href)) l.setAttribute("href", "/icons/boundview-favicon-48.png");
+            else l.setAttribute("href", "/boundview-icon.svg");
+          }
+        }
+      }
+      if (document.head) {
+        var metas = document.head.getElementsByTagName("meta");
+        for (var j = 0; j < metas.length; j++) {
+          var mp = (metas[j].getAttribute("property") || "") + (metas[j].getAttribute("name") || "");
+          if (/og:image|twitter:image/i.test(mp)) metas[j].setAttribute("content", "/icons/boundview-og-image.png");
+        }
+      }
+    } catch (e) { /* never break the page over branding */ }
+  }
+
   function start() {
     scrubAll(document.documentElement);
+    swapLinks();
     document.title = window.BRAND.title;
     // keep it clean: any dynamically-inserted UI gets scrubbed too
     if (window.MutationObserver) {
