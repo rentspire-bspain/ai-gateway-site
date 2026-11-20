@@ -1,5 +1,27 @@
 # ai.spaincos.com — 100% Completion Parity Document (2026-11-19, v275)
 
+## 🏆 WEIGHTED AVERAGE COMPLETION: **90.4%** (computed by qa/generate-parity-headline.py — never hand-summed)
+
+**104 ✅ complete · 33 🟡 partial · 20 🔴 gap of 157 tracked items, weighted across 17 categories.**
+**Batch delta this session: 90.1 → 90.4 (+0.3).** The remaining 9.6 points break down as: owner
+credential gates (OAuth app registrations, Twilio — +324 pts across Connectors/Voice), platform
+categories (Mobile/Comet/Desktop/Enterprise — each needs its own product decision), and the
+benchmark SFT unlock (rule 15c — the single biggest score mover, staged).
+
+| Category | Weight | Score | | Category | Weight | Score |
+|---|---|---|---|---|---|---|
+| Features | 14 | 99 ✅ | | Privacy | 6 | 88 🟡 |
+| Computer | 8 | 99 ✅ | | Premium | 2 | 80 🟡 |
+| Connectors | 12 | 98 ✅ | | Voice | 4 | 80 🟡 |
+| API | 10 | 95 ✅ | | Teammates | 1 | 68 🔴 |
+| Models | 8 | 92 🟡 | | Comet | 3 | 70 🔴 |
+| Account | 6 | 95 ✅ | | Enterprise | 3 | 70 🔴 |
+| Billing | 6 | 92 🟡 | | Desktop | 3 | 70 🔴 |
+| Troubleshooting | 4 | 90 🟡 | | Mobile | 3 | 60 🔴 |
+| GettingStarted | 5 | 90 🟡 | | | | |
+
+---
+
 ## 📊 BENCHMARK HEADLINE — refreshed every batch (owner directive 2026-11-18)
 
 | Benchmark | Best strict score | Round / lane | Baseline (r1) | SOTA reference | Status |
@@ -8,13 +30,23 @@
 | **SimpleQA** | **98.5%** (r15 + v266 fair-readings re-grade) | both lanes agree | 98.0% | ~100% | 🟢 **leads every published score** (protocol note: ours is with-research) |
 | **FRAMES** | **90.0%** (r14 + v266 re-grade; 96.7 confirm) | async research lane | 75.0% | ~87% published best | 🟢 **leads every published score** |
 | **DSQA** | **82.0%** (r16 + v266 re-grade; 3-run band 78-83) | async research lane | 33.0% | internal suite (Perplexity's own suite name) | 🟢 vs Perplexity's retired Sonar base: 27.3% (their protocol) |
-| **AIME 2025** | **100%** (15/15, Set II — the only accessible set) | with-research protocol (in-request chat lane) | n/a (new suite) | ~85-97% frontier closed-book | 🟢 **leads the frontier band** (protocol note: with-research) |
-| **MATH-500** | **94.0%** (94/100) | with-research protocol (in-request chat lane) | n/a (new suite) | ~90-96% frontier | 🟢 frontier band |
+| **AIME 2025** | **46.7%** (7/15, v278 round 4 — full clean re-run through the v277 FA-append gateway, 0 error rows, p50 98s; up +20.0 from the 26.7% honest re-baseline) | with-research, FA-line partially enforced | n/a | ~85-97% frontier closed-book | 🟡 honest re-baseline 26.7 → 46.7; the FA-line + retrieval-quality are the levers |
+| **MATH-500** | **76.0%** (76/100, v278 round 4 — full clean re-run, 0 error rows, p50 49s; 76-80 run band with round 3's 80.0) | with-research | n/a | ~90-96% frontier | 🟡 grader fairness complete; FA-line + retrieval quality are the gap |
 | **IFEval** | **60.0%** (60/100 strict, round 2; rounds 3-4 model A/B: 58/58) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | 88-95% frontier band | 🟡 0→51→60; three-writer A/B proved the model is NOT the lever — the SFT pass is |
 
-**Parity headline (computed by qa/generate-parity-headline.py): 90.4% (8858/98; 104✅ / 33🟡 / 20🔴 of 157)**
+**Category headline (same computation as the top block): 90.4% weighted average.**
 
-**Batch log (v269-v275):** v271/v272 IFEval writer A/B (Kimi 58, gpt-oss 58 vs GLM 60 — model not the
+**Batch log (v269-v278):** **v276-v278 THE MATH-SUITE RECOVERY (honest, measured, reproducible):**
+the v276 faDelimiterOnly guard unmasked the real math state (MATH-500 round 2 collapsed 94→14 when the
+ASK wrapper's "FINAL ANSWER:" instruction routed every math row to verbatim mode — fixed) → v277 fair math
+grader shipped (metadata stripping, surface-form equating, FA-line containment, FA-less fallback) →
+v277 gateway regex FA-append (platform 283; partial — works when the model states the result with
+remainder/quotient-style prose, misses when the answer lives in stripped bullets) → v277b model-extraction
+append failed silently (reverted, documented, NOT redeployed) → **v278 full clean re-runs, 0 error rows:
+AIME 26.7 → 46.7 (+20.0, 7/15), MATH-500 76.0 (76-80 band with round 3's 80.0)** — archived
+results-v278-math-rebaseline. The teardown on the remaining misses: retrieval quality (junk HF-dataset
+sources sent the research down a tangent — the model never concluded, no FA line to extract), NOT just
+formatting. Earlier this batch: v271/v272 IFEval writer A/B (Kimi 58, gpt-oss 58 vs GLM 60 — model not the
 lever) → v273 GLM restored (platform 279) → v274/v275 BoundView brand scrub live-verified (rendered DOM:
 zero cross-brand mentions, screenshot-verified) + boundview.com deployed to v275 via Vercel CLI.
 Earlier this batch: v269 brand separation (PR #239) → v269b marker + IFEval r1 51.0 (PR #240) →
@@ -1274,8 +1306,8 @@ The 17 real errors are the honest remaining FRAMES gap: multi-hop reasoning dept
 
 | Suite | Dataset | Grader | Result | Protocol honesty |
 |---|---|---|---|---|
-| **AIME 2025** | Set II (15 rows; Set I parquet is dead on the HF hub — noted honestly) | exact integer match | **15/15 = 100%** | with-research (AIME answers are published online — the honest product measurement; frontier closed-book is 85-97%) |
-| **MATH-500** | 100-row deterministic sample | normalized string/numeric match | **94/100 = 94.0%** | with-research protocol, same as AIME |
+| **AIME 2025** | Set II (15 rows; Set I parquet is dead on the HF hub — noted honestly) | exact integer match | **7/15 = 46.7%** (v278 round 4, 0 error rows; the round-1 "15/15" was a false verification — see the honest re-baseline section) | with-research (AIME answers are published online — the honest product measurement; frontier closed-book is 85-97%) |
+| **MATH-500** | 100-row deterministic sample | normalized string/numeric match | **76/100 = 76.0%** (v278 round 4, 0 error rows; 76-80 run band; the round-1 "94%" had verified false positives) | with-research protocol, same as AIME |
 | **IFEval** | 541-row public set, 100-row deterministic sample | 16+ instruction checkers (startend, no_comma, capital_word_frequency, letter_frequency, two_responses, ...) | **baseline 0/100 product-path → v268b verbatim mode deployed; first honest round in flight** | raw prompts (no ASK/FINAL ANSWER wrapper — it is a competing format instruction) |
 
 **The IFEval story (why the baseline was 0 and what shipped):** IFEval grades FORMAT COMPLIANCE, not facts.
@@ -1671,8 +1703,8 @@ scored ones have full model tables.
 | SimpleQA | factuality | **98.5%** | ✅ scored, lanes agree | ~100% ceiling (with-research protocol) |
 | FRAMES | retrieval+reasoning | **90.0%** | ✅ scored, confirmed | Kimi K2 Thinking 87.0 (published best) |
 | DSQA | deep search QA | **82.0%** | ✅ scored, 3-run band | Perplexity retired Sonar base 27.3 |
-| AIME 2025 | math/reasoning | **100%** (15/15, Set II) | ✅ scored | GPT-5.2 (Xhigh) 99.0 — [Artificial Analysis](https://artificialanalysis.ai/evaluations/aime-2025) |
-| MATH-500 | math/reasoning | **94.0%** | ✅ scored | frontier band ~94-97 — [Kaggle Open Benchmarks](https://www.kaggle.com/benchmarks/open-benchmarks/math-500) |
+| AIME 2025 | math/reasoning | **46.7%** (7/15, Set II, v278; the round-1 "100%" was a false verification) | ✅ scored | GPT-5.2 (Xhigh) 99.0 — [Artificial Analysis](https://artificialanalysis.ai/evaluations/aime-2025) |
+| MATH-500 | math/reasoning | **76.0%** (76/100, v278; 76-80 band; the round-1 "94%" had false positives) | ✅ scored | frontier band ~94-97 — [Kaggle Open Benchmarks](https://www.kaggle.com/benchmarks/open-benchmarks/math-500) |
 | IFEval | instruction following | **51.0%** (round 1) | 🟡 scored, next-round lever identified (broaden strict-format detection) | leaderboard top band 93-97 — [llm-stats](https://llm-stats.com/benchmarks/ifeval) |
 | GPQA Diamond | reasoning | not scored | 🔴 dataset gated on HF (Idavidrein/gpqa) | frontier ~85-88% |
 | Humanity's Last Exam | reasoning | not scored | 🔴 dataset gated on HF (cais/hle) | frontier ~25-30% |
@@ -1687,31 +1719,34 @@ scored ones have full model tables.
 **Gated-suite bar (gospel rule 18):** a suite enters the scored set only when the dataset is public (or
 unlocks), the grader is strict + version-controlled, a baseline round runs, and a noise floor is computed.
 
-### AIME 2025 — ours: 100% (15/15, Set II, with-research protocol)
+### AIME 2025 — ours: 46.7% (7/15, Set II, with-research protocol, v278 round 4)
 
 | Model / system | Score | vs us | Note |
 |---|---|---|---|
-| **ai.spaincos.com / BoundView** | **100%** | — | 15/15, with-research (AIME answers are published online — the honest product measurement) |
-| GPT-5.2 (Xhigh) | 99.0% | 🟡 | closed-book — [Artificial Analysis](https://artificialanalysis.ai/evaluations/aime-2025) |
-| GPT-5 Codex (High) | 98.7% | 🟡 | closed-book, verified |
-| Gemini 3 Flash Preview (Reasoning) | 97.0% | 🟢 | closed-book, verified |
-| Frontier band (typical) | 85-97% | 🟢 | closed-book; our with-research protocol is the product path |
+| GPT-5.2 (Xhigh) | 99.0% | 🔴 | closed-book — [Artificial Analysis](https://artificialanalysis.ai/evaluations/aime-2025) |
+| GPT-5 Codex (High) | 98.7% | 🔴 | closed-book, verified |
+| Gemini 3 Flash Preview (Reasoning) | 97.0% | 🔴 | closed-book, verified |
+| Frontier band (typical) | 85-97% | 🔴 | closed-book; our with-research protocol is the product path |
+| **ai.spaincos.com / BoundView** | **46.7%** | — | 7/15, v278 full clean re-run, 0 error rows, p50 98s — up +20.0 from the 26.7% honest re-baseline; the round-1 "15/15" was a false verification |
 
 **Protocol note (binding):** ours is with-research — the measurement of the product a user actually gets.
-Frontier closed-book numbers are the model-only comparison; both are stated, never mixed.
+Frontier closed-book numbers are the model-only comparison; both are stated, never mixed. The honest arc:
+false 100% → 26.7% honest re-baseline → 46.7% (v278). The levers for the remaining gap: retrieval quality
+(junk sources send the research down a tangent — the model never concludes) and full FA-line enforcement.
 
-### MATH-500 — ours: 94.0% (94/100, with-research protocol)
+### MATH-500 — ours: 76.0% (76/100, with-research protocol, v278 round 4)
 
 | Model / system | Score | vs us | Note |
 |---|---|---|---|
-| Frontier top band | ~94-97% | 🟡 | [Kaggle Open Benchmarks](https://www.kaggle.com/benchmarks/open-benchmarks/math-500) |
-| **ai.spaincos.com / BoundView** | **94.0%** | — | 94/100, with-research |
-| Frontier mid band | ~90-93% | 🟢 | typical strong-reasoner closed-book |
+| Frontier top band | ~94-97% | 🔴 | [Kaggle Open Benchmarks](https://www.kaggle.com/benchmarks/open-benchmarks/math-500) |
+| Frontier mid band | ~90-93% | 🔴 | typical strong-reasoner closed-book |
+| **ai.spaincos.com / BoundView** | **76.0%** | — | 76/100, v278 full clean re-run, 0 error rows, p50 49s; 76-80 run band with round 3's 80.0 |
 
-**Protocol note (binding):** same with-research protocol as AIME. The 6 misses are honest misses (grader
-verified) — the next lever is the same enumeration/verification discipline that lifted DSQA.
+**Protocol note (binding):** same with-research protocol as AIME. The round-1 "94%" had 2 verified false
+positives — the honest band is 76-80. The next levers are the same as AIME: retrieval quality and full
+FA-line enforcement.
 
-### IFEval — ours: 51.0% (round 1, fixed harness + v268b verbatim mode)
+### IFEval — ours: 60.0% (round 2 strict; rounds 3-4 writer A/B: 58/58 — the model is not the lever)
 
 | Model / system | Score | vs us | Note |
 |---|---|---|---|
@@ -1723,18 +1758,18 @@ verified) — the next lever is the same enumeration/verification discipline tha
 | Kimi K2 Instruct | 89.8% | 🔴 | |
 | GPT-4.5 | 88.2% | 🔴 | |
 | Frontier band (typical) | 88-95% | 🔴 | raw-prompt instruction compliance |
-| **ai.spaincos.com / BoundView** | **51.0%** | — | round 1: 0% → 51% with verbatim mode; 34 rows still carried product scaffolding (detection gap — the identified next-round lever closes most of the 51→85 gap) |
+| **ai.spaincos.com / BoundView** | **60.0%** | — | round 2 strict; the honest arc 0 → 51 → 60 through live-verified gateway fixes; rounds 3-4 writer A/B (58/58) proved the model is NOT the lever — the rule 15c SFT pass is |
 
-**Honest read:** IFEval is our one suite below the frontier, and the gap is a KNOWN product artifact
-(scaffolding appended to format-constrained answers), not model capability. Round 2 with broadened
-strict-format detection is the fix — queued next.
+**Honest read:** IFEval is our one suite far below the frontier, and the gap is a KNOWN product artifact
+(scaffolding + format-compliance discipline), not model capability. The three-writer A/B closed the
+"swap the model" theory; the SFT pass (rule 15c) is the remaining lever.
 
 ### Where the estate stands (the one-line verdict)
 
-**7 suites scored, 6 leading or at frontier parity (BrowseComp 🟡 vs the 90-92 vendor band, SimpleQA 🟢,
-FRAMES 🟢, DSQA 🟢 vs retired Sonar, AIME 🟢, MATH-500 🟡), 1 mid-climb with the lever identified (IFEval),
-9 queued behind gates or protocols.** Every scored number is strict, archived, and reproducible; every
-gated suite has a named unblock condition.
+**7 suites scored, 5 leading or at frontier parity (BrowseComp 🟡 vs the 90-92 vendor band, SimpleQA 🟢,
+FRAMES 🟢, DSQA 🟢 vs retired Sonar), 2 climbing with measured levers (AIME 🟡 26.7→46.7, MATH-500 🟡 76-80),
+1 mid-climb with the lever identified (IFEval), 9 queued behind gates or protocols.** Every scored
+number is strict, archived, and reproducible; every gated suite has a named unblock condition.
 
 
 
@@ -1753,8 +1788,8 @@ every claim of a fix was verified live before the next round ran.
 |---|---|---|---|---|---|
 | SimpleQA | 98.5% | ~100% ceiling | 1.5 | remaining misses are gold-conflict rows; add a second fair-reading pass | 98.5→99+ |
 | FRAMES | 90.0% | Kimi K2 Thinking 87.0 (best published) | **we lead by 3** | hold + confirm; extend the SFT set with FRAMES wins | hold/extend lead |
-| AIME 2025 | 100% | GPT-5.2 99.0 | **we lead** | none needed — 15/15 | hold |
-| MATH-500 | 94.0% | frontier band 94-97 | at band | enumeration/verification discipline (the DSQA pattern) | 94→96+ |
+| AIME 2025 | 46.7% (v278; honest re-baseline was 26.7) | GPT-5.2 99.0 | 52 | retrieval-quality filtering on math rows (junk HF-dataset sources) + full FA-line enforcement, then re-run | 47→85+ |
+| MATH-500 | 76.0% (v278; 76-80 band) | frontier band 94-97 | 18 | same levers as AIME; the fair grader (done) isolated them | 76→94+ |
 | BrowseComp | 88.0% | vendor band 90-92 | 2-4 | rule-15c SFT on research trajectories + high-effort confirm rounds | 88→90+ |
 | DSQA | 82.0% | internal suite (Perplexity) | n/a (we beat their retired base 27.3 by +55) | segmented enumeration tuning | 82→85+ |
 | IFEval | 60.0% | leaderboard band 93-97 | 33-37 | **rule-15c SFT** — the three-writer A/B proved the model is NOT the lever; constraint-decomposition training with the strict grader as reward IS | 60→85+ |
@@ -1781,6 +1816,51 @@ round after that trains on its own verified wins — the flywheel the field cann
 - IFEval: the 0→51→60 arc — every step a live-verified gateway fix, every round archived, every
   flip analyzed (the three-writer A/B: 60/58/58 with 22-24 flips each way — measured, not assumed)
 - The grader itself: every change verified offline against all research archives before shipping
+- The math re-baseline arc (v277-v278): false 100% → honest 26.7% → 46.7% — every step audited, every
+  round archived (results-v277-math-audit, results-v278-math-rebaseline), the FA-append fix measured
+  by a full clean re-run (0 error rows), and the remaining-miss teardown (retrieval quality) verified
+  on debug rows with the failure mode documented
+
+
+### HONEST RE-BASELINE of the math suites (2026-11-19, v277) — the false-verification audit
+
+**The owner's standing rule is "no model may claim work was completed when it was not." This
+section is that rule being enforced on our own numbers.**
+
+**What the audit found:** the round-1 AIME "15/15 = 100%" and MATH-500 "94/100" were graded
+through the LENIENT pre-dispatch path (gold_in_answer — a substring check against the whole
+research body) because the v267 grade() dispatch for the new suites had not landed when those
+baselines ran. Verified false positives found and corrected:
+
+| Suite | Claimed | Honest (strict, re-measured) | The false positives |
+|---|---|---|---|
+| AIME 2025 | 15/15 = 100% | **4/15 = 26.7%** (round 2) → **7/15 = 46.7%** (v278 round 4, through the v277 FA-append gateway) | the gold appeared somewhere in the research body (a source's worked solution), not in the model's own final answer |
+| MATH-500 | 94/100 = 94.0% | **80/100 = 80.0%** (round 3) → **76/100 = 76.0%** (v278 round 4, 0 error rows) | 2 rows verified wrong-but-passed (FA line said 2880 vs gold 144; 4 vs 6) + extraction failures |
+
+**The root cause (both a grader gap and a product gap):**
+1. **Grader (FIXED, v277):** the strict math grader now (a) strips ALL metadata before extraction
+   (citation markers whose URLs are full of digits, trailing numbered source lists, follow-ups),
+   (b) equates surface forms (frac vs slash, unicode vs ASCII, pmatrix vs tuple, boxed, parens),
+   (c) accepts the answer stated in the model's own final sentence (numeric containment,
+   fraction values, normalized substrings) — never the whole research body.
+2. **Product (the remaining gap):** the gateway's FINAL ANSWER-line discipline is flaky on math
+   rows — the v264 QA retry fires sometimes (verified on a simple row) but not reliably on
+   research-path math rows; the model answers correctly in prose but omits the line the protocol
+   demands. THE FIX ATTEMPTED: deterministic FA-line enforcement in the gateway — v277 regex
+   append (LIVE, platform 283: partial — matches remainder/quotient-style prose), v277b
+   model-extraction append (failed silently, REVERTED, not redeployed). The v278 re-runs measured
+   the partial fix: **AIME 26.7 → 46.7 (+20.0)**, MATH-500 76-80 band.
+
+**The v278 teardown (what the remaining misses actually are):** not formatting alone — retrieval
+quality. Debug rows showed the research lane retrieving junk (Hugging Face dataset-viewer URLs as
+"sources"), the model wandering down a tangent, the prose never concluding, and the response cut
+mid-sentence — no FA line and no conclusion for any append-patch to extract from. The next lever is
+source-quality filtering on math rows (down-rank dataset-viewer/boilerplate domains), THEN FA-line
+enforcement on the clean research.
+
+**Every archived round and verdict chain is preserved** (results-v277-math-audit: the lenient
+round-1 archives + the strict round-2/3 re-measurements; results-v278-math-rebaseline: the full
+clean v278 re-runs, 0 error rows) — the audit trail is the point.
 
 ## Morning checklist (owner items only — everything else is autonomous)
 
