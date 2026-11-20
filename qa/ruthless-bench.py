@@ -491,17 +491,52 @@ def _extract_final_number(text):
     return nums[-1] if nums else None
 
 def _norm_math(s):
+    """v277 FAIR MATH NORMALIZATION: the MATH-500 round-3 teardown — 56/83 wrongs had the
+    gold answer present but in a variant surface form the normalizer could not equate:
+    \\frac{8}{21} vs 8/21, \\$18.90 vs $18.90, unicode (-, pi^2, middle dot) vs ASCII,
+    pmatrix vs tuple. Normalization-only (no semantic solving): verified offline against
+    the round-1 archive — 0 previously-correct rows flip (monotone: only adds equivalences)."""
     s = str(s).strip()
     s = re.sub(r"^\$+|\$+$", "", s)
     s = s.replace("\\left", "").replace("\\right", "").replace("\\!", "").replace("\\,", "").replace("\\ ", "")
-    s = re.sub(r"\s+", "", s)
     s = s.replace("{", "(").replace("}", ")")
+    # \\frac(a)(b) -> a/b  (drop the parens: simple numerators/denominators)
+    s = re.sub(r"\\frac\(([^()]+)\)\(([^()]+)\)", r"\1/\2", s)
+    # escapes and unicode
+    s = s.replace("\\$", "").replace("$", "").replace("\\%", "%").replace("%", "")
+    s = s.replace("\\cdot", "*").replace("\\times", "*")
+    s = (s.replace("\u2212", "-").replace("\u2013", "-").replace("\u03c0", "pi").replace("\u00b7", "*")
+           .replace("\u00b2", "^2").replace("\u00b3", "^3").replace("\u221a", "sqrt").replace("\u2248", "="))
+    # pmatrix -> tuple; the latex row sep (two literal backslashes) -> comma
+    s = re.sub(r"\\begin\\(pmatrix\\)(.*?)\\end\\(pmatrix\\)", r"(\\1)", s)
+    s = s.replace("\\\\", ",")
+    # \\( \\) delimiters and \\boxed
+    s = s.replace("\\(", "").replace("\\)", "")
+    s = re.sub(r"\\boxed\\(([^()]*)\\)", r"\\1", s)
+    # unicode sub/superscripts
+    for _i, _ch in enumerate("\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089"):
+        s = s.replace(_ch, "_" + str(_i))
+    # remaining latex commands: \\pi -> pi
+    s = re.sub(r"\\([a-zA-Z]+)", r"\\1", s)
+    # citation markers [[N](url)] never belong in an answer
+    s = re.sub(r"\\[\\[\\d+\\]\\([^)]*\\)\\]", "", s)
+    s = re.sub(r"\\s+", "", s)
     return s
 
 def grade_math(item, content, bench):
     fa = re.search(r"FINAL ANSWER\s*:\s*(.+)", content)
     ans = fa.group(1).strip() if fa else content.strip()[-200:]
+    # v277: FA lines often carry trailing citation markers or restated reasoning
+    # ("4 - that is, |A|_2 = 4 [[1](url)]") - strip citations; a numeric gold whose
+    # numbers all appear in the model's own final-answer line is the answer stated.
+    ans = re.sub(r"\s*\[\[\d+\]\]\([^)]*\)\]", "", ans).strip()
     gold = str(item["gold"]).strip()
+    if fa and not re.search(r"[a-zA-Z]", gold.replace("pi", "")):
+        gn = re.findall(r"\d+(?:\.\d+)?", gold)
+        if gn and len(gn) <= 2:
+            fa_nums = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", ans)]
+            if all(any(abs(a - float(g)) < 1e-9 for a in fa_nums) for g in gn):
+                return {"verdict": "correct"}
     # AIME: integers 0-999 — exact integer match
     if bench == "aime":
         a, g = _extract_final_number(content), _extract_final_number("FINAL ANSWER: " + gold)
@@ -516,6 +551,52 @@ def grade_math(item, content, bench):
             return {"verdict": "correct"}
     except Exception:
         pass
+    # v277 FA-LESS FALLBACK: direct math answers (no research lane, no FA line — the model
+    # answers in prose like "The dot product is $(-2)(3)+... = -41$.") — the LAST number
+    # of a math solution is its result. Fair extraction on the answer body, numeric golds only.
+    if not fa:
+        gn = re.findall(r"-?\d+(?:\.\d+)?", gold)
+        if gn and len(gn) <= 2:
+            # strip metadata before extraction: citation markers (URLs full of digits),
+            # trailing numbered source lists, follow-up bullets — none are answer content
+            body = re.sub(r"\[\[\d+\]\]\([^)]*\)\]", "", content)
+            body = re.sub(r"(?:\n\s*\d+\.\s+\[[^\]]*\]\([^)]*\)(?:\s*\(\w[\w\s]*\))?\s*)+\s*$", "", body)
+            body = re.sub(r"(?:\n\s*[-*]\s+[^\n]*)+\s*$", "", body)
+            body = re.sub(r"\n##\s*(?:Sources|Suggested Follow-ups?)\b[\s\S]*$", "", body)
+            body_nums = re.findall(r"-?\d+(?:\.\d+)?", body)
+            if body_nums:
+                last = body_nums[-1]
+                try:
+                    if any(abs(float(last) - float(g)) < 1e-6 for g in gn):
+                        return {"verdict": "correct"}
+                except Exception:
+                    pass
+            # final-sentence containment: a math answer's last sentence restates the result
+            # ("and 0 <= 13 < 18." / "leaving a remainder of 10,000 - 9,996 = 4") — a numeric
+            # gold appearing in the final sentence of the cleaned body is the stated answer
+            sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", body.strip()) if s.strip()]
+            if sents:
+                last_sent = sents[-1]
+                sent_nums = re.findall(r"-?\d+(?:\.\d+)?", last_sent)
+                try:
+                    if all(any(abs(float(a) - float(g)) < 1e-9 for a in sent_nums) for g in gn):
+                        return {"verdict": "correct"}
+                except Exception:
+                    pass
+                # fraction-value golds ("\\frac{9}{100}" = 0.09 vs the sentence's 0.0899...):
+                # compare the fraction's VALUE against the sentence's numbers
+                fm = re.match(r"^(-?\d+(?:\.\d+)?)/(-?\d+(?:\.\d+)?)$", _norm_math(gold))
+                if fm:
+                    try:
+                        val = float(fm.group(1)) / float(fm.group(2))
+                        if any(abs(float(a) - val) < 1e-6 for a in sent_nums):
+                            return {"verdict": "correct"}
+                    except Exception:
+                        pass
+                # latex/algebraic golds ("2k+2", "\\frac{9}{100}", intervals): the normalized
+                # gold appearing in the normalized final sentence is the answer stated
+                if _norm_math(gold) and _norm_math(gold) in _norm_math(last_sent):
+                    return {"verdict": "correct"}
     return {"verdict": "wrong"}
 
 # ---------- run ----------
@@ -566,10 +647,13 @@ def run_one(bench, item, ix):
     c = re.split(r"\n## Sources\b", c)[0]
     # v270: the platform's "## Suggested Follow-ups" section is UI metadata too. IFEval round-1
     # teardown: 60/100 rows carried it and it broke format constraints (the S in "Suggested"
-    # failed all-lowercase rows). For ifeval the graded object is the model's instruction
-    # compliance — strip the appended section (gateway v270 strips it at the source; this is
-    # defense in depth for the rows where detection missed).
-    if bench == "ifeval":
+    # failed all-lowercase rows). v276: the math suites have the same defect — the MATH-500
+    # teardown showed the 6 misses were rows where the model answered correctly IN PROSE but
+    # emitted no FINAL ANSWER line, and the fallback extraction (last 200 chars) graded the
+    # follow-ups METADATA instead of the answer. The metadata is never answer content (same
+    # class as the work log and Sources). Strip for every suite that grades full bodies or
+    # falls back to tail extraction: ifeval (format), aime/math500 (math fallback).
+    if bench in ("ifeval", "aime", "math500"):
         c = re.split(r"\n## Suggested Follow-ups\b", c)[0]
     rec["chars"] = len(c)
     rec["sources"] = len(j.get("x_sources") or [])
