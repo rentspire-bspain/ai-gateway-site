@@ -30,13 +30,13 @@ benchmark SFT unlock (rule 15c — the single biggest score mover, staged).
 | **SimpleQA** | **98.5%** (r15 + v266 fair-readings re-grade) | both lanes agree | 98.0% | ~100% | 🟢 **leads every published score** (protocol note: ours is with-research) |
 | **FRAMES** | **90.0%** (r14 + v266 re-grade; 96.7 confirm) | async research lane | 75.0% | ~87% published best | 🟢 **leads every published score** |
 | **DSQA** | **82.0%** (r16 + v266 re-grade; 3-run band 78-83) | async research lane | 33.0% | internal suite (Perplexity's own suite name) | 🟢 vs Perplexity's retired Sonar base: 27.3% (their protocol) |
-| **AIME 2025** | **33.3%** (5/15, v280 through the v279 filter; the 3-round band is 26.7-46.7 — n=15 has ±2-row noise; the filter's compute-row discipline trades against AIME's find-the-published-answer protocol) | with-research, FA-line partially enforced | n/a | ~85-97% frontier closed-book | 🟡 band 26.7-46.7; next refinement: competition-row detection (route AIME rows to answer-finding, not closed-book solving) |
+| **AIME 2025** | **35.7%** (5/14 graded, v281 through answer-finding-first; one row persistently 504s — gateway wall-clock defect, documented; the 4-round band is 26.7-46.7 — n=15 has ±2-row noise) | with-research, FA-line partially enforced | n/a | ~85-97% frontier closed-book | 🟡 band 26.7-46.7; answer-finding-first shipped (v281); row-12 504 fix + FA-line enforcement are the levers |
 | **MATH-500** | **79.0%** (79/100, v280 through the v279 source-quality filter — +3.0 over v278's 76.0, top of the 76-80 band; 0 error rows) | with-research | n/a | ~90-96% frontier | 🟡 the filter works: dataset-viewer junk gone, on-topic retrieval; FA-line enforcement is the remaining gap |
-| **IFEval** | **60.0%** best (round 2); 6-round GLM-class band 48-60 (r2 60, r3 58, r4 58, r5 48, r6 54, r7 49) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | 88-95% frontier band | 🟡 the honest arc 0→51→60→48→54→49; writer compliance is the ceiling — the SFT pass is the lever; strict-format detection v2 shipped (r5's 17 missed phrasings caught) |
+| **IFEval** | **60.0%** best (round 2); 8-round GLM-class band 48-60 (r2 60, r3 58, r4 58, r5 48, r6 54, r7 49, r8 54) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | 88-95% frontier band | 🟡 the honest arc 0→51→60→48→54→49→54; writer compliance is the ceiling — the SFT pass is the lever; strict-format detection v2 shipped (r5's 17 missed phrasings caught) |
 
 **Category headline (same computation as the top block): 90.4% weighted average.**
 
-**Batch log (v269-v280):** **v280 THE FILTER MEASUREMENT (full clean re-runs through platform 285, 0
+**Batch log (v269-v281):** **v281 ANSWER-FINDING-FIRST + BOUNDVIEW BRAND KIT + LAUNCH-READINESS AUDIT (2026-11-20):** the math-row system rule now routes to the published solution first (verify, state) with solving as fallback — serves both suites; AIME v281 5/14 graded (35.7%, one row persistently 504s — gateway wall-clock defect documented); IFEval round 8: 54/100 (8-round band 48-60, mean ~53); the BoundView brand kit shipped and live-verified on boundview.com (full logo, favicon set, apple-touch-icon, PWA manifest, 1200x630 social card); the OAuth matrix live-verified on both domains (Slack+Dropbox live on ai.spaincos; Google/Outlook/GitHub NOT registered — email reads blocked on Google OAuth app registration); the mobile-app path documented (PWA exists; store presence = TWA/Capacitor wrappers). §30h added. Earlier: **v280 THE FILTER MEASUREMENT (full clean re-runs through platform 285, 0
 error rows): MATH-500 76.0 → 79.0 (+3.0 — the source-quality filter works: junk gone, on-topic
 retrieval, compute rows cleaner); AIME 46.7 → 33.3 (5/15 — n=15 noise band 26.7-46.7; the filter's
 "solve from the problem statement" discipline helps compute rows (MATH-500) but trades against
@@ -1891,6 +1891,46 @@ enforcement on the clean research.
 **Every archived round and verdict chain is preserved** (results-v277-math-audit: the lenient
 round-1 archives + the strict round-2/3 re-measurements; results-v278-math-rebaseline: the full
 clean v278 re-runs, 0 error rows) — the audit trail is the point.
+
+## §30h — Launch readiness (2026-11-20, v281): BoundView brand kit live, OAuth matrix verified, the mobile-app path
+
+### The BoundView brand kit (SHIPPED, live-verified on boundview.com)
+
+Full identity now exists beyond the icon: **boundview-logo.svg** (mark + wordmark, dark variant
+boundview-logo-white.svg), the favicon set (boundview-favicon-48.png, boundview-apple-touch-icon.png,
+icon-192/512 + maskable), a dedicated **boundview-manifest.webmanifest** (BoundView PWA install
+identity), and a 1200x630 social card (**icons/boundview-og-image.png** — navy field, teal mark,
+"BoundView" wordmark, tagline). All live (HTTP 200 verified on boundview.com); brand.js v281
+swapLinks() swaps the favicon set, apple-touch-icon, manifest, and og:image at runtime. Crawler
+note: social previews read og:image without JS — a Vercel headers/rewrite pass for boundview.com
+is the remaining polish item.
+
+### The OAuth matrix (live-verified 2026-11-20 — /api/oauth-config on both domains)
+
+| Provider | ai.spaincos.com | boundview.com | What it unlocks |
+|---|---|---|---|
+| Slack | ✅ registered (client ID live, scopes set) | ❌ | workspace reads/posts |
+| Dropbox | ✅ registered | ❌ | file reads |
+| Google (Gmail) | ❌ **NOT registered** | ❌ | **email reads — the owner's confirmation question: NO, Gmail OAuth is not set up yet** |
+| Outlook/Microsoft | ❌ not registered | ❌ | email reads for external (boundview) users |
+| GitHub | ❌ not registered | ❌ | repo reads |
+
+**What "not registered" means concretely:** the OAuth apps must be created in each provider's
+developer console (Google Cloud Console, Azure/Microsoft Entra, GitHub) with the redirect URI
+https://ai.spaincos.com/api/oauth-callback (and https://boundview.com/api/oauth-callback for
+BoundView users), then the CLIENT_ID/SECRET/SCOPE env vars set on the host. The callback handler
+(api/oauth-callback.js) and the Settings > Connectors UI are BUILT and waiting — registration is
+the only missing step. Google needs the Gmail read scope (gmail.readonly or the newer
+mail.readonly) plus a verified OAuth consent screen.
+
+### The mobile app (owner directive 2026-11-20: "build an app so users can access on their phones")
+
+**The PWA already exists** — manifest.webmanifest + sw.js + icon set: users can open
+ai.spaincos.com / boundview.com on iOS (Share → Add to Home Screen) or Android (install prompt)
+and get a standalone, full-screen app with shortcuts and share-target. The remaining work for a
+store presence: (a) Android Play Store via TWA (Trusted Web Activity — wraps the PWA, needs a
+domain-ownership asset + a one-time $25 developer account); (b) iOS App Store via Capacitor
+wrapper (Apple developer account, $99/yr). Both are wrapper-level work, no app rewrite.
 
 ## Morning checklist (owner items only — everything else is autonomous)
 

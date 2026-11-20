@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 96" width="420" height="96" role="img" aria-label="BoundView">
+  <!-- BoundView full logo, light-on-dark variant (sidebar/dark surfaces). -->
+  <g>
+    <rect x="4" y="16" width="64" height="64" rx="14" fill="#5eead4"/>
+    <path d="M18 60 L30 36 L42 60" stroke="#0f2f4a" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="51" cy="37" r="5" fill="#0f2f4a"/>
+    <text x="84" y="63" font-family="'Inter','Segoe UI','Helvetica Neue',Arial,sans-serif" font-size="40" font-weight="700" fill="#ffffff" letter-spacing="-0.5">Bound<tspan fill="#5eead4">View</tspan></text>
+  </g>
+</svg>
