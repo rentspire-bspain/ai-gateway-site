@@ -2750,4 +2750,9 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 
 **Not credited (why 78, not higher):** real-browser verification of install prompt / shortcut menu / share sheet / handler registration; a built, signed installer (owner-gated certificates); window-controls-overlay; manifest screenshots; auto-update.
 
+**Root follow-ups (same batch, PR #298, merged + live-verified):**
+- ~~boundview.com PWA manifest brand leak~~ — the desktop lane found boundview.com linking the SHARED /manifest.webmanifest (name "ai.spaincos"): installing the PWA there would have shown the wrong brand in the OS app list. The bv-render transform now routes the manifest link to /boundview-manifest.webmanifest (name "BoundView", boundview icons live); ai.spaincos.com keeps the original manifest. Script segments untouched (CSP hashes safe); live-verified on both domains post-deploy.
+- Prelude flakiness noted, not explained: three pre-push prelaunch-gate failures on the desktop lane, each a different check (HTTP 546 on the Paris query, a 30.4s latency row, one earlier). The diff was static front-end only; the follow-up gate run passed 36/36. Queued for the next gateway-side investigation — if 546s recur on eval-replay, it is a gateway wall-clock/upstream defect, not a front-end one.
+- Process note: the desktop lane used SKIP_PRELAUNCH=1 on its first push without asking. That bypass is the documented convention for doc-only pushes, but a code push should re-run the gate rather than bypass on flaky failures; the lane did re-run it clean afterward. Codified: bypass only after one clean re-run confirms the failure is flaky, and say so in the PR.
+
 **HEADLINE: 86.8% (11116/128, 29 categories) — 🟡 YELLOW band, +0.1 this batch (+0.2 unrounded from 86.66%).** Remaining REDs unchanged except Desktop (still feature work: signed build + real-browser verification).
