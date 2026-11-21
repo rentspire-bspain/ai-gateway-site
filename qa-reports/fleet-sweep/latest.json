@@ -1,0 +1,66 @@
+{
+ "ts": "2026-11-21T19:04:34+00:00",
+ "fleet_score": 0.87,
+ "counts": {
+  "PASS": 3,
+  "PARTIAL": 6,
+  "FAIL": 0,
+  "UNREACHABLE": 0
+ },
+ "apps": [
+  {
+   "app": "ai.spaincos.com (AI gateway)",
+   "host": "ai.spaincos.com",
+   "verdict": "PASS",
+   "score": 1.0
+  },
+  {
+   "app": "BoundView (public host, ai-gateway project)",
+   "host": "boundview.com",
+   "verdict": "PASS",
+   "score": 1.0
+  },
+  {
+   "app": "CondoScores",
+   "host": "condoscores.com",
+   "verdict": "PARTIAL",
+   "score": 0.833
+  },
+  {
+   "app": "Comptrove (rent comps public site)",
+   "host": "comptrove.com",
+   "verdict": "PARTIAL",
+   "score": 0.833
+  },
+  {
+   "app": "SpainCos marketing site",
+   "host": "spaincos.com",
+   "verdict": "PASS",
+   "score": 1.0
+  },
+  {
+   "app": "Spain Terminal (internal operating shell)",
+   "host": "terminal.spaincos.com",
+   "verdict": "PARTIAL",
+   "score": 0.75
+  },
+  {
+   "app": "Allowance (ICHRA plan finder)",
+   "host": "allowancehealth.com",
+   "verdict": "PARTIAL",
+   "score": 0.75
+  },
+  {
+   "app": "NodeGrade (agentready scorecard)",
+   "host": "nodegrade.com",
+   "verdict": "PARTIAL",
+   "score": 0.833
+  },
+  {
+   "app": "PERILMARK",
+   "host": "perilmark.com",
+   "verdict": "PARTIAL",
+   "score": 0.833
+  }
+ ]
+}

@@ -1,7 +1,9 @@
 /* response-diff.js — Response versioning & diff view (Parity doc §34b) for ai.spaincos.com.
    When a thread has more than one assistant answer, older answers display a version badge
-   ("v1", "v2", ...) and a "Compare with latest" action that opens an accessible modal diff
-   (Side-by-side + Unified modes) powered by a dependency-free LCS line/token diff. */
+   ("v1 of 3", "v2 of 3", ...) and a quick "Compare with v(n-1)" action (diff vs the PREVIOUS
+   assistant answer, per the §34b spec; v1 has no previous and compares with latest instead)
+   that opens an accessible modal diff (Side-by-side + Unified modes, free from/to version
+   selectors) powered by a dependency-free LCS line/token diff. */
 (function (root) {
   "use strict";
 
@@ -23,7 +25,14 @@
   // ---------------- Pure LCS diff engine ----------------
 
   function normalizeText(s) {
-    return String(s == null ? "" : s).replace(/\r\n?/g, "\n");
+    // Mirrors renderAnswer's pre-parse tidy (index.html) so a diff compares what the
+    // user actually SAW rendered, not raw transport quirks: CRLF, OPS FLEET markers
+    // on platform coordination messages, and python-style ''' fences that cheap
+    // models emit (renderAnswer rewrites them to ``` before markdown parsing).
+    return String(s == null ? "" : s)
+      .replace(/\r\n?/g, "\n")
+      .replace(/^\s*\[OPS FLEET\]\s*/, "")
+      .replace(/'''/g, "```");
   }
 
   function splitLines(s) {
@@ -1040,6 +1049,14 @@
     var sec = ver.section;
     if (!sec) return;
     var latestLabel = "v" + totalVersions;
+    // §34b spec: each answer's quick action compares against the PREVIOUS assistant
+    // answer ("v2 of 3 · diff vs v1"). v1 has no previous, so it keeps the
+    // compare-with-latest fallback. The modal's from/to selectors remain fully free.
+    var hasPrev = ver.index > 0;
+    var targetLabel = hasPrev ? "v" + ver.index : latestLabel;
+    var targetDesc = hasPrev ? "previous" : "latest";
+    var fullLabel = ver.label + " of " + totalVersions;
+    var compareText = hasPrev ? "Compare with " + targetLabel : "Compare with latest";
     var labelRow = null;
     if (sec.children) {
       for (var i = 0; i < sec.children.length; i++) {
@@ -1078,7 +1095,7 @@
       btn.type = "button";
       btn.className = "rd-compare-btn";
       btn.setAttribute("data-action", "compare-latest");
-      btn.innerHTML = DIFF_ICON + "<span>Compare with latest</span>";
+      btn.innerHTML = DIFF_ICON + "<span>Compare</span>"; // label set (and kept current) by the update block below
 
       var openHandler = function (e) {
         if (e && e.stopPropagation) e.stopPropagation();
@@ -1086,11 +1103,12 @@
         var container = sec.parentNode;
         var currentVersions = collectThreadVersions(container);
         if (currentVersions.length < 2) return;
+        // default target: the previous answer (v(n-1) -> v(n)); v1 falls back to latest
         openDiffModal({
           document: doc,
           versions: currentVersions,
-          fromIndex: Math.min(idx, currentVersions.length - 2),
-          toIndex: currentVersions.length - 1,
+          fromIndex: idx > 0 ? idx - 1 : 0,
+          toIndex: idx > 0 ? idx : currentVersions.length - 1,
           trigger: btn
         });
       };
@@ -1108,13 +1126,21 @@
     var badgeEl = meta.children[0];
     var btnEl = meta.children[1];
     if (badgeEl) {
-      if (badgeEl.textContent !== ver.label) badgeEl.textContent = ver.label;
+      if (badgeEl.textContent !== fullLabel) badgeEl.textContent = fullLabel;
       badgeEl.setAttribute("data-version", ver.label);
-      badgeEl.title = "Response " + ver.label + " of " + totalVersions + " \u2014 click to compare with latest (" + latestLabel + ")";
+      badgeEl.setAttribute("data-total", String(totalVersions));
+      badgeEl.title = "Response " + ver.label + " of " + totalVersions + " \u2014 click to compare with " + targetDesc + " (" + targetLabel + ")";
     }
     if (btnEl) {
-      btnEl.setAttribute("aria-label", "Compare " + ver.label + " with latest response (" + latestLabel + ")");
-      btnEl.title = "Compare " + ver.label + " markdown with " + latestLabel + " (latest)";
+      btnEl.setAttribute("data-action", hasPrev ? "compare-previous" : "compare-latest");
+      // rewrite the label only when it changed (cheap idempotent innerHTML; no user
+      // content — compareText is always one of our two fixed phrases + a v-label)
+      if (btnEl.getAttribute("data-rd-label") !== compareText) {
+        btnEl.setAttribute("data-rd-label", compareText);
+        btnEl.innerHTML = DIFF_ICON + "<span>" + compareText + "</span>";
+      }
+      btnEl.setAttribute("aria-label", "Compare " + ver.label + " with " + targetDesc + " response (" + targetLabel + ")");
+      btnEl.title = "Compare " + ver.label + " markdown with " + targetLabel + " (" + targetDesc + ")";
     }
   }
 

@@ -369,7 +369,7 @@ test("DOM integration: single-answer thread renders zero version badges", () => 
   assert.equal(env.resultsContent.querySelectorAll(".rd-compare-btn").length, 0);
 });
 
-test("DOM integration: multi-answer thread decorates older answers (v1, v2) and opens diff modal against latest", () => {
+test("DOM integration: multi-answer thread decorates older answers (v1 of 3, v2 of 3) and defaults to diff vs PREVIOUS", () => {
   const thread = {
     id: "t-multi",
     messages: [
@@ -388,34 +388,63 @@ test("DOM integration: multi-answer thread decorates older answers (v1, v2) and 
 
   env.ctx.ResponseDiff.syncThreadVersions(env.resultsContent, thread);
 
-  // Older answers get v1 and v2; latest (sec3) has none
+  // Older answers get "v1 of 3" / "v2 of 3"; latest (sec3) has none
   const b1 = sec1.querySelector(".rd-ver-badge");
   const b2 = sec2.querySelector(".rd-ver-badge");
   const b3 = sec3.querySelector(".rd-ver-badge");
-  assert.ok(b1 && b1.textContent === "v1");
-  assert.ok(b2 && b2.textContent === "v2");
+  assert.ok(b1 && b1.textContent === "v1 of 3");
+  assert.ok(b1.getAttribute("data-version") === "v1");
+  assert.ok(b1.getAttribute("data-total") === "3");
+  assert.ok(b2 && b2.textContent === "v2 of 3");
   assert.equal(b3, null);
 
   const compareBtns = env.resultsContent.querySelectorAll(".rd-compare-btn");
   assert.equal(compareBtns.length, 2);
+  // v2's quick action targets the PREVIOUS answer (v1); v1 has no previous -> latest
+  assert.equal(compareBtns[1].textContent, "Compare with v1");
+  assert.equal(compareBtns[1].getAttribute("data-action"), "compare-previous");
+  assert.equal(compareBtns[0].textContent, "Compare with latest");
+  assert.equal(compareBtns[0].getAttribute("data-action"), "compare-latest");
 
-  // Click "Compare with latest" on v1 -> opens modal comparing v1 (index 0) to v3 (index 2, latest)
-  compareBtns[0].click();
+  // Click "Compare with v1" on v2 -> modal defaults to v2 (index 1) vs v1 (index 0)
+  compareBtns[1].click();
   assert.equal(env.ctx.ResponseDiff.isOpen(), true);
-  const modal = env.doc.getElementById("responseDiffModal");
+  let modal = env.doc.getElementById("responseDiffModal");
   assert.ok(modal);
   assert.equal(modal.getAttribute("role"), "dialog");
   assert.equal(modal.getAttribute("aria-modal"), "true");
+  assert.equal(modal.querySelector('[data-rd-role="from-version"]').value, "0"); // v1
+  assert.equal(modal.querySelector('[data-rd-role="to-version"]').value, "1");   // v2
+  // Stats v1 -> v2: Austin 5.5% -> 5.4% is -1/+1
+  assert.equal(modal.querySelector(".rd-stat-add").textContent, "+1");
+  assert.equal(modal.querySelector(".rd-stat-del").textContent, "-1");
+  // from/to selectors stay free: switch to-version to v3 (latest, index 2)
+  const selToA = modal.querySelector('[data-rd-role="to-version"]');
+  selToA.value = "2";
+  selToA.dispatchChange();
+  assert.equal(env.ctx.ResponseDiff.isOpen(), true); // modal stays open, selection is free
+  env.doc.pressKey("Escape");
+  assert.equal(env.ctx.ResponseDiff.isOpen(), false);
+
+  // v1 (no previous answer) keeps the compare-with-latest fallback: v1 (index 0) to v3 (index 2)
+  compareBtns[0].click();
+  assert.equal(env.ctx.ResponseDiff.isOpen(), true);
+  const modal2 = env.doc.getElementById("responseDiffModal");
+  assert.ok(modal2);
+  assert.equal(modal2.getAttribute("role"), "dialog");
+  assert.equal(modal2.getAttribute("aria-modal"), "true");
+  assert.equal(modal2.querySelector('[data-rd-role="from-version"]').value, "0"); // v1
+  assert.equal(modal2.querySelector('[data-rd-role="to-version"]').value, "2");   // v3 (latest)
 
   // Stats: Austin 5.5% -> 5.3% (-1/+1) and Phoenix: 5.6% (+1) => +2 / -1
-  assert.equal(modal.querySelector(".rd-stat-add").textContent, "+2");
-  assert.equal(modal.querySelector(".rd-stat-del").textContent, "-1");
-  assert.equal(modal.querySelectorAll(".rd-split").length, 1);
+  assert.equal(modal2.querySelector(".rd-stat-add").textContent, "+2");
+  assert.equal(modal2.querySelector(".rd-stat-del").textContent, "-1");
+  assert.equal(modal2.querySelectorAll(".rd-split").length, 1);
 
   // Switch to Unified mode
-  const unifiedBtn = modal.querySelector('[data-mode="unified"]');
+  const unifiedBtn = modal2.querySelector('[data-mode="unified"]');
   unifiedBtn.click();
-  assert.equal(modal.querySelectorAll(".rd-unified").length, 1);
+  assert.equal(modal2.querySelectorAll(".rd-unified").length, 1);
 
   // Escape closes modal and restores focus to trigger button
   env.doc.pressKey("Escape");
@@ -446,7 +475,8 @@ test("DOM integration: promotes v1 dynamically when second answer arrives and su
   const sec2 = env.ctx.renderSection("Explain DSCR", thread.messages[3].content);
   env.ctx.ResponseDiff.syncThreadVersions(env.resultsContent, thread);
 
-  assert.equal(sec1.querySelector(".rd-ver-badge").textContent, "v1");
+  assert.equal(sec1.querySelector(".rd-ver-badge").textContent, "v1 of 2");
+  assert.equal(sec1.querySelector(".rd-compare-btn").textContent, "Compare with latest"); // v1 has no previous
   assert.ok(sec1.querySelector(".rd-compare-btn"));
   assert.equal(sec2.querySelector(".rd-ver-badge"), null);
 
@@ -482,16 +512,38 @@ test("DOM integration: preserves accurate version numbers in >40-turn truncated 
   env.ctx.ResponseDiff.syncThreadVersions(env.resultsContent, thread);
 
   // First visible section is v22, 20th visible is v41, 21st visible (v42, latest) has no badge
-  assert.equal(rendered[0].querySelector(".rd-ver-badge").textContent, "v22");
-  assert.equal(rendered[19].querySelector(".rd-ver-badge").textContent, "v41");
+  assert.equal(rendered[0].querySelector(".rd-ver-badge").textContent, "v22 of 42");
+  assert.equal(rendered[19].querySelector(".rd-ver-badge").textContent, "v41 of 42");
   assert.equal(rendered[20].querySelector(".rd-ver-badge"), null);
 
-  // Clicking Compare on v22 opens modal with all 42 versions available
+  // v22's quick action targets its PREVIOUS answer (v21)
+  assert.equal(rendered[0].querySelector(".rd-compare-btn").textContent, "Compare with v21");
+
+  // Clicking Compare on v22 opens modal with all 42 versions available, defaulted to v21 -> v22
   rendered[0].querySelector(".rd-compare-btn").click();
   const modal = env.doc.getElementById("responseDiffModal");
   const selFrom = modal.querySelector('[data-rd-role="from-version"]');
   const selTo = modal.querySelector('[data-rd-role="to-version"]');
   assert.equal(selFrom.children.length, 42);
-  assert.equal(selFrom.value, "21"); // 0-based index of v22
-  assert.equal(selTo.value, "41");   // 0-based index of v42 (latest)
+  assert.equal(selFrom.value, "20"); // 0-based index of v21 (previous answer)
+  assert.equal(selTo.value, "21");   // 0-based index of v22
+});
+
+test("diffLines normalizes OPS FLEET markers and python-style ''' fences (mirrors renderAnswer)", () => {
+  // OPS FLEET coordination prefix + CRLF must not show as a diff
+  const opsA = ResponseDiff.diffLines("[OPS FLEET] fleet note\r\nsecond line", "fleet note\nsecond line");
+  assert.equal(opsA.identical, true);
+  assert.equal(opsA.stats.added, 0);
+  assert.equal(opsA.stats.removed, 0);
+
+  // ''' fences are rewritten to ``` by renderAnswer before rendering — diff the same way
+  const fenceA = "Intro\n'''py\nprint('hi')\n'''\nOutro";
+  const fenceB = "Intro\n```py\nprint('hi')\n```\nOutro";
+  assert.equal(ResponseDiff.diffLines(fenceA, fenceB).identical, true);
+
+  // but real content changes still show through the normalization
+  const changed = ResponseDiff.diffLines("[OPS FLEET] alpha\nkeep", "beta\nkeep");
+  assert.equal(changed.stats.added, 1);
+  assert.equal(changed.stats.removed, 1);
+  assert.equal(changed.identical, false);
 });
