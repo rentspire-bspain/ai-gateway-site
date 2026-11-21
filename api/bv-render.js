@@ -25,13 +25,17 @@ const MAP = [
   [/ai\.BoundView\b/g, "BoundView"],
 ];
 
+const BV_LD = "{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"Organization\",\"@id\":\"https://boundview.com/#org\",\"name\":\"BoundView\",\"url\":\"https://boundview.com/\",\"logo\":\"https://boundview.com/icons/boundview-icon-512.png\",\"contactPoint\":{\"@type\":\"ContactPoint\",\"contactType\":\"customer support\",\"email\":\"support@boundview.com\"}},{\"@type\":\"WebSite\",\"@id\":\"https://boundview.com/#website\",\"name\":\"BoundView\",\"url\":\"https://boundview.com/\",\"publisher\":{\"@id\":\"https://boundview.com/#org\"}},{\"@type\":\"WebApplication\",\"@id\":\"https://boundview.com/#app\",\"name\":\"BoundView\",\"url\":\"https://boundview.com/\",\"description\":\"AI research with sources, and Neurons rewards for verified activity.\",\"applicationCategory\":\"BusinessApplication\",\"operatingSystem\":\"Web\",\"browserRequirements\":\"Requires JavaScript\",\"publisher\":{\"@id\":\"https://boundview.com/#org\"}},{\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"BoundView\",\"item\":\"https://boundview.com/\"}]}]}";
+
 function transformHtml(html) {
   // never touch <script> blocks: the CSP carries sha256 hashes of inline scripts —
   // rewriting script content would break the CSP and kill the page.
   const parts = html.split(/(<script[\s\S]*?<\/script>)/g);
   return parts
     .map((seg, i) => (i % 2 === 1 ? seg : MAP.reduce((s, [re, to]) => s.replace(re, to), seg)))
-    .join("");
+    .join("")
+    // crawler-visible structured data (data block, not executed — CSP-safe); brand.js skips its copy when present
+    .replace("</head>", '<script type="application/ld+json" data-bv="1">' + BV_LD + "</script></head>");
 }
 
 module.exports = async (req, res) => {
