@@ -1,5 +1,5 @@
 {
- "version": "v290",
+ "version": "v291",
  "generated_at": "2026-11-16T00:00:00Z",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE \u2014 GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90\u219295. | 2026-11-18: owner-blocker audit \u2014 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped \u2014 server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
@@ -106,6 +106,60 @@
    "weight": 3,
    "score": 60,
    "note": "benchmark marketing brief with strict-graded verified claims (2026-11-18); BoundView brand kit + social cards + PWA; launch-readiness audit. GAPS: no campaigns, no launch copy, no distribution."
+  },
+  {
+   "name": "Security",
+   "weight": 4,
+   "score": 70,
+   "note": "PRESENT: CSP with sha256 script hashes, HSTS (max-age 63072000), invite-only auth boundary + real error surfaces, RLS everywhere, credential scrubbing, API-key mode with usage logging. v291 ADDS: X-Content-Type-Options, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy headers (vercel.json). GAPS: no rate-limit evidence on the gateway, no security.txt, no pen test, no dependency-audit cadence."
+  },
+  {
+   "name": "Accessibility",
+   "weight": 2,
+   "score": 55,
+   "note": "PRESENT: html lang attr, 18 aria-labels, 9 roles, skip link, focus outlines (UA default), high-contrast body text, keyboard Enter submit. GAPS: only 2 alt attrs in served HTML (icon-heavy UI), no WCAG 2.1 audit, no screen-reader pass, default UA focus styles (no custom focus-visible), no reduced-motion handling verified."
+  },
+  {
+   "name": "Legal/Compliance",
+   "weight": 2,
+   "score": 25,
+   "note": "GAPS (live-verified 404s): /privacy 404, /terms 404 \u2014 a real compliance gap for a product with billing/credits. No cookie banner (invite-only private product mitigates but does not eliminate). OWNER-GATED: legal copy needs the owner's counsel. This is the single biggest honest drag on the full-product score."
+  },
+  {
+   "name": "Docs/Support",
+   "weight": 2,
+   "score": 50,
+   "note": "PRESENT: in-app Docs panel + Settings docs, onboarding tour (v290-verified), keyboard-shortcut hints, E2E-maintained flows. GAPS: no public docs site (/docs 404), no helpdesk/support surface, no contact path beyond the owner."
+  },
+  {
+   "name": "Observability",
+   "weight": 2,
+   "score": 55,
+   "note": "PRESENT: nightly parity_self_audit cron (07:30 UTC), retention cron, QA suites as gates, thread persistence with server-side turn recording, gateway-status function exists. v291 ADDS: /api/health liveness endpoint (200 JSON, no-auth). GAPS: no uptime monitor wired to it, no error-rate dashboard, no status page for users."
+  },
+  {
+   "name": "Fleet",
+   "weight": 3,
+   "score": 50,
+   "note": "PRESENT: fleet_registry + webapp_registry SQL + the Webapps explorer (schema/ontology per webapp), 108-app catalog documented, webapp_doctor tooling. GAPS: NO per-webapp E2E/UX benchmark runs (the owner's exact demand: 'all webapps through the same rigor') \u2014 the 46-check suite runs on ai.spaincos.com only; the fleet domains have no standing gates."
+  },
+  {
+   "name": "Email/Notifications",
+   "weight": 1,
+   "score": 30,
+   "note": "PRESENT: in-app Notifications button, notifications function. GAPS: email reads blocked on Google OAuth client registration (owner form open), Twilio/Play Console owner blockers from v282 \u00a730i."
+  },
+  {
+   "name": "i18n",
+   "weight": 1,
+   "score": 10,
+   "note": "GAPS: no locale switching, no translated surfaces, single-language product. Low weight: invite-only personal product; becomes material at public launch."
+  },
+  {
+   "name": "NativeMobile",
+   "weight": 1,
+   "score": 40,
+   "note": "PRESENT: PWA (manifest + SW + installable, mobile 375px benchmark-verified clean). GAPS: no store presence (TWA/Capacitor wrapper documented as the path, not built); Play Console + Apple Developer owner blockers from \u00a730i."
   }
  ],
  "raw_items": {
@@ -125,6 +179,11 @@
   }
  ],
  "changelog": [
+  {
+   "version": "v291",
+   "date": "2026-11-21",
+   "change": "Exhaustive rebalance per owner directive (be exhaustive on every dimension): +Security w4 70, +Accessibility w2 55, +Legal/Compliance w2 25 (privacy/terms 404 \u2014 live-verified gap), +Docs/Support w2 50, +Observability w2 55, +Fleet w3 50 (no per-webapp gates yet), +Email w1 30 (owner-gated), +i18n w1 10, +NativeMobile w1 40. Weight 110 -> 128. v291 also ships: /api/health, sitemap.xml, robots.txt update, security headers, and the context digest behind a double feature flag (deployed platform 301, OFF-path live-verified)."
+  },
   {
    "version": "v290",
    "date": "2026-11-21",

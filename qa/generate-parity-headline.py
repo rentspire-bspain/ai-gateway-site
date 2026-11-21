@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 ITEMS = ROOT / "qa" / "parity-items.json"
 OUT = ROOT / "qa-reports" / "parity-headline-latest.json"
 
-EXPECTED_WEIGHT = 110  # the 20-category weight total (v290: +UX/SEO/Marketing per owner directive); a change here is a deliberate decision, not an edit
+EXPECTED_WEIGHT = 128  # the 20-category weight total (v290: +UX/SEO/Marketing per owner directive); a change here is a deliberate decision, not an edit
 
 
 def main() -> int:
