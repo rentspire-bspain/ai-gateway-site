@@ -4,8 +4,12 @@
 // boundview.com before the scrub caught up. This function applies the same brand MAP
 // to the HTML BEFORE the browser ever sees it: zero flash, zero delay. The runtime
 // scrub stays as the safety net for dynamically-rendered nodes.
-// NOTE: this rewrite is boundview.com-only in effect — the Vercel project serves the
-// boundview deployment; ai.spaincos.com is served by GitHub Pages and never hits it.
+// NOTE (v290): the BoundView transform is applied ONLY when the request host is a
+// boundview hostname. This same Vercel project ALSO serves ai.spaincos.com (DNS
+// CNAMEs ai.spaincos.com to cname.vercel-dns.com — the "GitHub Pages serves it"
+// assumption in v283 was wrong), and serving the transformed HTML there shipped
+// BoundView branding to every ai.spaincos.com user (found by the v290 UX master
+// benchmark, check H2). Non-boundview hosts get the RAW index.html.
 const fs = require("fs");
 const path = require("path");
 
@@ -53,7 +57,12 @@ module.exports = async (req, res) => {
     ];
     let file = candidates.find((c) => { try { return fs.existsSync(c); } catch { return false; } });
     const html = fs.readFileSync(file, "utf8");
-    const out = transformHtml(html);
+    // v290: transform ONLY for boundview hosts — every other host (ai.spaincos.com
+    // included, which this same project serves) gets the RAW html. The transform is
+    // the BoundView brand kit; applying it to ai.spaincos.com is a brand leak.
+    const host = String(req.headers.host || "").toLowerCase();
+    const isBoundViewHost = /(^|\.)boundview\.com$/.test(host);
+    const out = isBoundViewHost ? transformHtml(html) : html;
     res.writeHead(200, headers);
     res.end(req.method === "HEAD" ? undefined : out);
   } catch (e) {
