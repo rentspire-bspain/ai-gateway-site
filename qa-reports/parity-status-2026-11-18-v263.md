@@ -1,6 +1,6 @@
 # ai.spaincos.com — 100% Completion Parity Document (2026-11-21, v290)
 
-## 🏆 WEIGHTED AVERAGE COMPLETION: **86.6%** (computed by qa/generate-parity-headline.py — never hand-summed; v294 CONNECTOR-MARKETING BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 55 — ToS draft live, Enterprise 72) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
+## 🏆 WEIGHTED AVERAGE COMPLETION: **86.8%** (computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 78) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 55 — ToS draft live, Enterprise 72) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
 ### 🏆 CATEGORY STATUS — G/R/Y ICONS (generated from qa/parity-items.json, never hand-built)
 
@@ -2726,7 +2726,15 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 
 **HEADLINE: 86.6% (11090/128, 29 categories) — 🟡 YELLOW band, +0.3 this batch, +2.2 across v292-v294.** The remaining REDs: Legal (owner review), i18n, Email (owner OAuth registration), Desktop/Comet/Teammates (feature work), and the Wave-1 webapp rebuild (all three top dispatches DRAFT-WITH-BLOCKERS per the acceptance pass). Open PRs awaiting review: #267 (v262.1 re-verify), #222 (gospel icons), #216 (checkout wiring).
 
-### 11. §30q addendum — v295: THE DESKTOP LANE (Desktop 70 → 78, headline 86.6% → 86.8%)
+### 11. §30q addendum — v295: THE TEAMMATES/COMET SHIP BATCH (headline 86.6% → 86.7%)
+
+**Lanes landed this batch:**
+- ~~Teammates onboarding unification (PR #294, 446b214)~~ — LIVE (cache-busted fetch matches master, SHA-256 7f2bf9b4…): duplicate invitation flow routed to Team onboarding, pending-invite filter, Account profile shortcut; node --check + 5 Node tests + verify-live CI green. Teammates 68→70. Honest limits: no authenticated E2E yet; templates and shared profile parity remain gaps.
+- ~~Comet extension v1.1.1 (PR #295, 19dd20f)~~ — LIVE: fixes the invalid array-shaped commands manifest in v1.1.0 plus shortcut dispatch storage/timestamp/gesture; manifest 1.1.1 with commands object + update feed live; ZIP SHA256 b7867109… matches the merge commit; all extension JS node --check + mocked dispatch/fallback green. Comet stays 70 pending real-browser validation at root.
+
+**Headline: 86.7% (11092/128, 29 categories) — 🟡 YELLOW band, +0.1 this batch, +2.3 across v292-v295.** Remaining REDs: Legal (owner review), i18n, Email (owner OAuth registration), Desktop 70, Comet 70 (browser validation unlock at root), Wave-1 webapp rebuild. Open PRs: #267, #222, #216.
+
+### 12. §30q addendum — v296: THE DESKTOP LANE (Desktop 70 → 78, headline 86.7% → 86.8%)
 
 **Lane:** Desktop 70 → close the gap (PWA install UX, desktop-wrapper readiness, offline/launcher surfaces). Evidence is code + curl only — no browser was available, and the score is capped accordingly.
 
@@ -2742,4 +2750,4 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 
 **Not credited (why 78, not higher):** real-browser verification of install prompt / shortcut menu / share sheet / handler registration; a built, signed installer (owner-gated certificates); window-controls-overlay; manifest screenshots; auto-update.
 
-**HEADLINE: 86.8% (11114/128, 29 categories) — 🟡 YELLOW band, +0.2 this batch.** Remaining REDs unchanged except Desktop (still feature work: signed build + real-browser verification).
+**HEADLINE: 86.8% (11116/128, 29 categories) — 🟡 YELLOW band, +0.1 this batch (+0.2 unrounded from 86.66%).** Remaining REDs unchanged except Desktop (still feature work: signed build + real-browser verification).

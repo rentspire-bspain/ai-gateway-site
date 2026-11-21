@@ -1,6 +1,7 @@
 # ai.spaincos.com Assistant (Chrome / Comet extension, Manifest V3)
 
 - Toolbar icon opens a side panel with the ai.spaincos.com chat.
+- Keyboard shortcuts open the panel (Ctrl+Shift+S) or ask it to summarize the active HTTP(S) page (Ctrl+Shift+A). Use Command instead of Ctrl on Mac. If the browser already uses a suggested shortcut, assign a free one in its extension shortcuts settings.
 - Right-click menu: "Ask ai.spaincos.com about this page" and "Ask ai.spaincos.com about this selection". The page URL, title and any selected text (first 2,000 chars) are typed into the chat composer and sent.
 - Sign-in reuse: the Supabase session of ai.spaincos.com is mirrored through `chrome.storage.local`, so the side panel and normal tabs stay signed in together.
 

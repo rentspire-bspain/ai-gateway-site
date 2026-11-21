@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ai.spaincos.com Assistant",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Open ai.spaincos.com chat in a side panel and ask about the current page or your selected text.",
   "minimum_chrome_version": "114",
   "icons": {
@@ -18,6 +18,7 @@
     }
   },
   "permissions": [
+    "activeTab",
     "sidePanel",
     "contextMenus",
     "storage",
@@ -49,22 +50,20 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://ai.spaincos.com"
   },
-  "commands": [
-    {
-      "name": "open-sidepanel",
+  "commands": {
+    "open-sidepanel": {
       "suggested_key": {
         "default": "Ctrl+Shift+S",
         "mac": "Command+Shift+S"
       },
       "description": "Open the ai.spaincos.com assistant side panel"
     },
-    {
-      "name": "summarize-page",
+    "summarize-page": {
       "suggested_key": {
         "default": "Ctrl+Shift+A",
         "mac": "Command+Shift+A"
       },
       "description": "Summarize the current page"
     }
-  ]
+  }
 }

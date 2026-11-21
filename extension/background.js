@@ -96,7 +96,11 @@ function buildQuestion(info, tab) {
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId !== MENU_PAGE && info.menuItemId !== MENU_SELECTION) return;
-  const pending = { id: Date.now() + "-" + Math.random().toString(36).slice(2, 8), text: buildQuestion(info, tab), ts: Date.now() };
+  dispatchAsk(buildQuestion(info, tab), tab);
+});
+
+function dispatchAsk(text, tab) {
+  const pending = { id: Date.now() + "-" + Math.random().toString(36).slice(2, 8), text, ts: Date.now() };
 
   // sidePanel.open() must run synchronously inside the user gesture, before any await.
   if (chrome.sidePanel && chrome.sidePanel.open && tab && tab.id !== undefined) {
@@ -106,7 +110,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   } else {
     openInTab(pending);
   }
-});
+}
 
 // Fallback: open the full site in a new tab; site-bridge.js (top frame) consumes the pending ask.
 function openInTab(pending) {
@@ -114,18 +118,16 @@ function openInTab(pending) {
     .finally(() => chrome.tabs.create({ url: SITE + "/" }));
 }
 
-// v1.1.0: keyboard commands — open the side panel / summarize the page
-chrome.commands && chrome.commands.onCommand && chrome.commands.onCommand.addListener(async (command) => {
-  try {
-    if (command === "open-sidepanel") {
-      // same behavior as the action button: open the side panel
-      chrome.sidePanel && chrome.sidePanel.open && chrome.sidePanel.open({ windowId: (await chrome.windows.getCurrent()).id });
-    } else if (command === "summarize-page") {
-      const tab = await chrome.tabs.query({ active: true, currentWindow: true });
-      const url = tab && tab[0] && tab[0].url;
-      if (!url) return;
-      chrome.storage.local.set({ pendingAsk: { id: Date.now().toString(36), text: "Read and summarize this page: " + url, at: Date.now() } });
-      chrome.sidePanel && chrome.sidePanel.open && chrome.sidePanel.open({ windowId: (await chrome.windows.getCurrent()).id });
+// Use the command's tab so sidePanel.open runs before any await.
+chrome.commands && chrome.commands.onCommand && chrome.commands.onCommand.addListener((command, tab) => {
+  if (command === "open-sidepanel") {
+    const fallback = () => chrome.tabs.create({ url: SITE + "/" });
+    if (chrome.sidePanel?.open && tab?.id !== undefined) {
+      chrome.sidePanel.open({ tabId: tab.id }).catch(fallback);
+    } else {
+      fallback();
     }
-  } catch (_e) { /* side panel API unavailable in this Chrome version */ }
+  } else if (command === "summarize-page" && /^https?:\/\//i.test(tab?.url || "")) {
+    dispatchAsk(buildQuestion({ pageUrl: tab.url }, tab), tab);
+  }
 });
