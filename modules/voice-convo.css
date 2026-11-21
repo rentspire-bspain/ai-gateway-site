@@ -25,3 +25,13 @@
 .vc-exit{min-height:36px}
 @media (max-width:480px){.vc-bar{bottom:max(12px,calc(env(safe-area-inset-bottom) + 8px))}.vc-exit{min-height:40px}}
 @media (prefers-reduced-motion:reduce){.vc-dot{animation:none !important}}
+
+/* Voice status/error notice + input-button states (v2) */
+.vc-notice { position:fixed; left:50%; bottom:76px; transform:translateX(-50%) translateY(8px); z-index:1001; opacity:0; pointer-events:none;
+  max-width:min(460px, calc(100vw - 24px)); box-sizing:border-box; padding:10px 16px; border-radius:12px; font-size:13px; line-height:1.4;
+  background:var(--bg-surface); color:var(--text); border:1px solid var(--border); box-shadow:0 8px 30px rgba(0,0,0,.35); transition:opacity .15s, transform .15s; }
+.vc-notice.show { opacity:1; transform:translateX(-50%); }
+.vc-notice[data-kind="error"] { border-color:#ef4444; }
+.mic-btn.processing { color:#f59e0b; background:rgba(245,158,11,.12); }
+.mic-btn.processing .mic-dot { display:block; background:#f59e0b; animation:micPulse .6s infinite; }
+.mic-btn.unsupported, .width-toggle.unsupported, .vc-btn.unsupported { opacity:.45; cursor:not-allowed; }
