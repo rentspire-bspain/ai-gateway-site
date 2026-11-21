@@ -1,5 +1,5 @@
 {
- "version": "v262",
+ "version": 5,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -35,7 +35,7 @@
    "cat": "PERF",
    "kind": "U",
    "check": "Largest Contentful Paint, field p75, mobile 4G",
-   "benchmark": "≤2.5 s good; >4.0 s fail",
+   "benchmark": "\u22642.5 s good; >4.0 s fail",
    "W": 5,
    "ircm": "3101",
    "status": {
@@ -55,7 +55,7 @@
    "cat": "PERF",
    "kind": "U",
    "check": "Interaction to Next Paint, field p75",
-   "benchmark": "≤200 ms good; >500 ms fail",
+   "benchmark": "\u2264200 ms good; >500 ms fail",
    "W": 5,
    "ircm": "3101",
    "status": {
@@ -75,7 +75,7 @@
    "cat": "PERF",
    "kind": "U",
    "check": "Cumulative Layout Shift",
-   "benchmark": "≤0.1 good; >0.25 fail",
+   "benchmark": "\u22640.1 good; >0.25 fail",
    "W": 5,
    "ircm": "3101",
    "status": {
@@ -95,7 +95,7 @@
    "cat": "PERF",
    "kind": "U",
    "check": "Time to First Byte p75",
-   "benchmark": "≤800 ms",
+   "benchmark": "\u2264800 ms",
    "W": 3,
    "ircm": "2100",
    "status": {
@@ -115,7 +115,7 @@
    "cat": "PERF",
    "kind": "U",
    "check": "First-load request count and critical JS",
-   "benchmark": "≤30 requests and ≤170 KB br critical JS",
+   "benchmark": "\u226430 requests and \u2264170 KB br critical JS",
    "W": 5,
    "ircm": "3101",
    "status": {
@@ -128,7 +128,7 @@
     "DG": "U"
    },
    "evidence": "Shell references 65 script tags + 16 stylesheets; modules/ dir is 3.4 MB raw across 77 files. TT is one 9.7 KB file with zero static deps",
-   "fix": "Bundle + defer non-critical modules (settings, fleet, media, voice) behind route/idle import; target ≤30 first-load requests"
+   "fix": "Bundle + defer non-critical modules (settings, fleet, media, voice) behind route/idle import; target \u226430 first-load requests"
   },
   {
    "id": "U-PERF-06",
@@ -174,7 +174,7 @@
    "id": "U-PERF-08",
    "cat": "PERF",
    "kind": "U",
-   "check": "Fonts self-hosted, ≤2 families, font-display swap, preloaded",
+   "check": "Fonts self-hosted, \u22642 families, font-display swap, preloaded",
    "benchmark": "0 third-party font origins",
    "W": 5,
    "ircm": "2201",
@@ -255,7 +255,7 @@
    "cat": "PERF",
    "kind": "U",
    "check": "Usable on Slow 4G / 400 ms RTT",
-   "benchmark": "interactive ≤6 s; core action ≤10 s",
+   "benchmark": "interactive \u22646 s; core action \u226410 s",
    "W": 5,
    "ircm": "3101",
    "status": {
@@ -275,7 +275,7 @@
    "cat": "PERF",
    "kind": "U",
    "check": "Answer latency (gateway)",
-   "benchmark": "first token ≤2 s p75; simple answer ≤8 s p95",
+   "benchmark": "first token \u22642 s p75; simple answer \u22648 s p95",
    "W": 6,
    "ircm": "4200",
    "status": {
@@ -315,7 +315,7 @@
    "cat": "A11Y",
    "kind": "U",
    "check": "Text contrast",
-   "benchmark": "≥4.5:1 body; ≥3:1 large text and UI components",
+   "benchmark": "\u22654.5:1 body; \u22653:1 large text and UI components",
    "W": 6,
    "ircm": "3021",
    "status": {
@@ -328,7 +328,7 @@
     "DG": "U"
    },
    "evidence": "qa/palette-check.py exists. TT measured: muted #7a6f64 on #fdf6ee = 4.57; pending dot #d9a441 on white = 2.25 (fails 3:1 non-text); coral #e8613c on white = 3.38",
-   "fix": "Run palette-check on every theme; darken dot to ≥3:1 or add text label"
+   "fix": "Run palette-check on every theme; darken dot to \u22653:1 or add text label"
   },
   {
    "id": "U-A11Y-02",
@@ -375,7 +375,7 @@
    "cat": "A11Y",
    "kind": "U",
    "check": "Visible focus (2.4.7 / 2.4.11)",
-   "benchmark": "≥2 px ring, ≥3:1, never hidden by sticky UI",
+   "benchmark": "\u22652 px ring, \u22653:1, never hidden by sticky UI",
    "W": 6,
    "ircm": "3021",
    "status": {
@@ -395,7 +395,7 @@
    "cat": "A11Y",
    "kind": "U",
    "check": "Target size (2.5.8)",
-   "benchmark": "≥24x24 px minimum; ≥44x44 px on touch",
+   "benchmark": "\u226524x24 px minimum; \u226544x44 px on touch",
    "W": 6,
    "ircm": "3021",
    "status": {
@@ -794,7 +794,7 @@
    "id": "U-MOB-06",
    "cat": "MOB",
    "kind": "U",
-   "check": "Inputs ≥16 px font on iOS",
+   "check": "Inputs \u226516 px font on iOS",
    "benchmark": "no auto-zoom on focus",
    "W": 2,
    "ircm": "2000",
@@ -808,7 +808,7 @@
     "DG": "U"
    },
    "evidence": "Not measured",
-   "fix": "Lint: input font-size ≥16 px on mobile"
+   "fix": "Lint: input font-size \u226516 px on mobile"
   },
   {
    "id": "U-MOB-07",
@@ -855,7 +855,7 @@
    "cat": "MOB",
    "kind": "U",
    "check": "Embedded iframes sized for mobile",
-   "benchmark": "≥70dvh, no nested scroll trap",
+   "benchmark": "\u226570dvh, no nested scroll trap",
    "W": 5,
    "ircm": "3101",
    "status": {
@@ -934,7 +934,7 @@
    "id": "U-ONB-01",
    "cat": "ONB",
    "kind": "U",
-   "check": "Value proposition clear in ≤5 s",
+   "check": "Value proposition clear in \u22645 s",
    "benchmark": "one h1 + one primary CTA above fold",
    "W": 7,
    "ircm": "4111",
@@ -947,7 +947,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Landing h1 \"Where knowledge begins\" (generic) while brand.js tagline is \"BoundView — see the whole picture\"",
+   "evidence": "Landing h1 \"Where knowledge begins\" (generic) while brand.js tagline is \"BoundView \u2014 see the whole picture\"",
    "fix": "Align headline + tagline; 5-second test with 5 users"
   },
   {
@@ -955,7 +955,7 @@
    "cat": "ONB",
    "kind": "U",
    "check": "Time to first value",
-   "benchmark": "≤60 s from landing to first answer (BV/AG) / first verified earn (TT)",
+   "benchmark": "\u226460 s from landing to first answer (BV/AG) / first verified earn (TT)",
    "W": 8,
    "ircm": "4211",
    "status": {
@@ -975,7 +975,7 @@
    "cat": "ONB",
    "kind": "U",
    "check": "Signup friction",
-   "benchmark": "≤3 screens, passkey/social/magic-link, no email-verify gate before first value",
+   "benchmark": "\u22643 screens, passkey/social/magic-link, no email-verify gate before first value",
    "W": 8,
    "ircm": "4211",
    "status": {
@@ -987,7 +987,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Passkey e2e still 🟡 (parity-master A1)",
+   "evidence": "Passkey e2e still \ud83d\udfe1 (parity-master A1)",
    "fix": "Finish passkey enablement; allow first query before verification"
   },
   {
@@ -1015,7 +1015,7 @@
    "cat": "ONB",
    "kind": "U",
    "check": "Try before sign-up (guest trial)",
-   "benchmark": "1–3 anonymous queries with clear upgrade path",
+   "benchmark": "1\u20133 anonymous queries with clear upgrade path",
    "W": 6,
    "ircm": "3201",
    "status": {
@@ -1088,14 +1088,14 @@
     "DG": "R"
    },
    "evidence": "No analytics by policy; no metric defined",
-   "fix": "Define: BV first answer ≤24 h; TT first verified offer; GH first quest; ST first record action"
+   "fix": "Define: BV first answer \u226424 h; TT first verified offer; GH first quest; ST first record action"
   },
   {
    "id": "U-ONB-09",
    "cat": "ONB",
    "kind": "U",
    "check": "Welcome / lifecycle email",
-   "benchmark": "delivered ≤60 s, brand-correct sender",
+   "benchmark": "delivered \u226460 s, brand-correct sender",
    "W": 5,
    "ircm": "2201",
    "status": {
@@ -1135,7 +1135,7 @@
    "cat": "AUTH",
    "kind": "U",
    "check": "Login success rate",
-   "benchmark": "≥98% first attempt; errors categorised",
+   "benchmark": "\u226598% first attempt; errors categorised",
    "W": 8,
    "ircm": "4211",
    "status": {
@@ -1188,14 +1188,14 @@
     "DG": "U"
    },
    "evidence": "Not tested",
-   "fix": "Playwright: logged-out /t/slug → login → thread"
+   "fix": "Playwright: logged-out /t/slug \u2192 login \u2192 thread"
   },
   {
    "id": "U-AUTH-04",
    "cat": "AUTH",
    "kind": "U",
    "check": "Reset / magic link",
-   "benchmark": "≤3 steps; TTL shown; resend cooldown visible",
+   "benchmark": "\u22643 steps; TTL shown; resend cooldown visible",
    "W": 5,
    "ircm": "3110",
    "status": {
@@ -1227,7 +1227,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "🟡 per master (owner enable steps pending)",
+   "evidence": "\ud83d\udfe1 per master (owner enable steps pending)",
    "fix": "Owner: Supabase auth_config_write; then e2e"
   },
   {
@@ -1295,7 +1295,7 @@
    "cat": "AUTH",
    "kind": "U",
    "check": "Logout, all-device sign-out, account deletion",
-   "benchmark": "self-serve ≤3 clicks",
+   "benchmark": "self-serve \u22643 clicks",
    "W": 6,
    "ircm": "3210",
    "status": {
@@ -1475,7 +1475,7 @@
    "cat": "FORM",
    "kind": "U",
    "check": "Destructive action safety",
-   "benchmark": "confirm + ≥10 s undo or typed confirm for irreversible",
+   "benchmark": "confirm + \u226510 s undo or typed confirm for irreversible",
    "W": 5,
    "ircm": "3110",
    "status": {
@@ -1587,8 +1587,8 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT poll: !res.ok → return, and catch → ignored; user never sees failure",
-   "fix": "Show 'Couldn't refresh · Retry · last updated hh:mm'"
+   "evidence": "TT poll: !res.ok \u2192 return, and catch \u2192 ignored; user never sees failure",
+   "fix": "Show 'Couldn't refresh \u00b7 Retry \u00b7 last updated hh:mm'"
   },
   {
    "id": "U-STATE-04",
@@ -1607,7 +1607,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Free-never-hard-fails chain live (\"pass — served by fallback (qwen)\")",
+   "evidence": "Free-never-hard-fails chain live (\"pass \u2014 served by fallback (qwen)\")",
    "fix": "Keep"
   },
   {
@@ -1667,7 +1667,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "404.html is a 108-byte \"Redirecting…\" stub running spa-redirect.js; live unknown path returns HTTP 404 with that stub",
+   "evidence": "404.html is a 108-byte \"Redirecting\u2026\" stub running spa-redirect.js; live unknown path returns HTTP 404 with that stub",
    "fix": "Real 404 page with nav; keep redirect only for known legacy slugs"
   },
   {
@@ -1747,7 +1747,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT toast \"Offer verified — +150 N added\"",
+   "evidence": "TT toast \"Offer verified \u2014 +150 N added\"",
    "fix": "Add 'See history' link"
   },
   {
@@ -1795,7 +1795,7 @@
    "cat": "REL",
    "kind": "U",
    "check": "Availability",
-   "benchmark": "≥99.9% monthly, public status page",
+   "benchmark": "\u226599.9% monthly, public status page",
    "W": 8,
    "ircm": "4202",
    "status": {
@@ -1815,7 +1815,7 @@
    "cat": "REL",
    "kind": "U",
    "check": "Client error rate and tracking",
-   "benchmark": "≤0.5% sessions with JS error; source-mapped; PII-free",
+   "benchmark": "\u22640.5% sessions with JS error; source-mapped; PII-free",
    "W": 5,
    "ircm": "3101",
    "status": {
@@ -1835,7 +1835,7 @@
    "cat": "REL",
    "kind": "U",
    "check": "API error budget",
-   "benchmark": "5xx ≤0.5%; p95 within budget",
+   "benchmark": "5xx \u22640.5%; p95 within budget",
    "W": 6,
    "ircm": "4101",
    "status": {
@@ -1867,7 +1867,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Master A1 ✅",
+   "evidence": "Master A1 \u2705",
    "fix": "Keep"
   },
   {
@@ -1875,7 +1875,7 @@
    "cat": "REL",
    "kind": "U",
    "check": "Deploy gate freshness",
-   "benchmark": "prelaunch ≤24 h old and green before launch",
+   "benchmark": "prelaunch \u226424 h old and green before launch",
    "W": 4,
    "ircm": "3100",
    "status": {
@@ -1914,7 +1914,7 @@
    "id": "U-REL-07",
    "cat": "REL",
    "kind": "U",
-   "check": "Rollback ≤5 min documented",
+   "check": "Rollback \u22645 min documented",
    "benchmark": "runbook + tested",
    "W": 4,
    "ircm": "3100",
@@ -1955,7 +1955,7 @@
    "cat": "REL",
    "kind": "U",
    "check": "Synthetic journeys",
-   "benchmark": "≤5 min interval with alert",
+   "benchmark": "\u22645 min interval with alert",
    "W": 4,
    "ircm": "3100",
    "status": {
@@ -1968,7 +1968,7 @@
     "DG": "U"
    },
    "evidence": "guardian-runner + scheduled prelaunch guardian",
-   "fix": "Add TT postback→balance synthetic and checkout synthetic"
+   "fix": "Add TT postback\u2192balance synthetic and checkout synthetic"
   },
   {
    "id": "U-REL-10",
@@ -1987,7 +1987,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Spain Terminal v2 health failures recurred ≥10 times after PR #342 (watchdog 55 s on /api/pdi/layers)",
+   "evidence": "Spain Terminal v2 health failures recurred \u226510 times after PR #342 (watchdog 55 s on /api/pdi/layers)",
    "fix": "Permanent: cache + pre-compute layers catalogue; watchdog alarm on trend"
   },
   {
@@ -2055,7 +2055,7 @@
    "cat": "PAY",
    "kind": "U",
    "check": "Checkout steps and wallets",
-   "benchmark": "≤3 steps; Apple Pay / Google Pay; saved methods",
+   "benchmark": "\u22643 steps; Apple Pay / Google Pay; saved methods",
    "W": 6,
    "ircm": "4200",
    "status": {
@@ -2095,7 +2095,7 @@
    "cat": "PAY",
    "kind": "U",
    "check": "Cancel / downgrade",
-   "benchmark": "≤2 clicks, same channel as signup, confirmation email",
+   "benchmark": "\u22642 clicks, same channel as signup, confirmation email",
    "W": 8,
    "ircm": "4301",
    "status": {
@@ -2135,7 +2135,7 @@
    "cat": "PAY",
    "kind": "U",
    "check": "Failed-payment recovery",
-   "benchmark": "in-app banner + email, ≥3 retries, grace period",
+   "benchmark": "in-app banner + email, \u22653 retries, grace period",
    "W": 5,
    "ircm": "3200",
    "status": {
@@ -2215,7 +2215,7 @@
    "cat": "PAY",
    "kind": "U",
    "check": "Student / .edu pricing flow",
-   "benchmark": "verify → price → checkout e2e",
+   "benchmark": "verify \u2192 price \u2192 checkout e2e",
    "W": 4,
    "ircm": "2200",
    "status": {
@@ -2227,7 +2227,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "🟡 .edu e2e pending; 2,255 domains; live prices $4.99/$9.99/$12.99",
+   "evidence": "\ud83d\udfe1 .edu e2e pending; 2,255 domains; live prices $4.99/$9.99/$12.99",
    "fix": "Owner price-ID wiring + counsel decision"
   },
   {
@@ -2375,7 +2375,7 @@
    "cat": "NOT",
    "kind": "U",
    "check": "SMS consent (TCPA) and quiet hours",
-   "benchmark": "express written consent, STOP/HELP, 8am–9pm recipient local",
+   "benchmark": "express written consent, STOP/HELP, 8am\u20139pm recipient local",
    "W": 6,
    "ircm": "3300",
    "status": {
@@ -2408,14 +2408,14 @@
     "DG": "U"
    },
    "evidence": "TT notifies only on in-tab delta",
-   "fix": "Event → notification matrix with tests"
+   "fix": "Event \u2192 notification matrix with tests"
   },
   {
    "id": "U-NOT-08",
    "cat": "NOT",
    "kind": "U",
    "check": "Notification volume control",
-   "benchmark": "≤N per day; digest option",
+   "benchmark": "\u2264N per day; digest option",
    "W": 3,
    "ircm": "2100",
    "status": {
@@ -2459,7 +2459,7 @@
    "W": 10,
    "ircm": "4233",
    "status": {
-    "BV": "R",
+    "BV": "Y",
     "TT": "R",
     "AG": "G",
     "GH": "R",
@@ -2467,7 +2467,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "LIVE: boundview.com/privacy.html is the ai.spaincos.com policy (\"private site… no public sign-up, no advertising, no analytics trackers\"). BV has a Free tier and an ad-network offer wall. Contradiction = deceptive-practice exposure",
+   "evidence": "LIVE: boundview.com/privacy.html is the ai.spaincos.com policy (\"private site\u2026 no public sign-up, no advertising, no analytics trackers\"). BV has a Free tier and an ad-network offer wall. Contradiction = deceptive-practice exposure | 2026-11-21 live re-verification (post PR #264 merge): public BV policy written + merged (privacy.boundview.html, host guard); NOT live \u2014 boundview.com is pinned to a stale deployment (see F.3); AG live",
    "fix": "Write BV policy: offer-wall partners, subid sharing, cookies, retention; per-host policy file"
   },
   {
@@ -2487,7 +2487,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "boundview.com/terms.html → 404 (live)",
+   "evidence": "boundview.com/terms.html \u2192 404 (live)",
    "fix": "Draft with counsel; link from signup and checkout"
   },
   {
@@ -2515,7 +2515,7 @@
    "cat": "TRU",
    "kind": "U",
    "check": "State privacy rights (CCPA/CPRA + ~20 state laws)",
-   "benchmark": "notice at collection; Do Not Sell/Share; limit-use; rights-request flow ≤45 days",
+   "benchmark": "notice at collection; Do Not Sell/Share; limit-use; rights-request flow \u226445 days",
    "W": 10,
    "ircm": "3322",
    "status": {
@@ -2535,7 +2535,7 @@
    "cat": "TRU",
    "kind": "U",
    "check": "FTC material-connection disclosure",
-   "benchmark": "adjacent to incentive/affiliate; ≥ body text; high contrast; before action",
+   "benchmark": "adjacent to incentive/affiliate; \u2265 body text; high contrast; before action",
    "W": 10,
    "ircm": "4231",
    "status": {
@@ -2547,8 +2547,8 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT banner exists but is 11.5 px muted gray; GH mockup disclosure at text-xs; D5 requires disclosure on every link",
-   "fix": "Raise to ≥14 px ink color; repeat on interstitial, toast, email, share"
+   "evidence": "TT banner exists but is 11.5 px muted gray; GH mockup disclosure at text-xs; D5 requires disclosure on every link | 2026-11-21 live re-verification (post PR #264 merge): prominent FTC disclosure shipped in the Tasks tab component (PR #15 branch) + policy section 3; BV page still stale-deployed",
+   "fix": "Raise to \u226514 px ink color; repeat on interstitial, toast, email, share"
   },
   {
    "id": "U-TRU-06",
@@ -2655,7 +2655,7 @@
    "cat": "TRU",
    "kind": "U",
    "check": "Data export and deletion",
-   "benchmark": "self-serve ≤3 clicks; SLA stated",
+   "benchmark": "self-serve \u22643 clicks; SLA stated",
    "W": 9,
    "ircm": "3321",
    "status": {
@@ -2679,7 +2679,7 @@
    "W": 8,
    "ircm": "4202",
    "status": {
-    "BV": "R",
+    "BV": "Y",
     "TT": "U",
     "AG": "G",
     "GH": "U",
@@ -2687,7 +2687,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "LIVE: manifest name/short_name \"ai.spaincos\" and privacy.html \"ai.spaincos.com\" on boundview.com. brand.js DOM scrub runs only in JS, not on static files or view-source",
+   "evidence": "LIVE: manifest name/short_name \"ai.spaincos\" and privacy.html \"ai.spaincos.com\" on boundview.com. brand.js DOM scrub runs only in JS, not on static files or view-source | 2026-11-21 live re-verification (post PR #264 merge): manifest swap + verify/privacy/brand guards merged in PR #264; live on ai.spaincos.com, stale on boundview.com",
    "fix": "Build-time per-host templating; add a crawler test that greps every static file for the other brand"
   },
   {
@@ -2728,7 +2728,7 @@
     "DG": "U"
    },
    "evidence": "brand.js supportEmail support@boundview.com",
-   "fix": "Add Help → Contact + SLA"
+   "fix": "Add Help \u2192 Contact + SLA"
   },
   {
    "id": "U-TRU-15",
@@ -2874,40 +2874,40 @@
    "id": "U-SEO-01",
    "cat": "SEO",
    "kind": "U",
-   "check": "Unique title ≤60 chars with brand + keyword",
+   "check": "Unique title \u226460 chars with brand + keyword",
    "benchmark": "per indexable page",
    "W": 6,
    "ircm": "2103",
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "R",
+    "AG": "Y",
     "GH": "U",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "LIVE: boundview.com and ai.spaincos.com both serve <title>BoundView</title> (identical bundle, 339,531 vs 339,560 bytes)",
+   "evidence": "LIVE: boundview.com and ai.spaincos.com both serve <title>BoundView</title> (identical bundle, 339,531 vs 339,560 bytes) | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
    "fix": "Per-page titles via prerender; per-host brand"
   },
   {
    "id": "U-SEO-02",
    "cat": "SEO",
    "kind": "U",
-   "check": "Meta description 70–160 chars",
+   "check": "Meta description 70\u2013160 chars",
    "benchmark": "every indexable page",
    "W": 6,
    "ircm": "2103",
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "R",
+    "AG": "Y",
     "GH": "U",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "LIVE: no meta description on either host",
+   "evidence": "LIVE: no meta description on either host | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
    "fix": "Add per route"
   },
   {
@@ -2921,13 +2921,13 @@
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "R",
+    "AG": "Y",
     "GH": "U",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "LIVE: no og:* tags in head",
+   "evidence": "LIVE: no og:* tags in head | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
    "fix": "Add; test in Slack, iMessage, X, LinkedIn"
   },
   {
@@ -2941,13 +2941,13 @@
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "R",
+    "AG": "Y",
     "GH": "U",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "Two domains serve the same bundle with no canonical (local grep: canonical absent from head)",
+   "evidence": "Two domains serve the same bundle with no canonical (local grep: canonical absent from head) | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
    "fix": "Canonical on BV; noindex on ai.spaincos"
   },
   {
@@ -2955,19 +2955,19 @@
    "cat": "SEO",
    "kind": "U",
    "check": "XML sitemap referenced in robots",
-   "benchmark": "valid; ≤50k URLs/file; index file",
+   "benchmark": "valid; \u226450k URLs/file; index file",
    "W": 6,
    "ircm": "2103",
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "R",
+    "AG": "G",
     "GH": "U",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "LIVE: /sitemap.xml 404; robots.txt has no Sitemap line",
+   "evidence": "LIVE: /sitemap.xml 404; robots.txt has no Sitemap line | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item) | 2026-11-21 live re-verification (post PR #264 merge): sitemap.xml live at ai.spaincos.com (200) and referenced in robots.txt",
    "fix": "Generate in build.js"
   },
   {
@@ -3001,13 +3001,13 @@
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "R",
+    "AG": "Y",
     "GH": "U",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "Local grep: 0 ld+json blocks",
+   "evidence": "Local grep: 0 ld+json blocks | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
    "fix": "Add and validate with Rich Results Test"
   },
   {
@@ -3075,7 +3075,7 @@
    "cat": "SEO",
    "kind": "U",
    "check": "Redirect hygiene",
-   "benchmark": "www→apex single 301; http→https; no chains",
+   "benchmark": "www\u2192apex single 301; http\u2192https; no chains",
    "W": 5,
    "ircm": "2102",
    "status": {
@@ -3121,13 +3121,13 @@
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "R",
+    "AG": "Y",
     "GH": "U",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "No og tags, so previews are bare URLs",
+   "evidence": "No og tags, so previews are bare URLs | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
    "fix": "Share image set; test matrix"
   },
   {
@@ -3161,13 +3161,13 @@
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "R",
+    "AG": "Y",
     "GH": "U",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "Benchmark marketing bullets exist as an internal md only",
+   "evidence": "Benchmark marketing bullets exist as an internal md only | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
    "fix": "Publish public benchmark page with honest ceiling"
   },
   {
@@ -3221,13 +3221,13 @@
    "status": {
     "BV": "-",
     "TT": "-",
-    "AG": "-",
+    "AG": "Y",
     "GH": "-",
     "ST": "U",
     "CT": "-",
     "DG": "U"
    },
-   "evidence": "Terminal and DoorGraph are internal; indexability not verified",
+   "evidence": "Terminal and DoorGraph are internal; indexability not verified | 2026-11-21 live re-verification (post PR #264 merge): runtime noindex meta live on AG host (brand.js); static noindex still an E11 item",
    "fix": "Verify headers and robots on each internal host"
   },
   {
@@ -3235,7 +3235,7 @@
    "cat": "COPY",
    "kind": "U",
    "check": "Plain language and acronyms spelled out",
-   "benchmark": "≤ grade 8 consumer; every acronym defined at first use (owner standard)",
+   "benchmark": "\u2264 grade 8 consumer; every acronym defined at first use (owner standard)",
    "W": 5,
    "ircm": "3101",
    "status": {
@@ -3287,7 +3287,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Three values in docs: TT says 1 N ≈ $0.004; pricing doc catalog (500 N = 1,000 credits; 2,500 credits = $1) gives ≈ $0.0008; D5 (2,500 N ≈ $0.25) gives ≈ $0.0001",
+   "evidence": "Three values in docs: TT says 1 N \u2248 $0.004; pricing doc catalog (500 N = 1,000 credits; 2,500 credits = $1) gives \u2248 $0.0008; D5 (2,500 N \u2248 $0.25) gives \u2248 $0.0001",
    "fix": "Decide one constant in earn_actions/model_costs; render from API; legal reviews any $ claim"
   },
   {
@@ -3387,7 +3387,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT title \"boundview — Tasks\"; GH title \"Boundview Free Tier\"; brand.js \"BoundView\"",
+   "evidence": "TT title \"boundview \u2014 Tasks\"; GH title \"Boundview Free Tier\"; brand.js \"BoundView\"",
    "fix": "Single BRAND constant"
   },
   {
@@ -3395,7 +3395,7 @@
    "cat": "AI",
    "kind": "U",
    "check": "Streaming and first-token feel",
-   "benchmark": "tokens stream; skeleton ≤300 ms",
+   "benchmark": "tokens stream; skeleton \u2264300 ms",
    "W": 5,
    "ircm": "4100",
    "status": {
@@ -3467,7 +3467,7 @@
     "CT": "-",
     "DG": "-"
    },
-   "evidence": "Master A1 ✅",
+   "evidence": "Master A1 \u2705",
    "fix": "Keep"
   },
   {
@@ -3475,7 +3475,7 @@
    "cat": "AI",
    "kind": "U",
    "check": "Instruction-format adherence",
-   "benchmark": "IFEval strict ≥80/100",
+   "benchmark": "IFEval strict \u226580/100",
    "W": 4,
    "ircm": "3100",
    "status": {
@@ -3495,7 +3495,7 @@
    "cat": "AI",
    "kind": "U",
    "check": "Answer accuracy honesty",
-   "benchmark": "SimpleQA ≥95, FRAMES ≥75, BrowseComp tracked",
+   "benchmark": "SimpleQA \u226595, FRAMES \u226575, BrowseComp tracked",
    "W": 6,
    "ircm": "4101",
    "status": {
@@ -3507,7 +3507,7 @@
     "CT": "-",
     "DG": "-"
    },
-   "evidence": "SimpleQA 98.0; FRAMES 75.0; BrowseComp 28.6–35.6 (in-request) vs 86–88 async",
+   "evidence": "SimpleQA 98.0; FRAMES 75.0; BrowseComp 28.6\u201335.6 (in-request) vs 86\u201388 async",
    "fix": "Publish ceilings; label in-request vs async"
   },
   {
@@ -3695,7 +3695,7 @@
    "cat": "NW",
    "kind": "U",
    "check": "Coverage across all 50 states + DC + PR, VI, GU, AS, MP",
-   "benchmark": "published coverage matrix; ≥95% ZIP5/county coverage per dataset",
+   "benchmark": "published coverage matrix; \u226595% ZIP5/county coverage per dataset",
    "W": 9,
    "ircm": "4113",
    "status": {
@@ -3848,7 +3848,7 @@
     "DG": "-"
    },
    "evidence": "No programmatic pages",
-   "fix": "Generate from data; thin-content guard (≥300 unique words or data rows)"
+   "fix": "Generate from data; thin-content guard (\u2265300 unique words or data rows)"
   },
   {
    "id": "U-NW-09",
@@ -3915,7 +3915,7 @@
    "cat": "NW",
    "kind": "U",
    "check": "Performance for the largest jurisdictions",
-   "benchmark": "p95 query for CA, TX, NY, FL ≤ budget",
+   "benchmark": "p95 query for CA, TX, NY, FL \u2264 budget",
    "W": 6,
    "ircm": "4101",
    "status": {
@@ -3955,7 +3955,7 @@
    "cat": "MEAS",
    "kind": "U",
    "check": "Event taxonomy and funnels",
-   "benchmark": "landing→signup→first answer→upgrade; offer view→click→verified",
+   "benchmark": "landing\u2192signup\u2192first answer\u2192upgrade; offer view\u2192click\u2192verified",
    "W": 7,
    "ircm": "3202",
    "status": {
@@ -4035,7 +4035,7 @@
    "cat": "MEAS",
    "kind": "U",
    "check": "In-product feedback and CSAT sampling",
-   "benchmark": "≥1 channel per app",
+   "benchmark": "\u22651 channel per app",
    "W": 4,
    "ircm": "3100",
    "status": {
@@ -4295,7 +4295,7 @@
    "cat": "DES",
    "kind": "U",
    "check": "Motion budget",
-   "benchmark": "150–300 ms, purposeful",
+   "benchmark": "150\u2013300 ms, purposeful",
    "W": 1,
    "ircm": "1000",
    "status": {
@@ -4349,13 +4349,13 @@
    "cat": "FTC",
    "kind": "A",
    "check": "Disclosure is clear and conspicuous",
-   "benchmark": "≥14 px (≥ body), ink color, ≥4.5:1, not collapsed",
+   "benchmark": "\u226514 px (\u2265 body), ink color, \u22654.5:1, not collapsed",
    "W": 9,
    "ircm": "4131",
    "status": {
-    "TT": "Y"
+    "TT": "G"
    },
-   "evidence": "11.5 px muted #7a6f64 on #fdf6ee = 4.57:1 (passes contrast, weak on size/prominence)",
+   "evidence": "11.5 px muted #7a6f64 on #fdf6ee = 4.57:1 (passes contrast, weak on size/prominence) | 2026-11-21 live re-verification (post PR #264 merge): disclosure rewritten clear-and-conspicuous on PR #15 branch 7258921 (pending merge)",
    "fix": "14 px, ink color, bold lead-in 'Ad disclosure'"
   },
   {
@@ -4367,9 +4367,9 @@
    "W": 9,
    "ircm": "4131",
    "status": {
-    "TT": "Y"
+    "TT": "G"
    },
-   "evidence": "Copy says 'may earn a referral fee'; boundview does earn on verified completions",
+   "evidence": "Copy says 'may earn a referral fee'; boundview does earn on verified completions | 2026-11-21 live re-verification (post PR #264 merge): connection stated plainly (paid partner offers, referral fee) on PR #15 branch (pending merge)",
    "fix": "Replace 'may earn' with 'earns'"
   },
   {
@@ -4437,9 +4437,9 @@
    "W": 8,
    "ircm": "3131",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "Toast has no disclosure; no email/push yet",
+   "evidence": "Toast has no disclosure; no email/push yet | 2026-11-21 live re-verification (post PR #264 merge): toast wording updated with caps + earn-only on PR #15 branch (pending merge)",
    "fix": "Single DISCLOSURE constant"
   },
   {
@@ -4475,7 +4475,7 @@
    "cat": "WALL",
    "kind": "A",
    "check": "Frame load health",
-   "benchmark": "loads ≤3 s p75; skeleton until load; timeout 10 s → retry + 'open in new tab'",
+   "benchmark": "loads \u22643 s p75; skeleton until load; timeout 10 s \u2192 retry + 'open in new tab'",
    "W": 7,
    "ircm": "4201",
    "status": {
@@ -4489,7 +4489,7 @@
    "cat": "WALL",
    "kind": "A",
    "check": "Detect frame refusal",
-   "benchmark": "blank frame (X-Frame-Options/CSP) → fallback",
+   "benchmark": "blank frame (X-Frame-Options/CSP) \u2192 fallback",
    "W": 7,
    "ircm": "4201",
    "status": {
@@ -4664,7 +4664,7 @@
     "TT": "R"
    },
    "evidence": "Markup initial value is a hard-coded \"1,240\"",
-   "fix": "Render '—' until data"
+   "fix": "Render '\u2014' until data"
   },
   {
    "id": "TT-BAL-02",
@@ -4685,13 +4685,13 @@
    "cat": "BAL",
    "kind": "A",
    "check": "Poll failure surfaced",
-   "benchmark": "after 2 failures show 'Couldn't refresh · retry · updated hh:mm'",
+   "benchmark": "after 2 failures show 'Couldn't refresh \u00b7 retry \u00b7 updated hh:mm'",
    "W": 6,
    "ircm": "4101",
    "status": {
     "TT": "R"
    },
-   "evidence": "!res.ok → return; catch ignored",
+   "evidence": "!res.ok \u2192 return; catch ignored",
    "fix": "Add state"
   },
   {
@@ -4699,7 +4699,7 @@
    "cat": "BAL",
    "kind": "A",
    "check": "Poll hygiene",
-   "benchmark": "pause when hidden; backoff + jitter; ≤2 req/min",
+   "benchmark": "pause when hidden; backoff + jitter; \u22642 req/min",
    "W": 3,
    "ircm": "2100",
    "status": {
@@ -4727,7 +4727,7 @@
    "cat": "BAL",
    "kind": "A",
    "check": "Toast accessibility and dwell",
-   "benchmark": "role=status; ≥5 s or dismissible",
+   "benchmark": "role=status; \u22655 s or dismissible",
    "W": 6,
    "ircm": "3021",
    "status": {
@@ -4769,7 +4769,7 @@
    "cat": "BAL",
    "kind": "A",
    "check": "Reward feedback",
-   "benchmark": "count-up ≤600 ms + ring fill; optional haptic; reduced-motion safe",
+   "benchmark": "count-up \u2264600 ms + ring fill; optional haptic; reduced-motion safe",
    "W": 5,
    "ircm": "3200",
    "status": {
@@ -4789,7 +4789,7 @@
    "status": {
     "TT": "R"
    },
-   "evidence": "'1 N ≈ $0.004 of AI usage' conflicts with catalog (≈$0.0008) and D5 (≈$0.0001)",
+   "evidence": "'1 N \u2248 $0.004 of AI usage' conflicts with catalog (\u2248$0.0008) and D5 (\u2248$0.0001)",
    "fix": "See U-COPY-03; read from API"
   },
   {
@@ -4832,7 +4832,7 @@
     "TT": "R"
    },
    "evidence": "None; redemption catalog exists server-side",
-   "fix": "Link to Settings → Neurons"
+   "fix": "Link to Settings \u2192 Neurons"
   },
   {
    "id": "TT-BAL-14",
@@ -4871,9 +4871,9 @@
    "W": 6,
    "ircm": "4200",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "UI shows daily only; users hit 60/month silently and completions are rejected",
+   "evidence": "UI shows daily only; users hit 60/month silently and completions are rejected | 2026-11-21 live re-verification (post PR #264 merge): monthly 60 meter shipped on PR #15 branch 7258921 (pending merge)",
    "fix": "Add monthly meter"
   },
   {
@@ -4881,13 +4881,13 @@
    "cat": "CAP",
    "kind": "A",
    "check": "Cap-reached state",
-   "benchmark": "wall paused or overlaid: 'Daily limit reached — resets at <local time>'",
+   "benchmark": "wall paused or overlaid: 'Daily limit reached \u2014 resets at <local time>'",
    "W": 7,
    "ircm": "4300",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "Wall stays open at cap; simulation shows 27 cap-rejected completions",
+   "evidence": "Wall stays open at cap; simulation shows 27 cap-rejected completions | 2026-11-21 live re-verification (post PR #264 merge): cap-reached states shipped on PR #15 branch 7258921 (pending merge)",
    "fix": "Overlay at cap"
   },
   {
@@ -4899,9 +4899,9 @@
    "W": 6,
    "ircm": "4101",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "Caps use UTC periods (spec §3) = 4 pm PT / 7 pm ET / 2 pm HI daily reset; 60 s cooldown not explained",
+   "evidence": "Caps use UTC periods (spec \u00a73) = 4 pm PT / 7 pm ET / 2 pm HI daily reset; 60 s cooldown not explained | 2026-11-21 live re-verification (post PR #264 merge): reset basis labeled '4:00 PM PT (UTC midnight)' on PR #15 branch (pending merge)",
    "fix": "Show local reset; state cooldown"
   },
   {
@@ -5083,7 +5083,7 @@
    "status": {
     "TT": "R"
    },
-   "evidence": "'boundview — Tasks'",
+   "evidence": "'boundview \u2014 Tasks'",
    "fix": "Use BRAND.name"
   },
   {
@@ -5259,7 +5259,7 @@
    "cat": "BV",
    "kind": "A",
    "check": "Upgrade prompts",
-   "benchmark": "≤1 per session; contextual; no dark patterns",
+   "benchmark": "\u22641 per session; contextual; no dark patterns",
    "W": 7,
    "ircm": "3301",
    "status": {
@@ -5315,13 +5315,13 @@
    "cat": "BV",
    "kind": "A",
    "check": "Student flow",
-   "benchmark": ".edu verify → price",
+   "benchmark": ".edu verify \u2192 price",
    "W": 4,
    "ircm": "2200",
    "status": {
     "BV": "Y"
    },
-   "evidence": "student-verify.js; 🟡 e2e",
+   "evidence": "student-verify.js; \ud83d\udfe1 e2e",
    "fix": "Owner steps"
   },
   {
@@ -5343,7 +5343,7 @@
    "cat": "BV",
    "kind": "A",
    "check": "Mobile parity",
-   "benchmark": "Mobile category ≥90",
+   "benchmark": "Mobile category \u226590",
    "W": 4,
    "ircm": "3100",
    "status": {
@@ -5357,7 +5357,7 @@
    "cat": "BV",
    "kind": "A",
    "check": "Feature-parity categories at 70",
-   "benchmark": "Comet, Enterprise, Desktop, Teammates ≥85",
+   "benchmark": "Comet, Enterprise, Desktop, Teammates \u226585",
    "W": 3,
    "ircm": "2100",
    "status": {
@@ -5511,7 +5511,7 @@
    "cat": "AG",
    "kind": "A",
    "check": "Public API docs",
-   "benchmark": "quickstart ≤5 min; copy curl; error codes",
+   "benchmark": "quickstart \u22645 min; copy curl; error codes",
    "W": 5,
    "ircm": "3101",
    "status": {
@@ -5847,7 +5847,7 @@
    "cat": "GH",
    "kind": "A",
    "check": "Programmatic SEO",
-   "benchmark": "platform × state pages",
+   "benchmark": "platform \u00d7 state pages",
    "W": 7,
    "ircm": "3103",
    "status": {
@@ -5923,7 +5923,7 @@
    "status": {
     "ST": "R"
    },
-   "evidence": "v2 failures recurred ≥10 times after PR #342",
+   "evidence": "v2 failures recurred \u226510 times after PR #342",
    "fix": "See U-REL-10"
   },
   {
@@ -6091,7 +6091,7 @@
    "status": {
     "ST": "G"
    },
-   "evidence": "741,967 → 4.40 plan cost",
+   "evidence": "741,967 \u2192 4.40 plan cost",
    "fix": "Keep"
   },
   {
@@ -6190,7 +6190,7 @@
     "ST": "R"
    },
    "evidence": "SF 46.6%, Seattle 4.1% staged",
-   "fix": "Expand per city; do not surface until ≥80% match"
+   "fix": "Expand per city; do not surface until \u226580% match"
   },
   {
    "id": "ST-22",
@@ -6323,7 +6323,7 @@
    "cat": "CT",
    "kind": "A",
    "check": "Onboarding for property managers",
-   "benchmark": "≤10 min to first insight",
+   "benchmark": "\u226410 min to first insight",
    "W": 7,
    "ircm": "4201",
    "status": {
@@ -6392,7 +6392,7 @@
    "id": "CT-12",
    "cat": "CT",
    "kind": "A",
-   "check": "Demo request → CRM",
+   "check": "Demo request \u2192 CRM",
    "benchmark": "consent captured",
    "W": 7,
    "ircm": "3202",
@@ -6421,7 +6421,7 @@
    "cat": "CT",
    "kind": "A",
    "check": "Map performance",
-   "benchmark": "pan/zoom ≤100 ms frame",
+   "benchmark": "pan/zoom \u2264100 ms frame",
    "W": 4,
    "ircm": "3100",
    "status": {
@@ -6561,7 +6561,7 @@
    "cat": "DG",
    "kind": "A",
    "check": "Recipient access",
-   "benchmark": "magic link ≤2 steps, expiry",
+   "benchmark": "magic link \u22642 steps, expiry",
    "W": 6,
    "ircm": "4200",
    "status": {
@@ -6793,7 +6793,7 @@
     "U-COPY-03",
     "TT-ECON-01"
    ],
-   "title": "Neuron valuation inconsistent by up to 40x: UI says 1 N ≈ $0.004; redemption catalog implies ≈ $0.0008; master doc D5 implies ≈ $0.0001",
+   "title": "Neuron valuation inconsistent by up to 40x: UI says 1 N \u2248 $0.004; redemption catalog implies \u2248 $0.0008; master doc D5 implies \u2248 $0.0001",
    "fix": "Owner picks one rate; publish in `pricing.json`; render everywhere from API; delete hardcoded claims; legal review of any dollar equivalence",
    "psc": "PSC-5 (single source) + PSC-3 (price diff)"
   },
@@ -6810,7 +6810,7 @@
     "TT-FTC-07"
    ],
    "title": "FTC disclosure is small and hedged (\"may earn\"): 11.5 px, #7a6f64 on #fdf6ee (4.57:1); per-offer disclosure promised in v261 A6 is missing",
-   "fix": "Shared DISCLOSURE constant, ≥14 px, ink colour, plain \"boundview earns a fee when you complete offers\", above the wall and per offer, same wording in toast, email, push",
+   "fix": "Shared DISCLOSURE constant, \u226514 px, ink colour, plain \"boundview earns a fee when you complete offers\", above the wall and per offer, same wording in toast, email, push",
    "psc": "PSC-4 (shared component) + PSC-1 (lint: wall renders only with disclosure sibling)"
   },
   {
@@ -6955,7 +6955,7 @@
     "TT-BAL-08"
    ],
    "title": "Toast always says \"Offer verified\", has no ARIA, lasts 3.5 s on a single timer",
-   "fix": "Toast with role=status, attribution, ≥5 s, queue",
+   "fix": "Toast with role=status, attribution, \u22655 s, queue",
    "psc": "PSC-4"
   },
   {
@@ -7053,7 +7053,7 @@
     "U-STATE-07",
     "U-SEO-11"
    ],
-   "title": "Unknown path returns HTTP 404 with a 108-byte \"Redirecting…\" script stub, not a branded page",
+   "title": "Unknown path returns HTTP 404 with a 108-byte \"Redirecting\u2026\" script stub, not a branded page",
    "fix": "Branded 404 with search and links; keep status 404",
    "psc": "PSC-2"
   },
