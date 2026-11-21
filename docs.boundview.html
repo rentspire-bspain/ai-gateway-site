@@ -22,17 +22,36 @@
   th { color: var(--muted); font-weight: 600; }
   code { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 13px; }
   .note { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; margin: 16px 0; }
+  .status-live { display: inline-block; font-size: 12px; font-weight: 600; color: #7EE787; background: rgba(46, 160, 67, 0.16); border: 1px solid rgba(126, 231, 135, 0.38); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+  .status-pending { display: inline-block; font-size: 12px; font-weight: 600; color: #F2CC60; background: rgba(210, 153, 34, 0.14); border: 1px solid rgba(242, 204, 96, 0.36); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
   nav a { margin-right: 14px; font-size: 14px; }
 </style>
 </head>
 <body>
 <main>
-<nav><a href="/">&larr; Back to BoundView</a><a href="/privacy.html">Privacy</a></nav>
+<nav><a href="/">&larr; Back to BoundView</a><a href="/privacy.boundview.html">Privacy</a><a href="/terms.boundview.html">Terms</a></nav>
 <h1>BoundView docs</h1>
 <p class="muted">Last updated 2026-11-21. Every figure below comes from the repository's QA reports; sources are named next to each number.</p>
 
 <h2>What it is</h2>
 <p>BoundView is a research-and-answer assistant: ask a question and it searches the web and your connected sources, then writes a cited answer. It runs on open-weight models behind a single gateway, and long reports and files open in a side panel next to the conversation. Access is invite-only (see below).</p>
+
+<h2 id="connected-context">Connected context</h2>
+<p>Connecting your own accounts turns workspace messages, files, inbox threads, and calendar schedules into cited, searchable context alongside live web search &mdash; so one question can cross-reference your documents and conversations with live web sources instead of manual copy-paste:</p>
+<ul>
+<li><strong>Ask your Slack</strong> <span class="status-live">Live</span> &mdash; <em>&ldquo;What did #ops decide this week on the Q4 rollout, with links to each thread?&rdquo;</em></li>
+<li><strong>Ask your files</strong> <span class="status-live">Live</span> &mdash; <em>&ldquo;Compare the figures in my Dropbox Q3 folder against live market data.&rdquo;</em></li>
+<li><strong>Ask your own inbox</strong> <span class="status-pending">Pending registration</span> &mdash; <em>&ldquo;What did my accountant say about the Q3 invoices?&rdquo;</em></li>
+</ul>
+<div class="note"><strong>Privacy contract:</strong> Connector credentials and indexed context rows are stored in Supabase as user-owned rows scoped to <code>auth.uid()</code> and enforced at the database layer by Postgres Row-Level Security (<code>RLS</code>) &mdash; no other user can read your rows. OAuth authorization codes are exchanged server-side (<code>/api/oauth-callback</code>), so client secrets and refresh tokens never reach browser JavaScript. Only snippets retrieved for your active query are sent to generate the answer; there are no ads, no third-party trackers, and no sale of data. Write actions (sending email or creating calendar events once mail/calendar providers are connected) require clicking an explicit in-chat <strong>Approve</strong> card. You can disconnect any provider in <strong>Settings &rarr; Connectors</strong> or delete threads and stored files at any time (see <a href="/privacy.boundview.html">Privacy</a>).</div>
+<div class="tw"><table>
+<tr><th>Provider</th><th>Context unlocked</th><th>OAuth status</th><th>Current state (verified via <code>/api/oauth-config</code>)</th></tr>
+<tr><td>Slack</td><td>Channel, group, and direct-message history and search as cited context</td><td><span class="status-live">LIVE</span></td><td>Registered OAuth 2.0 app; one-click connect in Settings &rarr; Connectors (<code>channels:history</code>, <code>im:history</code>, <code>search:read</code>).</td></tr>
+<tr><td>Dropbox</td><td>Folders, spreadsheets, PDFs, and documents as cited context</td><td><span class="status-live">LIVE</span></td><td>Registered OAuth 2.0 app; one-click connect in Settings &rarr; Connectors with offline refresh.</td></tr>
+<tr><td>Google (Gmail, Calendar, Drive, Sheets)</td><td>Inbox threads, calendar events, Drive docs, and Sheets as cited context</td><td><span class="status-pending">Pending registration</span></td><td>Public OAuth client registration and Google verification pending (<code>google: null</code>); UI shows honest setup state, never a fake connect button.</td></tr>
+<tr><td>Microsoft Outlook (Mail, Calendar)</td><td>Inbox messages and calendar events as cited context</td><td><span class="status-pending">Pending registration</span></td><td>Microsoft Entra OAuth app registration pending (<code>outlook: null</code>).</td></tr>
+<tr><td>GitHub</td><td>Repositories, issues, and pull requests</td><td><span class="status-pending">Pending registration</span></td><td>Public OAuth app registration pending (<code>github: null</code>); personal API token paste is available in Settings &rarr; Connectors for authorized accounts.</td></tr>
+</table></div>
 
 <h2>The completion program</h2>
 <p>Progress is tracked against a fixed set of 29 weighted dimensions, scored from live-verified evidence and computed by <code>qa/generate-parity-headline.py</code> from <code>qa/parity-items.json</code>. Nothing is hand-summed. Current headline: <strong>84.4%</strong> (10804 / 128 weighted points, version v291b; source: <code>qa-reports/parity-headline-latest.json</code>).</p>
