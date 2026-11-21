@@ -72,8 +72,10 @@
   }
   #topbar .search, .topbar .search { width: 100%; }
 
-  /* tables inside thread answers scroll horizontally instead of breaking layout */
-  .thread-content table, .answer table, .msg-content table {
+  /* Rendered Markdown tables already have a scroll wrapper. */
+  .thread-content table:not(.table-wrap > table),
+  .answer table:not(.table-wrap > table),
+  .msg-content table:not(.table-wrap > table) {
     display: block;
     max-width: 100%;
     overflow-x: auto;
@@ -124,6 +126,9 @@
 
 /* Keep these controls hidden even where the sidebar button class uses display:flex. */
 #pwaInstall[hidden], #pwaInstallHelp[hidden] { display: none; }
+/* The external install module owns this action; the legacy inline handler
+   still exists in the CSP-pinned bootstrap, but must not expose a second button. */
+#installAppBtn.show { display: none; }
 #pwaInstallHelp { margin: 0 0 12px; color: var(--text-muted); font-size: 14px; }
 .sidebar.collapsed #pwaInstall, .sidebar.collapsed #pwaInstallHelp { display: none; }
 
@@ -138,8 +143,13 @@
     font-size: 16px !important;
     max-height: min(160px, 30dvh);
   }
-  #landingSubmit, #followupSend, .search-box .attach-btn, .followup-box .attach-btn, .m375-burger {
+  #landingSubmit, #followupSend, .search-box .attach-btn, .followup-box .attach-btn,
+  .m375-burger, #expandSidebar, #collapseSidebar, #modelSel, #pwaInstall {
     min-width: 44px;
     min-height: 44px;
   }
+  .answer-content { min-width: 0; overflow-wrap: anywhere; }
+  .answer-content .table-wrap, .answer-content pre { min-width: 0; }
+  .answer-content pre code { word-break: normal; }
+  .answer-content video, .answer-content iframe { max-width: 100%; }
 }
