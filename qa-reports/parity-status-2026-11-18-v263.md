@@ -30,8 +30,8 @@ benchmark SFT unlock (rule 15c — the single biggest score mover, staged).
 | **SimpleQA** | **99.0%** (v282 async confirm — NEW HIGH; in-request lane agrees at 99) | both lanes agree | 98.0% | ~100% | 🟢 **leads every published score** |
 | **FRAMES** | **90.0%** (r14; v282 async confirm 89.0 — band 89-90) | async research lane | 75.0% | ~87% published best | 🟢 **leads every published score** |
 | **DSQA** | **84.0%** (v282 async confirm — NEW HIGH; band 78-84) | async research lane | 33.0% | internal suite | 🟢 vs Perplexity's retired Sonar base: 27.3% (their protocol) |
-| **AIME 2025** | **53.3%** (8/15, v282 — NEW HIGH: 26.7 → 46.7 → 53.3; the row-12 fix + planner skip + answer-finding-first) | with-research, FA-line partially enforced | n/a | ~85-97% frontier closed-book | 🟡 climbing fast; the honest arc 26.7→46.7→53.3; FA-line enforcement is the next lever |
-| **MATH-500** | **79.0%** (79/100, v282 — stable at the top of the 76-80 band; 0 error rows) | with-research | n/a | ~90-96% frontier | 🟡 stable through the filter + planner-skip; FA-line enforcement is the remaining gap |
+| **AIME 2025** | **53.3%** (8/15, v282 best) — ⚠️ **v288 REGRESSION: 46.7% (7/15) through the v286c FA-gate gateway** (5 HTTP-546 rows re-run to 0 errors; 2/5 correct on re-run) | with-research | n/a | ~85-97% frontier closed-book | 🔴 **REGRESSION UNDER ACTIVE DEBUG** — the FA-line enforcement gates (v284-v286c) are the suspect; the v282 gateway is the known-good reference |
+| **MATH-500** | **79.0%** (v282 best) — ⚠️ **v288 REGRESSION: 68.0% (68/100, 0 error rows) through the v286c FA-gate gateway** (21 answered-wrong, 11 truncated in the v286c run) | with-research | n/a | ~90-96% frontier | 🔴 **REGRESSION UNDER ACTIVE DEBUG** — the v286c FA gates interact badly with math responses (truncations up); do NOT cite 79 as current; the debug loop is the active work item |
 | **IFEval** | **60.0%** best (round 2); 8-round GLM-class band 48-60 (r2 60, r3 58, r4 58, r5 48, r6 54, r7 49, r8 54) | raw-prompt + verbatim mode | 0% (product-path baseline, broken-harness) | 88-95% frontier band | 🟡 the honest arc 0→51→60→48→54→49→54; writer compliance is the ceiling — the SFT pass is the lever; strict-format detection v2 shipped (r5's 17 missed phrasings caught) |
 
 **Category headline (same computation as the top block): 90.4% weighted average.**
@@ -2421,3 +2421,23 @@ theory (it was reachable the whole time).
    mutation between parse and execution can invalidate a hash that the network layer
    validates. F1+F2 in the E2E suite are the structural guard (they fail on the LIVE page,
    not the bytes).
+
+## §30l — v288 MATH REGRESSION (honest, open) — the FA-gate debug loop (2026-11-20, ACTIVE)
+
+The v286c measurement runs + v288 error-row re-runs graded clean (0 error rows):
+**MATH-500 68.0** (68/100; 21 answered-wrong, 11 truncated), **AIME 46.7** (7/15) — both
+REGRESSIONS vs the v282 confirm highs (79.0 / 53.3). The research suites confirm stable
+through the same gateway (SimpleQA 99, BrowseComp 88, FRAMES 89, DSQA 84, IFEval 54 — all
+exactly the v282 numbers), so the regression is MATH-SPECIFIC and points at the v284-v286c
+FA-line enforcement gates: the v286c run shows truncations UP (11) and answered-wrong UP
+(21) on MATH-500 — the FA gates appear to interact badly with long math responses (either
+triggering response replacement/truncation paths or corrupting the tail the grader reads).
+THE DISCIPLINE (gospel rules): no claims until the clean re-run graded — it graded, it
+regressed, it is now the ACTIVE debug loop. The v282 gateway (platform 287) is the
+known-good reference; the candidate fixes, in debug order: (1) diff a truncated row's
+response tail between the v282 and v286c gateways to see exactly what the FA gate does
+to it; (2) check whether the FINAL FA ENFORCEMENT gate's response-replacement path (the
+v286b "last gate before ship") drops the response body when the FA extraction fails on
+math prose (the v286c digit-validation reject may be firing on valid math tails);
+(3) if the gates cannot be made math-safe, scope them to the math rows' actual FA format
+only. Rule-15c SFT remains the structural unlock for IFEval/math compliance ceilings.
