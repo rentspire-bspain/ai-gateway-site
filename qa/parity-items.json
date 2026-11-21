@@ -1,5 +1,5 @@
 {
- "version": "v297",
+ "version": "v298",
  "generated_at": "2026-11-16T00:00:00Z",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE — GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90→95. | 2026-11-18: owner-blocker audit — 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped — server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
@@ -158,8 +158,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 10,
-   "note": "GAPS: no locale switching, no translated surfaces, single-language product. Low weight: invite-only personal product; becomes material at public launch."
+   "score": 28,
+   "note": "v298 (was 10): i18n foundation live (PR #302, 9f1596a) — modules/i18n.js locale detection (?lang= > saved ai_lang > browser > en), PARTIAL Spanish chrome translation (sidebar, New Thread, search, composer placeholder, landing hero, Settings nav/pane titles, a few Preferences labels; model answers NOT translated, honestly labeled 'Español (partial)' in the Settings picker), hreflang en/es/x-default on the homepage. Curl + code verified live; lane Playwright QA (en/es switching, es-MX detection, picker round trip) but no live-browser check by root. GAPS: no other locales, no full-page translation, no translated model output, no locale-aware formatting."
   },
   {
    "name": "NativeMobile",
@@ -185,6 +185,11 @@
   }
  ],
  "changelog": [
+  {
+   "version": "v298",
+   "date": "2026-11-21",
+   "change": "i18n 10->28 (PR #302 partial Spanish foundation, live-verified); offline-bar pointer-events fix (PR #303) — root cause of the flaky prelaunch doc-chip failure, fixed live."
+  },
   {
    "version": "v297",
    "date": "2026-11-21",
