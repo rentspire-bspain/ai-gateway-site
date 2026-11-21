@@ -1,6 +1,6 @@
 # ai.spaincos.com — 100% Completion Parity Document (2026-11-21, v290)
 
-## 🏆 WEIGHTED AVERAGE COMPLETION: **85.9%** (computed by qa/generate-parity-headline.py — never hand-summed; v292 PARALLEL-LANE HARVEST: 29 categories, weight 128; six dimensions re-scored on live evidence (Accessibility 70, Docs 70, Observability 75, Mobile 75, SEO 85, Fleet 65) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 60 (w3) + Marketing 60 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 60 (w3) + Marketing 60 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
+## 🏆 WEIGHTED AVERAGE COMPLETION: **86.3%** (computed by qa/generate-parity-headline.py — never hand-summed; v293 G/R/Y ICON BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 55 — ToS draft live, Enterprise 72) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 60 (w3) + Marketing 60 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 60 (w3) + Marketing 60 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
 **104 ✅ complete · 33 🟡 partial · 20 🔴 gap of 157 tracked items, weighted across 17 categories.**
 **Batch delta this session: 90.1 → 90.4 (+0.3).** The remaining 9.6 points break down as: owner
@@ -2662,3 +2662,18 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 **THE HEADLINE: 85.9% (10999/128, 29 categories).** +1.5 points in one batch, all from live-verified lane work — the largest single-batch jump since the exhaustive rebalance. Remaining biggest honest drags: Legal 45 (ToS owner-gated), i18n 10, Email 30 (Google OAuth owner-gated), Enterprise/Comet/Desktop 70s, and the Wave-1 webapp rebuild (the fleet dispatches need real persistence/routes before any launch claim).
 
 **The UX master benchmark re-ran green against the final deploy** (fleet-sweep carry, dpl_26PKV): brand alive, zero errors, full answer flow (10 sources), response-diff badges rendering ("v2 of 7", "Compare with v1"), TTFB 234ms / FCP 1248ms.
+
+### 9. §30q addendum — v293: THE G/R/Y ICON BATCH (headline 85.9% → 86.3%; the icon law is now IN the doc)
+
+**The icon law, live in the document:** the category status table (generated from qa/parity-items.json, never hand-built) now renders under the headline with ✅/🟡/🔴 per category; batch-log items take ~~strikethrough~~ once merged AND live-verified. Owner directive 2026-11-21, exactly as ordered.
+
+**Lanes landed this batch (all merged + live-verified):**
+- ~~Terms of Service draft (PR #290)~~ — LIVE both domains (/terms 200, ten sections, AI-output disclaimer, "Draft pending owner legal review" card naming the open items). Legal 45→55.
+- ~~Voice states (PR #289)~~ — LIVE: amber processing state, visible error notices (was silent failures), unsupported-browser explanations, 20/20 headless checks. Voice 80→85. The server STT/TTS dependency is documented exactly (voice-service on Render, owner action).
+- ~~Enterprise evidence (PR #288)~~ — merged: the honest deployed-reality map (PASS/PARTIAL/FAIL per capability, OIDC/SAML/SCIM owner dependencies). Enterprise 70→72.
+- ~~Eval-replay standing gate (PR #286)~~ — merged: the 10-query battery is now part of qa/run.sh --post-deploy with rolling deploy history (2 recorded runs, both 10/10).
+- ~~G/R/Y icon table (PR #287)~~ — merged: the icon law in the doc.
+
+**In flight (next batch):** the OAuth connector-benefit lanes — onboarding persuasion examples (concrete before/after questions per provider) and the marketing surfaces (docs + landing benefit lines).
+
+**HEADLINE: 86.3% (11045/128, 29 categories) — 🟡 YELLOW band, +0.4 this batch, +1.9 across v292+v293.** The remaining REDs: Legal (owner review), i18n, Email (owner OAuth), Marketing (connector lanes landing), Desktop/Comet/Teammates (feature work), and the Wave-1 webapp rebuild.
