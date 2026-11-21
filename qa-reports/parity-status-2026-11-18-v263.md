@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-20, v288)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-21, v289)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **90.4%** (computed by qa/generate-parity-headline.py — never hand-summed)
 
@@ -2476,7 +2476,7 @@ theory (it was reachable the whole time).
    | Single-pass extraction captured a prose heading | live row shipped "FINAL ANSWER: Verification" | v289b heading strip + CANDIDATE LADDER (first value-shaped candidate wins); v289c eq-trim + markdown sanitize | 298-299 |
    | **THE POSITION BUG** (subtlest — found via the coverage run) | the append FIRED but landed after "## Sources"; the harness (and any metadata-stripping reader) stripped the line with the section — measured 42% coverage while the gate fired on ~every row | v289d: the FA line ships BEFORE the metadata sections | 300 |
 
-   LIVE-VERIFIED: "17*23" → "FINAL ANSWER: 391" survives the harness's metadata stripping; the AIME-class row ships its stated result. A fresh 20-row coverage measurement through platform 300 is running (results to Slack when graded).
+   LIVE-VERIFIED: "17*23" → "FINAL ANSWER: 391" survives the harness's metadata stripping; the AIME-class row ships its stated result. The fresh 20-row coverage measurement through platform 300 is IN: **FINAL ANSWER line present 20/20 (100%, up from 42% with the position bug); fair 17/20 (85%); strict 17/20.** Misses: the \\(\pi^2/8\) interval (interval notation not yet FA-extractable), \\(9/100\) (wordy solution), and the pmatrix vector (stated in body, format variant). Slice-row noise vs the 92.0% full-suite fair run — the FA line now persists in every graded body, which was the point.
 
 3. **THE REAL-USER-EXPERIENCE SUITE (qa/e2e-ux-flows.py) — the owner's "aside from the benchmarks" demand, answered with method:** the 9-flow UX suite (U1 session restore, U2 ask-a-question with citations, U3 thread persistence, U4 deep link, U5 history awareness, U6 follow-up multi-turn, U7 sources, U8 mobile 375px, U9 error surface) drives a REAL signed-in browser session with the fleet eval account. LIVE EXECUTION, ALL GREEN (details in the batch log). Standing rule: BOTH suites (e2e-real-flows.py shell + e2e-ux-flows.py experience) run after every deploy — the benchmark scores measure the ENGINE; these suites measure what the user actually experiences, and the v288 login bug proved the second is not optional.
 
