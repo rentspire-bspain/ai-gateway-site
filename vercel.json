@@ -4,6 +4,7 @@
   "routes": [
     {"src": "/", "dest": "/api/bv-render"},
     {"src": "/index.html", "dest": "/api/bv-render"},
+    {"src": "/t/(.*)", "dest": "/api/bv-render"},
     {"handle": "filesystem"}
   ]
 }
