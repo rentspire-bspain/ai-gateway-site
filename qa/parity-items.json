@@ -74,7 +74,7 @@
   {
    "name": "Desktop",
    "weight": 3,
-   "score": 70
+   "score": 78
   },
   {
    "name": "Billing",
@@ -211,6 +211,11 @@
    "version": "v290",
    "date": "2026-11-21",
    "change": "Added UX (w6), SEO (w3), Marketing (w3) per owner directive \"the new UX/SEO/marketing all weighed/rolled into the completion doc\". Weight total 98 -> 110; EXPECTED_WEIGHT updated in generate-parity-headline.py. UX score = the measured UX master benchmark (91.4 first live run). SEO/Marketing scored from live evidence (robots/og/canonical present; sitemap 404; brief+brand kit shipped, no campaigns)."
+  },
+  {
+   "version": "v295",
+   "date": "2026-11-21",
+   "change": "Desktop 70 -> 78 (code + curl evidence, no browser). Manifest shortcuts/share_target/protocol/file handlers now have real handlers (modules/desktop-shell.js, previously none); single install owner (duplicate #installAppBtn removed) plus macOS Safari Add to Dock help; sw.js v3 with offline.html fallback and an offline/back-online bar; Electron wrapper scaffold in desktop/ (unbuilt, unsigned). Not credited: real-browser install/handler behavior, built or signed installers, window-controls-overlay. Detail: docs/DESKTOP.md."
   }
  ]
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-Rrbn492u+fJUI6ao8INB4hbuyu26g6L9s4/rI5okgXQ=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-BrCS5dcCRgl2Y42YfiQFHbQ6yFBi8iRGsW8LSP4BmUw=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
@@ -28,6 +28,8 @@ html.pre-boot body::before{content:"";position:fixed;top:72px;left:50%;transform
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <script defer src="/modules/pwa-install.js"></script>
+<link rel="stylesheet" href="/modules/desktop-shell.css">
+<script defer src="/modules/desktop-shell.js"></script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://frontend-cdn.perplexity.ai" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="https://frontend-cdn.perplexity.ai/_agi_assets/fonts/PPLX-Sans-Beta-R6-VF.woff2" crossorigin>
@@ -81,8 +83,6 @@ body.incognito .question-header::after{content:"";}
 .drop-overlay{position:fixed;inset:0;z-index:970;display:none;align-items:center;justify-content:center;background:rgba(20,100,107,.18);backdrop-filter:blur(2px);pointer-events:none}
 .drop-overlay.show{display:flex}
 .drop-overlay div{border:2px dashed var(--accent);border-radius:16px;background:var(--bg-elevated);color:var(--text);padding:28px 36px;font-size:16px;font-weight:500;max-width:calc(100vw - 40px);text-align:center}
-#installAppBtn{display:none}
-#installAppBtn.show{display:flex}
 @media(max-width:768px){.incognito-bar{top:52px}}
 
 
@@ -1693,10 +1693,6 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
       <button class="import-history-btn" id="importHistoryBtn" title="Import your Perplexity history as searchable context">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
         Import Perplexity history
-      </button>
-      <button class="import-history-btn" id="installAppBtn" title="Install ai.spaincos as an app">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-        Install app
       </button>
       <div class="user-row" id="userRow">
         <div class="user-avatar" id="userAvatar">?</div>
@@ -5951,11 +5947,6 @@ function wireCodeCopy(scope) {
       if (localStorage.getItem("ai_sw_reset_99")) navigator.serviceWorker.register("/sw.js").catch(() => {});
     });
   }
-  let deferred = null;
-  const btn = document.getElementById("installAppBtn");
-  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferred = e; if (btn) btn.classList.add("show"); });
-  window.addEventListener("appinstalled", () => { deferred = null; if (btn) btn.classList.remove("show"); });
-  if (btn) btn.onclick = async () => { if (!deferred) return; deferred.prompt(); try { await deferred.userChoice; } catch (e) {} deferred = null; btn.classList.remove("show"); };
 })();
 
 // ============ INIT ============

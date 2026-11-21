@@ -19,7 +19,7 @@
 | 🟡 | Premium | 2 | 80 |
 | 🔴 | Enterprise | 3 | 70 |
 | ✅ | GettingStarted | 5 | 90 |
-| 🔴 | Desktop | 3 | 70 |
+| 🔴 | Desktop | 3 | 78 |
 | ✅ | Billing | 6 | 92 |
 | 🔴 | Mobile | 3 | 75 |
 | 🔴 | Teammates | 1 | 68 |
@@ -52,7 +52,7 @@ benchmark SFT unlock (rule 15c — the single biggest score mover, staged).
 | API | 10 | 95 ✅ | | Teammates | 1 | 68 🔴 |
 | Models | 8 | 92 🟡 | | Comet | 3 | 70 🔴 |
 | Account | 6 | 95 ✅ | | Enterprise | 3 | 70 🔴 |
-| Billing | 6 | 92 🟡 | | Desktop | 3 | 70 🔴 |
+| Billing | 6 | 92 🟡 | | Desktop | 3 | 78 🔴 |
 | Troubleshooting | 4 | 90 🟡 | | Mobile | 3 | 60 🔴 |
 | GettingStarted | 5 | 90 🟡 | | | | |
 
@@ -2044,7 +2044,7 @@ wrapper (Apple developer account, $99/yr). Both are wrapper-level work, no app r
 | 3 | **Create files and apps: XLSX, PPTX, HTML apps** with edit history, preview, sharing, Drive export | Perplexity | Features/Premium | 🟡 DOCX/PDF covered; spreadsheet/deck/app creation not tracked |
 | 4 | **Learn Mode** | Perplexity | Features | 🔴 not tracked |
 | 5 | **Model Council** (multi-model deliberation mode) | Perplexity | Models | 🟡 we have writer A/B infra; council mode not tracked |
-| 6 | **Personal Computer for Windows** (desktop app) | Perplexity | Desktop | 🟡 tracked as "Desktop app" generally; Windows-native build not itemized |
+| 6 | **Personal Computer for Windows** (desktop app) | Perplexity | Desktop | 🟡 tracked as "Desktop app" generally; v295 adds the installable-PWA launch surfaces + an unbuilt Electron scaffold (desktop/); Windows-native signed build not itemized and not built |
 | 7 | **Audio/video transcription + speaker labeling** in uploads | Perplexity | Features | 🔴 not tracked |
 | 8 | **File connectors sync** (Google Docs/Slides/Sheets live sync) | Perplexity | Connectors | 🟡 covered by the Google OAuth item |
 | 9 | **API: Decisions API, Monitor API, Context API** (we track Search/Agent API parity in §30e) | Perplexity | API | 🔴 the three newer API surfaces not tracked |
@@ -2725,3 +2725,21 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 **In flight (next batch):** the onboarding persuasion lane (connector_oauth_flows) — the empty-connectors guide upgrade with concrete before/after examples per provider. Gateway prompt fix already live in platform 301: the IMPORTED HISTORY guardrail (owner-observed defect 2026-11-20 — the model must call search_my_context before ever claiming imported history is unavailable).
 
 **HEADLINE: 86.6% (11090/128, 29 categories) — 🟡 YELLOW band, +0.3 this batch, +2.2 across v292-v294.** The remaining REDs: Legal (owner review), i18n, Email (owner OAuth registration), Desktop/Comet/Teammates (feature work), and the Wave-1 webapp rebuild (all three top dispatches DRAFT-WITH-BLOCKERS per the acceptance pass). Open PRs awaiting review: #267 (v262.1 re-verify), #222 (gospel icons), #216 (checkout wiring).
+
+### 11. §30q addendum — v295: THE DESKTOP LANE (Desktop 70 → 78, headline 86.6% → 86.8%)
+
+**Lane:** Desktop 70 → close the gap (PWA install UX, desktop-wrapper readiness, offline/launcher surfaces). Evidence is code + curl only — no browser was available, and the score is capped accordingly.
+
+**Finding that drove the work:** `manifest.webmanifest` already declared `shortcuts` and a `share_target`, but nothing in the app handled `?q=`, `#search`, `#settings` or `source=pwa-shortcut` — they were dead entries. Two install buttons (`#installAppBtn` legacy + `#pwaInstall`) both consumed the one-shot `beforeinstallprompt`; install help existed only for iOS Safari; the offline navigation fallback was a bare 503 string.
+
+**Shipped (branch feat/desktop-shell):**
+- `modules/desktop-shell.js` + `.css`: handlers for shortcuts (new thread / search / settings), share target (title/text/url → composer, never auto-sent), `web+aispaincos:` protocol handler, file handler (.txt .md .csv .json, 500KB cap), `launchQueue` (focus-existing), URL cleanup after handling, offline/back-online status bar, installed-window shortcuts (Ctrl/Cmd+Shift+O, Ctrl/Cmd+,).
+- Manifest: `launch_handler`, `protocol_handlers`, `file_handlers`, `categories`, `display_override`, three-field share target, shortcut icons.
+- Install UX: one owner (`pwa-install.js`); legacy duplicate button + inline handler removed (CSP hashes regenerated, `--check` ok); macOS Safari "File → Add to Dock" help.
+- Offline: `sw.js` v3 precaches `offline.html` and the desktop shell; fallback chain is cached app shell → `offline.html` → 503.
+- `desktop/`: Electron wrapper scaffold (single instance, global hotkey, tray, deep links, navigation allow-list). UNBUILT and UNSIGNED.
+- `docs/DESKTOP.md`; `tests/desktop-shell.test.js` (4 passing) plus a stubbed-DOM smoke run.
+
+**Not credited (why 78, not higher):** real-browser verification of install prompt / shortcut menu / share sheet / handler registration; a built, signed installer (owner-gated certificates); window-controls-overlay; manifest screenshots; auto-update.
+
+**HEADLINE: 86.8% (11114/128, 29 categories) — 🟡 YELLOW band, +0.2 this batch.** Remaining REDs unchanged except Desktop (still feature work: signed build + real-browser verification).

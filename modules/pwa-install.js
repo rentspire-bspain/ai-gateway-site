@@ -1,4 +1,5 @@
-/* Native install where offered; Safari on iOS uses manual Home Screen steps. */
+/* Single owner of install UX. Native prompt where offered (Chrome/Edge desktop + Android);
+   manual steps for iOS Safari (Add to Home Screen) and macOS Safari 17+ (File > Add to Dock). */
 (() => {
   "use strict";
 
@@ -7,6 +8,9 @@
   const ios = /iPhone|iPad|iPod/.test(ua) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const safari = ios && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  const macSafari = !ios && /Macintosh/.test(ua) && /Safari/.test(ua) &&
+    !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Firefox/.test(ua);
+  const manual = safari || macSafari;
   let pendingPrompt;
   let installed = false;
   let button;
@@ -15,7 +19,7 @@
   function update() {
     if (!button || !help) return;
     button.hidden = installed || standalone.matches || navigator.standalone === true ||
-      (!pendingPrompt && !safari);
+      (!pendingPrompt && !manual);
     if (button.hidden || pendingPrompt) {
       help.hidden = true;
       button.removeAttribute("aria-expanded");
@@ -46,6 +50,7 @@
     button = document.getElementById("pwaInstall");
     help = document.getElementById("pwaInstallHelp");
     if (!button || !help) return;
+    if (macSafari) help.textContent = "In Safari, choose File, then Add to Dock, then Add.";
     update();
     button.addEventListener("click", async () => {
       if (button.hidden) return;
@@ -59,7 +64,8 @@
       pendingPrompt = undefined; // a browser prompt can only be used once
       button.disabled = true;
       try {
-        const choice = await event.prompt();
+        const shown = await event.prompt();
+        const choice = shown?.outcome ? shown : await event.userChoice;
         if (choice?.outcome === "accepted") installed = true;
       } catch {
         // A stale or unavailable prompt cannot be retried; wait for a new event.
