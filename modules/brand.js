@@ -36,9 +36,24 @@
     for (var i = 0; i < MAP.length; i++) out = out.replace(MAP[i][0], MAP[i][1]);
     return out;
   }
+  // v288 CRITICAL FIX: NEVER scrub text inside <script> (or <style>) elements. A script's
+  // content is a text node, and this module runs synchronously in <head> with a
+  // MutationObserver that fires in microtasks WHILE THE PARSER IS STILL STREAMING the
+  // document. The observer rewrote the main inline script's source mid-parse
+  // ("ai.spaincos.com" -> "BoundView" inside the JS), so the browser computed the CSP
+  // sha256 from the MUTATED text -> hash mismatch -> the main script was blocked by
+  // script-src-elem -> `sb` (the whole app) never defined -> login silently dead on
+  // boundview.com (live-verified via securitypolicyviolation capture). ai.spaincos.com is
+  // unaffected because the scrub only runs when the hostname contains "boundview".
+  // Script text is never rendered, so scrubbing it was pointless AND fatal.
+  function isProtectedText(node) {
+    var p = node.parentElement;
+    return !!p && (p.tagName === "SCRIPT" || p.tagName === "STYLE");
+  }
   function scrubNode(node) {
     try {
       if (node.nodeType === 3) { // text node
+        if (isProtectedText(node)) return;
         var s = scrubText(node.nodeValue || "");
         if (s !== node.nodeValue) node.nodeValue = s;
       } else if (node.nodeType === 1) { // element
@@ -68,13 +83,35 @@
       while (walker.nextNode()) scrubNode(walker.currentNode);
     }
   }
-  // v262 (UX debug-loop 2026-11-20): brand-aware PWA manifest. On boundview.com the
-  // shared /manifest.webmanifest would leak "ai.spaincos" — serve the BoundView one.
-  function swapManifest() {
-    var l = document.querySelector('link[rel="manifest"]');
-    if (l) l.setAttribute("href", "/manifest.boundview.webmanifest");
-  }
-
+  // ---- v281 BOUNDVIEW BRAND ASSETS: swap the static brand links (favicon set,
+  // apple-touch-icon, PWA manifest, og:image) to the BoundView kit. Same runtime
+  // pattern as the icon swap — the files ship in the repo; only boundview.com
+  // requests them. Crawler note: social previews read og:image without JS, so
+  // boundview.com's og:image also needs the Vercel headers pass (see doc §30h).
+  function swapLinks() {
+    try {
+      var links = document.head ? document.head.getElementsByTagName("link") : [];
+      for (var i = 0; i < links.length; i++) {
+        var l = links[i];
+        var rel = (l.getAttribute("rel") || "").toLowerCase();
+        var href = l.getAttribute("href") || "";
+        if (/icon|apple-touch|manifest/.test(rel)) {
+          if (/(spaincos|favicon\.png|favicon\.webp|apple-touch-icon\.png|icons\/icon-|manifest\.webmanifest)/i.test(href)) {
+            if (/apple-touch/.test(rel)) l.setAttribute("href", "/icons/boundview-apple-touch-icon.png");
+            else if (/manifest/.test(rel)) l.setAttribute("href", "/boundview-manifest.webmanifest");
+            else if (/\.png/i.test(href)) l.setAttribute("href", "/icons/boundview-favicon-48.png");
+            else l.setAttribute("href", "/boundview-icon.svg");
+          }
+        }
+      }
+      if (document.head) {
+        var metas = document.head.getElementsByTagName("meta");
+        for (var j = 0; j < metas.length; j++) {
+          var mp = (metas[j].getAttribute("property") || "") + (metas[j].getAttribute("name") || "");
+          if (/og:image|twitter:image/i.test(mp)) metas[j].setAttribute("content", "/icons/boundview-og-image.png");
+        }
+      }
+    } catch (e) { /* never break the page over branding */ }
   // v262 (UX debug-loop 2026-11-20): SEO heads. The private workspace host gets noindex
   // (it must not be indexed under the BoundView title); the public BoundView host gets
   // description/og/canonical/JSON-LD. Static per-host HTML heads are E11 owner item.
@@ -105,21 +142,23 @@
 
   function start() {
     scrubAll(document.documentElement);
+    swapLinks();
     document.title = window.BRAND.title;
-    swapManifest();
     seoHeads();
-    // keep it clean: any dynamically-inserted UI gets scrubbed too
-    if (window.MutationObserver) {
-      new MutationObserver(function (muts) {
-        for (var i = 0; i < muts.length; i++) {
-          var m = muts[i];
-          if (m.addedNodes && m.addedNodes.length) {
-            for (var j = 0; j < m.addedNodes.length; j++) scrubAll(m.addedNodes[j]);
-          }
-          if (m.type === "characterData" && m.target) scrubNode(m.target);
-        }
-      }).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
-    }
+  }
+  // v283 PRE-PAINT SCRUB: brand.js loads synchronously in <head> — the observer
+  // starts IMMEDIATELY (not on DOMContentLoaded), so every node the parser or the
+  // SPA adds is scrubbed in a microtask BEFORE the browser paints it. Combined with
+  // the server-side transform (api/bv-render.js), the wrong brand never paints.
+  if (window.MutationObserver) {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) {
+        var m = muts[i];
+        if (m.addedNodes && m.addedNodes.length) {
+          for (var j = 0; j < m.addedNodes.length; j++) scrubAll(m.addedNodes[j]);        }
+        if (m.type === "characterData" && m.target) scrubNode(m.target);
+      }
+    }).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();

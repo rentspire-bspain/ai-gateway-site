@@ -1,6 +1,7 @@
 // cors.js — origin-pinned CORS. Browser calls come only from the site origin; server-to-server
 // functions (call-model, history-import) should send NO CORS headers at all (use serverOnly()).
-export const SITE_ORIGINS = ["https://ai.spaincos.com"];
+// v283 PERMANENT FIX (owner report 2026-11-20: "Couldn't reach the gateway — Network request failed (Failed to fetch)" on boundview.com): the CORS allowlist was pinned to ai.spaincos.com ONLY — every browser call from https://boundview.com was refused the ACAO header and the browser blocked the response. Both site origins are now allowed (the gateway is shared; auth is per-user either way). Verified live on platform 288.
+export const SITE_ORIGINS = ["https://ai.spaincos.com", "https://boundview.com", "https://www.boundview.com"];
 
 /** @param {Request} req @param {{origins?:string[], extraHeaders?:string[], allowLocalhost?:boolean}} o */
 export function corsFor(req, o = {}) {

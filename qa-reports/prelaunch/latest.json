@@ -1,9 +1,24 @@
 {
- "ts": "2026-11-16T19:48:38+00:00",
+ "ts": "2026-11-21T03:19:42+00:00",
  "base": "https://ai.spaincos.com",
- "passed": 31,
- "failed": 0,
+ "passed": 29,
+ "failed": 2,
  "checks": [
+  {
+   "name": "benchmark gospel present and unaltered",
+   "ok": true,
+   "detail": "qa/BENCHMARK_GOSPEL.md missing or modified \u2014 restore from master"
+  },
+  {
+   "name": "gospel enforcer present",
+   "ok": true,
+   "detail": "qa/gospel-check.py missing or gutted"
+  },
+  {
+   "name": "benchmark harness gospel-bound",
+   "ok": true,
+   "detail": "ruthless-bench.py docstring lost the gospel reference"
+  },
   {
    "name": "gateway-status 200",
    "ok": true,
@@ -22,22 +37,22 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "16.6s"
+   "detail": "13.1s"
   },
   {
    "name": "current-events answered",
-   "ok": true,
-   "detail": "HTTP 200"
+   "ok": false,
+   "detail": "HTTP 546"
   },
   {
    "name": "current-events fast path (loop skipped)",
-   "ok": true,
-   "detail": "skipped=research_sufficient"
+   "ok": false,
+   "detail": "skipped=None"
   },
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "18.5s"
+   "detail": "15.6s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -48,21 +63,6 @@
    "name": "memory_items table reachable",
    "ok": true,
    "detail": "HTTP 200"
-  },
-  {
-   "name": "index.html loads real modules",
-   "ok": true,
-   "detail": "70 refs"
-  },
-  {
-   "name": "all deployed modules match repo",
-   "ok": true,
-   "detail": ""
-  },
-  {
-   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
-   "ok": true,
-   "detail": "build.js=v250 build.json=v250"
   },
   {
    "name": "landing renders",
@@ -147,7 +147,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n9 FAILED\n\u00b7 21/30 checks \u00b7 11/16/2026, 7:38:3"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 31/31 checks \u00b7 11/16/2026, 7:48:"
   },
   {
    "name": "follow-up chip submits (search state)",
@@ -160,5 +160,5 @@
    "detail": ""
   }
  ],
- "exit": 0
+ "exit": 1
 }
