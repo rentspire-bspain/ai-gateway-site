@@ -2604,6 +2604,22 @@ The owner's "ALL WEBAPPS through the same rigor" is not yet met: the 46-check UX
 
 **The post-deploy UX master benchmark re-run (against dpl_GByd..., master dbabac8):** session restore green, full answer flow green (Fed funds answer with citations + 10 sources, ~20s), both domains brand-correct with security headers, privacy/sitemap/health 200 on both. The suite's H2 check now also asserts the public host is current (the staleness guard).
 
+### 5. §30q addendum — v291c: THE CROSS-SESSION COORDINATION (owner directive: "tell all other open sessions working on webapps... have them acknowledge")
+
+**The broadcast (2026-11-21):** the 29-dimension contract + rigor rules sent to 21 live webapp/UX/completion-doc sessions. The durable record lives in the repo (qa/COORDINATION-DIMENSIONS.md, PR #270, merged bb7a7b7) so every session — including any outside this tree — picks it up from master.
+
+**The contract:** (1) all 29 dimensions with canonical names/weights in any completion doc, checklist, or scoring; (2) evidence-based scoring only (live-verified, partials = 0.5, no grader-gaming); (3) the three standing post-deploy gates or an explicit Fleet-gap flag; (4) the serving-layer lessons (verify the real server per domain, never cross-serve brand HTML, function-routed paths carry their own headers, non-git deploy targets go stale silently); (5) master-doc changes via branch + PR only.
+
+**Acknowledgments received and applied (12 of 21 at press time; the rest are processing):**
+- boundview_showcase_fleet: catalog v3.1 updated with the full contract — all 29 dimensions retained, explicitly UNSCORED pending live evidence, Fleet-gap flagged, dispatch discipline codified (free-model fleet only, no paid build agents, no prose-only "deployed" claims). Shared library copy updated.
+- visual_parity_fleet: acknowledged; prior outcome stays BLOCKED, not a parity pass.
+- webapp_schema_tools: acknowledged; read-only evidence tools are in the contract's spirit; PR lacks e2e suite coverage — flagged as a gap rather than claiming green.
+- getting_started: acknowledged; answered its overlap question — the onboarding checklist (PR #129 + fixes #130-#132), GettingStarted guided steps (v235) shipped since its base; it is rebasing/diffing before publishing.
+- getting_started_polish, qa_new_panes, eval_replay, regression_suite, self_audit, deploy_pipeline: acknowledged, applying the contract in their lanes.
+- computer_parity_builder: dimension-contract section appended to its doc; Computer stays PARTIAL until live deploy + suites; Fleet and Observability gaps flagged.
+- self_improver: Part E appended mapping its findings to the dimensions; local-only fixes earn no credit until live-verified; proposed a post-deploy answer-quality suite to close a Fleet gap.
+
+**Session-level corrections applied during coordination:** getting_started's EADDRINUSE "integrity failure" was a local port collision (environment issue, not a product defect); the BUILD-check mismatch (inline vs external build.js) is noted for its re-run.
 ### 6. §30q addendum — v291d: THE COORDINATION SAVE (brand.js was DEAD in production — found by the push-gate network, fixed by the owning workstream)
 
 **The incident (honest record):** the parallel v262 session's PR #264 (merged 2026-11-21 ~17:49Z) shipped a brand.js with a SYNTAX ERROR — the seoHeads function was inserted INSIDE swapLinks without the closing brace (plus a stray brace on the observer's inner for-line), so the whole IIFE failed to parse. **For ~40 minutes of production time, brand.js was DEAD on both domains: window.BRAND undefined, the pre-paint brand scrub gone (the v288 login-bug safety net), the v262 noindex/SEO heads dead, and a SyntaxError in the console of EVERY page load.** The e2e suites did not catch it because the v291 deploy-verification spot-checks ran before the broken file went live, and the zero-JS-errors capture was not re-armed after the session-recovery events — a gap now closed (the check is part of the standing benchmark and re-runs on every deploy).
