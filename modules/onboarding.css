@@ -48,7 +48,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--text);
   background: var(--accent-light);
   border: 1px solid var(--border-light);
   border-radius: 999px;
@@ -217,8 +217,8 @@
 }
 
 .ob-tour-btn-pri {
-  background: var(--accent);
-  border: 1px solid var(--accent);
+  background: var(--accent-btn, var(--accent));
+  border: 1px solid var(--accent-btn, var(--accent));
   color: var(--text-inverse, #fff);
   font-weight: 600;
 }
