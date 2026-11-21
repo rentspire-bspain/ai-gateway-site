@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-21T19:27:42+00:00",
- "version": "v293",
- "headline_pct": 86.3,
- "weighted_sum": 11045,
+ "ts": "2026-11-21T19:41:15+00:00",
+ "version": "v294",
+ "headline_pct": 86.6,
+ "weighted_sum": 11090,
  "total_weight": 128,
  "categories": {
   "Features": 99,
@@ -24,7 +24,7 @@
   "Teammates": 68,
   "UX": 91,
   "SEO": 85,
-  "Marketing": 60,
+  "Marketing": 75,
   "Security": 80,
   "Accessibility": 70,
   "Legal/Compliance": 55,
