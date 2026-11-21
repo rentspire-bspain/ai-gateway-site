@@ -35,7 +35,16 @@ function transformHtml(html) {
 }
 
 module.exports = async (req, res) => {
-  const headers = { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" };
+  // v291: security headers on every response (the vercel.json headers block does not
+  // apply to function-routed paths — the function owns its response headers).
+  const headers = {
+    "Content-Type": "text/html; charset=utf-8",
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(self), geolocation=()",
+  };
   if (req.method === "OPTIONS") {
     res.writeHead(204, { ...headers, Allow: "GET, OPTIONS" });
     res.end();
