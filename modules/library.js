@@ -906,10 +906,18 @@
     var list = filtered(all), p = pins();
     if (!list.length) {
       var none = !all.length; renderBulk();
-      body.innerHTML = '<div class="lib-empty"><h2>' + (none ? "Your library is empty" : state.archived && !state.q ? "Nothing archived" : "No matching threads") + '</h2><p>' +
-        (none ? "Threads you start will show up here, ready to revisit, pin and organize." : "Try a different search or clear a filter.") +
-        '</p><button class="lib-btn primary" id="libNew">New thread</button></div>';
+      body.innerHTML = '<div class="lib-empty"><h2>' + (none ? "No threads yet" : state.archived && !state.q ? "Nothing archived" : "No matching threads") + '</h2><p>' +
+        (none ? "Start with a question. Your threads will appear here so you can revisit them." : "Try another search or clear the filters to see your threads.") +
+        '</p><div class="lib-empty-actions"><button class="lib-btn primary" id="libNew">New thread</button></div></div>';
       body.querySelector("#libNew").onclick = function () { close(); call("newThread"); };
+      var actions = body.querySelector(".lib-empty-actions");
+      if (none && window.OnboardingUI) window.OnboardingUI.starterButtons(actions);
+      if (!none) {
+        var clear = document.createElement("button"); clear.type = "button"; clear.className = "lib-btn"; clear.textContent = "Clear search and filters";
+        clear.onclick = function () { state.q = ""; state.pinOnly = state.sources = state.archived = false; state.model = state.col = ""; var input = document.getElementById("libQ"); if (input) input.value = ""; renderBody(); };
+        actions.appendChild(clear);
+        if (window.OnboardingUI) window.OnboardingUI.starterButtons(actions, 2);
+      }
       return;
     }
     var sc = state.scores, items = list.map(function (t) { return { t: t, ts: stamp(t), pin: p.indexOf(t.id) > -1, m: sc && sc[t.id] }; });

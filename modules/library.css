@@ -52,7 +52,9 @@
 .lib-menu .lbl{font-size:11px;color:var(--text-faint,var(--text-muted));padding:6px 10px 2px;text-transform:uppercase;letter-spacing:.05em}
 .lib-empty{text-align:center;padding:90px 20px;color:var(--text-muted)}
 .lib-empty h2{color:var(--text);font-size:20px;margin:0 0 8px}
-.lib-empty p{margin:0 0 18px;font-size:14px;max-width:48ch;margin-left:auto;margin-right:auto;line-height:1.5}
+.lib-empty p{margin:0 0 18px;font-size:14px;max-width:48ch;line-height:1.5}
+.lib-empty{text-align:left;padding:32px 0}
+.lib-empty-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .lib-count{font-size:12px;color:var(--text-faint,var(--text-muted));margin-left:auto}
 @media (max-width:640px){.lib-header{padding:12px 14px}.lib-body{padding:4px 14px 40px}.lib-title{font-size:17px}.lib-top{flex-wrap:wrap;gap:8px}.lib-tab{padding:4px 8px;font-size:12.5px}.lib-spacer{display:none}#libClose{margin-left:auto}.lib-search{order:3;flex-basis:100%;max-width:none}.lib-grid{grid-template-columns:1fr}}
 
