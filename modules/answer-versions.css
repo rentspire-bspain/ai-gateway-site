@@ -1,0 +1,117 @@
+/* answer-versions.css — Response versioning + diff view (answer-versions.js, section 34b) */
+/* Reuses the app's design tokens so dark/light themes both render correctly. */
+
+/* small version badge inside the answer action row */
+.av-version-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-faint);
+  font-size: 13px;
+  font-weight: 500;
+}
+.av-version-btn .av-version-label { color: var(--text-muted); }
+.av-version-btn:hover .av-version-label { color: var(--text); }
+
+/* diff modal — same overlay pattern as .import-modal-backdrop */
+.av-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+}
+.av-backdrop.open { display: flex; }
+.av-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(860px, 94vw);
+  max-height: min(84vh, 900px);
+  background: var(--bg-surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+.av-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+.av-title { font-size: 16px; font-weight: 650; }
+.av-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
+.av-close {
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border-radius: var(--radius-xs, 6px);
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  flex: none;
+}
+.av-close:hover { color: var(--text); border-color: var(--accent); }
+.av-close:focus-visible, .av-version-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.av-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 0;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  background: var(--bg-surface);
+}
+.av-ln { display: flex; gap: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.av-sign {
+  flex: none;
+  width: 34px;
+  text-align: center;
+  color: var(--text-faint);
+  user-select: none;
+  border-left: 2px solid transparent;
+}
+.av-txt { flex: 1; min-width: 0; padding-right: 14px; color: var(--text); }
+.av-ln.av-ctx .av-txt { color: var(--text-muted); }
+.av-ln.av-add { background: rgba(46, 160, 67, 0.13); }
+.av-ln.av-add .av-sign { color: #2EA043; border-left-color: #2EA043; }
+.av-ln.av-del { background: rgba(248, 81, 73, 0.12); }
+.av-ln.av-del .av-sign { color: #E5534B; border-left-color: #E5534B; }
+.av-gap {
+  padding: 3px 0 3px 44px;
+  color: var(--text-faint);
+  font-size: 11.5px;
+  font-family: var(--font-sans);
+  background: var(--bg-elevated);
+  user-select: none;
+}
+.av-legend {
+  display: flex;
+  gap: 14px;
+  padding: 8px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+.av-lg-add { color: #2EA043; }
+.av-lg-del { color: #E5534B; }
+
+@media (max-width: 640px) {
+  .av-backdrop { padding: 10px; }
+  .av-modal { width: 100%; max-height: 92vh; }
+  .av-body { font-size: 11.5px; }
+}
