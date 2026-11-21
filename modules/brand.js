@@ -103,18 +103,21 @@
     scrubAll(document.documentElement);
     swapLinks();
     document.title = window.BRAND.title;
-    // keep it clean: any dynamically-inserted UI gets scrubbed too
-    if (window.MutationObserver) {
-      new MutationObserver(function (muts) {
-        for (var i = 0; i < muts.length; i++) {
-          var m = muts[i];
-          if (m.addedNodes && m.addedNodes.length) {
-            for (var j = 0; j < m.addedNodes.length; j++) scrubAll(m.addedNodes[j]);
-          }
-          if (m.type === "characterData" && m.target) scrubNode(m.target);
+  }
+  // v283 PRE-PAINT SCRUB: brand.js loads synchronously in <head> — the observer
+  // starts IMMEDIATELY (not on DOMContentLoaded), so every node the parser or the
+  // SPA adds is scrubbed in a microtask BEFORE the browser paints it. Combined with
+  // the server-side transform (api/bv-render.js), the wrong brand never paints.
+  if (window.MutationObserver) {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) {
+        var m = muts[i];
+        if (m.addedNodes && m.addedNodes.length) {
+          for (var j = 0; j < m.addedNodes.length; j++) scrubAll(m.addedNodes[j]);
         }
-      }).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
-    }
+        if (m.type === "characterData" && m.target) scrubNode(m.target);
+      }
+    }).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
