@@ -29,9 +29,10 @@
     btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg><span>Talk</span>';
     var anchor = document.getElementById("voiceToggle") || document.getElementById("deepResearchToggle");
     if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(btn, anchor); else { btn.style.cssText = "position:fixed;top:10px;right:10px;z-index:1000"; document.body.appendChild(btn); }
-    if (!SR || !window.speechSynthesis) { btn.disabled = true; btn.title = "Voice conversation not supported in this browser"; }
+    if (!SR || !window.speechSynthesis) { btn.classList.add("unsupported"); btn.setAttribute("aria-disabled", "true"); btn.title = "Voice conversation not supported in this browser"; btn.onclick = function () { notice("Voice conversation isn't supported in this browser. Try Chrome, Edge or Safari.", "error"); }; }
     else { btn.title = "Hands-free voice conversation"; btn.onclick = function () { active ? stop() : start(); }; }
   }
+  function notice(m, k) { if (typeof window.voiceNotice === "function") window.voiceNotice(m, k); else try { alert(m); } catch (e) {} }
   function setState(s, text) {
     state = s; bar.dataset.state = s; btn.classList.toggle("active", s !== "off");
     stateEl.textContent = LABELS[s] || ""; textEl.textContent = text || "";
@@ -48,7 +49,9 @@
     rec = new SR(); rec.continuous = true; rec.interimResults = true; rec.lang = navigator.language || "en-US";
     rec.onresult = onResult;
     rec.onerror = function (e) {
-      if (e.error === "not-allowed" || e.error === "service-not-allowed") { stop(); alert("Microphone permission denied"); }
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") { stop(); notice("Microphone access was blocked. Allow the microphone in your browser's site settings, then tap Talk again.", "error"); }
+      else if (e.error === "audio-capture") { stop(); notice("No microphone found. Connect one and try again.", "error"); }
+      else if (e.error === "network") { stop(); notice("Speech recognition needs a network connection. Check your connection and try again.", "error"); }
     };
     rec.onend = function () { rec = null; if (active) restartTimer = setTimeout(startRec, 250); };
     try { rec.start(); } catch (e) { rec = null; }

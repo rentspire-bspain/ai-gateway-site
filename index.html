@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-+SLsd3o76M+HPBo20TVP4DFRfLnnV9bVNJYo3h9m08A=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-Rrbn492u+fJUI6ao8INB4hbuyu26g6L9s4/rI5okgXQ=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
@@ -2582,6 +2582,24 @@ function stripMarkdownForSpeech(t) {
     .replace(/[\[\]()]/g, "")
     .replace(/\n{2,}/g, ". ").replace(/\s+/g, " ").trim();
 }
+// Visible, CSP-safe voice status/error notice (no inline handlers; styled in modules/voice-convo.css)
+let _vnT = null;
+function voiceNotice(msg, kind) {
+  let el = document.getElementById("voiceNotice");
+  if (!el) { el = document.createElement("div"); el.id = "voiceNotice"; el.className = "vc-notice"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite"); document.body.appendChild(el); }
+  el.textContent = msg; el.dataset.kind = kind || "info"; el.classList.add("show");
+  clearTimeout(_vnT); _vnT = setTimeout(() => el.classList.remove("show"), 4500);
+}
+window.voiceNotice = voiceNotice;
+const VOICE_UNSUPPORTED = "Voice input isn't supported in this browser. Try Chrome, Edge or Safari, or type your question.";
+const VOICE_ERRORS = {
+  "not-allowed": "Microphone access was blocked. Allow the microphone in your browser's site settings, then try again.",
+  "service-not-allowed": "Speech recognition is blocked on this device or browser.",
+  "no-speech": "Didn't hear anything. Tap the mic and try again.",
+  "audio-capture": "No microphone found. Connect one and try again.",
+  "network": "Speech recognition needs a network connection. Check your connection and try again.",
+  "language-not-supported": "Speech recognition doesn't support this language here."
+};
 function speakAnswer(text) {
   if (!voiceOn || !("speechSynthesis" in window)) return;
   stopSpeaking();
@@ -2595,16 +2613,22 @@ function speakAnswer(text) {
   const vt = document.getElementById("voiceToggle");
   const syncToggle = () => { vt.classList.toggle("active", voiceOn); vt.title = voiceOn ? "Voice on: answers are read aloud" : "Read answers aloud"; };
   syncToggle();
-  if (!("speechSynthesis" in window)) { vt.disabled = true; vt.title = "Voice output not supported in this browser"; }
-  vt.onclick = () => { voiceOn = !voiceOn; localStorage.setItem("voiceOn", voiceOn ? "1" : "0"); if (!voiceOn) stopSpeaking(); syncToggle(); };
+  const ttsOk = "speechSynthesis" in window;
+  if (!ttsOk) { vt.classList.add("unsupported"); vt.setAttribute("aria-disabled", "true"); vt.title = "Voice output not supported in this browser"; }
+  vt.onclick = () => { if (!ttsOk) { voiceNotice("Spoken answers aren't supported in this browser.", "error"); return; } voiceOn = !voiceOn; localStorage.setItem("voiceOn", voiceOn ? "1" : "0"); if (!voiceOn) stopSpeaking(); syncToggle(); };
 
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   let rec = null, activeBtn = null;
   function bind(btnId, inputId) {
     const btn = document.getElementById(btnId), input = document.getElementById(inputId);
-    if (!SR) { btn.disabled = true; btn.title = "Voice input not supported in this browser"; return; }
+    if (!SR) {
+      // Honest fallback: keep the button focusable/clickable so touch users get an explanation (disabled buttons show no tooltip).
+      btn.classList.add("unsupported"); btn.setAttribute("aria-disabled", "true"); btn.title = "Voice input not supported in this browser";
+      btn.addEventListener("click", (e) => { e.preventDefault(); voiceNotice(VOICE_UNSUPPORTED, "error"); });
+      return;
+    }
     let downAt = 0;
-    const stop = () => { if (rec) { try { rec.stop(); } catch (e) {} } };
+    const stop = () => { if (rec) { btn.classList.remove("recording"); btn.classList.add("processing"); btn.title = "Finishing transcription…"; try { rec.stop(); } catch (e) {} } };
     function start() {
       stop(); stopSpeaking();
       const base = input.value ? input.value.replace(/\s+$/, "") + " " : "";
@@ -2615,9 +2639,9 @@ function speakAnswer(text) {
         for (let i = 0; i < ev.results.length; i++) txt += ev.results[i][0].transcript;
         input.value = base + txt.trim();
       };
-      rec.onerror = (ev) => { if (ev.error === "not-allowed") { btn.title = "Microphone permission denied"; } };
-      rec.onend = () => { btn.classList.remove("recording"); btn.title = "Voice input"; activeBtn = null; rec = null; input.focus(); };
-      try { rec.start(); } catch (e) { btn.classList.remove("recording"); }
+      rec.onerror = (ev) => { if (ev.error === "aborted") return; voiceNotice(VOICE_ERRORS[ev.error] || ("Voice input error: " + (ev.error || "unknown")), "error"); };
+      rec.onend = () => { btn.classList.remove("recording", "processing"); btn.title = "Voice input"; activeBtn = null; rec = null; input.focus(); };
+      try { rec.start(); } catch (e) { btn.classList.remove("recording"); activeBtn = null; rec = null; voiceNotice("Couldn't start voice input. Please try again.", "error"); }
     }
     // Tap toggles; hold (>600ms) = hold-to-talk, stops on release.
     let handled = false;
