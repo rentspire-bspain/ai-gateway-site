@@ -1,9 +1,9 @@
 {
- "ts": "2026-11-20T21:58:21+00:00",
- "version": 242,
- "headline_pct": 90.4,
- "weighted_sum": 8858,
- "total_weight": 98,
+ "ts": "2026-11-21T15:41:29+00:00",
+ "version": "v290",
+ "headline_pct": 88.8,
+ "weighted_sum": 9764,
+ "total_weight": 110,
  "categories": {
   "Features": 99,
   "Computer": 99,
@@ -21,7 +21,10 @@
   "Desktop": 70,
   "Billing": 92,
   "Mobile": 60,
-  "Teammates": 68
+  "Teammates": 68,
+  "UX": 91,
+  "SEO": 60,
+  "Marketing": 60
  },
  "raw_items": {
   "done": 104,

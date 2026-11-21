@@ -1,5 +1,5 @@
 {
- "version": 242,
+ "version": "v290",
  "generated_at": "2026-11-16T00:00:00Z",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE \u2014 GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90\u219295. | 2026-11-18: owner-blocker audit \u2014 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped \u2014 server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
@@ -88,6 +88,24 @@
    "name": "Teammates",
    "weight": 1,
    "score": 68
+  },
+  {
+   "name": "UX",
+   "weight": 6,
+   "score": 91,
+   "note": "v290 UX master benchmark first live run: 91.4 (8 categories, 46 checks, weighted) \u2014 qa/e2e-ux-master.py; results qa-private/bench/results/ux-master.json"
+  },
+  {
+   "name": "SEO",
+   "weight": 3,
+   "score": 60,
+   "note": "robots.txt 200 allow-all; og/twitter cards + social image + canonical + description present (v281); PWA manifest. GAPS: sitemap.xml 404, no SSR for /t/ content, no structured data."
+  },
+  {
+   "name": "Marketing",
+   "weight": 3,
+   "score": 60,
+   "note": "benchmark marketing brief with strict-graded verified claims (2026-11-18); BoundView brand kit + social cards + PWA; launch-readiness audit. GAPS: no campaigns, no launch copy, no distribution."
   }
  ],
  "raw_items": {
@@ -104,6 +122,13 @@
   {
    "item": "Twilio credentials (Voice 65\u219280)",
    "url": "https://console.twilio.com"
+  }
+ ],
+ "changelog": [
+  {
+   "version": "v290",
+   "date": "2026-11-21",
+   "change": "Added UX (w6), SEO (w3), Marketing (w3) per owner directive \"the new UX/SEO/marketing all weighed/rolled into the completion doc\". Weight total 98 -> 110; EXPECTED_WEIGHT updated in generate-parity-headline.py. UX score = the measured UX master benchmark (91.4 first live run). SEO/Marketing scored from live evidence (robots/og/canonical present; sitemap 404; brief+brand kit shipped, no campaigns)."
   }
  ]
 }
