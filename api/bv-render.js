@@ -34,6 +34,14 @@ function transformHtml(html) {
   return parts
     .map((seg, i) => (i % 2 === 1 ? seg : MAP.reduce((s, [re, to]) => s.replace(re, to), seg)))
     .join("")
+    // PWA manifest brand fix (v297 follow-up): boundview.com linked the SHARED
+    // /manifest.webmanifest — installing the PWA there would show "ai.spaincos"
+    // in the OS app list (brand leak found by the desktop lane). Route the link
+    // to the dedicated boundview-manifest.webmanifest (name/icons already live).
+    .replace(
+      /<link\s+rel="manifest"\s+href="\/manifest\.webmanifest"\s*\/?>/,
+      '<link rel="manifest" href="/boundview-manifest.webmanifest">'
+    )
     // crawler-visible structured data (data block, not executed — CSP-safe); brand.js skips its copy when present
     .replace("</head>", '<script type="application/ld+json" data-bv="1">' + BV_LD + "</script></head>");
 }
