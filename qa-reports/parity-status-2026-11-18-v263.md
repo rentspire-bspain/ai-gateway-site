@@ -1,6 +1,6 @@
 # ai.spaincos.com — 100% Completion Parity Document (2026-11-21, v290)
 
-## 🏆 WEIGHTED AVERAGE COMPLETION: **84.4%** (computed by qa/generate-parity-headline.py — never hand-summed; v291b EXHAUSTIVE rebalance: 29 categories, weight 128; v291b re-scores the five fixed dimensions (SEO 75, Legal 45, Observability 65, Security 80, Fleet 55 — all live-verified) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 60 (w3) + Marketing 60 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 60 (w3) + Marketing 60 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
+## 🏆 WEIGHTED AVERAGE COMPLETION: **85.9%** (computed by qa/generate-parity-headline.py — never hand-summed; v292 PARALLEL-LANE HARVEST: 29 categories, weight 128; six dimensions re-scored on live evidence (Accessibility 70, Docs 70, Observability 75, Mobile 75, SEO 85, Fleet 65) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 60 (w3) + Marketing 60 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 60 (w3) + Marketing 60 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
 **104 ✅ complete · 33 🟡 partial · 20 🔴 gap of 157 tracked items, weighted across 17 categories.**
 **Batch delta this session: 90.1 → 90.4 (+0.3).** The remaining 9.6 points break down as: owner
@@ -2643,3 +2643,22 @@ The owner's "ALL WEBAPPS through the same rigor" is not yet met: the 46-check UX
 - **deploy_pipeline (governed-sql PR #17, open by design):** the gateway-chat CI deploy pipeline (eszip-safe lexer gate, esbuild parse gate, honest-secret degradation — P=0.5 until SUPABASE_ACCESS_TOKEN exists, post-deploy smoke probes). Verified live: Actions run GREEN in 13s, gateway OPTIONS 200 / unauthenticated POST 401. Blocked only on the owner adding the repo secret.
 
 **Standing rule reinforced (owner directive 2026-11-21): SERVER-SIDE AGENTS ONLY — no Perplexity agents or credits for any lane. All fleet sessions execute their own work; the primary session drives tools directly (browser/HTTP/CLI), spawning nothing.**
+
+### 8. §30q addendum — v292: THE PARALLEL-LANE HARVEST (six server-side lanes, all merged, all live-verified, headline 84.4% → 85.9%)
+
+The owner's directive: parallel server-side lanes, huge jumps, full doc + headline update per batch. Six lanes fired and landed:
+
+| Lane | PR | What went LIVE (verified) | Score |
+|---|---|---|---|
+| WCAG AA pass (ux_perplexity_parity) | #279 | axe-core dark 0 violations (button-name, 7 contrast, 2 link-in-block all fixed), custom 2px accent focus ring (live-verified in browser), contrast tokens fixed, labelled controls | Accessibility 55→70 |
+| Public docs page (docs_panel_parity) | #280 | /docs 200 both domains, per-host brand guard, honest benchmark table (strict+fair lanes, noise floors, per-row round citations, invite-only) | Docs/Support 50→70 |
+| Uptime monitor (prod_health_monitor) | governed-sql #18 + ops-health v22 deployed | api_health checks in every 10-min pg_cron run (19:10Z: 200 in 195/213ms), alert path proven, results feed the nightly board | Observability 65→75 |
+| Mobile hardening (mobile_parity code audit + root browser checks) | #281 | 44px touch floors, overflow containment, SW cache scoping/namespacing, PWA manifest+icons fully verified (192/512/maskable, shortcuts, share target) | Mobile 60→75 |
+| SEO structured data (tab_title_favicon) | #282 | Organization/WebSite/WebApplication/Breadcrumb JSON-LD server-side on boundview.com (crawler-visible), per-route metas on /privacy + /verify | SEO 75→85 |
+| Fleet-sweep runner (webapp_schema) | #284 | qa/fleet-sweep.py + FIRST RUN: 9 estate apps, fleet score 87% (3 PASS / 6 honest PARTIAL / 0 FAIL), surfaced in the Webapps explorer | Fleet 55→65 |
+
+Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges + previous-answer default, live-verified in the browser), the eval-replay standing gate (PR #276), the prelaunch 39/39 expansion (PR #277), the self-verify lane (governed-sql #16, merged on independent review), and the Wave-1 acceptance truth (all 3 top Boundview webapp dispatches are DRAFT-WITH-BLOCKERS — no persistence, no routes, seeded-stat inconsistencies; recorded honestly, none called launch-ready).
+
+**THE HEADLINE: 85.9% (10999/128, 29 categories).** +1.5 points in one batch, all from live-verified lane work — the largest single-batch jump since the exhaustive rebalance. Remaining biggest honest drags: Legal 45 (ToS owner-gated), i18n 10, Email 30 (Google OAuth owner-gated), Enterprise/Comet/Desktop 70s, and the Wave-1 webapp rebuild (the fleet dispatches need real persistence/routes before any launch claim).
+
+**The UX master benchmark re-ran green against the final deploy** (fleet-sweep carry, dpl_26PKV): brand alive, zero errors, full answer flow (10 sources), response-diff badges rendering ("v2 of 7", "Compare with v1"), TTFB 234ms / FCP 1248ms.
