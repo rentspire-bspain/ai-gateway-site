@@ -2630,3 +2630,16 @@ The owner's "ALL WEBAPPS through the same rigor" is not yet met: the 46-check UX
 1. `node --check modules/*.js` joins the pre-deploy verification (the esbuild-parse-before-deploy rule for the gateway, extended to the frontend modules) — a syntax check would have caught this in seconds.
 2. The zero-JS-errors capture is re-armed on EVERY deploy verification (it was lost after session-recovery events during the v291 run — the exact gap that let 40 minutes of production breakage go unnoticed by the suites).
 3. THE COORDINATION LESSON: the push-gate network (sessions refusing to ship on a red baseline and reporting the reproducer) caught a production break that the primary session's own spot-checks missed. The gates are not bureaucracy — they are the immune system.
+
+### 7. §30q addendum — v291e: THE COORDINATION HARVEST (four session deliverables + the full benchmark re-run green)
+
+**The full UX master benchmark re-run (against dpl_DiyhA, master 2ebe08a — the deploy carrying PRs #271/#276/#277): ALL KEY CHECKS GREEN** — session restore, brand alive (window.BRAND defined, the v291d hotfix holding), zero JS errors + zero CSP violations, full answer flow (Bitcoin answer, 10 sources, citations, ~20s), thread sidebar + reload persistence, mobile 375px clean, invalid deep link graceful, TTFB 162ms / FCP 964ms. The master score stands at 91.4 GREEN.
+
+**The session deliverables merged this batch:**
+- **eval_replay (PR #276, merged ff11222):** the standalone 10-query gateway eval-replay harness — LIVE PRODUCTION RESULTS 10/10 PASS (research/continuation/status/fact/doc lanes, 12.8-98.3s, honest claim checks per row).
+- **qa_new_panes (PR #277, merged c413882):** prelaunch.py expanded to 39/39 LIVE PASSING — Automations pane, Artifacts pane, Fleet Automations tab, tool-chips render+expand, follow-up chip full-command submit (no truncation). The zero-JS-errors check is now part of the standing 39.
+- **getting_started (PR #274, previously merged):** empty-state/no-match/connectors guides, live gate 31/31 after the baseline repair.
+- **response_diff_v2:** PR #275 CLOSED as superseded (owner-approved, evidence-backed — master's live response-diff.js stays; the redundant brand.js hotfix was already shipped as PR #272); its LANE to evolve response-diff.js in place (previous-answer default + total-count labels) is APPROVED and in flight — server-side fleet session, no Perplexity agents/credits (owner directive 2026-11-21).
+- **deploy_pipeline (governed-sql PR #17, open by design):** the gateway-chat CI deploy pipeline (eszip-safe lexer gate, esbuild parse gate, honest-secret degradation — P=0.5 until SUPABASE_ACCESS_TOKEN exists, post-deploy smoke probes). Verified live: Actions run GREEN in 13s, gateway OPTIONS 200 / unauthenticated POST 401. Blocked only on the owner adding the repo secret.
+
+**Standing rule reinforced (owner directive 2026-11-21): SERVER-SIDE AGENTS ONLY — no Perplexity agents or credits for any lane. All fleet sessions execute their own work; the primary session drives tools directly (browser/HTTP/CLI), spawning nothing.**
