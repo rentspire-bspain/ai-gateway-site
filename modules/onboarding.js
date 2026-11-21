@@ -540,6 +540,40 @@
     return false;
   }
 
+  /* Empty surfaces share the existing examples and real composer send/queue path.
+     Never click the round send button here: while busy it means Stop. */
+  function runStarter(query) {
+    var q = String(query == null ? "" : query).trim();
+    if (!q) return false;
+    if (window.LibraryUI && window.LibraryUI.close) window.LibraryUI.close();
+    if (window.SettingsUI && window.SettingsUI.close) window.SettingsUI.close();
+    if (state.open) closeTour(false);
+    var landing = document.getElementById("landing");
+    var busy = typeof isSearching !== "undefined" && isSearching;
+    if (!busy && landing && landing.style.display === "none") {
+      var create = window.__appGlobals && window.__appGlobals.newThread;
+      if (typeof create === "function") create();
+    }
+    var input = document.getElementById(busy && landing && landing.style.display === "none" ? "followupInput" : "landingInput");
+    if (!input) return false;
+    input.value = q;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+    return true;
+  }
+
+  function starterButtons(host, count) {
+    EXAMPLE_PROMPTS.slice(0, count || 3).forEach(function (item) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "ob-empty-starter";
+      button.textContent = item.query;
+      button.addEventListener("click", function () { runStarter(item.query); });
+      host.appendChild(button);
+    });
+    return host;
+  }
+
   function mountExamplePrompts() {
     var box = document.getElementById("suggestions");
     if (!box) return null;
@@ -602,6 +636,15 @@
     var empty = document.createElement("div");
     empty.className = "ob-threads-empty";
     empty.textContent = q ? "No matching threads" : "Your research threads will appear here.";
+    if (q) {
+      var reset = document.createElement("button");
+      reset.type = "button"; reset.className = "ob-empty-starter"; reset.textContent = "Clear search";
+      reset.addEventListener("click", function () {
+        searchEl.value = ""; searchEl.dispatchEvent(new Event("input", { bubbles: true })); searchEl.focus();
+      });
+      empty.appendChild(reset);
+      starterButtons(empty, 2);
+    }
     list.appendChild(empty);
   }
 
@@ -715,6 +758,8 @@
     getState: getState,
     refresh: function () { detectAutomateAsync(); try { mountChecklist(); } catch (e) {} },
     runExample: runExample,
+    runStarter: runStarter,
+    starterButtons: starterButtons,
     syncEmptyState: syncEmptyState,
     CHECKLIST: CHECKLIST,
     checklistState: checklistState,

@@ -635,12 +635,34 @@
     c.appendChild(el("p", "cn-note", "Ask in chat: “what’s on my calendar Friday”, “find the email from my landlord”, “find the lease spreadsheet in my Drive”. If you connected Google earlier, press Reconnect once to add Drive and Sheets. Emails and events are always shown as a preview and only sent or created after you press Approve. Your Google token is encrypted on the server and never sent to your browser."));
     return c;
   }
-
+  function emptyGuide(h) {
+    // Unknown status is not an empty connection state; do not imply disconnection during loading.
+    if (!Object.keys(pstat).length || Object.keys(pstat).some(function (id) { return pstat[id] && pstat[id].error; })) return;
+    if (Object.keys(connectedMap()).length) return;
+    var guide = el("div", "cn-empty");
+    guide.appendChild(el("strong", "", "Connect a source to use it in chat"));
+    guide.appendChild(el("p", "", "Choose a provider below, then try a question about your own data. You can also ask a general question without connecting anything."));
+    var prompts = [
+      ["Check my calendar", "What is on my calendar this week? Summarize the events and any conflicts."],
+      ["Find a file", "Find the latest project plan in my connected Drive and summarize its next steps."],
+      ["Search my code", "Search my connected GitHub repositories for open issues assigned to me and group them by repo."]
+    ];
+    var row = el("div", "cn-empty-actions");
+    prompts.forEach(function (p) {
+      var b = el("button", "stg-btn ghost", p[0]); b.type = "button";
+      b.addEventListener("click", function () {
+        if (root.OnboardingUI) root.OnboardingUI.runStarter(p[1]);
+      });
+      row.appendChild(b);
+    });
+    guide.appendChild(row); h.appendChild(guide);
+  }
   function render() {
     hosts = hosts.filter(function (h) { return h.isConnected; });
     hosts.forEach(function (h) {
       h.textContent = "";
       if (activeDrop) h.appendChild(dropCard(activeDrop));
+      emptyGuide(h);
       h.appendChild(build());
       PROVS.forEach(function (P) { h.appendChild(provCard(P)); });
     });
