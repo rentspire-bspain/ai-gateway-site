@@ -1,6 +1,6 @@
 # ai.spaincos.com — 100% Completion Parity Document (2026-11-21, v290)
 
-## 🏆 WEIGHTED AVERAGE COMPLETION: **86.3%** (computed by qa/generate-parity-headline.py — never hand-summed; v293 G/R/Y ICON BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 55 — ToS draft live, Enterprise 72) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 60 (w3) + Marketing 60 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 60 (w3) + Marketing 60 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
+## 🏆 WEIGHTED AVERAGE COMPLETION: **86.6%** (computed by qa/generate-parity-headline.py — never hand-summed; v294 CONNECTOR-MARKETING BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 55 — ToS draft live, Enterprise 72) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
 ### 🏆 CATEGORY STATUS — G/R/Y ICONS (generated from qa/parity-items.json, never hand-built)
 
@@ -25,7 +25,7 @@
 | 🔴 | Teammates | 1 | 68 |
 | ✅ | UX | 6 | 91 |
 | 🟡 | SEO | 3 | 85 |
-| 🔴 | Marketing | 3 | 60 |
+| 🟡 | Marketing | 3 | 75 |
 | 🟡 | Security | 4 | 80 |
 | 🔴 | Accessibility | 2 | 70 |
 | 🔴 | Legal/Compliance | 2 | 45 |
@@ -2714,3 +2714,14 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 **In flight (next batch):** the OAuth connector-benefit lanes — onboarding persuasion examples (concrete before/after questions per provider) and the marketing surfaces (docs + landing benefit lines).
 
 **HEADLINE: 86.3% (11045/128, 29 categories) — 🟡 YELLOW band, +0.4 this batch, +1.9 across v292+v293.** The remaining REDs: Legal (owner review), i18n, Email (owner OAuth), Marketing (connector lanes landing), Desktop/Comet/Teammates (feature work), and the Wave-1 webapp rebuild.
+
+### 10. §30q addendum — v294: THE CONNECTOR-MARKETING BATCH (headline 86.3% → 86.6%)
+
+**Owner directive 2026-11-21:** "You need to also show examples to convince users to set up OAuth for the emails and why it'll make their lives better. We need to roll in all the benefits of connectors into onboarding, as part of marketing, etc."
+
+**Lanes landed this batch:**
+- ~~Connector-benefits marketing (PR #292, master a9f5b48)~~ — LIVE both domains, verified 2026-11-21: connected-context docs section (/docs connected-context), landing benefit lines including the concrete "What did my accountant say" example, RLS privacy contract, and the HONEST live matrix (Slack + Dropbox LIVE; Google/Outlook/GitHub PENDING — verified against /api/oauth-config, which matches the real registration state). Marketing 60→75.
+
+**In flight (next batch):** the onboarding persuasion lane (connector_oauth_flows) — the empty-connectors guide upgrade with concrete before/after examples per provider. Gateway prompt fix already live in platform 301: the IMPORTED HISTORY guardrail (owner-observed defect 2026-11-20 — the model must call search_my_context before ever claiming imported history is unavailable).
+
+**HEADLINE: 86.6% (11090/128, 29 categories) — 🟡 YELLOW band, +0.3 this batch, +2.2 across v292-v294.** The remaining REDs: Legal (owner review), i18n, Email (owner OAuth registration), Desktop/Comet/Teammates (feature work), and the Wave-1 webapp rebuild (all three top dispatches DRAFT-WITH-BLOCKERS per the acceptance pass). Open PRs awaiting review: #267 (v262.1 re-verify), #222 (gospel icons), #216 (checkout wiring).

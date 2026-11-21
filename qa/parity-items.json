@@ -1,7 +1,7 @@
 {
- "version": "v293",
+ "version": "v294",
  "generated_at": "2026-11-16T00:00:00Z",
- "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE \u2014 GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90\u219295. | 2026-11-18: owner-blocker audit \u2014 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped \u2014 server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
+ "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE — GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90→95. | 2026-11-18: owner-blocker audit — 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped — server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
   {
    "name": "Features",
@@ -27,13 +27,13 @@
    "name": "Voice",
    "weight": 4,
    "score": 85,
-   "note": "v293 re-score: voice states shipped (PR #289, merged + deployed) \u2014 amber processing state, VISIBLE error notices (mic denied / no speech / no mic / network \u2014 previously silent failures), unsupported-browser explanations on mic/Voice/Talk (no dead buttons), alert() replaced with notices, 20/20 headless-Chromium checks at 390/1024px with CSP enforced. REMAINING: server STT/TTS (Kokoro/whisper voice-service) owner-gated (Render deploy + VOICE_URL \u2014 exact dependency documented in docs/voice-status.md); Firefox dictation blocked on it; read-aloud end-to-end untested."
+   "note": "v293 re-score: voice states shipped (PR #289, merged + deployed) — amber processing state, VISIBLE error notices (mic denied / no speech / no mic / network — previously silent failures), unsupported-browser explanations on mic/Voice/Talk (no dead buttons), alert() replaced with notices, 20/20 headless-Chromium checks at 390/1024px with CSP enforced. REMAINING: server STT/TTS (Kokoro/whisper voice-service) owner-gated (Render deploy + VOICE_URL — exact dependency documented in docs/voice-status.md); Firefox dictation blocked on it; read-aloud end-to-end untested."
   },
   {
    "name": "Account",
    "weight": 6,
    "score": 95,
-   "note": "v242 (2026-11-15): auth email codes WORKING \u2014 Resend domain ai.spaincos.com verified (3 DNS records live at GoDaddy), fresh API key vaulted, RESEND_FROM fixed to login@ai.spaincos.com, live send DELIVERED to bspain@spaincos.com. Password login + logout fixed in v240. Passkeys enabled by owner in dashboard (enrollment test pending)."
+   "note": "v242 (2026-11-15): auth email codes WORKING — Resend domain ai.spaincos.com verified (3 DNS records live at GoDaddy), fresh API key vaulted, RESEND_FROM fixed to login@ai.spaincos.com, live send DELIVERED to bspain@spaincos.com. Password login + logout fixed in v240. Passkeys enabled by owner in dashboard (enrollment test pending)."
   },
   {
    "name": "Models",
@@ -64,7 +64,7 @@
    "name": "Enterprise",
    "weight": 3,
    "score": 72,
-   "note": "v293 re-score (honest, evidence-only): the enterprise evidence pass (PR #288) mapped deployed reality \u2014 PASS asset delivery (modules SHA-matched to master); PARTIAL admin access, roster/invites/roles, seats/org billing, audit/CSV; FAIL in-app SSO + SCIM (status cards only) with the exact OIDC/SAML owner dependencies documented. No unverified production changes; the dependency map is the deliverable."
+   "note": "v293 re-score (honest, evidence-only): the enterprise evidence pass (PR #288) mapped deployed reality — PASS asset delivery (modules SHA-matched to master); PARTIAL admin access, roster/invites/roles, seats/org billing, audit/CSV; FAIL in-app SSO + SCIM (status cards only) with the exact OIDC/SAML owner dependencies documented. No unverified production changes; the dependency map is the deliverable."
   },
   {
    "name": "GettingStarted",
@@ -85,7 +85,7 @@
    "name": "Mobile",
    "weight": 3,
    "score": 75,
-   "note": "v292 re-score: mobile hardening shipped (PR #281) \u2014 44px touch floors on sidebar/model-picker/install controls, long-token + media overflow containment in answers, SW caches namespaced + scoped (no more global cache deletion), duplicate install handler hidden; PWA manifest/assets PASS (192/512/maskable icons, 3 shortcuts, share target; all icon URLs 200 correct MIME, PNG IHDR sizes verified). REMAINING: native install prompt/keyboard behaviors NOT-VERIFIABLE-HERE; store apps owner-gated (Play Console, Apple Developer)."
+   "note": "v292 re-score: mobile hardening shipped (PR #281) — 44px touch floors on sidebar/model-picker/install controls, long-token + media overflow containment in answers, SW caches namespaced + scoped (no more global cache deletion), duplicate install handler hidden; PWA manifest/assets PASS (192/512/maskable icons, 3 shortcuts, share target; all icon URLs 200 correct MIME, PNG IHDR sizes verified). REMAINING: native install prompt/keyboard behaviors NOT-VERIFIABLE-HERE; store apps owner-gated (Play Console, Apple Developer)."
   },
   {
    "name": "Teammates",
@@ -96,31 +96,31 @@
    "name": "UX",
    "weight": 6,
    "score": 91,
-   "note": "v290 UX master benchmark first live run: 91.4 (8 categories, 46 checks, weighted) \u2014 qa/e2e-ux-master.py; results qa-private/bench/results/ux-master.json"
+   "note": "v290 UX master benchmark first live run: 91.4 (8 categories, 46 checks, weighted) — qa/e2e-ux-master.py; results qa-private/bench/results/ux-master.json"
   },
   {
    "name": "SEO",
    "weight": 3,
    "score": 85,
-   "note": "v292 re-score (live-verified): structured data LIVE server-side on boundview.com (Organization + WebSite + WebApplication + BreadcrumbList JSON-LD, crawler-visible without JS, client fallback only if server copy missing); per-route metas live on /privacy and /verify (title/description/canonical/og/twitter per brand); /docs in sitemap; robots.txt with sitemap pointer. REMAINING: no SSR for SPA content (deliberate \u2014 /t/ noindexed)."
+   "note": "v292 re-score (live-verified): structured data LIVE server-side on boundview.com (Organization + WebSite + WebApplication + BreadcrumbList JSON-LD, crawler-visible without JS, client fallback only if server copy missing); per-route metas live on /privacy and /verify (title/description/canonical/og/twitter per brand); /docs in sitemap; robots.txt with sitemap pointer. REMAINING: no SSR for SPA content (deliberate — /t/ noindexed)."
   },
   {
    "name": "Marketing",
    "weight": 3,
-   "score": 60,
-   "note": "benchmark marketing brief with strict-graded verified claims (2026-11-18); BoundView brand kit + social cards + PWA; launch-readiness audit. GAPS: no campaigns, no launch copy, no distribution."
+   "score": 75,
+   "note": "v294 (was 60): connector-benefits marketing live (PR #292, master a9f5b48) — connected-context docs section + landing benefit lines incl. 'What did my accountant say' example, honest live matrix (slack/dropbox LIVE, google/outlook/github PENDING per /api/oauth-config) on BOTH ai.spaincos.com and boundview.com, live-verified 2026-11-21. Benchmark brief + brand kit + social cards + PWA still standing. GAPS: no campaigns, no launch copy, no distribution."
   },
   {
    "name": "Security",
    "weight": 4,
    "score": 80,
-   "note": "v291b re-score: the four security headers now LIVE on function-routed paths too (bv-render carries them; vercel.json headers alone do not reach function routes \u2014 found and fixed). CSP+hashes, HSTS, invite-only, RLS present. REMAINING GAPS: no rate-limit evidence on the gateway, no pen test."
+   "note": "v291b re-score: the four security headers now LIVE on function-routed paths too (bv-render carries them; vercel.json headers alone do not reach function routes — found and fixed). CSP+hashes, HSTS, invite-only, RLS present. REMAINING GAPS: no rate-limit evidence on the gateway, no pen test."
   },
   {
    "name": "Accessibility",
    "weight": 2,
    "score": 70,
-   "note": "v292 re-score (all live-verified): WCAG 2.1 AA pass shipped (PR #279) \u2014 axe-core dark theme 0 violations (button-name, color-contrast 7->0, link-in-text-block 2->0), custom 2px accent focus ring live in the browser (was UA default), contrast tokens fixed (text-faint dark/light), labelled landing submit + send buttons. REMAINING: light-mode live check PARTIAL, an H3 precedes H1 in import dialog, skip-link unaudited."
+   "note": "v292 re-score (all live-verified): WCAG 2.1 AA pass shipped (PR #279) — axe-core dark theme 0 violations (button-name, color-contrast 7->0, link-in-text-block 2->0), custom 2px accent focus ring live in the browser (was UA default), contrast tokens fixed (text-faint dark/light), labelled landing submit + send buttons. REMAINING: light-mode live check PARTIAL, an H3 precedes H1 in import dialog, skip-link unaudited."
   },
   {
    "name": "Legal/Compliance",
@@ -138,19 +138,19 @@
    "name": "Observability",
    "weight": 2,
    "score": 75,
-   "note": "v292 re-score (live-verified): the UPTIME MONITOR IS LIVE \u2014 ops-health v22 runs every 10 min (pg_cron), api_health_ai_spaincos + api_health_boundview checks PASS in the deployed run (19:10Z: HTTP 200 in 195ms/213ms), alert path proven by the lane (transition-only, deduplicated, owner-notified), results in ops_health_runs for the nightly board. Plus /api/health on both domains + the nightly parity board. REMAINING: no user-facing status page."
+   "note": "v292 re-score (live-verified): the UPTIME MONITOR IS LIVE — ops-health v22 runs every 10 min (pg_cron), api_health_ai_spaincos + api_health_boundview checks PASS in the deployed run (19:10Z: HTTP 200 in 195ms/213ms), alert path proven by the lane (transition-only, deduplicated, owner-notified), results in ops_health_runs for the nightly board. Plus /api/health on both domains + the nightly parity board. REMAINING: no user-facing status page."
   },
   {
    "name": "Fleet",
    "weight": 3,
    "score": 65,
-   "note": "v292 re-score (live-verified): THE FLEET-SWEEP RUNNER IS LIVE (PR #284) \u2014 first run swept 9 estate apps: fleet score 87% (3 PASS / 6 PARTIAL / 0 FAIL), honest partials (Vercel bot-challenge-gated domains get H2 not_measured, excluded from denominator \u2014 not failures), per-app scores in qa-private/bench/results/fleet-sweep.json, surfaced in the Webapps explorer. REMAINING: webapp_catalog undercounts the estate (5 of 9 swept apps missing \u2014 backfill lane queued); Wave-1 Boundview acceptance found all 3 top apps DRAFT-WITH-BLOCKERS (no persistence, no routes, seeded-stat inconsistencies \u2014 honest, unlaunchable as-is)."
+   "note": "v292 re-score (live-verified): THE FLEET-SWEEP RUNNER IS LIVE (PR #284) — first run swept 9 estate apps: fleet score 87% (3 PASS / 6 PARTIAL / 0 FAIL), honest partials (Vercel bot-challenge-gated domains get H2 not_measured, excluded from denominator — not failures), per-app scores in qa-private/bench/results/fleet-sweep.json, surfaced in the Webapps explorer. REMAINING: webapp_catalog undercounts the estate (5 of 9 swept apps missing — backfill lane queued); Wave-1 Boundview acceptance found all 3 top apps DRAFT-WITH-BLOCKERS (no persistence, no routes, seeded-stat inconsistencies — honest, unlaunchable as-is)."
   },
   {
    "name": "Email/Notifications",
    "weight": 1,
    "score": 30,
-   "note": "PRESENT: in-app Notifications button, notifications function. GAPS: email reads blocked on Google OAuth client registration (owner form open), Twilio/Play Console owner blockers from v282 \u00a730i."
+   "note": "PRESENT: in-app Notifications button, notifications function. GAPS: email reads blocked on Google OAuth client registration (owner form open), Twilio/Play Console owner blockers from v282 §30i."
   },
   {
    "name": "i18n",
@@ -162,7 +162,7 @@
    "name": "NativeMobile",
    "weight": 1,
    "score": 40,
-   "note": "PRESENT: PWA (manifest + SW + installable, mobile 375px benchmark-verified clean). GAPS: no store presence (TWA/Capacitor wrapper documented as the path, not built); Play Console + Apple Developer owner blockers from \u00a730i."
+   "note": "PRESENT: PWA (manifest + SW + installable, mobile 375px benchmark-verified clean). GAPS: no store presence (TWA/Capacitor wrapper documented as the path, not built); Play Console + Apple Developer owner blockers from §30i."
   }
  ],
  "raw_items": {
@@ -173,15 +173,20 @@
  },
  "owner_blockers": [
   {
-   "item": "Register OAuth apps: Slack/Dropbox/Outlook/Box (Connectors 58\u219285, +324 pts)",
+   "item": "Register OAuth apps: Slack/Dropbox/Outlook/Box (Connectors 58→85, +324 pts)",
    "url": "https://api.slack.com/apps"
   },
   {
-   "item": "Twilio credentials (Voice 65\u219280)",
+   "item": "Twilio credentials (Voice 65→80)",
    "url": "https://console.twilio.com"
   }
  ],
  "changelog": [
+  {
+   "version": "v294",
+   "date": "2026-11-21",
+   "change": "Marketing 60->75: connector-benefits surfaces (PR #292) live-verified both domains; headline recomputed."
+  },
   {
    "version": "v293",
    "date": "2026-11-21",
@@ -195,12 +200,12 @@
   {
    "version": "v291b",
    "date": "2026-11-21",
-   "change": "Re-scored 5 dimensions after the v291 fixes went LIVE (all live-verified): SEO 60->75, Legal 25->45 (privacy policy live both domains), Observability 55->65 (/api/health), Security 70->80 (headers on function routes), Fleet 50->55 (boundview.com moved to the auto-deploying project \u2014 the public-host staleness is permanently fixed). Plus the full-tree deploy to the boundview project + domain consolidation."
+   "change": "Re-scored 5 dimensions after the v291 fixes went LIVE (all live-verified): SEO 60->75, Legal 25->45 (privacy policy live both domains), Observability 55->65 (/api/health), Security 70->80 (headers on function routes), Fleet 50->55 (boundview.com moved to the auto-deploying project — the public-host staleness is permanently fixed). Plus the full-tree deploy to the boundview project + domain consolidation."
   },
   {
    "version": "v291",
    "date": "2026-11-21",
-   "change": "Exhaustive rebalance per owner directive (be exhaustive on every dimension): +Security w4 70, +Accessibility w2 55, +Legal/Compliance w2 25 (privacy/terms 404 \u2014 live-verified gap), +Docs/Support w2 50, +Observability w2 55, +Fleet w3 50 (no per-webapp gates yet), +Email w1 30 (owner-gated), +i18n w1 10, +NativeMobile w1 40. Weight 110 -> 128. v291 also ships: /api/health, sitemap.xml, robots.txt update, security headers, and the context digest behind a double feature flag (deployed platform 301, OFF-path live-verified)."
+   "change": "Exhaustive rebalance per owner directive (be exhaustive on every dimension): +Security w4 70, +Accessibility w2 55, +Legal/Compliance w2 25 (privacy/terms 404 — live-verified gap), +Docs/Support w2 50, +Observability w2 55, +Fleet w3 50 (no per-webapp gates yet), +Email w1 30 (owner-gated), +i18n w1 10, +NativeMobile w1 40. Weight 110 -> 128. v291 also ships: /api/health, sitemap.xml, robots.txt update, security headers, and the context digest behind a double feature flag (deployed platform 301, OFF-path live-verified)."
   },
   {
    "version": "v290",
