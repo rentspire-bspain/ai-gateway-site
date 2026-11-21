@@ -36,18 +36,42 @@
   "shortcuts": [
     {
       "name": "New thread",
-      "url": "/?source=pwa-shortcut",
-      "description": "Start a new conversation"
+      "short_name": "New",
+      "url": "/?source=pwa-shortcut&intent=new",
+      "description": "Start a new conversation",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Search threads",
-      "url": "/#search",
-      "description": "Search your history"
+      "short_name": "Search",
+      "url": "/?source=pwa-shortcut&intent=search",
+      "description": "Search your history",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Settings",
-      "url": "/#settings",
-      "description": "Open settings"
+      "short_name": "Settings",
+      "url": "/?source=pwa-shortcut&intent=settings",
+      "description": "Open settings",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ],
   "share_target": {
@@ -55,7 +79,51 @@
     "method": "GET",
     "enctype": "application/x-www-form-urlencoded",
     "params": {
-      "text": "q"
+      "title": "title",
+      "text": "q",
+      "url": "url"
     }
-  }
+  },
+  "lang": "en",
+  "dir": "ltr",
+  "orientation": "any",
+  "categories": [
+    "productivity",
+    "utilities",
+    "education"
+  ],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "launch_handler": {
+    "client_mode": [
+      "focus-existing",
+      "auto"
+    ]
+  },
+  "handle_links": "preferred",
+  "protocol_handlers": [
+    {
+      "protocol": "web+aispaincos",
+      "url": "/?q=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/?source=file",
+      "accept": {
+        "text/plain": [
+          ".txt",
+          ".md"
+        ],
+        "text/csv": [
+          ".csv"
+        ],
+        "application/json": [
+          ".json"
+        ]
+      }
+    }
+  ]
 }

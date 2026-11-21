@@ -1,6 +1,6 @@
 # ai.spaincos.com — 100% Completion Parity Document (2026-11-21, v290)
 
-## 🏆 WEIGHTED AVERAGE COMPLETION: **86.7%** (computed by qa/generate-parity-headline.py — never hand-summed; v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 55 — ToS draft live, Enterprise 72) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
+## 🏆 WEIGHTED AVERAGE COMPLETION: **86.8%** (computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 78) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 55 — ToS draft live, Enterprise 72) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
 ### 🏆 CATEGORY STATUS — G/R/Y ICONS (generated from qa/parity-items.json, never hand-built)
 
@@ -19,7 +19,7 @@
 | 🟡 | Premium | 2 | 80 |
 | 🔴 | Enterprise | 3 | 70 |
 | ✅ | GettingStarted | 5 | 90 |
-| 🔴 | Desktop | 3 | 70 |
+| 🔴 | Desktop | 3 | 78 |
 | ✅ | Billing | 6 | 92 |
 | 🔴 | Mobile | 3 | 75 |
 | 🔴 | Teammates | 1 | 68 |
@@ -52,7 +52,7 @@ benchmark SFT unlock (rule 15c — the single biggest score mover, staged).
 | API | 10 | 95 ✅ | | Teammates | 1 | 68 🔴 |
 | Models | 8 | 92 🟡 | | Comet | 3 | 70 🔴 |
 | Account | 6 | 95 ✅ | | Enterprise | 3 | 70 🔴 |
-| Billing | 6 | 92 🟡 | | Desktop | 3 | 70 🔴 |
+| Billing | 6 | 92 🟡 | | Desktop | 3 | 78 🔴 |
 | Troubleshooting | 4 | 90 🟡 | | Mobile | 3 | 60 🔴 |
 | GettingStarted | 5 | 90 🟡 | | | | |
 
@@ -2044,7 +2044,7 @@ wrapper (Apple developer account, $99/yr). Both are wrapper-level work, no app r
 | 3 | **Create files and apps: XLSX, PPTX, HTML apps** with edit history, preview, sharing, Drive export | Perplexity | Features/Premium | 🟡 DOCX/PDF covered; spreadsheet/deck/app creation not tracked |
 | 4 | **Learn Mode** | Perplexity | Features | 🔴 not tracked |
 | 5 | **Model Council** (multi-model deliberation mode) | Perplexity | Models | 🟡 we have writer A/B infra; council mode not tracked |
-| 6 | **Personal Computer for Windows** (desktop app) | Perplexity | Desktop | 🟡 tracked as "Desktop app" generally; Windows-native build not itemized |
+| 6 | **Personal Computer for Windows** (desktop app) | Perplexity | Desktop | 🟡 tracked as "Desktop app" generally; v295 adds the installable-PWA launch surfaces + an unbuilt Electron scaffold (desktop/); Windows-native signed build not itemized and not built |
 | 7 | **Audio/video transcription + speaker labeling** in uploads | Perplexity | Features | 🔴 not tracked |
 | 8 | **File connectors sync** (Google Docs/Slides/Sheets live sync) | Perplexity | Connectors | 🟡 covered by the Google OAuth item |
 | 9 | **API: Decisions API, Monitor API, Context API** (we track Search/Agent API parity in §30e) | Perplexity | API | 🔴 the three newer API surfaces not tracked |
@@ -2733,3 +2733,21 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - ~~Comet extension v1.1.1 (PR #295, 19dd20f)~~ — LIVE: fixes the invalid array-shaped commands manifest in v1.1.0 plus shortcut dispatch storage/timestamp/gesture; manifest 1.1.1 with commands object + update feed live; ZIP SHA256 b7867109… matches the merge commit; all extension JS node --check + mocked dispatch/fallback green. Comet stays 70 pending real-browser validation at root.
 
 **Headline: 86.7% (11092/128, 29 categories) — 🟡 YELLOW band, +0.1 this batch, +2.3 across v292-v295.** Remaining REDs: Legal (owner review), i18n, Email (owner OAuth registration), Desktop 70, Comet 70 (browser validation unlock at root), Wave-1 webapp rebuild. Open PRs: #267, #222, #216.
+
+### 12. §30q addendum — v296: THE DESKTOP LANE (Desktop 70 → 78, headline 86.7% → 86.8%)
+
+**Lane:** Desktop 70 → close the gap (PWA install UX, desktop-wrapper readiness, offline/launcher surfaces). Evidence is code + curl only — no browser was available, and the score is capped accordingly.
+
+**Finding that drove the work:** `manifest.webmanifest` already declared `shortcuts` and a `share_target`, but nothing in the app handled `?q=`, `#search`, `#settings` or `source=pwa-shortcut` — they were dead entries. Two install buttons (`#installAppBtn` legacy + `#pwaInstall`) both consumed the one-shot `beforeinstallprompt`; install help existed only for iOS Safari; the offline navigation fallback was a bare 503 string.
+
+**Shipped (branch feat/desktop-shell):**
+- `modules/desktop-shell.js` + `.css`: handlers for shortcuts (new thread / search / settings), share target (title/text/url → composer, never auto-sent), `web+aispaincos:` protocol handler, file handler (.txt .md .csv .json, 500KB cap), `launchQueue` (focus-existing), URL cleanup after handling, offline/back-online status bar, installed-window shortcuts (Ctrl/Cmd+Shift+O, Ctrl/Cmd+,).
+- Manifest: `launch_handler`, `protocol_handlers`, `file_handlers`, `categories`, `display_override`, three-field share target, shortcut icons.
+- Install UX: one owner (`pwa-install.js`); legacy duplicate button + inline handler removed (CSP hashes regenerated, `--check` ok); macOS Safari "File → Add to Dock" help.
+- Offline: `sw.js` v3 precaches `offline.html` and the desktop shell; fallback chain is cached app shell → `offline.html` → 503.
+- `desktop/`: Electron wrapper scaffold (single instance, global hotkey, tray, deep links, navigation allow-list). UNBUILT and UNSIGNED.
+- `docs/DESKTOP.md`; `tests/desktop-shell.test.js` (4 passing) plus a stubbed-DOM smoke run.
+
+**Not credited (why 78, not higher):** real-browser verification of install prompt / shortcut menu / share sheet / handler registration; a built, signed installer (owner-gated certificates); window-controls-overlay; manifest screenshots; auto-update.
+
+**HEADLINE: 86.8% (11116/128, 29 categories) — 🟡 YELLOW band, +0.1 this batch (+0.2 unrounded from 86.66%).** Remaining REDs unchanged except Desktop (still feature work: signed build + real-browser verification).

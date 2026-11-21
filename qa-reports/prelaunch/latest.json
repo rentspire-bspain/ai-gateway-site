@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-21T18:38:23+00:00",
+ "ts": "2026-11-21T19:51:23+00:00",
  "base": "https://ai.spaincos.com",
- "passed": 39,
- "failed": 0,
+ "passed": 35,
+ "failed": 1,
  "checks": [
   {
    "name": "benchmark gospel present and unaltered",
@@ -36,8 +36,8 @@
   },
   {
    "name": "simple query < 30s",
-   "ok": true,
-   "detail": "11.5s"
+   "ok": false,
+   "detail": "30.4s"
   },
   {
    "name": "current-events answered",
@@ -52,7 +52,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "15.3s"
+   "detail": "27.2s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -63,21 +63,6 @@
    "name": "memory_items table reachable",
    "ok": true,
    "detail": "HTTP 200"
-  },
-  {
-   "name": "index.html loads real modules",
-   "ok": true,
-   "detail": "72 refs"
-  },
-  {
-   "name": "all deployed modules match repo",
-   "ok": true,
-   "detail": ""
-  },
-  {
-   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
-   "ok": true,
-   "detail": "build.js=v275 build.json=v275"
   },
   {
    "name": "landing renders",
@@ -172,7 +157,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n2 FAILED\n\u00b7 29/31 checks \u00b7 11/21/2026, 3:19:4"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 39/39 checks \u00b7 11/21/2026, 6:38:"
   },
   {
    "name": "Fleet Automations tab renders",
@@ -192,7 +177,7 @@
   {
    "name": "Follow-up chip submits full command",
    "ok": true,
-   "detail": "q=2 msg='-vs-FRED gap across the last 10 trading days for consistency' payload='-vs-FRED gap across the last 10 trading days for consistency'"
+   "detail": "q=2 msg='\u20134.8% against the 4.95% Treasury yield for negative leverage' payload='\u20134.8% against the 4.95% Treasury yield for negative leverage'"
   },
   {
    "name": "zero JS/CSP errors",
@@ -200,5 +185,5 @@
    "detail": ""
   }
  ],
- "exit": 0
+ "exit": 1
 }

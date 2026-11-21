@@ -1,10 +1,10 @@
-/* ai.spaincos service worker (G6): offline app shell.
+/* ai.spaincos service worker (G6): offline app shell (v3: offline.html is the branded fallback when no shell is cached yet).
    - navigations: network-first, fall back to the cached shell (index.html) when offline
    - same-origin static assets: network-first with an offline fallback
    - everything cross-origin (Supabase, gateway, CDNs) and all non-GET: untouched (never cached) */
 const CACHE_PREFIX = "ai-spaincos-shell-";
-const VERSION = CACHE_PREFIX + "2";
-const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./favicon.webp", "./icons/icon-192.png"]; // icon-512 (78 KB) is no longer precached: it only matters for install and is cached on first request by the stale-while-revalidate branch
+const VERSION = CACHE_PREFIX + "3";
+const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./favicon.webp", "./icons/icon-192.png", "./offline.html", "./modules/desktop-shell.js", "./modules/desktop-shell.css"]; // icon-512 (78 KB) is no longer precached: it only matters for install and is cached on first request by the stale-while-revalidate branch
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => Promise.all(SHELL.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
 });
@@ -23,7 +23,7 @@ self.addEventListener("fetch", (e) => {
     e.respondWith(fetch(nreq).then((res) => {
       if (res.ok) { const copy = res.clone(); caches.open(VERSION).then((c) => c.put("./index.html", copy)).catch(() => {}); }
       return res;
-    }).catch(() => caches.match("./index.html").then((r) => r || new Response("<h1>Offline</h1><p>ai.spaincos is offline and has no saved shell yet.</p>", { status: 503, headers: { "Content-Type": "text/html" } }))));
+    }).catch(() => caches.match("./index.html").then((r) => r || caches.match("./offline.html")).then((r) => r || new Response("<h1>Offline</h1><p>ai.spaincos is offline and has no saved shell yet.</p>", { status: 503, headers: { "Content-Type": "text/html" } }))));
     return;
   }
   if (!/^\/(?:modules\/|css\/|icons\/|favicon\.(?:png|webp)$|manifest\.webmanifest$)/.test(url.pathname)) return;

@@ -1,0 +1,27 @@
+{
+  "name": "ai-spaincos-desktop",
+  "productName": "ai.spaincos",
+  "version": "0.1.0",
+  "description": "Thin desktop shell for ai.spaincos.com (scaffold, unsigned, not yet built or released).",
+  "main": "main.js",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.js",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.spaincos.ai",
+    "productName": "ai.spaincos",
+    "files": ["main.js", "preload.js", "package.json"],
+    "protocols": [{ "name": "ai.spaincos", "schemes": ["aispaincos"] }],
+    "mac": { "category": "public.app-category.productivity", "hardenedRuntime": true },
+    "win": { "target": ["nsis"] },
+    "linux": { "target": ["AppImage", "deb"], "category": "Office" }
+  }
+}

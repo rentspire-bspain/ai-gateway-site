@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#14646B">
+<title>Offline - ai.spaincos</title>
+<style>
+html,body{height:100%;margin:0}
+body{display:flex;align-items:center;justify-content:center;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:#f7f7f5;color:#1f2328}
+main{max-width:420px;padding:32px;text-align:center}
+.dot{width:12px;height:12px;border-radius:50%;background:#F59E0B;display:inline-block;margin-bottom:12px}
+h1{font-size:22px;margin:0 0 8px}
+p{margin:0 0 20px;color:#57606a}
+button{font:inherit;padding:10px 20px;border-radius:999px;border:0;background:#14646B;color:#fff;cursor:pointer}
+@media(prefers-color-scheme:dark){body{background:#161819;color:#e6e6e3}p{color:#9aa0a6}}
+</style>
+</head>
+<body>
+<main>
+  <span class="dot" aria-hidden="true"></span>
+  <h1>You're offline</h1>
+  <p>ai.spaincos needs a connection the first time it opens. Reconnect and it will load automatically, or try again now.</p>
+  <button type="button" id="retry">Try again</button>
+</main>
+<script>
+document.getElementById("retry").addEventListener("click",function(){location.reload()});
+window.addEventListener("online",function(){location.reload()});
+</script>
+</body>
+</html>
