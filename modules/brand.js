@@ -68,9 +68,46 @@
       while (walker.nextNode()) scrubNode(walker.currentNode);
     }
   }
+  // v262 (UX debug-loop 2026-11-20): brand-aware PWA manifest. On boundview.com the
+  // shared /manifest.webmanifest would leak "ai.spaincos" — serve the BoundView one.
+  function swapManifest() {
+    var l = document.querySelector('link[rel="manifest"]');
+    if (l) l.setAttribute("href", "/manifest.boundview.webmanifest");
+  }
+
+  // v262 (UX debug-loop 2026-11-20): SEO heads. The private workspace host gets noindex
+  // (it must not be indexed under the BoundView title); the public BoundView host gets
+  // description/og/canonical/JSON-LD. Static per-host HTML heads are E11 owner item.
+  function seoHeads() {
+    var head = document.head;
+    function meta(k, v, attr) {
+      var el = document.createElement("meta");
+      el.setAttribute(attr || (k.charAt(0) === "#" ? "itemprop" : "name"), k.replace(/^#/, ""));
+      el.setAttribute("content", v);
+      head.appendChild(el);
+    }
+    if (isBV) {
+      meta("description", "BoundView — see the whole picture. AI research with sources, and Neurons rewards for verified activity.");
+      meta("og:title", "BoundView");
+      meta("og:description", "AI research with sources. Earn Neurons for verified offers and activity.");
+      meta("og:type", "website");
+      meta("og:url", "https://boundview.com/");
+      meta("og:site_name", "BoundView");
+      meta("twitter:card", "summary");
+      var c = document.createElement("link"); c.setAttribute("rel", "canonical"); c.setAttribute("href", "https://boundview.com/"); head.appendChild(c);
+      var ld = document.createElement("script"); ld.setAttribute("type", "application/ld+json");
+      ld.textContent = JSON.stringify({"@context":"https://schema.org","@type":"WebSite","name":"BoundView","url":"https://boundview.com/"});
+      head.appendChild(ld);
+    } else {
+      meta("robots", "noindex, nofollow");
+    }
+  }
+
   function start() {
     scrubAll(document.documentElement);
     document.title = window.BRAND.title;
+    swapManifest();
+    seoHeads();
     // keep it clean: any dynamically-inserted UI gets scrubbed too
     if (window.MutationObserver) {
       new MutationObserver(function (muts) {
