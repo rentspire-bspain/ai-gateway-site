@@ -68,23 +68,79 @@ const read = name => readFileSync(__dirname + "/" + name, "utf8");
   w.OnboardingUI.runStarter("Start a fresh question");
   assert.equal(w.created, 1);
   assert.equal(w.sent.at(-1).input, "landingInput");
-  w.STATUS = { google: { connected: false }, github: { connected: false } };
+  w.STATUS = { google: { connected: false }, dropbox: { connected: false }, github: { connected: false } };
+  w.OAUTH_CFG = { ok: true, redirectUri: "https://example.test/api/oauth-callback", providers: { google: null, outlook: null, github: null, dropbox: { clientId: "dbx-live-client" }, slack: { clientId: "slk-live-client" } } };
+  w.openedUrls = [];
+  w.open = url => { w.openedUrls.push(url); return { closed: false, focus() {} }; };
+  w.connectorCalls = [];
   w.GATEWAY = "https://example.test/functions/v1";
   w.sb = { auth: { getSession: () => Promise.resolve({ data: { session: { access_token: "test" } } }) } };
-  w.fetch = () => Promise.resolve({ json: () => Promise.resolve({ providers: w.STATUS }), status: 200, ok: true });
+  w.fetch = (url, opts) => {
+    if (String(url).includes("/api/oauth-config")) {
+      return Promise.resolve({ json: () => Promise.resolve(w.OAUTH_CFG), status: 200, ok: true });
+    }
+    const body = opts && opts.body ? JSON.parse(opts.body) : {};
+    w.connectorCalls.push(body);
+    if (body.action === "start") {
+      return Promise.resolve({ json: () => Promise.resolve({ url: "https://www.dropbox.com/oauth2/authorize?client_id=dbx-live-client&state=st1" }), status: 200, ok: true });
+    }
+    return Promise.resolve({ json: () => Promise.resolve({ providers: w.STATUS }), status: 200, ok: true });
+  };
+  w.eval(read("connectors.config.js"));
   w.eval(read("connectors.js"));
-  d.body.appendChild(w.ConnectorsUI.card());
-  await new Promise(r => w.setTimeout(r, 20));
-  assert.equal(d.querySelectorAll(".cn-empty button").length, 3);
+  const cardNode = w.ConnectorsUI.card();
+  assert.equal(cardNode.querySelector(".cn-empty"), null, "suppress guide while connector status is unknown/loading");
+  d.body.appendChild(cardNode);
+  await new Promise(r => w.setTimeout(r, 25));
+
+  // Persuasion surface in .cn-empty: 3 concrete Before/After examples + 4 Why-connect benefits
+  assert.equal(d.querySelectorAll(".cn-empty .cn-demo-card").length, 3);
+  assert.equal(d.querySelectorAll(".cn-empty [data-cn-why='1'] .cn-why-item").length, 4);
+  assert(d.querySelector(".cn-empty").textContent.includes("What did my accountant say about the Q3 invoices?"));
+  assert(d.querySelector(".cn-empty").textContent.includes("What's on my plate Thursday and when should I leave for the 2pm?"));
+  assert(d.querySelector(".cn-empty").textContent.includes("Summarize the contract my lawyer sent last week"));
+  assert(d.querySelector(".cn-empty").textContent.includes("20 minutes of scrolling"));
+
+  // Landing & onboarding tour persuasion surfaces also mirror live OAuth states
+  w.OnboardingUI.syncPersuasion();
+  assert(d.querySelector("#suggestions [data-ob-persuasion='1']") && !d.querySelector("#suggestions [data-ob-persuasion='1']").hidden);
+  assert.equal(d.querySelectorAll("#suggestions .ob-persuade-chip").length, 3);
+  assert.equal(d.querySelectorAll("#suggestions .ob-why-item").length, 4);
+
+  // Unregistered provider (Google = null in /api/oauth-config): shows honest registration-pending status, never dead, never submits unconnected prompt
   const before = w.sent.length;
-  [...d.querySelectorAll(".cn-empty button")].forEach(b => b.click());
-  assert.equal(w.sent.length, before + 3);
-  w.STATUS = { google: { connected: true }, github: { connected: false } };
+  const gmailChip = d.querySelector(".cn-empty [data-demo-id='gmail']");
+  assert.equal(gmailChip.getAttribute("data-demo-state"), "registration_pending");
+  gmailChip.click();
+  assert.equal(w.sent.length, before, "unconnected demo chip must not submit chat prompt");
+  assert(d.querySelector(".cn-empty [data-cn-demo-status='google']").textContent.includes("OAuth registration pending"));
+  assert(d.querySelector("[data-provider='google']").className.includes("cn-card-highlight"));
+
+  // Live configured provider (Dropbox has clientId): routes to real OAuth connect flow
+  const filesChip = d.querySelector(".cn-empty [data-demo-id='files']");
+  assert.equal(filesChip.getAttribute("data-demo-provider"), "dropbox");
+  assert.equal(filesChip.getAttribute("data-demo-state"), "oauth_ready");
+  filesChip.click();
+  await new Promise(r => w.setTimeout(r, 25));
+  assert(
+    w.openedUrls.some(u => u.includes("dropbox.com/oauth2/authorize")) ||
+    w.connectorCalls.some(c => c.action === "start" && c.provider === "dropbox"),
+    "configured demo chip starts real OAuth flow"
+  );
+
+  // Connected state: .cn-empty suppressed AND connected demo runs real starter prompt
+  w.STATUS = { google: { connected: true, services: { gmail: true, calendar: true, drive: true } }, dropbox: { connected: false }, github: { connected: false } };
   await w.ConnectorsUI.refresh();
-  assert.equal(d.querySelector(".cn-empty"), null);
-  w.STATUS = { google: { error: "Unavailable" }, github: { connected: false } };
+  assert.equal(d.querySelector(".cn-empty"), null, "suppress empty guide when a provider is connected");
+  assert.equal(d.querySelector("#suggestions [data-ob-persuasion='1']").hidden, true, "hide landing persuasion card once a connector is linked");
+  const connectedRes = w.OnboardingUI.triggerConnectorDemo("gmail");
+  assert.equal(connectedRes.action, "asked");
+  assert.equal(w.sent.at(-1).text, "What did my accountant say about the Q3 invoices?");
+
+  // Error state: .cn-empty remains suppressed
+  w.STATUS = { google: { error: "Unavailable" }, dropbox: { connected: false }, github: { connected: false } };
   await w.ConnectorsUI.refresh();
-  assert.equal(d.querySelector(".cn-empty"), null);
+  assert.equal(d.querySelector(".cn-empty"), null, "suppress empty guide on provider status error");
   dom.window.close();
   console.log("PASS: existing onboarding preserved; sidebar/library empty states, clear/reset, connector prompts/status, real composer Enter path and busy-thread safety");
 })().catch(e => { console.error(e); process.exitCode = 1; });

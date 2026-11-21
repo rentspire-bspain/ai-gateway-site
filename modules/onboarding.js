@@ -34,9 +34,62 @@
     {
       id: "settings",
       title: "Settings \u2014 connectors, fleet, tasks, automations",
-      body: "Connect Google Drive, Gmail, Calendar, GitHub, and Comptrove data in Settings \u2192 Connectors. Schedule recurring jobs in Tasks & Automations, and monitor live multi-agent health and QA in Fleet.",
-      pills: ["Connectors", "Tasks & Automations", "Fleet & QA"],
+      body: "Turn 20 minutes of inbox, calendar, or folder digging into one cited question. Link OAuth sources in Settings \u2192 Connectors, schedule recurring jobs in Tasks & Automations, and monitor runs in Fleet.",
+      pills: ["OAuth Connectors", "Tasks & Automations", "Fleet & QA"],
       icon: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'
+    }
+  ];
+
+  var CONNECTOR_EXAMPLES = [
+    {
+      id: "gmail",
+      capability: "Gmail connected",
+      provider: "google",
+      fallbackProviders: [],
+      before: "20 minutes of scrolling \u2192 one question, cited",
+      prompt: "What did my accountant say about the Q3 invoices?",
+      after: "Answers cited from your inbox, no digging."
+    },
+    {
+      id: "calendar",
+      capability: "Calendar connected",
+      provider: "google",
+      fallbackProviders: [],
+      before: "20 minutes of tab-hopping \u2192 one question, cited",
+      prompt: "What's on my plate Thursday and when should I leave for the 2pm?",
+      after: "Reads your real schedule and travel window."
+    },
+    {
+      id: "files",
+      capability: "Files connected",
+      provider: "dropbox",
+      fallbackProviders: ["google"],
+      before: "20 minutes of folder hunting \u2192 one question, cited",
+      prompt: "Summarize the contract my lawyer sent last week",
+      after: "Your documents become searchable, cited context."
+    }
+  ];
+
+  var CONNECTOR_BENEFITS = [
+    {
+      id: "ownership",
+      title: "Your data stays yours",
+      body: "Row-level security (RLS) isolates every token per user \u2014 disconnect and delete anytime."
+    },
+    {
+      id: "citations",
+      title: "Answers cite your real emails & files",
+      body: "Inline citations point back to the exact message, calendar invite, or document."
+    },
+    {
+      id: "history",
+      title: "History-aware across devices",
+      body: "Threads and connected context stay synced wherever you sign in."
+    },
+    {
+      id: "incognito",
+      title: "Incognito available",
+      body: "Switch on Incognito anytime for off-the-record questions with zero saved history."
     }
   ];
 
@@ -76,7 +129,8 @@
   var state = {
     open: false,
     step: 0,
-    emptyPromptsVisible: false
+    emptyPromptsVisible: false,
+    demoNotice: null
   };
 
 
@@ -118,6 +172,9 @@
       var conns = {};
       try { conns = JSON.parse(lsGet("ai_conn_watch") || "{}") || {}; } catch (e2) {}
       var connected = Object.keys(conns).filter(function (k) { return conns[k]; }).length > 0;
+      if (!connected && window.ConnectorsUI && typeof window.ConnectorsUI.hasAnyConnected === "function") {
+        connected = !!window.ConnectorsUI.hasAnyConnected();
+      }
       if (!connected && window.ConnectorUI && typeof window.ConnectorUI.connectedCount === "function") {
         connected = (window.ConnectorUI.connectedCount() || 0) > 0;
       }
@@ -219,9 +276,18 @@
     if (!card) {
       card = document.createElement("div");
       card.setAttribute("data-ob-checklist", "1");
-      // insert after the example grid (both live inside #suggestions)
-      var grid = host.querySelector(".ob-example-grid");
-      if (grid && grid.nextSibling) host.insertBefore(card, grid.nextSibling);
+      // insert after the persuasion panel (or example grid) inside #suggestions
+      var persuade = null;
+      if (host.children) {
+        for (var k = 0; k < host.children.length; k++) {
+          if (host.children[k] && host.children[k].getAttribute && host.children[k].getAttribute("data-ob-persuasion") === "1") {
+            persuade = host.children[k];
+            break;
+          }
+        }
+      }
+      var anchor = persuade || host.querySelector(".ob-example-grid");
+      if (anchor && anchor.parentNode === host && anchor.nextSibling && typeof host.insertBefore === "function") host.insertBefore(card, anchor.nextSibling);
       else host.appendChild(card);
       host.addEventListener("click", function (e) {
         var row = e.target && e.target.closest ? e.target.closest("[data-cl-id]") : null;
@@ -339,6 +405,274 @@
     return Boolean(auth && auth.style && auth.style.display && auth.style.display !== "none");
   }
 
+  /* ---- OAuth Connector Persuasion (Before/After examples + Why connect? + wired demos) ---- */
+  function findClosestAttr(el, attrs) {
+    if (!el) return null;
+    if (typeof el.closest === "function") {
+      var sel = attrs.map(function (a) { return "[" + a + "]"; }).join(", ");
+      var m = el.closest(sel);
+      if (m) return m;
+    }
+    var cur = el;
+    while (cur && cur !== document) {
+      if (cur.getAttribute) {
+        for (var i = 0; i < attrs.length; i++) {
+          if (cur.getAttribute(attrs[i]) != null) return cur;
+        }
+      }
+      cur = cur.parentNode;
+    }
+    return null;
+  }
+
+  function preloadConnectorsReady() {
+    try {
+      if (window.ConnectorsUI && typeof window.ConnectorsUI.ensureReady === "function") {
+        window.ConnectorsUI.ensureReady();
+      }
+    } catch (e) {}
+  }
+
+  function hasAnyConnectedConnector() {
+    try {
+      if (window.ConnectorsUI && typeof window.ConnectorsUI.hasAnyConnected === "function") {
+        if (window.ConnectorsUI.hasAnyConnected()) return true;
+      }
+      var conns = JSON.parse(lsGet("ai_conn_watch") || "{}") || {};
+      return Object.keys(conns).some(function (k) { return !!conns[k]; });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function fallbackProviderName(id) {
+    var names = { google: "Google", dropbox: "Dropbox", slack: "Slack", outlook: "Outlook", github: "GitHub" };
+    return names[id] || (id ? id.charAt(0).toUpperCase() + id.slice(1) : "Provider");
+  }
+
+  function getConnectorDemoState(demoId) {
+    if (window.ConnectorsUI && typeof window.ConnectorsUI.getDemoState === "function") {
+      var live = window.ConnectorsUI.getDemoState(demoId);
+      if (live) return live;
+    }
+    var item = CONNECTOR_EXAMPLES.find(function (x) { return x.id === demoId; }) || CONNECTOR_EXAMPLES[0];
+    var candidates = [item.provider].concat(item.fallbackProviders || []);
+    var winCfg = (window && window.CONNECTOR_OAUTH) || null;
+    var pool = winCfg && ((winCfg.providers && typeof winCfg.providers === "object") ? winCfg.providers : winCfg);
+    var watched = {};
+    try { watched = JSON.parse(lsGet("ai_conn_watch") || "{}") || {}; } catch (e) {}
+
+    for (var i = 0; i < candidates.length; i++) {
+      var cid = candidates[i];
+      if (watched[cid]) {
+        return {
+          id: item.id,
+          capability: item.capability,
+          provider: cid,
+          providerName: fallbackProviderName(cid),
+          state: "connected",
+          actionLabel: "Ask in chat \u2192",
+          prompt: item.prompt,
+          statusNote: ""
+        };
+      }
+    }
+    for (var j = 0; j < candidates.length; j++) {
+      var pid = candidates[j];
+      var entry = pool && pool[pid];
+      var clientId = typeof entry === "string" ? entry : (entry && (entry.clientId || entry.client_id)) || "";
+      if (clientId && String(clientId).trim()) {
+        var pName = fallbackProviderName(pid);
+        return {
+          id: item.id,
+          capability: item.capability,
+          provider: pid,
+          providerName: pName,
+          state: "oauth_ready",
+          actionLabel: "Connect " + pName + " \u2192",
+          prompt: item.prompt,
+          statusNote: ""
+        };
+      }
+    }
+    var defName = fallbackProviderName(item.provider);
+    return {
+      id: item.id,
+      capability: item.capability,
+      provider: item.provider,
+      providerName: defName,
+      state: "registration_pending",
+      actionLabel: "Registration pending",
+      prompt: item.prompt,
+      statusNote: defName + " OAuth registration pending \u2014 Google, Outlook, and GitHub OAuth apps are not registered on this host yet."
+    };
+  }
+
+  function oauthSummaryLine() {
+    if (window.ConnectorsUI && typeof window.ConnectorsUI.oauthMatrixSummaryText === "function") {
+      return window.ConnectorsUI.oauthMatrixSummaryText();
+    }
+    return "OAuth registration pending: Google, Outlook, GitHub \u00b7 Live when configured: Dropbox, Slack";
+  }
+
+  function persuasionMarkup(surface) {
+    var cardsHtml = CONNECTOR_EXAMPLES.map(function (item) {
+      var info = getConnectorDemoState(item.id);
+      return '<button type="button" class="ob-persuade-chip state-' + esc(info.state) + '" ' +
+        'data-ob-demo="' + esc(item.id) + '" ' +
+        'data-demo-provider="' + esc(info.provider) + '" ' +
+        'data-demo-state="' + esc(info.state) + '">' +
+          '<span class="ob-persuade-top">' +
+            '<span class="ob-persuade-cap">' + esc(item.capability) + "</span>" +
+            '<span class="ob-persuade-pill is-' + esc(info.state) + '">' + esc(info.actionLabel) + "</span>" +
+          "</span>" +
+          '<span class="ob-persuade-before">' + esc(item.before) + "</span>" +
+          '<span class="ob-persuade-prompt">\u201c' + esc(item.prompt) + "\u201d</span>" +
+          '<span class="ob-persuade-after">' + esc(item.after) + "</span>" +
+        "</button>";
+    }).join("");
+
+    var whyHtml = CONNECTOR_BENEFITS.map(function (w) {
+      return '<li class="ob-why-item" data-ob-why-id="' + esc(w.id) + '">' +
+        '<strong class="ob-why-head">' + esc(w.title) + "</strong>" +
+        '<span class="ob-why-body">' + esc(w.body) + "</span>" +
+      "</li>";
+    }).join("");
+
+    var notice = state.demoNotice;
+    var statusText = notice ? notice.text : oauthSummaryLine();
+    var statusCls = "ob-persuade-status" + (notice ? (" is-active " + (notice.kind || "warn")) : "");
+    var openConnBtn = notice && notice.provider
+      ? ' <button type="button" class="ob-persuade-open-btn" data-ob-open-connectors="' + esc(notice.provider) + '">View in Connectors \u2192</button>'
+      : "";
+
+    return '<div class="ob-persuade-box ob-persuade-' + esc(surface) + '" data-ob-persuasion-surface="' + esc(surface) + '">' +
+      '<div class="ob-persuade-head">' +
+        '<span class="ob-persuade-kicker">Why link your email, calendar &amp; files</span>' +
+        '<strong class="ob-persuade-title">20 minutes of scrolling \u2192 one question, cited</strong>' +
+      "</div>" +
+      '<div class="ob-persuade-grid">' + cardsHtml + "</div>" +
+      '<div class="' + statusCls + '" role="status" aria-live="polite" data-ob-demo-status="' + esc(notice && notice.provider ? notice.provider : "summary") + '">' +
+        "<span>" + esc(statusText) + "</span>" + openConnBtn +
+      "</div>" +
+      '<div class="ob-why-block" data-ob-why="1">' +
+        '<div class="ob-why-title">Why connect?</div>' +
+        '<ul class="ob-why-grid">' + whyHtml + "</ul>" +
+      "</div>" +
+    "</div>";
+  }
+
+  function openConnectorsForDemo(demoOrProviderId) {
+    if (state.open) closeTour(false);
+    if (window.SettingsUI && typeof window.SettingsUI.open === "function") {
+      window.SettingsUI.open("connectors");
+    }
+    if (window.ConnectorsUI && typeof window.ConnectorsUI.triggerDemo === "function") {
+      var matching = CONNECTOR_EXAMPLES.find(function (x) { return x.id === demoOrProviderId || x.provider === demoOrProviderId; });
+      if (matching) window.ConnectorsUI.triggerDemo(matching.id);
+    }
+  }
+
+  function triggerConnectorDemo(demoId) {
+    var info = getConnectorDemoState(demoId);
+    if (!info) return { ok: false, action: "unknown" };
+    if (info.state === "connected") {
+      state.demoNotice = null;
+      runStarter(info.prompt);
+      return { ok: true, action: "asked", state: "connected", provider: info.provider, prompt: info.prompt };
+    }
+    if (info.state === "oauth_ready" || info.state === "awaiting_callback") {
+      state.demoNotice = {
+        kind: "info",
+        provider: info.provider,
+        text: "Starting " + info.providerName + " OAuth \u2014 once connected, ask: \u201c" + info.prompt + "\u201d"
+      };
+      if (state.open) closeTour(false);
+      if (window.SettingsUI && typeof window.SettingsUI.open === "function") {
+        window.SettingsUI.open("connectors");
+      }
+      if (window.ConnectorsUI && typeof window.ConnectorsUI.triggerDemo === "function") {
+        return window.ConnectorsUI.triggerDemo(demoId);
+      }
+      syncPersuasion();
+      return { ok: true, action: "oauth_started", state: info.state, provider: info.provider, prompt: info.prompt };
+    }
+    state.demoNotice = {
+      kind: "warn",
+      provider: info.provider,
+      text: info.statusNote + " (" + oauthSummaryLine() + ")."
+    };
+    syncPersuasion();
+    return { ok: true, action: "registration_pending", state: "registration_pending", provider: info.provider, message: state.demoNotice.text };
+  }
+
+  function mountPersuasionPanel() {
+    var host = document.getElementById("suggestions");
+    if (!host) return null;
+    var panel = null;
+    if (host.children) {
+      for (var i = 0; i < host.children.length; i++) {
+        var ch = host.children[i];
+        if (ch && ch.getAttribute && ch.getAttribute("data-ob-persuasion") === "1") {
+          panel = ch;
+          break;
+        }
+      }
+    }
+    if (hasAnyConnectedConnector()) {
+      if (panel) {
+        panel.hidden = true;
+        if (panel.style) panel.style.display = "none";
+        panel.innerHTML = "";
+      }
+      return null;
+    }
+    if (!panel) {
+      panel = document.createElement("div");
+      panel.className = "ob-persuade-wrap";
+      panel.setAttribute("data-ob-persuasion", "1");
+      var cl = null;
+      if (host.children) {
+        for (var j = 0; j < host.children.length; j++) {
+          if (host.children[j] && host.children[j].getAttribute && host.children[j].getAttribute("data-ob-checklist") === "1") {
+            cl = host.children[j];
+            break;
+          }
+        }
+      }
+      if (cl && cl.parentNode === host && typeof host.insertBefore === "function") {
+        host.insertBefore(panel, cl);
+      } else {
+        host.appendChild(panel);
+      }
+      if (!host.__obPersuadeBound) {
+        host.__obPersuadeBound = true;
+        host.addEventListener("click", function (e) {
+          var hit = findClosestAttr(e.target, ["data-ob-demo", "data-ob-open-connectors"]);
+          if (!hit) return;
+          e.preventDefault();
+          if (hit.getAttribute("data-ob-open-connectors") != null) {
+            openConnectorsForDemo(hit.getAttribute("data-ob-open-connectors"));
+            return;
+          }
+          triggerConnectorDemo(hit.getAttribute("data-ob-demo"));
+        });
+      }
+    }
+    panel.hidden = false;
+    if (panel.style) panel.style.display = "";
+    panel.innerHTML = persuasionMarkup("landing");
+    return panel;
+  }
+
+  function syncPersuasion() {
+    try {
+      if (state.open && state.step === STEPS.length - 1) renderTourStep();
+      mountPersuasionPanel();
+      mountChecklist();
+    } catch (e) {}
+  }
+
   /* ---- Onboarding Tour (#tour) ---- */
   function ensureTourElement() {
     if (tourEl && tourEl.parentNode) return tourEl;
@@ -365,7 +699,17 @@
           skipTour();
           return;
         }
-        var target = e.target && e.target.closest ? e.target.closest("[data-tour-act], [data-tour-step]") : null;
+        var demoHit = findClosestAttr(e.target, ["data-ob-demo", "data-ob-open-connectors"]);
+        if (demoHit) {
+          e.preventDefault();
+          if (demoHit.getAttribute("data-ob-open-connectors") != null) {
+            openConnectorsForDemo(demoHit.getAttribute("data-ob-open-connectors"));
+          } else {
+            triggerConnectorDemo(demoHit.getAttribute("data-ob-demo"));
+          }
+          return;
+        }
+        var target = findClosestAttr(e.target, ["data-tour-act", "data-tour-step"]);
         if (!target) return;
         if (target.getAttribute("data-tour-step") != null) {
           goToStep(Number(target.getAttribute("data-tour-step")));
@@ -404,9 +748,12 @@
     var pillsHtml = (step.pills || []).map(function (p) {
       return '<span class="ob-tour-pill">' + esc(p) + "</span>";
     }).join("");
+    if (!isLast) {
+      pillsHtml += '<button type="button" class="ob-tour-pill ob-tour-pill-jump" data-tour-step="' + (STEPS.length - 1) + '">OAuth email &amp; file examples \u2192</button>';
+    }
 
     host.innerHTML =
-      '<div class="import-modal ob-tour-modal">' +
+      '<div class="import-modal ob-tour-modal' + (isLast ? " ob-tour-modal-wide" : "") + '">' +
         '<div class="ob-tour-top">' +
           '<div class="ob-tour-kicker">' +
             '<span>Getting started</span>' +
@@ -426,6 +773,7 @@
             '<div class="ob-tour-pills">' + pillsHtml + "</div>" +
           "</div>" +
         "</div>" +
+        (isLast ? persuasionMarkup("tour") : "") +
         '<div class="ob-tour-foot">' +
           '<div class="ob-tour-dots" role="group" aria-label="Onboarding progress">' + dotsHtml + "</div>" +
           '<div class="ob-tour-actions">' +
@@ -440,6 +788,7 @@
   }
 
   function openTour(stepIdx, opts) {
+    preloadConnectorsReady();
     state.step = clampStep(stepIdx === undefined ? 0 : stepIdx);
     state.open = true;
     var host = ensureTourElement();
@@ -448,7 +797,11 @@
     host.setAttribute("aria-hidden", "false");
     if ((!opts || opts.focus !== false) && !isAuthBlocking()) {
       var pri = host.querySelector ? host.querySelector(".ob-tour-btn-pri") : null;
-      if (pri && typeof pri.focus === "function") pri.focus();
+      if (pri && typeof pri.focus === "function") {
+        try { pri.focus({ preventScroll: true }); } catch (e) { pri.focus(); }
+      }
+      var modal = host.querySelector ? host.querySelector(".ob-tour-modal") : null;
+      if (modal && typeof modal.scrollTop === "number") modal.scrollTop = 0;
     }
     return getState();
   }
@@ -556,10 +909,13 @@
     }
     var input = document.getElementById(busy && landing && landing.style.display === "none" ? "followupInput" : "landingInput");
     if (!input) return false;
-    input.value = q;
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
-    return true;
+    if (typeof Event === "function" && typeof KeyboardEvent === "function" && typeof input.dispatchEvent === "function") {
+      input.value = q;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+      return true;
+    }
+    return runExample(q);
   }
 
   function starterButtons(host, count) {
@@ -650,6 +1006,7 @@
 
   function syncEmptyState() {
     var box = mountExamplePrompts();
+    mountPersuasionPanel();
     mountChecklist();
     var show = shouldShowEmptyPrompts(getComposerValue(), getThreadCount());
     state.emptyPromptsVisible = show;
@@ -734,6 +1091,7 @@
 
     syncEmptyState();
     syncSidebarEmptyHint();
+    preloadConnectorsReady();
 
     if (shouldAutoOpen()) {
       openTour(0, { focus: false });
@@ -744,6 +1102,8 @@
     STORAGE_KEY: STORAGE_KEY,
     STEPS: STEPS,
     EXAMPLE_PROMPTS: EXAMPLE_PROMPTS,
+    CONNECTOR_EXAMPLES: CONNECTOR_EXAMPLES,
+    CONNECTOR_BENEFITS: CONNECTOR_BENEFITS,
     isOnboarded: isOnboarded,
     markOnboarded: markOnboarded,
     resetOnboarding: resetOnboarding,
@@ -756,11 +1116,14 @@
     prev: prevStep,
     goToStep: goToStep,
     getState: getState,
-    refresh: function () { detectAutomateAsync(); try { mountChecklist(); } catch (e) {} },
+    refresh: function () { detectAutomateAsync(); try { mountChecklist(); syncPersuasion(); } catch (e) {} },
     runExample: runExample,
     runStarter: runStarter,
     starterButtons: starterButtons,
     syncEmptyState: syncEmptyState,
+    syncPersuasion: syncPersuasion,
+    getConnectorDemoState: getConnectorDemoState,
+    triggerConnectorDemo: triggerConnectorDemo,
     CHECKLIST: CHECKLIST,
     checklistState: checklistState,
     checklistCardHtml: checklistCardHtml,

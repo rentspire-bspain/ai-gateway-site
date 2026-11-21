@@ -166,12 +166,16 @@
       var map = (src.providers && typeof src.providers === "object") ? src.providers : null;
       if (map) {
         Object.keys(map).forEach(function (k) {
-          if (map[k] != null) out.providers[normalizeProviderId(k) || k] = map[k];
+          var nk = normalizeProviderId(k) || k;
+          if (map[k] === null) out.providers[nk] = null;
+          else if (map[k] != null) out.providers[nk] = map[k];
         });
       }
       Object.keys(src).forEach(function (k) {
         if (k === "providers" || k === "redirectUri" || k === "redirect_uri" || k === "ok") return;
-        if (src[k] != null) out.providers[normalizeProviderId(k) || k] = src[k];
+        var nk = normalizeProviderId(k) || k;
+        if (src[k] === null) out.providers[nk] = null;
+        else if (src[k] != null) out.providers[nk] = src[k];
       });
     }
     ingest(baseCfg);
@@ -324,8 +328,12 @@
     var c = ctx || {};
     var st = c.serverStatus || null;
     var resolved = resolveProviderConfig(spec.id, c.oauthConfig || null, c);
+    var rawMap = c.oauthConfig && c.oauthConfig.providers && typeof c.oauthConfig.providers === "object"
+      ? c.oauthConfig.providers
+      : (c.oauthConfig && typeof c.oauthConfig === "object" ? c.oauthConfig : null);
+    var explicitlyUnregistered = !!(rawMap && Object.prototype.hasOwnProperty.call(rawMap, spec.id) && rawMap[spec.id] === null);
     var hasClientConfig = !!(resolved && resolved.configured);
-    var hasServerConfig = serverHasOAuthConfig(spec.id, st);
+    var hasServerConfig = !explicitlyUnregistered && serverHasOAuthConfig(spec.id, st);
     var hasConfig = hasClientConfig || hasServerConfig;
     var connected = !!(st && st.connected);
     var runtime = c.runtimeState || null;

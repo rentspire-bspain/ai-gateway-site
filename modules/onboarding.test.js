@@ -454,3 +454,95 @@ test("checklistCardHtml renders rows, progress bar, and all-done state", () => {
   assert.ok(html.includes('ob-cl-auto'));
   assert.ok(html.includes('All set'));
 });
+
+test("OAuth connector persuasion renders Before/After examples and Why connect? in #tour and #suggestions", () => {
+  const env = makeEnv({});
+  const { api } = env;
+  assert.equal(api.CONNECTOR_EXAMPLES.length, 3);
+  assert.equal(api.CONNECTOR_BENEFITS.length, 4);
+  assert.equal(api.CONNECTOR_EXAMPLES[0].prompt, "What did my accountant say about the Q3 invoices?");
+  assert.equal(api.CONNECTOR_EXAMPLES[1].prompt, "What's on my plate Thursday and when should I leave for the 2pm?");
+  assert.equal(api.CONNECTOR_EXAMPLES[2].prompt, "Summarize the contract my lawyer sent last week");
+
+  // Step 1 shows jump pill to Step 4
+  const tour = env.document.getElementById("tour");
+  assert.ok(tour.innerHTML.includes("ob-tour-pill-jump"), "steps 1-3 include jump pill to OAuth examples");
+
+  // Step 4 renders concrete Before/After examples + Why connect? block
+  api.goToStep(3);
+  assert.ok(tour.innerHTML.includes("20 minutes of scrolling"), "pain-removed framing rendered in tour");
+  assert.ok(tour.innerHTML.includes("What did my accountant say about the Q3 invoices?"));
+  assert.ok(tour.innerHTML.includes("What&#39;s on my plate Thursday and when should I leave for the 2pm?"));
+  assert.ok(tour.innerHTML.includes("Summarize the contract my lawyer sent last week"));
+  assert.ok(tour.innerHTML.includes("Why connect?"));
+  assert.ok(tour.innerHTML.includes("RLS"));
+  assert.ok(tour.innerHTML.includes("Incognito"));
+
+  // Landing suggestions mounts [data-ob-persuasion="1"]
+  const persuadeWrap = env.byId.suggestions.children.find((ch) => ch.getAttribute("data-ob-persuasion") === "1");
+  assert.ok(persuadeWrap, "landing persuasion panel mounted");
+  assert.equal(persuadeWrap.hidden, false);
+  assert.ok(persuadeWrap.innerHTML.includes("Why connect?"));
+});
+
+test("triggerConnectorDemo routes unregistered to registration_pending, configured to OAuth, connected to runStarter", () => {
+  const env = makeEnv({});
+  const { api } = env;
+
+  // 1. Default unregistered state -> honest registration_pending notice, no chat query submitted
+  const pendingRes = api.triggerConnectorDemo("gmail");
+  assert.equal(pendingRes.action, "registration_pending");
+  assert.equal(pendingRes.state, "registration_pending");
+  assert.equal(env.submittedQueries.length, 0);
+  const persuadeWrap = env.byId.suggestions.children.find((ch) => ch.getAttribute("data-ob-persuasion") === "1");
+  assert.ok(persuadeWrap.innerHTML.includes("OAuth registration pending"));
+
+  // 2. Configured OAuth provider -> opens Settings connectors & delegates to ConnectorsUI.triggerDemo
+  let openedTab = null;
+  let delegatedId = null;
+  env.window.SettingsUI = { open(tab) { openedTab = tab; }, close() {} };
+  env.window.ConnectorsUI = {
+    getDemoState(id) {
+      if (id === "files") {
+        return {
+          id: "files",
+          provider: "dropbox",
+          providerName: "Dropbox",
+          state: "oauth_ready",
+          actionLabel: "Connect Dropbox",
+          prompt: "Summarize the contract my lawyer sent last week",
+          statusNote: "Opens Dropbox OAuth."
+        };
+      }
+      return null;
+    },
+    hasAnyConnected() { return false; },
+    oauthMatrixSummaryText() { return "OAuth registration pending: Google, Outlook, GitHub · Live now: Dropbox, Slack"; },
+    triggerDemo(id) {
+      delegatedId = id;
+      return { ok: true, action: "oauth_started", state: "oauth_ready", provider: "dropbox" };
+    }
+  };
+  const oauthRes = api.triggerConnectorDemo("files");
+  assert.equal(oauthRes.action, "oauth_started");
+  assert.equal(openedTab, "connectors");
+  assert.equal(delegatedId, "files");
+  assert.equal(env.submittedQueries.length, 0);
+
+  // 3. Connected provider -> hides landing persuasion panel and runs the starter prompt
+  env.window.ConnectorsUI.hasAnyConnected = () => true;
+  env.window.ConnectorsUI.getDemoState = () => ({
+    id: "gmail",
+    provider: "google",
+    providerName: "Google",
+    state: "connected",
+    actionLabel: "Ask now",
+    prompt: "What did my accountant say about the Q3 invoices?",
+    statusNote: "Connected."
+  });
+  api.syncPersuasion();
+  assert.equal(persuadeWrap.hidden, true);
+  const askRes = api.triggerConnectorDemo("gmail");
+  assert.equal(askRes.action, "asked");
+  assert.deepEqual(env.submittedQueries, ["What did my accountant say about the Q3 invoices?"]);
+});

@@ -161,6 +161,8 @@
 .ob-tour-dot {
   width: 7px;
   height: 7px;
+  min-width: 0;
+  min-height: 0;
   padding: 0;
   border-radius: 999px;
   border: none;
@@ -400,3 +402,286 @@
 .ob-empty-starter:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .ob-threads-empty .ob-empty-starter{display:block;width:100%;margin-top:8px;font-size:12px;padding:7px 8px}
 @media(max-width:768px){.ob-empty-starter{min-height:44px}}
+
+/* ---- OAuth Connector Persuasion in Onboarding & Landing ---- */
+.ob-tour-modal.ob-tour-modal-wide {
+  width: min(650px, calc(100vw - 32px));
+  max-width: 650px;
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+}
+
+.ob-tour-pill.ob-tour-pill-jump {
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-light);
+  font-weight: 600;
+  transition: background 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.ob-tour-pill.ob-tour-pill-jump:hover {
+  background: var(--accent);
+  color: var(--text-inverse, #fff);
+}
+
+.ob-persuade-wrap {
+  margin-top: 10px;
+}
+
+.ob-persuade-wrap[hidden] {
+  display: none !important;
+}
+
+.ob-persuade-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  text-align: left;
+}
+
+.ob-persuade-box.ob-persuade-tour {
+  padding: 11px 12px;
+  background: var(--bg-secondary);
+  border-color: var(--border-light, var(--border));
+}
+
+.ob-persuade-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ob-persuade-kicker {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ob-persuade-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-primary, var(--text));
+}
+
+.ob-persuade-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ob-persuade-chip {
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 5px;
+  padding: 10px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-primary, var(--text));
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.ob-persuade-chip:hover {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.ob-persuade-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ob-persuade-chip.state-registration_pending {
+  border-style: dashed;
+}
+
+.ob-persuade-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 5px;
+  width: 100%;
+}
+
+.ob-persuade-cap {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary, var(--text));
+  letter-spacing: 0.01em;
+}
+
+.ob-persuade-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.25;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+}
+
+.ob-persuade-pill.is-connected,
+.ob-persuade-pill.is-oauth_ready,
+.ob-persuade-pill.is-awaiting_callback {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.ob-persuade-pill.is-registration_pending {
+  color: #b45309;
+  border-color: rgba(217, 119, 6, 0.38);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+[data-theme="dark"] .ob-persuade-pill.is-registration_pending {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.36);
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.ob-persuade-before {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-tertiary, var(--muted));
+}
+
+.ob-persuade-prompt {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.38;
+  color: var(--text-primary, var(--text));
+  overflow-wrap: anywhere;
+}
+
+.ob-persuade-after {
+  margin-top: auto;
+  padding-top: 2px;
+  font-size: 11px;
+  line-height: 1.36;
+  color: var(--text-secondary);
+}
+
+.ob-persuade-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  line-height: 1.42;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light, var(--border));
+}
+
+.ob-persuade-status.is-active.warn {
+  color: #92400e;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(217, 119, 6, 0.35);
+}
+
+[data-theme="dark"] .ob-persuade-status.is-active.warn {
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.ob-persuade-status.is-active.info {
+  color: var(--text-primary, var(--text));
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+
+.ob-persuade-open-btn {
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ob-persuade-open-btn:hover {
+  background: var(--accent-light);
+}
+
+.ob-why-block {
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light, var(--border));
+}
+
+.ob-why-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.ob-why-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 12px;
+}
+
+.ob-why-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.ob-why-head {
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.32;
+  color: var(--text-primary, var(--text));
+}
+
+.ob-why-body {
+  font-size: 11px;
+  line-height: 1.38;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 680px) {
+  .ob-persuade-grid,
+  .ob-why-grid {
+    grid-template-columns: 1fr;
+  }
+  .ob-tour-modal.ob-tour-modal-wide {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+  }
+}
