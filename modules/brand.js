@@ -36,9 +36,24 @@
     for (var i = 0; i < MAP.length; i++) out = out.replace(MAP[i][0], MAP[i][1]);
     return out;
   }
+  // v288 CRITICAL FIX: NEVER scrub text inside <script> (or <style>) elements. A script's
+  // content is a text node, and this module runs synchronously in <head> with a
+  // MutationObserver that fires in microtasks WHILE THE PARSER IS STILL STREAMING the
+  // document. The observer rewrote the main inline script's source mid-parse
+  // ("ai.spaincos.com" -> "BoundView" inside the JS), so the browser computed the CSP
+  // sha256 from the MUTATED text -> hash mismatch -> the main script was blocked by
+  // script-src-elem -> `sb` (the whole app) never defined -> login silently dead on
+  // boundview.com (live-verified via securitypolicyviolation capture). ai.spaincos.com is
+  // unaffected because the scrub only runs when the hostname contains "boundview".
+  // Script text is never rendered, so scrubbing it was pointless AND fatal.
+  function isProtectedText(node) {
+    var p = node.parentElement;
+    return !!p && (p.tagName === "SCRIPT" || p.tagName === "STYLE");
+  }
   function scrubNode(node) {
     try {
       if (node.nodeType === 3) { // text node
+        if (isProtectedText(node)) return;
         var s = scrubText(node.nodeValue || "");
         if (s !== node.nodeValue) node.nodeValue = s;
       } else if (node.nodeType === 1) { // element
