@@ -19,7 +19,16 @@ def api(url, method="GET", body=None, is_json=True):
     cmd = ["curl", "-s", "-m", "300", "-X", method, url]
     if body is not None:
         cmd += ["-H", "Content-Type: application/json", "-d", json.dumps(body)]
-    out = sh(cmd)
+    # v288: upload as base64 in a JSON body (multipart through the proxy corrupts files)
+    b64 = __import__("base64").b64encode(data).decode()
+    import urllib.request as _ur
+    req = _ur.Request("https://api.vercel.com/v2/files?teamId=team_qpLUu8GANcBKGRNwaQP1J1gl",
+        data=json.dumps({"file": b64, "encoding": "base64", "sha1": sha, "size": size}).encode(),
+        headers={"Content-Type": "application/json", "Authorization": "Bearer " + __import__("os").environ.get("VERCEL_TOKEN", "")},
+        method="POST")
+    with _ur.urlopen(req, timeout=300) as r:
+        out = r.read().decode()
+    return sha, size, out
     return json.loads(out) if is_json and out.strip().startswith(("{", "[")) else out
 
 def upload_file(path, rel):
@@ -31,7 +40,16 @@ def upload_file(path, rel):
     cmd = ["curl", "-s", "-m", "300", "-X", "POST",
            "https://api.vercel.com/v2/files",
            "-F", f"file=@{path}"]
-    out = sh(cmd)
+    # v288: upload as base64 in a JSON body (multipart through the proxy corrupts files)
+    b64 = __import__("base64").b64encode(data).decode()
+    import urllib.request as _ur
+    req = _ur.Request("https://api.vercel.com/v2/files?teamId=team_qpLUu8GANcBKGRNwaQP1J1gl",
+        data=json.dumps({"file": b64, "encoding": "base64", "sha1": sha, "size": size}).encode(),
+        headers={"Content-Type": "application/json", "Authorization": "Bearer " + __import__("os").environ.get("VERCEL_TOKEN", "")},
+        method="POST")
+    with _ur.urlopen(req, timeout=300) as r:
+        out = r.read().decode()
+    return sha, size, out
     return sha, size, out
 
 # 1. flatten the current deployment tree
