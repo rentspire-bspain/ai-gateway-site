@@ -15,6 +15,7 @@ SKIP_PRELAUNCH=1 git push ...   # emergencies only
 
 - Machine report: `qa-reports/prelaunch/latest.json` (+ `history.jsonl`) — rendered inside the product on the Fleet page → QA tab.
 - A push is blocked when any check fails; the failing check names print with details.
+- Post-deploy gateway regression gate (10 queries only — work log, claim guard, continuations, facts, artifact creation): `python3 qa/eval-replay.py --deploy-id <dpl_or_sha>` (or `./qa/run.sh --post-deploy <dpl_or_sha>`). Appends per-deploy drift history to `qa-reports/eval-replay/history.jsonl` and `qa-reports/eval-replay/history.md`.
 
 ## Stale-cleanup fleet
 

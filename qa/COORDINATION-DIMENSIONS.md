@@ -22,8 +22,11 @@ NEVER hand-summed. Current: **84.4% (10804/128)**. Feature-parity-only view: 90.
 
 1. **Evidence-scored, never vibes**: every dimension score cites live-verified evidence (curl
    results, browser-run checks, measured suites). Partials are honest (P = 0.5).
-2. **The three standing post-deploy gates**: `qa/e2e-real-flows.py` (9 shell flows),
-   `qa/e2e-ux-flows.py` (9 UX flows), `qa/e2e-ux-master.py` (46 checks, gate >= 90 GREEN).
+2. **The standing post-deploy gates**: `qa/e2e-real-flows.py` (9 shell flows),
+   `qa/e2e-ux-flows.py` (9 UX flows), `qa/e2e-ux-master.py` (46 checks, gate >= 90 GREEN), and
+   `qa/eval-replay.py --deploy-id <dpl_or_sha>` (or `./qa/run.sh --eval-replay <dpl_or_sha>`, the
+   cheap 10-query gateway work-log / claim-guard / continuation / artifact gate appending per-deploy
+   drift rows to `qa-reports/eval-replay/history.jsonl` + `history.md`).
    Any webapp without equivalent gates is flagged as a Fleet-category gap in its doc.
 3. **No false claims**: never report work complete without live verification. No grader-gaming.
 4. **Serving-layer lessons (v290/v291, apply to every webapp)**:

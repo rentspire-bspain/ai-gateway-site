@@ -1,0 +1,173 @@
+{
+ "ts": "2026-11-21T19:13:01+00:00",
+ "deploy_id": "master-8c8ee47",
+ "live_build": "v275",
+ "passed": 10,
+ "total": 10,
+ "score": "10/10",
+ "lanes": {
+  "research": "3/3",
+  "continuation": "2/2",
+  "status": "2/2",
+  "fact": "2/2",
+  "doc": "1/1"
+ },
+ "failures": [],
+ "secs": 416.5,
+ "exit": 0,
+ "checks": [
+  {
+   "id": "research-1",
+   "kind": "research",
+   "q": "What is the current 30-year fixed mortgage rate in the US?",
+   "http": 200,
+   "secs": 29.7,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources",
+    "attach files \u2014 1 file(s)"
+   ],
+   "claim_checks": 0
+  },
+  {
+   "id": "research-2",
+   "kind": "research",
+   "q": "What is the latest US CPI inflation rate reported by the BLS?",
+   "http": 200,
+   "secs": 30.0,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources",
+    "attach files \u2014 1 file(s)"
+   ],
+   "claim_checks": 0
+  },
+  {
+   "id": "research-3",
+   "kind": "research",
+   "q": "What is the current price of Bitcoin in USD?",
+   "http": 200,
+   "secs": 26.7,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources",
+    "attach files \u2014 1 file(s)"
+   ],
+   "claim_checks": 0
+  },
+  {
+   "id": "continue-1",
+   "kind": "continuation",
+   "q": "What is the current US 10-year Treasury yield?",
+   "http": "200/200",
+   "secs": 49.7,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "retrieval decision \u2014 skipped (analyst_no_search)",
+    "attach files \u2014 1 file(s)"
+   ],
+   "claim_checks": 0
+  },
+  {
+   "id": "continue-2",
+   "kind": "continuation",
+   "q": "What are this week's top headlines about the Federal Reserve?",
+   "http": "200/200",
+   "secs": 58.4,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "retrieval decision \u2014 skipped (analyst_no_search)",
+    "attach files \u2014 1 file(s)"
+   ],
+   "claim_checks": 0
+  },
+  {
+   "id": "status-1",
+   "kind": "status",
+   "q": "Confirm the runner jobs are deployed.",
+   "http": 200,
+   "secs": 50.7,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources",
+    "attach files \u2014 2 file(s)"
+   ],
+   "claim_checks": 1
+  },
+  {
+   "id": "status-2",
+   "kind": "status",
+   "q": "Confirm PR #96 is merged and deployed to production.",
+   "http": 200,
+   "secs": 33.8,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources",
+    "attach files \u2014 1 file(s)"
+   ],
+   "claim_checks": 1
+  },
+  {
+   "id": "fact-1",
+   "kind": "fact",
+   "q": "What is the capital of France? One sentence.",
+   "http": 200,
+   "secs": 26.7,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources",
+    "attach files \u2014 1 file(s)"
+   ],
+   "claim_checks": 0
+  },
+  {
+   "id": "fact-2",
+   "kind": "fact",
+   "q": "What is the chemical symbol for gold and its atomic number? One sentence.",
+   "http": 200,
+   "secs": 25.5,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources",
+    "attach files \u2014 1 file(s)"
+   ],
+   "claim_checks": 0
+  },
+  {
+   "id": "doc-1",
+   "kind": "doc",
+   "q": "Create a markdown document named eval-replay-checklist.md with a 3-step release readiness checklist (Gate A, Gate B, Gate C) using create_file and attach it.",
+   "http": 200,
+   "secs": 85.3,
+   "assets": [
+    "completion-status-2026-11-21.md"
+   ],
+   "ok": true,
+   "failed": "",
+   "worklog_n": 2,
+   "commands": [
+    "run live web research \u2014 lane perplexity, 3 sub-queries, 18 sources",
+    "attach files \u2014 1 file(s)"
+   ],
+   "claim_checks": 0
+  }
+ ]
+}

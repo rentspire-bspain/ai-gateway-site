@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """ai.spaincos.com GATEWAY EVAL-REPLAY HARNESS (section 34f: completion claims bound to tool evidence).
 
-Standalone, run on demand. NOT part of the prelaunch gate (qa/run.sh does not call it).
+Standing post-deploy 10-query gateway regression gate (alongside e2e-real-flows.py,
+e2e-ux-flows.py, and e2e-ux-master.py). Stays out of the pre-push git hook so pushes stay fast;
+invoked post-deploy or on demand:
 
-    python3 qa/eval-replay.py                 # 10-query replay against production gateway-chat
-    python3 qa/eval-replay.py --only research-1,doc-1
-    python3 qa/eval-replay.py --jobs 1        # strictly serial (default: 2 concurrent workers)
+    python3 qa/eval-replay.py --deploy-id <dpl_or_sha>   # standing post-deploy gate (10 queries)
+    ./qa/run.sh --eval-replay <dpl_or_sha>               # convenience wrapper
+    ./qa/run.sh --post-deploy <dpl_or_sha>               # prelaunch.py + eval-replay.py
+    python3 qa/eval-replay.py --only research-1,doc-1    # targeted debug (skips history append)
 
 Each case POSTs to the gateway REST endpoint (same auth + body pattern as qa/prelaunch.py:
 eval-bot password grant -> Bearer token -> POST /functions/v1/gateway-chat, non-streaming JSON)
@@ -20,9 +23,10 @@ and asserts that the response is mechanically bound to what actually executed th
   fact          work log header + expected fact in the answer
   doc           answer names the file AND the work log has a doc/file/asset/attach/create command
 
-Writes qa-reports/eval-replay/latest.md (markdown results table) and exits nonzero if any fail.
+Writes qa-reports/eval-replay/latest.md + latest.json, appends a summary row to rolling
+qa-reports/eval-replay/history.jsonl + history.md, and exits nonzero if any case fails.
 """
-import argparse, concurrent.futures as cf, datetime, importlib.util, json, re, sys, time
+import argparse, concurrent.futures as cf, datetime, importlib.util, json, os, re, sys, time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -228,16 +232,46 @@ def md_escape(s):
     return str(s).replace("|", "\\|").replace("\n", " ")
 
 
-def write_report(results):
+LANE_ORDER = ("research", "continuation", "status", "fact", "doc")
+
+
+def detect_live_build():
+    try:
+        st, body, _ = prelaunch.http(f"{prelaunch.BASE}/build.json", 5)
+        if st == 200:
+            return str(json.loads(body).get("build") or "")
+    except Exception:
+        pass
+    return ""
+
+
+def lane_breakdown(results):
+    lanes = {}
+    for k in LANE_ORDER:
+        rs = [r for r in results if r["kind"] == k]
+        if rs:
+            lanes[k] = f"{sum(1 for r in rs if r['ok'])}/{len(rs)}"
+    return lanes
+
+
+def write_report(results, deploy_id="", live_build="", record_history=True):
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     ts = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
     passed = sum(1 for r in results if r["ok"])
-    lines = [
+    total = len(results)
+    exit_code = 0 if passed == total else 1
+    lanes = lane_breakdown(results)
+    failures = [{"id": r["id"], "kind": r["kind"], "failed": r["failed"]} for r in results if not r["ok"]]
+    total_secs = round(sum(float(r.get("secs") or 0) for r in results), 1)
+
+    meta = [
         "# Gateway eval-replay report",
         "",
         f"- Run: {ts}",
+        f"- Deploy ID: `{deploy_id or 'unspecified'}`" + (f" (live build `{live_build}`)" if live_build else ""),
         f"- Endpoint: `{GATEWAY}` (eval-bot account, non-streaming JSON)",
-        f"- Result: **{passed}/{len(results)} passed**" + (" — all green" if passed == len(results) else f", {len(results) - passed} failed"),
+        f"- Result: **{passed}/{total} passed**" + (" — all green" if exit_code == 0 else f", {total - passed} failed"),
+        f"- Lanes: " + ", ".join(f"{k} {v}" for k, v in lanes.items()),
         "",
         "| # | Case | Kind | Query | Result | Assertion that failed | Work log (N) / commands | Claim checks | HTTP | Secs |",
         "|---|---|---|---|---|---|---|---|---|---|",
@@ -246,21 +280,60 @@ def write_report(results):
         q = r["q"] + (f"  →  \"{CONTINUE}\"" if r["kind"] == "continuation" else "")
         cmds = "; ".join(r.get("commands") or []) or "—"
         wl = f"({r['worklog_n']}) {cmds}" if r.get("worklog_n") is not None else "none"
-        lines.append(f"| {i} | {r['id']} | {r['kind']} | {md_escape(q)} | {'PASS' if r['ok'] else 'FAIL'} | "
-                     f"{md_escape(r['failed']) or '—'} | {md_escape(wl)} | {r.get('claim_checks', 0)} | {r['http']} | {r['secs']} |")
-    lines += ["", "Exit code: " + ("0" if passed == len(results) else "1"), ""]
-    out = "\n".join(lines)
+        meta.append(f"| {i} | {r['id']} | {r['kind']} | {md_escape(q)} | {'PASS' if r['ok'] else 'FAIL'} | "
+                    f"{md_escape(r['failed']) or '—'} | {md_escape(wl)} | {r.get('claim_checks', 0)} | {r['http']} | {r['secs']} |")
+    meta += ["", f"Exit code: {exit_code}", ""]
+    out = "\n".join(meta)
     (REPORT_DIR / "latest.md").write_text(out)
+
+    summary = {
+        "ts": ts,
+        "deploy_id": deploy_id or None,
+        "live_build": live_build or None,
+        "passed": passed,
+        "total": total,
+        "score": f"{passed}/{total}",
+        "lanes": lanes,
+        "failures": failures,
+        "secs": total_secs,
+        "exit": exit_code,
+    }
+    (REPORT_DIR / "latest.json").write_text(json.dumps({**summary, "checks": results}, indent=1) + "\n")
+
+    if record_history:
+        with open(REPORT_DIR / "history.jsonl", "a") as fh:
+            fh.write(json.dumps(summary) + "\n")
+        hist_md = REPORT_DIR / "history.md"
+        if not hist_md.exists():
+            hist_md.write_text(
+                "# Gateway eval-replay rolling history\n\n"
+                "Appended automatically on every full 10-query run of `qa/eval-replay.py` "
+                "(machine-readable companion: `qa-reports/eval-replay/history.jsonl`).\n\n"
+                "| Timestamp (UTC) | Deploy ID | Live build | Score | Lanes (research / continuation / status / fact / doc) | Failures | Secs | Exit |\n"
+                "|---|---|---|---|---|---|---|---|\n"
+            )
+        lane_str = " / ".join(f"{k}:{lanes.get(k, '-')}" for k in LANE_ORDER)
+        fail_str = "; ".join(f"{f['id']} ({f['kind']}): {f['failed']}" for f in failures) or "—"
+        with open(hist_md, "a") as fh:
+            fh.write(
+                f"| {ts} | `{md_escape(deploy_id or 'unspecified')}` | `{md_escape(live_build or '-')}` | "
+                f"**{passed}/{total}** | {md_escape(lane_str)} | {md_escape(fail_str)} | {total_secs} | {exit_code} |\n"
+            )
     return out
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--only", default="", help="comma-separated case ids to run")
+    ap.add_argument("--deploy-id", default=os.environ.get("DEPLOY_ID", ""), help="deploy ID or commit SHA for rolling history")
+    ap.add_argument("--only", default="", help="comma-separated case ids to run (skips history append unless --record-history)")
     ap.add_argument("--jobs", type=int, default=1, help="concurrent gateway requests (default 1 = serial; avoids HTTP 546 worker limits)")
+    ap.add_argument("--no-history", action="store_true", help="do not append this run to history.jsonl / history.md")
+    ap.add_argument("--record-history", action="store_true", help="force history append even when --only is used")
     a = ap.parse_args()
     cases = [c for c in CASES if not a.only or c["id"] in a.only.split(",")]
-    print(f"GATEWAY EVAL-REPLAY -> {GATEWAY} ({len(cases)} cases, jobs={a.jobs})", flush=True)
+    live_build = detect_live_build()
+    tag = f", deploy={a.deploy_id}" if a.deploy_id else (f", build={live_build}" if live_build else "")
+    print(f"GATEWAY EVAL-REPLAY -> {GATEWAY} ({len(cases)} cases, jobs={a.jobs}{tag})", flush=True)
     tok = prelaunch.mint_token()
     if not tok:
         print("FAIL: eval-bot token mint failed", flush=True)
@@ -278,9 +351,10 @@ def main():
             ordered[idx] = r
             print(f"  {'PASS' if r['ok'] else 'FAIL'}  {r['id']:<11} {r['secs']:>6}s" + (f"  [{r['failed']}]" if not r["ok"] else ""), flush=True)
     results = ordered
-    report = write_report(results)
+    rec_hist = (not a.no_history) and (not a.only or a.record_history)
+    report = write_report(results, deploy_id=a.deploy_id.strip(), live_build=live_build, record_history=rec_hist)
     print("\n" + report, flush=True)
-    print(f"report: {REPORT_DIR / 'latest.md'}", flush=True)
+    print(f"report: {REPORT_DIR / 'latest.md'}" + (f" (history appended: {REPORT_DIR / 'history.jsonl'})" if rec_hist else ""), flush=True)
     sys.exit(0 if all(r["ok"] for r in results) else 1)
 
 

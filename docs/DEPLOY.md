@@ -29,3 +29,11 @@ A GitHub Action with a VERCEL_TOKEN secret was not needed (and the vault token v
 ## Verification and /api/geocode
 - `.github/workflows/verify-live.yml` runs on push to master and on demand; it md5-compares https://ai.spaincos.com with index.html and fails red if they differ.
 - `/api/geocode` returning 401 is BY DESIGN: api/geocode.js requires the X-Worker-Token header (or ?token=) matching env GEOCODE_WORKER_TOKEN and returns 401 `unauthorized` otherwise. Code is unchanged by the move to Git deploys. Direct *.vercel.app deployment URLs additionally sit behind Vercel Authentication (302).
+
+## Post-deploy verification checklist (standing gates)
+Run after every production frontend or `gateway-chat` deploy (all four stay lightweight; no full benchmark suites):
+
+1. `python3 qa/e2e-real-flows.py --url https://ai.spaincos.com` (and `https://boundview.com`) — 9 browser shell flows.
+2. `python3 qa/e2e-ux-flows.py --url https://ai.spaincos.com` — 9 signed-in experience flows.
+3. `python3 qa/e2e-ux-master.py --url https://ai.spaincos.com` — 46-check UX master rubric (gate `>= 90` GREEN).
+4. `python3 qa/eval-replay.py --deploy-id <dpl_or_sha>` (optional combined wrapper: `./qa/run.sh --post-deploy <dpl_or_sha>` or `./qa/run.sh --eval-replay <dpl_or_sha>`) — the cheap 10-query gateway regression gate (3 live research, 2 `OK CONTINUE AUTONOMOUSLY` continuations, 2 status/claim-guard checks, 2 facts, 1 doc creation). Writes `qa-reports/eval-replay/latest.md` + `latest.json` and appends a drift row to `qa-reports/eval-replay/history.jsonl` + `history.md`.

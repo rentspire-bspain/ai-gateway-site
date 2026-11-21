@@ -2540,11 +2540,12 @@ The benchmark's H2 check caught it: **ai.spaincos.com was serving BoundView-bran
 
 The full run plan is staged and executable the moment the RunPod API key lands (the credential form is still open/unanswered): dataset = the IFEval rule-15c failure corpus + verified search trajectories; target = the free-fleet writer model; success gate = IFEval band mean > 70 (from 48-60) with zero SimpleQA/FRAMES/DSQA regression. NOTHING runs until the key exists — no claims until then.
 
-### 5. STANDING GATES (all three post-deploy, in order)
+### 5. STANDING GATES (post-deploy, in order)
 
 1. e2e-real-flows.py — 9 shell flows (sb defined, CSP, runtime errors, auth chain, brand+script integrity, deep link, gateway, SW hygiene, served-markup scrub)
 2. e2e-ux-flows.py — 9 experience flows (session restore, ask+citations, persistence, deep link, history, follow-up, sources, mobile, error surface)
 3. e2e-ux-master.py — THE UX MASTER BENCHMARK (46 checks, weighted score, gate >=90 GREEN) — the H2 served-brand check is the new permanent guard for the v290 brand-leak class
+4. eval-replay.py — 10-query gateway regression gate (`python3 qa/eval-replay.py --deploy-id <dpl_or_sha>` or `./qa/run.sh --eval-replay <dpl_or_sha>`; stays cheap at the 10-query battery only — 3 research, 2 continuation, 2 status/claim-guard, 2 fact, 1 doc — and appends per-deploy drift rows to `qa-reports/eval-replay/history.jsonl` + `history.md`)
 
 
 ## §30p — v290b THE HEADLINE REBALANCE: UX/SEO/MARKETING ROLLED INTO THE WEIGHTED AVERAGE (owner directive 2026-11-21: "what is the updated weighted average with the new UX/SEO/marketing all weighed/rolled into the completion doc")
