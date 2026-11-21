@@ -1,9 +1,9 @@
 {
- "ts": "2026-11-21T15:41:29+00:00",
- "version": "v290",
- "headline_pct": 88.8,
- "weighted_sum": 9764,
- "total_weight": 110,
+ "ts": "2026-11-21T17:50:04+00:00",
+ "version": "v291",
+ "headline_pct": 83.2,
+ "weighted_sum": 10644,
+ "total_weight": 128,
  "categories": {
   "Features": 99,
   "Computer": 99,
@@ -24,7 +24,16 @@
   "Teammates": 68,
   "UX": 91,
   "SEO": 60,
-  "Marketing": 60
+  "Marketing": 60,
+  "Security": 70,
+  "Accessibility": 55,
+  "Legal/Compliance": 25,
+  "Docs/Support": 50,
+  "Observability": 55,
+  "Fleet": 50,
+  "Email/Notifications": 30,
+  "i18n": 10,
+  "NativeMobile": 40
  },
  "raw_items": {
   "done": 104,

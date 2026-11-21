@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- v291: sitemap for the public surfaces of ai.spaincos.com (SEO dimension).
+     Thread pages are SPA routes behind an invite-only gate — crawlers get the
+     app shell, so only the stable public routes are listed. Keep in sync with
+     the SPA's real routes when new public surfaces ship. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ai.spaincos.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

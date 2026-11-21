@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+Disallow: /t/
+Sitemap: https://ai.spaincos.com/sitemap.xml
