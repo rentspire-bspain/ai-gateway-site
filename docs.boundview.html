@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docs — BoundView</title>
+<meta name="robots" content="index, follow">
+<meta name="description" content="What BoundView is, how it is measured, and the benchmark scores with strict and fair grading shown side by side. Invite-only.">
+<style>
+  :root { --bg: #0C0E14; --fg: #E8ECF4; --muted: #9AA4B8; --border: #232A3A; --surface: #141824; --accent: #5B8CFF; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.65; }
+  main { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 32px; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 40px 0 10px; color: var(--accent); }
+  p, li { color: var(--fg); }
+  .muted { color: var(--muted); font-size: 14px; }
+  a { color: var(--accent); }
+  .tw { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--surface); }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  code { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 13px; }
+  .note { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; margin: 16px 0; }
+  nav a { margin-right: 14px; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+<nav><a href="/">&larr; Back to BoundView</a><a href="/privacy.html">Privacy</a></nav>
+<h1>BoundView docs</h1>
+<p class="muted">Last updated 2026-11-21. Every figure below comes from the repository's QA reports; sources are named next to each number.</p>
+
+<h2>What it is</h2>
+<p>BoundView is a research-and-answer assistant: ask a question and it searches the web and your connected sources, then writes a cited answer. It runs on open-weight models behind a single gateway, and long reports and files open in a side panel next to the conversation. Access is invite-only (see below).</p>
+
+<h2>The completion program</h2>
+<p>Progress is tracked against a fixed set of 29 weighted dimensions, scored from live-verified evidence and computed by <code>qa/generate-parity-headline.py</code> from <code>qa/parity-items.json</code>. Nothing is hand-summed. Current headline: <strong>84.4%</strong> (10804 / 128 weighted points, version v291b; source: <code>qa-reports/parity-headline-latest.json</code>).</p>
+<ul>
+<li><strong>Feature parity (17):</strong> Features, Computer, API, Troubleshooting, Voice, Account, Models, Connectors, Privacy, Comet, Premium, Enterprise, Getting Started, Desktop, Billing, Mobile, Teammates.</li>
+<li><strong>Product surfaces (12):</strong> UX, SEO, Marketing, Security, Accessibility, Legal/Compliance, Docs/Support, Observability, Fleet, Email/Notifications, i18n, Native Mobile.</li>
+</ul>
+<p class="muted">Several dimensions score well below 100 (for example Mobile 60, Accessibility 55, Legal/Compliance 45, i18n 10). Partial credit counts as half.</p>
+
+<h2>Benchmark scores</h2>
+<div class="note">Two grading lanes are shown. <strong>Strict</strong> reads only the tail of the response for the final answer. <strong>Fair</strong> credits a correct gold answer stated in the body; each fair-correct row was verified by hand, and fair numbers are the honest ceiling. Where a strict figure exists, it is shown beside the fair one. Search benchmarks (SimpleQA, FRAMES, DSQA, BrowseComp) are strict-graded with fair readings of gold added (v256+).</div>
+<div class="tw"><table>
+<tr><th>Benchmark</th><th>Fair / headline</th><th>Strict lane</th><th>Source (round)</th></tr>
+<tr><td>SimpleQA</td><td>99.0%</td><td>strict-graded</td><td>v282 async confirm; in-request lane also 99</td></tr>
+<tr><td>FRAMES</td><td>89&ndash;90%</td><td>strict-graded</td><td>r14 (90.0) and v282 confirm (89.0)</td></tr>
+<tr><td>DSQA</td><td>84.0%</td><td>strict-graded; band 78&ndash;84</td><td>v282 async confirm</td></tr>
+<tr><td>BrowseComp</td><td>88.0%</td><td>strict-graded</td><td>v282 async confirm r17</td></tr>
+<tr><td>MATH-500</td><td>92.0% fair (92/100)</td><td>68&ndash;79%</td><td>v288b fair-graded; strict from v278&ndash;v286c rounds</td></tr>
+<tr><td>AIME 2025</td><td>93.3% fair (14/15, n=15)</td><td>46.7&ndash;53.3%</td><td>v288b fair-graded; strict from v278&ndash;v286c rounds</td></tr>
+<tr><td>IFEval</td><td>band 48&ndash;60%</td><td>best single round 60.0 (round 2)</td><td>rounds r2&ndash;r8, GLM-class writer</td></tr>
+<tr><td>UX master benchmark</td><td>91.4, GREEN</td><td>46 checks; 9 scored partial</td><td>first live run, 2026-11-21, platform 300</td></tr>
+</table></div>
+<p class="muted">Source for all rows: <code>qa-reports/parity-status-2026-11-18-v263.md</code> (benchmark table and batch log). Round archives are committed under <code>qa-private/bench/results-v*/</code>; the UX run is <code>qa-private/bench/results/ux-master.json</code>. Noise floors (strict): SimpleQA &plusmn;2%, FRAMES &plusmn;4.3%, DSQA &plusmn;5%, BrowseComp &plusmn;4.7%; AIME with 15 questions moves in steps of 6.7 points, so its band is wide. IFEval remains the weakest result; instruction-format compliance is below the frontier range and is still being worked on.</p>
+<p class="muted">Rules these numbers follow are in <code>qa/BENCHMARK_GOSPEL.md</code>: every quality change needs a full round, gains must reproduce, regressions are fixed within a round, and the grader may not be tuned to inflate scores.</p>
+
+<h2>Standing post-deploy checks</h2>
+<p>No deploy counts as done until these three suites pass against the live site:</p>
+<ul>
+<li><code>qa/e2e-real-flows.py</code>: 9 shell flows (app loads, no CSP violations, no runtime errors, real auth errors shown, no brand leaks).</li>
+<li><code>qa/e2e-ux-flows.py</code>: 9 UX flows.</li>
+<li><code>qa/e2e-ux-master.py</code>: 46 weighted checks, passing at 90 or above.</li>
+</ul>
+
+<h2>Access</h2>
+<p>BoundView is <strong>invite-only</strong>. There is no open signup; sign-in with an uninvited email shows an invite-only message. To request access, contact the owner of the deployment you were pointed to.</p>
+
+<p class="muted" style="margin-top:40px">This page is static and reflects the repository at the date above. If it disagrees with the QA reports, the reports win.</p>
+</main>
+</body>
+</html>

@@ -29,6 +29,16 @@
       "status": 307
     },
     {
+      "src": "/docs",
+      "dest": "/docs.html",
+      "status": 307
+    },
+    {
+      "src": "/docs/$",
+      "dest": "/docs.html",
+      "status": 307
+    },
+    {
       "src": "/verify/$",
       "dest": "/verify.html",
       "status": 307
