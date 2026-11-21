@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 14.6%** (app-weighted; unmeasured counts as 0) · **measured-only: 32.7%** · evidence coverage 36.7% of 1376 applicable app-item checks · 106✅ / 201🟡 / 198🔴 / 871⚪ across 386 line items (215 universal items scored per app + 171 app-specific items).
+**Part E portfolio UX readiness, strict: 15.5%** (app-weighted; unmeasured counts as 0; v5 re-scored 2026-11-21 after the debug-loop fixes) · **measured-only: 34.0%** · evidence coverage 36.9% of 1376 applicable app-item checks · 126✅ / 237🟡 / 174🔴 / 839⚪ across 386 line items (215 universal items scored per app + 171 app-specific items). Per-app strict: BV 27.9% · TT 15.2% · AG 32.8% · GH 10.4% · ST 7.9% · CT 1.3% · DG 2.8%.
 
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
@@ -1401,13 +1401,25 @@ workstream (gap09, PR #3993, Rule 11, gap05). Evidence: `browser-debug-loop-2026
 
 ### F.3 Live verification after fixes (re-probe of the same paths)
 
-| Check | Before | After |
+| Check | Before | After (live re-verification 2026-11-21, post-merge) |
 |---|---|---|
-| GET /verify (both hosts) | 404 + SPA fallback | pending deploy of this PR — re-verified at merge |
-| GET /privacy.html on boundview.com | private policy | public BoundView policy (host rewrite) |
-| manifest on boundview.com | "ai.spaincos" | "BoundView" |
+| GET /verify on ai.spaincos.com | 404 + SPA fallback | **200 via 307 → /verify.html — FIXED** (also fixed client-side by the spa-redirect.js map) |
+| GET /verify on boundview.com | 404 + SPA fallback | **STILL 404 — see the stale-deployment finding below** |
+| GET /privacy.html on ai.spaincos.com | private policy | private policy (correct — this host IS the private workspace) |
+| manifest / brand assets on boundview.com | "ai.spaincos" | still "ai.spaincos" on the stale deploy; the fix (boundview-manifest swap + host guards) is merged and waiting on the redeploy |
 | offerwall-postback v7 (adscend signed/bad-sig/duplicate) | — | verified live 2026-11-21: correct sig → `1`, wrong secret → `0`, duplicate → `0` (idempotent); probe row + neuron ledger entry cleaned to zero residue |
 | ayeT (wall #2) | pre-wired | secret present, reject paths verified |
+| sitemap.xml / robots.txt on ai.spaincos.com | 404 / no sitemap line | **200 + sitemap referenced — FIXED** |
+
+**🔴 NEW P0 (F-31): boundview.com is serving a stale deployment.** The v262 merge
+(affc61d) deployed and is live on ai.spaincos.com, but boundview.com still serves
+the 03:17–06:54 UTC 2026-11-21 v290b build (old spa-redirect.js, no /verify fix,
+old manifest, old privacy policy). The domain is pinned to an old deployment
+(likely a rollback or a paused/disconnected git integration on that Vercel
+project — the CLI in this workspace has no credentials to force it). **Owner
+action: open the Vercel dashboard, find the boundview project's deployment for
+master @ affc61d, and promote it to production (or reconnect its git
+integration).** Every BV-side fix above lands the moment it does.
 
 ### F.4 SHMT server-side workstream (rolled in from 2026-11-20/21)
 
@@ -1428,3 +1440,9 @@ P0s and four P1s from 🔴/🟡 to fix-verified once this PR deploys; the remain
 concentrated in (a) per-host static SEO heads, (b) neuron valuation consistency (E11),
 (c) the internal apps (Spain Terminal, Comptrove, DoorGraph) whose evidence lives outside
 this workspace, and (d) nationwide data conformance behind the CR expansion (F.4).
+
+### C-addendum (2026-11-21): new owner blockers from the debug-loop
+
+1. **🔴 F-31 (P0): boundview.com stale deployment** — promote master @ affc61d to production in the Vercel dashboard (see Part F.3). Every merged BV fix is waiting on this.
+2. **F-05: neuron valuation conflict (S1)** — UI says $0.004/N, the redemption catalog implies ~$0.0008/N, the master doc D5 implies ~$0.0001/N. Pick one rate; it changes the entire earn-surface economics (E11 item).
+3. **E11 owner decisions** (14 items in Part E §E11) — neuron rate, Tasks tab name (collides with Scheduled Tasks), age/eligibility rule, cap-reset basis, counsel review of the new BoundView privacy policy.
