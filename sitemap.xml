@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- v262 (UX debug-loop F-08): SEO surface for boundview.com (the public product host).
+     ai.spaincos.com is the private workspace and is noindexed via brand.js. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://boundview.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://boundview.com/privacy.boundview.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+</urlset>

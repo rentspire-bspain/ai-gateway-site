@@ -112,12 +112,39 @@
         }
       }
     } catch (e) { /* never break the page over branding */ }
+  // v262 (UX debug-loop 2026-11-20): SEO heads. The private workspace host gets noindex
+  // (it must not be indexed under the BoundView title); the public BoundView host gets
+  // description/og/canonical/JSON-LD. Static per-host HTML heads are E11 owner item.
+  function seoHeads() {
+    var head = document.head;
+    function meta(k, v, attr) {
+      var el = document.createElement("meta");
+      el.setAttribute(attr || (k.charAt(0) === "#" ? "itemprop" : "name"), k.replace(/^#/, ""));
+      el.setAttribute("content", v);
+      head.appendChild(el);
+    }
+    if (isBV) {
+      meta("description", "BoundView — see the whole picture. AI research with sources, and Neurons rewards for verified activity.");
+      meta("og:title", "BoundView");
+      meta("og:description", "AI research with sources. Earn Neurons for verified offers and activity.");
+      meta("og:type", "website");
+      meta("og:url", "https://boundview.com/");
+      meta("og:site_name", "BoundView");
+      meta("twitter:card", "summary");
+      var c = document.createElement("link"); c.setAttribute("rel", "canonical"); c.setAttribute("href", "https://boundview.com/"); head.appendChild(c);
+      var ld = document.createElement("script"); ld.setAttribute("type", "application/ld+json");
+      ld.textContent = JSON.stringify({"@context":"https://schema.org","@type":"WebSite","name":"BoundView","url":"https://boundview.com/"});
+      head.appendChild(ld);
+    } else {
+      meta("robots", "noindex, nofollow");
+    }
   }
 
   function start() {
     scrubAll(document.documentElement);
     swapLinks();
     document.title = window.BRAND.title;
+    seoHeads();
   }
   // v283 PRE-PAINT SCRUB: brand.js loads synchronously in <head> — the observer
   // starts IMMEDIATELY (not on DOMContentLoaded), so every node the parser or the
@@ -128,8 +155,7 @@
       for (var i = 0; i < muts.length; i++) {
         var m = muts[i];
         if (m.addedNodes && m.addedNodes.length) {
-          for (var j = 0; j < m.addedNodes.length; j++) scrubAll(m.addedNodes[j]);
-        }
+          for (var j = 0; j < m.addedNodes.length; j++) scrubAll(m.addedNodes[j]);        }
         if (m.type === "characterData" && m.target) scrubNode(m.target);
       }
     }).observe(document.documentElement, { childList: true, subtree: true, characterData: true });

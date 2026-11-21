@@ -1,10 +1,40 @@
 {
-  "crons": [{"path": "/api/retention?execute=1", "schedule": "0 9 * * *"}],
-  "functions": {"api/bv-render.js": {"includeFiles": "index.html"}},
+  "crons": [
+    {
+      "path": "/api/retention?execute=1",
+      "schedule": "0 9 * * *"
+    }
+  ],
+  "functions": {
+    "api/bv-render.js": {
+      "includeFiles": "index.html"
+    }
+  },
   "routes": [
-    {"src": "/", "dest": "/api/bv-render"},
-    {"src": "/index.html", "dest": "/api/bv-render"},
-    {"src": "/t/(.*)", "dest": "/api/bv-render"},
-    {"handle": "filesystem"}
+    {
+      "src": "/",
+      "dest": "/api/bv-render"
+    },
+    {
+      "src": "/index.html",
+      "dest": "/api/bv-render"
+    },
+    {
+      "src": "/t/(.*)",
+      "dest": "/api/bv-render"
+    },
+    {
+      "src": "/verify",
+      "dest": "/verify.html",
+      "status": 307
+    },
+    {
+      "src": "/verify/$",
+      "dest": "/verify.html",
+      "status": 307
+    },
+    {
+      "handle": "filesystem"
+    }
   ]
 }
