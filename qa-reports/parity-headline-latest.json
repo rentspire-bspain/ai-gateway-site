@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-21T20:02:30+00:00",
- "version": "v297",
- "headline_pct": 87.1,
- "weighted_sum": 11143,
+ "ts": "2026-11-21T20:12:29+00:00",
+ "version": "v298",
+ "headline_pct": 87.2,
+ "weighted_sum": 11161,
  "total_weight": 128,
  "categories": {
   "Features": 99,
@@ -32,7 +32,7 @@
   "Observability": 75,
   "Fleet": 65,
   "Email/Notifications": 30,
-  "i18n": 10,
+  "i18n": 28,
   "NativeMobile": 40
  },
  "raw_items": {
