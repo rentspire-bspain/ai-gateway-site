@@ -24,6 +24,7 @@
       "dest": "/api/bv-render"
     },
     {
+<<<<<<< HEAD
       "handle": "filesystem"
     }
   ],
@@ -49,5 +50,19 @@
         }
       ]
     }
+=======
+      "src": "/verify",
+      "dest": "/verify.html",
+      "status": 307
+    },
+    {
+      "src": "/verify/$",
+      "dest": "/verify.html",
+      "status": 307
+    },
+    {
+      "handle": "filesystem"
+    }
+>>>>>>> origin/master
   ]
 }
