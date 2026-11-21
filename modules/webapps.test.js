@@ -242,3 +242,21 @@ test("module file loads under vm without throwing and exposes the pure API on wi
     assert.equal(typeof w[k], "function", "window.WebappsUI." + k + " must be a function");
   });
 });
+
+test("sweepLine renders the fleet-sweep summary honestly and degrades to empty", () => {
+  const env = makeEnv();
+  const w = env.window.WebappsUI;
+  const line = w.sweepLine({ fleet_score: 0.87, counts: { PASS: 3, PARTIAL: 6, FAIL: 0, UNREACHABLE: 0 }, apps: new Array(9), ts: "2026-11-21T19:20:00Z" });
+  assert.ok(line.startsWith("Fleet sweep 87%"));
+  assert.ok(line.includes("3 pass"));
+  assert.ok(line.includes("6 partial"));
+  assert.ok(!line.includes("0 fail")); // zero-count classes are omitted, not zero-padded
+  assert.ok(line.endsWith("9 apps"));
+  // empty/degraded data never renders a fake summary
+  assert.equal(w.sweepLine(null), "");
+  assert.equal(w.sweepLine({}), "");
+  assert.equal(w.sweepLine({ counts: {}, apps: [] }), "");
+  // unreachable apps are named, never folded into pass or fail
+  const u = w.sweepLine({ fleet_score: 0.5, counts: { PARTIAL: 1, UNREACHABLE: 2 }, apps: new Array(3) });
+  assert.ok(u.includes("2 unreachable"));
+});
