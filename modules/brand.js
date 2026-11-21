@@ -112,6 +112,7 @@
         }
       }
     } catch (e) { /* never break the page over branding */ }
+  }
   // v262 (UX debug-loop 2026-11-20): SEO heads. The private workspace host gets noindex
   // (it must not be indexed under the BoundView title); the public BoundView host gets
   // description/og/canonical/JSON-LD. Static per-host HTML heads are E11 owner item.
@@ -155,7 +156,8 @@
       for (var i = 0; i < muts.length; i++) {
         var m = muts[i];
         if (m.addedNodes && m.addedNodes.length) {
-          for (var j = 0; j < m.addedNodes.length; j++) scrubAll(m.addedNodes[j]);        }
+          for (var j = 0; j < m.addedNodes.length; j++) scrubAll(m.addedNodes[j]);
+        }
         if (m.type === "characterData" && m.target) scrubNode(m.target);
       }
     }).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
