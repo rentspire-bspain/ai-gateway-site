@@ -488,7 +488,7 @@ test("ConnectorsUI renders Owner setup required with copyable/one-tap URLs when 
     slack: "https://api.slack.com/apps",
     dropbox: "https://www.dropbox.com/developers/apps",
     outlook: "https://entra.microsoft.com",
-    box: "https://app.box.com/developers/console"
+    github: "https://github.com/settings/developers"
   };
 
   for (const [prov, regUrl] of Object.entries(expectedReg)) {
@@ -611,5 +611,6 @@ test("api/oauth-config.js returns null entries by default and populates clientId
   const cfgBody = JSON.parse(cfgRes.body);
   assert.deepEqual(cfgBody.providers.slack, { clientId: "slack-env-id" });
   assert.deepEqual(cfgBody.providers.outlook, { clientId: "msft-env-id" });
-  assert.equal(cfgBody.providers.box, null);
+  assert.equal(cfgBody.providers.google, null);
+  assert.equal(cfgBody.providers.github, null);
 });

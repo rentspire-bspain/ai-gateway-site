@@ -28,7 +28,7 @@
     var wrap = document.createElement("div");
     wrap.className = "cn-logo";
     wrap.setAttribute("aria-hidden", "true");
-    if (d) {
+    if (d && typeof document.createElementNS === "function") {
       var ns = "http://www.w3.org/2000/svg";
       var svg = document.createElementNS(ns, "svg");
       svg.setAttribute("viewBox", "0 0 24 24");
@@ -46,7 +46,8 @@
   }
 
   var status = null, busy = false, banner = null, hosts = [], pstat = {}, pbusy = {}, pbanner = {}, badges = [];
-  var statusLoaded = false, oauthRemoteCfg = null, seenCallbackStates = {};
+  var statusLoaded = false, oauthRemoteCfg = null, oauthConfigLoaded = false, readyPromise = null, seenCallbackStates = {};
+  var activeDemoNotice = null, highlightedProvider = null;
 
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   function fnBase() { return (typeof GATEWAY !== "undefined" && GATEWAY) || ((typeof SUPABASE_URL !== "undefined" ? SUPABASE_URL : "") + "/functions/v1"); }
@@ -87,6 +88,14 @@
     Object.keys(pstat).forEach(function (k) { oauthMachine.setServerStatus(k, pstat[k]); });
   }
 
+  function notifyOnboarding() {
+    try {
+      if (root && root.OnboardingUI && typeof root.OnboardingUI.syncPersuasion === "function") {
+        root.OnboardingUI.syncPersuasion();
+      }
+    } catch (e) {}
+  }
+
   function loadOAuthConfig() {
     if (cfgLib && cfgLib.fetchOAuthConfig) {
       return cfgLib.fetchOAuthConfig({
@@ -94,9 +103,11 @@
         windowConfig: (root && root.CONNECTOR_OAUTH) || null
       }).then(function (merged) {
         oauthRemoteCfg = merged;
+        oauthConfigLoaded = true;
         syncMachineConfig();
         render();
         notifyBadges();
+        notifyOnboarding();
         return merged;
       });
     }
@@ -108,10 +119,14 @@
       return res.json().catch(function () { return null; });
     }).then(function (data) {
       oauthRemoteCfg = (data && typeof data === "object") ? data : null;
+      oauthConfigLoaded = true;
       render();
       notifyBadges();
+      notifyOnboarding();
       return activeOAuthConfig();
     }).catch(function () {
+      oauthConfigLoaded = true;
+      notifyOnboarding();
       return activeOAuthConfig();
     });
   }
@@ -124,10 +139,15 @@
       if (derived) return derived;
     }
     var connected = !!(serverSt && serverSt.connected);
-    var hasServer = id === "google"
-      ? !!(serverSt && serverSt.configured && (serverSt.configured === true || serverSt.configured.oauth_client === true))
-      : !!(serverSt && serverSt.configured === true);
     var raw = activeOAuthConfig();
+    var rawPool = raw && ((raw.providers && typeof raw.providers === "object") ? raw.providers : raw);
+    var winCfg = (root && root.CONNECTOR_OAUTH) || null;
+    var winPool = winCfg && ((winCfg.providers && typeof winCfg.providers === "object") ? winCfg.providers : winCfg);
+    var winOverride = !!(winPool && winPool[id] != null);
+    var explicitlyUnregistered = !winOverride && !!(rawPool && Object.prototype.hasOwnProperty.call(rawPool, id) && rawPool[id] === null);
+    var hasServer = !explicitlyUnregistered && (id === "google"
+      ? !!(serverSt && serverSt.configured && (serverSt.configured === true || serverSt.configured.oauth_client === true))
+      : !!(serverSt && serverSt.configured === true));
     var entry = raw && ((raw.providers && raw.providers[id]) || raw[id]);
     var cid = typeof entry === "string" ? entry : (entry && (entry.clientId || entry.client_id)) || "";
     var hasClient = !!(cid && String(cid).trim());
@@ -240,11 +260,11 @@
       statusLoaded = true;
       if (d && d.providers) { pstat = d.providers; if (d.providers.google && !d.providers.google.error) status = d.providers.google; }
       syncMachineConfig();
-      render(); notifyBadges(); checkWatch();
+      render(); notifyBadges(); checkWatch(); notifyOnboarding();
     }).catch(function () {
       statusLoaded = true;
       syncMachineConfig();
-      render(); notifyBadges();
+      render(); notifyBadges(); notifyOnboarding();
     });
   }
   function notifyBadges() { badges = badges.filter(function (b) { return b.node.isConnected; }); badges.forEach(function (b) { paintBadge(b); }); }
@@ -438,7 +458,7 @@
     var awaiting = !!(oState && oState.state === "awaiting_callback");
     var cbReceived = !!(oState && oState.state === "callback_received");
 
-    var c = el("div", "cn-card");
+    var c = el("div", "cn-card" + (highlightedProvider === P.id ? " cn-card-highlight" : ""));
     c.setAttribute("data-provider", P.id);
     if (oState) c.setAttribute("data-oauth-state", oState.state);
 
@@ -563,7 +583,7 @@
   }
 
   function build() {
-    var c = el("div", "cn-card");
+    var c = el("div", "cn-card" + (highlightedProvider === "google" ? " cn-card-highlight" : ""));
     c.setAttribute("data-provider", "google");
     var gState = getProviderOAuthState("google", status);
     c.setAttribute("data-oauth-state", gState.state);
@@ -635,27 +655,292 @@
     c.appendChild(el("p", "cn-note", "Ask in chat: “what’s on my calendar Friday”, “find the email from my landlord”, “find the lease spreadsheet in my Drive”. If you connected Google earlier, press Reconnect once to add Drive and Sheets. Emails and events are always shown as a preview and only sent or created after you press Approve. Your Google token is encrypted on the server and never sent to your browser."));
     return c;
   }
+  // ---------- Persuasion surface: Before/After OAuth examples + Why connect? + wired demos ----------
+  var PERSUASION_EXAMPLES = [
+    {
+      id: "gmail",
+      capability: "Gmail connected",
+      provider: "google",
+      fallbackProviders: [],
+      before: "20 minutes of scrolling \u2192 one question, cited",
+      prompt: "What did my accountant say about the Q3 invoices?",
+      after: "Answers cited from your inbox, no digging."
+    },
+    {
+      id: "calendar",
+      capability: "Calendar connected",
+      provider: "google",
+      fallbackProviders: [],
+      before: "20 minutes of tab-hopping \u2192 one question, cited",
+      prompt: "What's on my plate Thursday and when should I leave for the 2pm?",
+      after: "Reads your real schedule and travel window."
+    },
+    {
+      id: "files",
+      capability: "Files connected",
+      provider: "dropbox",
+      fallbackProviders: ["google"],
+      before: "20 minutes of folder hunting \u2192 one question, cited",
+      prompt: "Summarize the contract my lawyer sent last week",
+      after: "Your documents become searchable, cited context."
+    }
+  ];
+
+  var WHY_CONNECT = [
+    {
+      id: "ownership",
+      title: "Your data stays yours",
+      body: "Row-level security (RLS) isolates every token per user \u2014 disconnect and delete anytime."
+    },
+    {
+      id: "citations",
+      title: "Answers cite your real emails & files",
+      body: "Inline citations point back to the exact message, calendar invite, or document."
+    },
+    {
+      id: "history",
+      title: "History-aware across devices",
+      body: "Threads and connected context stay synced wherever you sign in."
+    },
+    {
+      id: "incognito",
+      title: "Incognito available",
+      body: "Switch on Incognito anytime for off-the-record questions with zero saved history."
+    }
+  ];
+
+  function providerDisplayName(id) {
+    if (id === "google") return "Google";
+    var found = PROVS.find(function (P) { return P.id === id; });
+    return found ? found.name : (id ? id.charAt(0).toUpperCase() + id.slice(1) : "Provider");
+  }
+
+  function isProviderConnected(id) {
+    if (id === "google") return !!((status && status.connected) || (pstat.google && pstat.google.connected));
+    return !!(pstat[id] && pstat[id].connected);
+  }
+
+  function hasAnyConnected() {
+    return Boolean(Object.keys(connectedMap()).length > 0 || (status && status.connected));
+  }
+
+  function ensureReady() {
+    if (statusLoaded && oauthConfigLoaded) return Promise.resolve();
+    if (readyPromise) return readyPromise;
+    readyPromise = Promise.all([
+      loadOAuthConfig(),
+      loadAll().then(function () {
+        if (!status) { status = { connected: false }; syncMachineConfig(); render(); notifyOnboarding(); }
+      })
+    ]).then(function () {
+      readyPromise = null;
+    }).catch(function () {
+      readyPromise = null;
+    });
+    return readyPromise;
+  }
+
+  function oauthMatrixSummaryText() {
+    var order = ["dropbox", "slack", "google", "outlook", "github"];
+    var live = [], pending = [];
+    order.forEach(function (id) {
+      var stObj = id === "google" ? (status || pstat.google) : pstat[id];
+      var oSt = getProviderOAuthState(id, stObj);
+      var label = providerDisplayName(id);
+      if (oSt && (oSt.canConnect || oSt.state === "awaiting_callback" || oSt.state === "connected")) live.push(label);
+      else pending.push(label);
+    });
+    if (live.length && pending.length) {
+      return "OAuth live now: " + live.join(", ") + " \u00b7 Registration pending: " + pending.join(", ");
+    }
+    if (live.length) return "OAuth live now: " + live.join(", ");
+    return "OAuth registration pending: " + pending.join(", ") + " \u2014 see setup details on each card below.";
+  }
+
+  function getDemoState(demoId) {
+    var item = PERSUASION_EXAMPLES.find(function (x) { return x.id === demoId; }) || PERSUASION_EXAMPLES[0];
+    if (!item) return null;
+    var candidates = [item.provider].concat(item.fallbackProviders || []);
+    for (var i = 0; i < candidates.length; i++) {
+      var cid = candidates[i];
+      if (isProviderConnected(cid)) {
+        return {
+          id: item.id,
+          capability: item.capability,
+          provider: cid,
+          providerName: providerDisplayName(cid),
+          state: "connected",
+          actionLabel: "Ask in chat \u2192",
+          prompt: item.prompt,
+          statusNote: ""
+        };
+      }
+    }
+    for (var j = 0; j < candidates.length; j++) {
+      var pid = candidates[j];
+      var pName = providerDisplayName(pid);
+      var stObj = pid === "google" ? (status || pstat.google) : pstat[pid];
+      var oSt = getProviderOAuthState(pid, stObj);
+      if (oSt && oSt.state === "awaiting_callback") {
+        return {
+          id: item.id,
+          capability: item.capability,
+          provider: pid,
+          providerName: pName,
+          state: "awaiting_callback",
+          actionLabel: "Awaiting callback\u2026",
+          prompt: item.prompt,
+          statusNote: "Complete " + pName + " authorization in the open tab, then ask: \u201c" + item.prompt + "\u201d"
+        };
+      }
+      if (oSt && oSt.canConnect) {
+        return {
+          id: item.id,
+          capability: item.capability,
+          provider: pid,
+          providerName: pName,
+          state: "oauth_ready",
+          actionLabel: "Connect " + pName + " \u2192",
+          prompt: item.prompt,
+          statusNote: ""
+        };
+      }
+    }
+    var defName = providerDisplayName(item.provider);
+    return {
+      id: item.id,
+      capability: item.capability,
+      provider: item.provider,
+      providerName: defName,
+      state: "registration_pending",
+      actionLabel: "Registration pending",
+      prompt: item.prompt,
+      statusNote: defName + " OAuth registration pending \u2014 Google, Outlook, and GitHub OAuth apps are not registered on this host yet."
+    };
+  }
+
+  function connectProvider(providerId) {
+    if (providerId === "google") {
+      connect();
+      return getProviderOAuthState("google", status);
+    }
+    var P = PROVS.find(function (x) { return x.id === providerId; });
+    if (P) {
+      pconnect(P);
+      return getProviderOAuthState(P.id, pstat[P.id]);
+    }
+    return null;
+  }
+
+  function highlightProviderCard(providerId) {
+    highlightedProvider = providerId || null;
+    render();
+    try {
+      hosts.forEach(function (h) {
+        if (!h || typeof h.querySelector !== "function") return;
+        var target = h.querySelector('[data-provider="' + providerId + '"]');
+        if (target && typeof target.scrollIntoView === "function") {
+          target.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      });
+    } catch (e) {}
+  }
+
+  function triggerDemo(demoId) {
+    var info = getDemoState(demoId);
+    if (!info) return { ok: false, action: "unknown" };
+    if (info.state === "connected") {
+      activeDemoNotice = null;
+      highlightedProvider = null;
+      if (root && root.OnboardingUI && typeof root.OnboardingUI.runStarter === "function") {
+        root.OnboardingUI.runStarter(info.prompt);
+      }
+      return { ok: true, action: "asked", state: "connected", provider: info.provider, prompt: info.prompt };
+    }
+    if (info.state === "oauth_ready" || info.state === "awaiting_callback") {
+      highlightedProvider = info.provider;
+      activeDemoNotice = {
+        kind: "info",
+        provider: info.provider,
+        text: "Starting " + info.providerName + " OAuth \u2014 once connected, ask: \u201c" + info.prompt + "\u201d"
+      };
+      if (info.state === "oauth_ready") connectProvider(info.provider);
+      else render();
+      notifyOnboarding();
+      return { ok: true, action: "oauth_started", state: info.state, provider: info.provider, prompt: info.prompt };
+    }
+    var liveSummary = oauthMatrixSummaryText();
+    activeDemoNotice = {
+      kind: "warn",
+      provider: info.provider,
+      text: info.statusNote + " (" + liveSummary + "). Inspect " + info.providerName + " setup details below."
+    };
+    highlightProviderCard(info.provider);
+    notifyOnboarding();
+    return { ok: true, action: "registration_pending", state: "registration_pending", provider: info.provider, message: activeDemoNotice.text };
+  }
+
   function emptyGuide(h) {
     // Unknown status is not an empty connection state; do not imply disconnection during loading.
     if (!Object.keys(pstat).length || Object.keys(pstat).some(function (id) { return pstat[id] && pstat[id].error; })) return;
     if (Object.keys(connectedMap()).length) return;
     var guide = el("div", "cn-empty");
-    guide.appendChild(el("strong", "", "Connect a source to use it in chat"));
-    guide.appendChild(el("p", "", "Choose a provider below, then try a question about your own data. You can also ask a general question without connecting anything."));
-    var prompts = [
-      ["Check my calendar", "What is on my calendar this week? Summarize the events and any conflicts."],
-      ["Find a file", "Find the latest project plan in my connected Drive and summarize its next steps."],
-      ["Search my code", "Search my connected GitHub repositories for open issues assigned to me and group them by repo."]
-    ];
-    var row = el("div", "cn-empty-actions");
-    prompts.forEach(function (p) {
-      var b = el("button", "stg-btn ghost", p[0]); b.type = "button";
+    guide.setAttribute("data-cn-persuasion", "1");
+
+    var head = el("div", "cn-empty-head");
+    head.appendChild(el("span", "cn-empty-kicker", "Unlock personal context"));
+    head.appendChild(el("strong", "cn-empty-title", "20 minutes of scrolling \u2192 one question, cited"));
+    head.appendChild(el("p", "cn-empty-lead", "Pick an example below to launch its OAuth connection (or inspect live registration status). Once linked, ask directly in chat."));
+    guide.appendChild(head);
+
+    var row = el("div", "cn-empty-actions cn-demo-grid");
+    PERSUASION_EXAMPLES.forEach(function (item) {
+      var info = getDemoState(item.id);
+      var b = el("button", "cn-demo-card state-" + info.state);
+      b.type = "button";
+      b.setAttribute("data-demo-id", item.id);
+      b.setAttribute("data-demo-provider", info.provider);
+      b.setAttribute("data-demo-state", info.state);
+
+      var top = el("span", "cn-demo-top");
+      top.appendChild(el("span", "cn-demo-cap", item.capability));
+      top.appendChild(el("span", "cn-demo-pill is-" + info.state, info.actionLabel));
+      b.appendChild(top);
+
+      b.appendChild(el("span", "cn-demo-before", item.before));
+      b.appendChild(el("span", "cn-demo-prompt", "\u201c" + item.prompt + "\u201d"));
+      b.appendChild(el("span", "cn-demo-after", item.after));
+
       b.addEventListener("click", function () {
-        if (root.OnboardingUI) root.OnboardingUI.runStarter(p[1]);
+        triggerDemo(item.id);
       });
       row.appendChild(b);
     });
-    guide.appendChild(row); h.appendChild(guide);
+    guide.appendChild(row);
+
+    var statusText = activeDemoNotice ? activeDemoNotice.text : oauthMatrixSummaryText();
+    var statusCls = "cn-demo-status" + (activeDemoNotice ? (" is-active " + activeDemoNotice.kind) : "");
+    var statusBar = el("div", statusCls, statusText);
+    statusBar.setAttribute("role", "status");
+    statusBar.setAttribute("aria-live", "polite");
+    statusBar.setAttribute("data-cn-demo-status", activeDemoNotice ? activeDemoNotice.provider : "summary");
+    guide.appendChild(statusBar);
+
+    var why = el("div", "cn-why");
+    why.setAttribute("data-cn-why", "1");
+    why.appendChild(el("div", "cn-why-title", "Why connect?"));
+    var whyGrid = el("ul", "cn-why-grid");
+    WHY_CONNECT.forEach(function (w) {
+      var li = el("li", "cn-why-item");
+      li.setAttribute("data-why-id", w.id);
+      li.appendChild(el("strong", "cn-why-head", w.title));
+      li.appendChild(el("span", "cn-why-body", w.body));
+      whyGrid.appendChild(li);
+    });
+    why.appendChild(whyGrid);
+    guide.appendChild(why);
+
+    h.appendChild(guide);
   }
   function render() {
     hosts = hosts.filter(function (h) { return h.isConnected; });
@@ -669,7 +954,12 @@
   }
   function card() {
     syncMachineConfig();
-    var h = el("div", "cn-host"); hosts.push(h); h.appendChild(build()); PROVS.forEach(function (P) { h.appendChild(provCard(P)); });
+    var h = el("div", "cn-host");
+    hosts.push(h);
+    if (activeDrop) h.appendChild(dropCard(activeDrop));
+    emptyGuide(h);
+    h.appendChild(build());
+    PROVS.forEach(function (P) { h.appendChild(provCard(P)); });
     loadStatus();
     return h;
   }
@@ -864,6 +1154,7 @@
     syncMachineConfig();
     render();
     notifyBadges();
+    notifyOnboarding();
   }
 
   root.ConnectorsUI = {
@@ -871,6 +1162,14 @@
     badge: badge,
     renderActions: renderActions,
     refresh: loadStatus,
+    ensureReady: ensureReady,
+    hasAnyConnected: hasAnyConnected,
+    PERSUASION_EXAMPLES: PERSUASION_EXAMPLES,
+    WHY_CONNECT: WHY_CONNECT,
+    getDemoState: getDemoState,
+    connectProvider: connectProvider,
+    triggerDemo: triggerDemo,
+    oauthMatrixSummaryText: oauthMatrixSummaryText,
     setOAuthConfig: setOAuthConfig,
     getOAuthState: function (id) { return getProviderOAuthState(id, id === "google" ? status : pstat[id]); },
     _receiveOAuthCallback: receiveOAuthCallback,
