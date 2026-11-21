@@ -7,8 +7,10 @@ Run BEFORE every frontend push and AFTER every deploy:
 
 Gates a launch: any FAIL blocks the push/deploy until fixed. Covers frontend E2E
 (landing, composer, thread restore, sidebar search, follow-ups, Run-all, doc
-panel, Fleet page, Settings/Connectors, memory sync), CSP integrity, service-worker
-freshness, and backend smoke (gateway health, mode smoke, guardian-runner).
+panel, Fleet page + Automations tab, Settings/Connectors + Automations,
+Library/Artifacts, per-tool chips, full follow-up submission, memory sync),
+CSP integrity, service-worker freshness, and backend smoke (gateway health,
+mode smoke, guardian-runner).
 
 Exit code 0 = all green (launch). Non-zero = red (fix first).
 """
@@ -154,6 +156,209 @@ def integrity(base):
         check("build.json matches shipped BUILD (stale-tab detector armed)", False, str(e)[:100])
 
 # ---------------- frontend E2E ----------------
+def _check_automations_pane(pg):
+    """Settings -> Automations opens, shows create form and dispatch list (or graceful migration notice)."""
+    pg.evaluate("""() => {
+        if (window.SettingsUI && window.SettingsUI.open) window.SettingsUI.open('automations');
+        const t = document.querySelector('#stg-tab-automations, .stg-nav-btn[data-pane="automations"]');
+        if (t) t.click();
+    }""")
+    st = None
+    for _ in range(8):
+        pg.wait_for_timeout(600)
+        st = pg.evaluate("""() => {
+            const tab = document.querySelector('#stg-tab-automations, .stg-nav-btn[data-pane="automations"]');
+            const root = document.querySelector('#stg-content .am-wrap');
+            const form = root && root.querySelector('form.am-create-form');
+            const autoList = root && root.querySelector('[data-role="auto-list"]');
+            const dispList = root && root.querySelector('[data-role="disp-list"]');
+            const autoTxt = (autoList && autoList.innerText || '').trim();
+            const dispTxt = (dispList && dispList.innerText || '').trim();
+            const settled = !!autoTxt && !/loading automations/i.test(autoTxt) && !!dispTxt && !/loading dispatch/i.test(dispTxt);
+            return {
+                tabSelected: !!(tab && tab.getAttribute('aria-selected') === 'true'),
+                hasForm: !!(form && form.querySelector('input[name="name"]') && form.querySelector('textarea[name="instruction"]') && form.querySelectorAll('.am-sched-btn').length >= 4),
+                hasAutoState: !!autoList && (!!autoList.querySelector('.am-card') || /no recurring automations|has not been applied|sql\\/automations\\.sql/i.test(autoTxt)),
+                hasDispList: !!dispList && (!!dispList.querySelector('.am-card[data-did]') || /no dispatches/i.test(dispTxt)),
+                settled,
+            };
+        }""")
+        if st and st["settled"]:
+            break
+    ok = bool(st and st["tabSelected"] and st["hasForm"] and st["hasAutoState"] and st["hasDispList"])
+    check("Automations pane renders", ok, str(st))
+    pg.evaluate("() => { if (window.SettingsUI && window.SettingsUI.close) window.SettingsUI.close(); }")
+    pg.wait_for_timeout(300)
+
+def _check_artifacts_pane(pg):
+    """Sidebar Artifacts (#navArtifacts) opens Library on Artifacts tab and renders pane container."""
+    pg.evaluate("() => { const b = document.getElementById('navArtifacts'); if (b) b.click(); }")
+    st = None
+    for _ in range(8):
+        pg.wait_for_timeout(600)
+        st = pg.evaluate("""() => {
+            const navBtn = document.getElementById('navArtifacts');
+            const root = document.getElementById('libraryRoot');
+            const tab = root && root.querySelector('.lib-tab[data-tab="artifacts"]');
+            const body = document.getElementById('libBody');
+            const skel = !!(body && body.querySelector('.lib-art-skel'));
+            const hasContainer = !!(body && body.querySelector('.lib-art-grid, .lib-empty'));
+            const hasErr = !!(body && body.querySelector('.lib-art-err'));
+            return {
+                hasNavBtn: !!navBtn,
+                open: !!(root && root.classList.contains('open')),
+                tabSelected: !!(tab && tab.getAttribute('aria-selected') === 'true'),
+                settled: !skel && hasContainer,
+                hasContainer,
+                hasErr,
+            };
+        }""")
+        if st and st["open"] and st["settled"]:
+            break
+    ok = bool(st and st["hasNavBtn"] and st["open"] and st["tabSelected"] and st["hasContainer"] and not st["hasErr"])
+    check("Artifacts pane renders", ok, str(st))
+    pg.evaluate("() => { if (window.LibraryUI && window.LibraryUI.close) window.LibraryUI.close(); }")
+    pg.wait_for_timeout(300)
+
+def _check_fleet_automations_tab(pg):
+    """Fleet page data-tab='automations' tab exists, opens, and renders AutomationsUI."""
+    pg.evaluate("""() => {
+        const t = document.querySelector('.fl-tab[data-tab="automations"]');
+        if (t) t.click();
+    }""")
+    st = None
+    for _ in range(8):
+        pg.wait_for_timeout(600)
+        st = pg.evaluate("""() => {
+            const tab = document.querySelector('.fl-tab[data-tab="automations"]');
+            const host = document.querySelector('.fl-root .fl-auto-host');
+            const dispList = host && host.querySelector('[data-role="disp-list"]');
+            const dispTxt = (dispList && dispList.innerText || '').trim();
+            return {
+                tabExists: !!tab,
+                tabPressed: !!(tab && tab.getAttribute('aria-pressed') === 'true'),
+                hasWrap: !!(host && host.querySelector('.am-wrap')),
+                hasForm: !!(host && host.querySelector('form.am-create-form')),
+                hasDispList: !!dispList && !/loading dispatch/i.test(dispTxt),
+            };
+        }""")
+        if st and st["hasWrap"] and st["hasDispList"]:
+            break
+    ok = bool(st and st["tabExists"] and st["tabPressed"] and st["hasWrap"] and st["hasForm"] and st["hasDispList"])
+    check("Fleet Automations tab renders", ok, str(st))
+
+def _check_tool_chips_and_followup_full(pg, base, has_auth):
+    """Run live research query via eval-bot session, assert tool chips expand + follow-up submits untruncated command."""
+    if not has_auth:
+        check("Tool chips render on tool turns", False, "missing eval-bot auth token")
+        check("Follow-up chip submits full command", False, "missing eval-bot auth token")
+        return
+    sent_user_msgs = []
+    def _on_req(req):
+        if req.method == "POST" and "functions/v1/gateway-chat" in req.url:
+            try:
+                payload = json.loads(req.post_data or "{}")
+                msgs = [m.get("content", "") for m in (payload.get("messages") or []) if m.get("role") == "user"]
+                if msgs:
+                    sent_user_msgs.append(str(msgs[-1]))
+            except Exception:
+                pass
+    pg.on("request", _on_req)
+    pg.evaluate("""() => {
+        localStorage.setItem('pplx-onboarded', '1');
+        localStorage.removeItem('ai_draft_landing');
+        sessionStorage.removeItem('ai_current_thread');
+    }""")
+    pg.goto(base, wait_until="networkidle", timeout=45000)
+    pg.evaluate("""() => {
+        if (typeof newThread === 'function') newThread();
+        if (window.OnboardingUI && window.OnboardingUI.close) window.OnboardingUI.close();
+    }""")
+    pg.wait_for_selector("#landingInput", state="visible", timeout=10000)
+    live_q = "What is the current 10-year Treasury yield? research live"
+    inp = pg.locator("#landingInput")
+    inp.fill(live_q)
+    inp.press("Enter")
+    settled = False
+    for _ in range(95):
+        pg.wait_for_timeout(1000)
+        done = pg.evaluate("""() => !document.querySelector('.searching-state') &&
+            !!document.querySelector('.related-section .related-item, .answer-error')""")
+        if done:
+            settled = True
+            break
+    chip_count = pg.locator(".tool-chips .tc-chip").count()
+    if chip_count >= 1:
+        pg.locator(".tool-chips .tc-chip").first.click()
+        pg.wait_for_timeout(350)
+    tc = pg.evaluate("""() => {
+        const chips = [...document.querySelectorAll('.tool-chips .tc-chip')];
+        const exp = chips.find(b => b.getAttribute('aria-expanded') === 'true' || b.classList.contains('expanded'));
+        const ctrlId = exp && exp.getAttribute('aria-controls');
+        const panel = (ctrlId && document.getElementById(ctrlId)) || document.querySelector('.tool-chips .tc-detail:not([hidden])');
+        const hasErr = !!document.querySelector('.answer-error');
+        return {
+            settled: !document.querySelector('.searching-state'),
+            hasErr,
+            count: chips.length,
+            expanded: !!exp,
+            detailVisible: !!(panel && !panel.hidden && (panel.innerText || '').trim().length > 0),
+        };
+    }""")
+    check("Tool chips render on tool turns",
+          bool(settled and not tc["hasErr"] and tc["count"] >= 1 and tc["expanded"] and tc["detailVisible"]),
+          str(tc))
+    # Follow-up chip truncation check: click follow-up chip (preferring any chip whose display label ends with '…')
+    before_q = pg.locator(".question-header").count()
+    before_sent = len(sent_user_msgs)
+    pick = pg.evaluate("""() => {
+        const items = [...document.querySelectorAll('.related-section .related-item')];
+        if (!items.length) return null;
+        let idx = items.findIndex(el => ((el.innerText || '').trim()).endsWith('\\u2026'));
+        if (idx < 0) {
+            let bestLen = -1;
+            items.forEach((el, i) => {
+                const raw = (el.getAttribute('aria-label') || el.innerText || '').replace(/^Run this follow-up:\\s*/i, '').trim();
+                if (raw.length > bestLen) { bestLen = raw.length; idx = i; }
+            });
+        }
+        const target = items[idx];
+        const expected = (target.getAttribute('aria-label') || '').replace(/^Run this follow-up:\\s*/i, '').trim();
+        const label = (target.innerText || '').trim();
+        return { idx, count: items.length, expected, label };
+    }""")
+    if pick and pick["count"] >= 1:
+        pg.locator(".related-section .related-item").nth(pick["idx"]).click()
+        for _ in range(10):
+            pg.wait_for_timeout(500)
+            if pg.locator(".question-header").count() > before_q:
+                break
+    fu = pg.evaluate("""(beforeCount) => {
+        const qhs = [...document.querySelectorAll('.question-header')].map(el => (el.innerText || '').trim());
+        const latest = qhs.length > beforeCount ? qhs[qhs.length - 1] : '';
+        return { qCount: qhs.length, latest };
+    }""", before_q)
+    payload_msg = sent_user_msgs[-1] if len(sent_user_msgs) > before_sent else ""
+    new_msg = fu["latest"]
+    expected_cmd = (pick or {}).get("expected") or ""
+    fu_ok = bool(
+        pick
+        and fu["qCount"] > before_q
+        and len(new_msg) > 0
+        and not new_msg.endswith("\u2026")
+        and not new_msg.endswith("...")
+        and (not expected_cmd or new_msg == expected_cmd)
+        and (not payload_msg or (not payload_msg.endswith("\u2026") and not payload_msg.endswith("...")))
+    )
+    check("Follow-up chip submits full command", fu_ok,
+          f"q={fu['qCount']} msg={new_msg[-60:]!r} payload={payload_msg[-60:]!r}")
+    # Stop the secondary follow-up turn cleanly before closing browser
+    pg.evaluate("""() => {
+        const send = document.getElementById('followupSend');
+        if (send && document.querySelector('.searching-state')) send.click();
+    }""")
+    pg.wait_for_timeout(300)
+
 def frontend(base):
     print("FRONTEND E2E")
     from playwright.sync_api import sync_playwright
@@ -192,7 +397,7 @@ def frontend(base):
             sess = {"access_token": m.get("access_token"), "refresh_token": m.get("refresh_token"),
                     "expires_in": m.get("expires_in", 3600), "expires_at": m.get("expires_at") or int(time.time()) + 3600,
                     "token_type": m.get("token_type", "bearer"), "user": m.get("user")}
-            pg.evaluate("s => localStorage.setItem('sb-bnxermyboeigvwonfrzx-auth-token', JSON.stringify(s))", sess)
+            pg.evaluate("s => { localStorage.setItem('sb-bnxermyboeigvwonfrzx-auth-token', JSON.stringify(s)); localStorage.setItem('pplx-onboarded', '1'); }", sess)
         # unique slug per run: reusing a fixed slug accumulated ~50 duplicate
         # "Prelaunch" threads on the eval account and the app's slug-dedup resync
         # (rename loop prelaunch-1..-N + redirect) grew slower than this suite's
@@ -255,6 +460,9 @@ def frontend(base):
                 conn_ok = True; break
         pg.screenshot(path=str(SHOTS / "connectors.png"))
         check("Connectors panel renders", conn_ok)
+        # Settings > Automations + Library > Artifacts
+        _check_automations_pane(pg)
+        _check_artifacts_pane(pg)
         # Fleet page
         pg.evaluate("() => document.getElementById('navFleet') && document.getElementById('navFleet').click()")
         pg.wait_for_timeout(2500)
@@ -266,6 +474,8 @@ def frontend(base):
         qa_txt = pg.evaluate("() => { const w = document.querySelector('.fl-wrap'); return w ? w.innerText : ''; }")
         check("Fleet QA tab shows fleet report", "pre-launch regression fleet" in qa_txt.lower() and ("all green" in qa_txt.lower() or "failed" in qa_txt.lower()), qa_txt[:120])
         pg.screenshot(path=str(SHOTS / "fleet-qa.png"))
+        # Fleet > Automations tab
+        _check_fleet_automations_tab(pg)
         if chips:
             try:  # close any open overlays (Fleet panel, Settings modal) — they intercept clicks on the thread below
                 pg.evaluate("""() => { const x = document.querySelector('.fl-x'); if (x) x.click();
@@ -276,6 +486,8 @@ def frontend(base):
             pg.evaluate("() => { const c = document.querySelector('.related-item'); if (c) c.click(); }")  # DOM click — immune to overlay interception
             pg.wait_for_timeout(3000)
             check("follow-up chip submits (search state)", pg.locator(".searching-state").count() >= 1 or pg.locator(".question-header").count() >= 2)
+        # Live research turn: per-tool chips + full follow-up command submission
+        _check_tool_chips_and_followup_full(pg, base, bool(tok))
         check("zero JS/CSP errors", len([e for e in errs if "404" not in e]) == 0, "; ".join(errs[:3]))
         b.close()
 

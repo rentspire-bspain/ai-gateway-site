@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-21T03:19:42+00:00",
+ "ts": "2026-11-21T18:38:23+00:00",
  "base": "https://ai.spaincos.com",
- "passed": 29,
- "failed": 2,
+ "passed": 39,
+ "failed": 0,
  "checks": [
   {
    "name": "benchmark gospel present and unaltered",
@@ -37,22 +37,22 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "13.1s"
+   "detail": "11.5s"
   },
   {
    "name": "current-events answered",
-   "ok": false,
-   "detail": "HTTP 546"
+   "ok": true,
+   "detail": "HTTP 200"
   },
   {
    "name": "current-events fast path (loop skipped)",
-   "ok": false,
-   "detail": "skipped=None"
+   "ok": true,
+   "detail": "skipped=research_sufficient"
   },
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "15.6s"
+   "detail": "15.3s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -63,6 +63,21 @@
    "name": "memory_items table reachable",
    "ok": true,
    "detail": "HTTP 200"
+  },
+  {
+   "name": "index.html loads real modules",
+   "ok": true,
+   "detail": "72 refs"
+  },
+  {
+   "name": "all deployed modules match repo",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "name": "build.json matches shipped BUILD (stale-tab detector armed)",
+   "ok": true,
+   "detail": "build.js=v275 build.json=v275"
   },
   {
    "name": "landing renders",
@@ -140,6 +155,16 @@
    "detail": ""
   },
   {
+   "name": "Automations pane renders",
+   "ok": true,
+   "detail": "{'tabSelected': True, 'hasForm': True, 'hasAutoState': True, 'hasDispList': True, 'settled': True}"
+  },
+  {
+   "name": "Artifacts pane renders",
+   "ok": true,
+   "detail": "{'hasNavBtn': True, 'open': True, 'tabSelected': True, 'settled': True, 'hasContainer': True, 'hasErr': False}"
+  },
+  {
    "name": "Fleet page renders registry",
    "ok": true,
    "detail": ""
@@ -147,7 +172,12 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 31/31 checks \u00b7 11/16/2026, 7:48:"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n2 FAILED\n\u00b7 29/31 checks \u00b7 11/21/2026, 3:19:4"
+  },
+  {
+   "name": "Fleet Automations tab renders",
+   "ok": true,
+   "detail": "{'tabExists': True, 'tabPressed': True, 'hasWrap': True, 'hasForm': True, 'hasDispList': True}"
   },
   {
    "name": "follow-up chip submits (search state)",
@@ -155,10 +185,20 @@
    "detail": ""
   },
   {
+   "name": "Tool chips render on tool turns",
+   "ok": true,
+   "detail": "{'settled': True, 'hasErr': False, 'count': 1, 'expanded': True, 'detailVisible': True}"
+  },
+  {
+   "name": "Follow-up chip submits full command",
+   "ok": true,
+   "detail": "q=2 msg='-vs-FRED gap across the last 10 trading days for consistency' payload='-vs-FRED gap across the last 10 trading days for consistency'"
+  },
+  {
    "name": "zero JS/CSP errors",
    "ok": true,
    "detail": ""
   }
  ],
- "exit": 1
+ "exit": 0
 }
