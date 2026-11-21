@@ -5,5 +5,6 @@
      SPA's real routes when new public surfaces ship. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://boundview.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://boundview.com/docs.boundview.html</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://boundview.com/privacy.boundview.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
