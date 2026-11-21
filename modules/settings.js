@@ -217,8 +217,12 @@
     pane.appendChild(row("Read-aloud speed", "How fast answers are spoken (a sample plays when you change it).", rateSel));
 
     // Language
-    pane.appendChild(row("Language", "Interface and answer language.",
-      makeSelect([{ v: "en", t: "English" }], "en", function () {}, "Language"), true));
+    var I = window.I18N;
+    var langOpts = I ? Object.keys(I.supported).map(function (k) { return { v: k, t: I.supported[k] + (I.coverage[k] === "complete" ? "" : " (partial)") }; })
+                      : [{ v: "en", t: "English" }];
+    var langDesc = I ? "Interface language. Spanish is a partial translation (sidebar, composer, Settings headers); everything else stays in English, and model answers are not translated." : "Interface and answer language.";
+    pane.appendChild(row("Language", langDesc,
+      makeSelect(langOpts, I ? I.lang : "en", function (v) { if (I) { I.set(v); renderPane("preferences"); } }, "Language"), true));
     return pane;
   }
 
