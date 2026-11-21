@@ -1,14 +1,17 @@
 /* ai.spaincos service worker (G6): offline app shell.
    - navigations: network-first, fall back to the cached shell (index.html) when offline
-   - same-origin static assets (modules/, icons/, favicon): stale-while-revalidate
+   - same-origin static assets: network-first with an offline fallback
    - everything cross-origin (Supabase, gateway, CDNs) and all non-GET: untouched (never cached) */
-const VERSION = "v192-push";
+const CACHE_PREFIX = "ai-spaincos-shell-";
+const VERSION = CACHE_PREFIX + "2";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./favicon.webp", "./icons/icon-192.png"]; // icon-512 (78 KB) is no longer precached: it only matters for install and is cached on first request by the stale-while-revalidate branch
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => Promise.all(SHELL.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", (e) => {
-  e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then((ks) => Promise.all(ks
+    .filter((k) => k === "v192-push" || (k.startsWith(CACHE_PREFIX) && k !== VERSION))
+    .map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
 self.addEventListener("fetch", (e) => {
   const req = e.request;
@@ -23,6 +26,7 @@ self.addEventListener("fetch", (e) => {
     }).catch(() => caches.match("./index.html").then((r) => r || new Response("<h1>Offline</h1><p>ai.spaincos is offline and has no saved shell yet.</p>", { status: 503, headers: { "Content-Type": "text/html" } }))));
     return;
   }
+  if (!/^\/(?:modules\/|css\/|icons\/|favicon\.(?:png|webp)$|manifest\.webmanifest$)/.test(url.pathname)) return;
   // v97: static assets are NETWORK-FIRST — stale-while-revalidate kept serving the previous
   // deploy's modules on every visit (users saw old renderers for days). The cache is now only
   // an offline fallback; a fresh deploy is visible on the very next page load.
