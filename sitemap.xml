@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- v262 (UX debug-loop F-08): SEO surface for boundview.com (the public product host).
-     ai.spaincos.com is the private workspace and is noindexed via brand.js. -->
+<!-- v291 merge: SEO surface for boundview.com (the PUBLIC product host, per the v262
+     strategy: ai.spaincos.com is the private workspace, noindexed via brand.js).
+     Thread pages are SPA routes behind the invite-only gate. Keep in sync with the
+     SPA's real routes when new public surfaces ship. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://boundview.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://boundview.com/privacy.boundview.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
