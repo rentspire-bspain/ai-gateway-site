@@ -121,7 +121,8 @@
     summarizeStacks: summarizeStacks,
     schemaBrowserHtml: schemaBrowserHtml,
     statusDotClass: statusDotClass,
-    fmtWhen: fmtWhen
+    fmtWhen: fmtWhen,
+    sweepLine: sweepLine
   };
 
   if (typeof module !== "undefined" && module.exports) {
@@ -191,7 +192,7 @@
     document.head.appendChild(st);
   }
 
-  var el = null, rows = [], st = { loading: true, error: "", expanded: {} };
+  var el = null, rows = [], st = { loading: true, error: "", expanded: {}, sweep: null };
 
   // Load: try the webapp_stack view first (when the ship-only SQL has been applied),
   // fall back to the fleet_registry REST endpoint and derive webapps client-side.
@@ -259,6 +260,29 @@
       "</details></div>";
   }
 
+  // Fleet-sweep summary (qa-reports/fleet-sweep/latest.json — written by qa/fleet-sweep.py,
+  // deployed with the site like the prelaunch report). Pure so it is unit-testable.
+  function sweepLine(data) {
+    if (!data || typeof data !== "object") return "";
+    var c = data.counts || {}, apps = data.apps || [];
+    var parts = [];
+    ["PASS", "PARTIAL", "FAIL", "UNREACHABLE"].forEach(function (k) {
+      if (c[k]) parts.push(c[k] + " " + k.toLowerCase());
+    });
+    if (!parts.length && !apps.length) return "";
+    return "Fleet sweep " + (data.fleet_score != null ? Math.round(data.fleet_score * 100) + "%" : "—") +
+      (parts.length ? " · " + parts.join(" · ") : "") +
+      (data.ts ? " · run " + fmtWhen(data.ts) : "") +
+      " · " + apps.length + " apps";
+  }
+
+  function loadSweep() {
+    return fetch("/qa-reports/fleet-sweep/latest.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { st.sweep = j || null; render(); })
+      .catch(function () { st.sweep = null; });
+  }
+
   function render() {
     if (!el) return;
     var body = el.querySelector(".wa-body");
@@ -266,8 +290,10 @@
     if (st.error) { body.innerHTML = '<p class="wa-msg">' + esc(st.error) + ' <button type="button" class="wa-rf" style="margin-left:8px">Retry</button></p>'; return; }
     if (!rows.length) { body.innerHTML = '<p class="wa-msg">No webapps registered yet. Add fleet_registry rows with kind=webapp to see them here.</p>'; return; }
     var s = summarizeStacks(rows);
+    var sw = st.sweep ? '<p class="wa-m" style="margin:0 0 10px">' + esc(sweepLine(st.sweep)) + ' <span style="opacity:.75">(H-category rigor battery — <code>qa/fleet-sweep.py</code>)</span></p>' : "";
     body.innerHTML = '<div class="wa-wrap">' +
       '<h3 class="wa-h">Webapps (' + rows.length + ") · " + s.withDb + " with DB · " + s.withDomain + " with domain</h3>" +
+      sw +
       '<div class="wa-grid">' + rows.map(card).join("") + "</div>" +
       '<p class="wa-m" style="margin-top:18px">Counts from <code>list_webapp_schemas</code> require a governed per-project connection; until then, each card shows the webapp stack and an honest placeholder. SQL: <code>sql/webapp_registry.sql</code>.</p>' +
       "</div>";
@@ -291,6 +317,7 @@
     });
     document.addEventListener("keydown", onKey);
     load();
+    loadSweep();
   }
 
   function close() {
@@ -423,6 +450,7 @@
     summarizeStacks: summarizeStacks,
     schemaBrowserHtml: schemaBrowserHtml,
     statusDotClass: statusDotClass,
-    fmtWhen: fmtWhen
+    fmtWhen: fmtWhen,
+    sweepLine: sweepLine
   };
 })(typeof window !== "undefined" ? window : globalThis);
