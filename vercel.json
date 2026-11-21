@@ -1,1 +1,9 @@
-{"crons": [{"path": "/api/retention?execute=1", "schedule": "0 9 * * *"}], "rewrites": [{"source": "/verify", "destination": "/verify.html"}, {"source": "/verify/", "destination": "/verify.html"}]}
+{
+  "crons": [{"path": "/api/retention?execute=1", "schedule": "0 9 * * *"}],
+  "functions": {"api/bv-render.js": {"includeFiles": "index.html"}},
+  "routes": [
+    {"src": "/", "dest": "/api/bv-render"},
+    {"src": "/index.html", "dest": "/api/bv-render"},
+    {"handle": "filesystem"}
+  ]
+}
