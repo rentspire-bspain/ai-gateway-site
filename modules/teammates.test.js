@@ -46,8 +46,8 @@ test("Settings roster searches locally and only owners can change a teammate's r
   }
   const all = (node) => [node, ...node.children.flatMap(all)];
   for (const role of ["owner", "admin", "member"]) {
-    const calls = [];
-    const window = { TeammatesPane: h, sb: { auth: { getSession: async () => ({
+    const calls = [], opened = [];
+    const window = { SettingsUI: { open: (pane) => opened.push(pane) }, TeammatesPane: h, sb: { auth: { getSession: async () => ({
       data: { session: { access_token: "current-token" } }
     }) } } };
     vm.runInNewContext(settings, {
@@ -56,7 +56,10 @@ test("Settings roster searches locally and only owners can change a teammate's r
         const body = JSON.parse(options.body);
         calls.push(body);
         return { ok: true, json: async () => body.action === "whoami" ? { role } : {
-          members: [{ full_name: "Ada Example", email: "ada@example.com", role: "member", created_at: "2026-01-12" }]
+          members: [
+            { full_name: "Ada Example", email: "ada@example.com", role: "member", created_at: "2026-01-12" },
+            { email: "pending@example.com", role: "member", status: "invited" }
+          ]
         } };
       }
     });
@@ -66,6 +69,15 @@ test("Settings roster searches locally and only owners can change a teammate's r
     assert.ok(nodes.some((n) => n.textContent === "Ada Example"));
     assert.ok(nodes.some((n) => /^Added: \d.+Last active:/.test(n.textContent)));
     assert.equal(nodes.find((n) => n.textContent === "Invite a teammate").hidden, role === "member");
+    nodes.find((n) => n.textContent === "Edit my account profile").events.click();
+    if (role !== "member") nodes.find((n) => n.textContent === "Open Team invitations").events.click();
+    assert.deepEqual(opened, role === "member" ? ["account"] : ["account", "team"]);
+    const status = nodes.find((n) => n.attrs["aria-label"] === "Teammate invitation status");
+    status.value = "invited";
+    status.events.change();
+    assert.ok(all(pane).some((n) => n.textContent === "pending@example.com (invited)"));
+    assert.ok(!all(pane).some((n) => n.textContent === "Ada Example"));
+    status.value = "all";
     const select = nodes.find((n) => n.attrs["aria-label"] === "Role for ada@example.com");
     assert.equal(Boolean(select), role === "owner");
     const search = nodes.find((n) => n.type === "search");
