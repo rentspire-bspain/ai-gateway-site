@@ -2,6 +2,42 @@
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **85.9%** (computed by qa/generate-parity-headline.py — never hand-summed; v292 PARALLEL-LANE HARVEST: 29 categories, weight 128; six dimensions re-scored on live evidence (Accessibility 70, Docs 70, Observability 75, Mobile 75, SEO 85, Fleet 65) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 60 (w3) + Marketing 60 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 10 (w1) + NativeMobile 40 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 60 (w3) + Marketing 60 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
+### 🏆 CATEGORY STATUS — G/R/Y ICONS (generated from qa/parity-items.json, never hand-built)
+
+| | Category | Weight | Score |
+|---|---|---|---|
+| ✅ | Features | 14 | 99 |
+| ✅ | Computer | 8 | 99 |
+| ✅ | API | 10 | 95 |
+| ✅ | Troubleshooting | 4 | 90 |
+| 🟡 | Voice | 4 | 80 |
+| ✅ | Account | 6 | 95 |
+| ✅ | Models | 8 | 92 |
+| ✅ | Connectors | 12 | 98 |
+| 🟡 | Privacy | 6 | 88 |
+| 🔴 | Comet | 3 | 70 |
+| 🟡 | Premium | 2 | 80 |
+| 🔴 | Enterprise | 3 | 70 |
+| ✅ | GettingStarted | 5 | 90 |
+| 🔴 | Desktop | 3 | 70 |
+| ✅ | Billing | 6 | 92 |
+| 🔴 | Mobile | 3 | 75 |
+| 🔴 | Teammates | 1 | 68 |
+| ✅ | UX | 6 | 91 |
+| 🟡 | SEO | 3 | 85 |
+| 🔴 | Marketing | 3 | 60 |
+| 🟡 | Security | 4 | 80 |
+| 🔴 | Accessibility | 2 | 70 |
+| 🔴 | Legal/Compliance | 2 | 45 |
+| 🔴 | Docs/Support | 2 | 70 |
+| 🔴 | Observability | 2 | 75 |
+| 🔴 | Fleet | 3 | 65 |
+| 🔴 | Email/Notifications | 1 | 30 |
+| 🔴 | i18n | 1 | 10 |
+| 🔴 | NativeMobile | 1 | 40 |
+
+**Icon law (the gospel's completion-tracking convention, owner directive 2026-11-21):** ✅ GREEN ≥90 (shipped and live-verified) · 🟡 YELLOW 80-89.9 (partial, fixes in flight) · 🔴 RED <80 (open work). Items in the batch log take ~~strikethrough~~ once their lane is merged AND live-verified. The weighted-average headline follows the same bands: **85.9% = 🟡 YELLOW band** (the GREEN threshold is 90%).
+
 **104 ✅ complete · 33 🟡 partial · 20 🔴 gap of 157 tracked items, weighted across 17 categories.**
 **Batch delta this session: 90.1 → 90.4 (+0.3).** The remaining 9.6 points break down as: owner
 credential gates (OAuth app registrations, Twilio — +324 pts across Connectors/Voice), platform
