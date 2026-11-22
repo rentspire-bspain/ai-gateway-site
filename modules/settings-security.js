@@ -36,7 +36,7 @@
     return Math.floor(s / 86400) + "d ago";
   }
   function fmtDate(t) {
-    try { return new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+    try { return new Date(t).toLocaleDateString(window.I18N ? window.I18N.locale() : undefined, { month: "short", day: "numeric", year: "numeric" }); }
     catch (e) { return ""; }
   }
   function errText(e) { return String((e && e.message) || e || "Something went wrong").slice(0, 200); }

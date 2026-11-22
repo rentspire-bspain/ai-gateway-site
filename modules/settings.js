@@ -220,7 +220,7 @@
     var I = window.I18N;
     var langOpts = I ? Object.keys(I.supported).map(function (k) { return { v: k, t: I.supported[k] + (I.coverage[k] === "complete" ? "" : " (partial)") }; })
                       : [{ v: "en", t: "English" }];
-    var langDesc = I ? "Interface language. Spanish is a partial translation (sidebar, composer, Settings headers); everything else stays in English, and model answers are not translated." : "Interface and answer language.";
+    var langDesc = I ? "Interface language. Spanish is a partial translation; untranslated areas and model answers stay in English." : "Interface and answer language.";
     pane.appendChild(row("Language", langDesc,
       makeSelect(langOpts, I ? I.lang : "en", function (v) { if (I) { I.set(v); renderPane("preferences"); } }, "Language"), true));
     return pane;

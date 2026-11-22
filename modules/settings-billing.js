@@ -55,7 +55,7 @@
       '<div id="billNote" class="muted" style="margin-top:10px;max-width:60ch"></div>';
     var balVal = root.querySelector("#balVal"), ledger = root.querySelector("#ledger"), note = root.querySelector("#billNote");
 
-    function fmt(n) { return (n >= 0 ? "" : "−") + Math.abs(n).toLocaleString(); }
+    function fmt(n) { return (n >= 0 ? "" : "−") + Math.abs(n).toLocaleString(window.I18N ? window.I18N.locale() : undefined); }
     credits("balance").then(function (d) {
       balVal.textContent = fmt(Number(d.balance || 0) * 10) + " pts";
       if (Number(d.balance || 0) === 0) note.textContent = "No credits yet — the launch bonus grants 10,000 pts when billing goes fully live.";
