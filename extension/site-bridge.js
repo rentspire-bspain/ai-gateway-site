@@ -94,6 +94,35 @@
     setter.call(el, text);
     el.dispatchEvent(new Event("input", { bubbles: true }));
   }
+  // ---------- model choice (extension settings) ----------
+  // Apply the model chosen in the extension settings to the site's own #modelSel, using the same change event the
+  // site listens to (it persists the choice itself). Empty setting = leave the site's own choice alone.
+  async function applyModel() {
+    try {
+      const { settings } = await chrome.storage.local.get("settings");
+      const want = settings && typeof settings.model === "string" ? settings.model : "";
+      const sel = document.getElementById("modelSel");
+      if (!want || !sel || sel.value === want) return;
+      if (![...sel.options].some((o) => o.value === want)) return;
+      sel.value = want;
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+    } catch (_e) { /* storage unavailable */ }
+  }
+  // Publish the site's real model list so the panel's settings drop-down never drifts from the site.
+  function reportModels() {
+    try {
+      const sel = document.getElementById("modelSel");
+      if (!sel) return;
+      const options = [...sel.options].map((o) => ({ value: o.value, label: (o.textContent || o.value).replace(/\s+/g, " ").trim() }));
+      const sig = JSON.stringify(options);
+      chrome.storage.local.get("modelOptions", (r) => {
+        if (r && r.modelOptions && JSON.stringify(r.modelOptions.options) === sig) return;
+        chrome.storage.local.set({ modelOptions: { origin: location.origin, options } });
+      });
+    } catch (_e) { /* ignore */ }
+  }
+  window.addEventListener("load", reportModels);
+
   async function ask(text, submit) {
     const deadline = Date.now() + 10000;
     // Wait for the site's inline script to bind its Enter handler (it runs while the document is still parsing).
@@ -101,6 +130,7 @@
     let el = pickInput();
     while (!el && Date.now() < deadline) { await new Promise((r) => setTimeout(r, 200)); el = pickInput(); }
     if (!el) return false;
+    await applyModel();
     el.focus();
     setValue(el, String(text).slice(0, 4000));
     if (submit) {

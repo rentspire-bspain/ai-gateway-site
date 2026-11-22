@@ -1,6 +1,7 @@
 // Service worker: side panel wiring + "Ask about this page / selection" context menu.
-const SITE = "https://ai.spaincos.com";
-const MAX_SELECTION = 2000;
+importScripts("lib.js"); // shared pure helpers (settings, question builders, frame rules)
+const { buildQuestion, normalizeSettings, frameRules } = self.AISC;
+const SITE = "https://ai.spaincos.com"; // update feed + default; the panel/tab site comes from settings
 const MENU_PAGE = "ask-page";
 const MENU_SELECTION = "ask-selection";
 
@@ -52,6 +53,21 @@ chrome.notifications && chrome.notifications.onClicked && chrome.notifications.o
   chrome.action.setBadgeText({ text: "" });
 });
 
+// Settings (site + model choice) live in chrome.storage.local under "settings"; always validated on read.
+async function getSettings() {
+  try { const { settings } = await chrome.storage.local.get("settings"); return normalizeSettings(settings); }
+  catch { return normalizeSettings(null); }
+}
+
+// The site sends X-Frame-Options: DENY / frame-ancestors 'none'; relax it only for this extension's own iframe.
+async function installFrameRules() {
+  if (!(chrome.declarativeNetRequest && chrome.declarativeNetRequest.updateDynamicRules)) return;
+  try {
+    await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [1], addRules: frameRules(chrome.runtime.id) });
+  } catch { /* leave any previous rule in place */ }
+}
+installFrameRules(); // idempotent; runs on every service-worker start so the rule can never go missing
+
 chrome.alarms && chrome.alarms.create("update-check", { periodInMinutes: 360 });
 chrome.alarms && chrome.alarms.onAlarm.addListener((a) => { if (a.name === "update-check") checkForUpdate(); });
 chrome.runtime.onStartup.addListener(checkForUpdate);
@@ -70,28 +86,12 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // Fallback for browsers without the side panel API: toolbar icon opens the site in a tab.
 chrome.action.onClicked.addListener(() => {
-  if (!(chrome.sidePanel && chrome.sidePanel.open)) chrome.tabs.create({ url: SITE + "/" });
+  if (!(chrome.sidePanel && chrome.sidePanel.open)) getSettings().then((st) => chrome.tabs.create({ url: st.site + "/" }));
 });
 
 // Let the site-bridge content script read the one-shot pending ask (tab fallback only).
 if (chrome.storage.session && chrome.storage.session.setAccessLevel) {
   chrome.storage.session.setAccessLevel({ accessLevel: "TRUSTED_AND_UNTRUSTED_CONTEXTS" }).catch(() => {});
-}
-
-function clean(s) { return String(s || "").replace(/\s+/g, " ").trim(); }
-
-// The site's composer is a single-line input, so the question is built as one line.
-function buildQuestion(info, tab) {
-  const url = clean(info.pageUrl || (tab && tab.url));
-  const title = clean(tab && tab.title).slice(0, 200);
-  const where = title ? `"${title}" (${url})` : url;
-  if (info.menuItemId === MENU_SELECTION && info.selectionText) {
-    let sel = clean(info.selectionText);
-    const cut = sel.length > MAX_SELECTION;
-    sel = sel.slice(0, MAX_SELECTION) + (cut ? "…" : "");
-    return `Explain this text selected on ${where}: "${sel}"`;
-  }
-  return `Read and summarize this page: ${where}`;
 }
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -114,14 +114,14 @@ function dispatchAsk(text, tab) {
 
 // Fallback: open the full site in a new tab; site-bridge.js (top frame) consumes the pending ask.
 function openInTab(pending) {
-  chrome.storage.session.set({ pendingAsk: { ...pending, target: "tab" } })
-    .finally(() => chrome.tabs.create({ url: SITE + "/" }));
+  Promise.all([chrome.storage.session.set({ pendingAsk: { ...pending, target: "tab" } }).catch(() => {}), getSettings()])
+    .then(([, st]) => chrome.tabs.create({ url: st.site + "/" }));
 }
 
 // Use the command's tab so sidePanel.open runs before any await.
 chrome.commands && chrome.commands.onCommand && chrome.commands.onCommand.addListener((command, tab) => {
   if (command === "open-sidepanel") {
-    const fallback = () => chrome.tabs.create({ url: SITE + "/" });
+    const fallback = () => getSettings().then((st) => chrome.tabs.create({ url: st.site + "/" }));
     if (chrome.sidePanel?.open && tab?.id !== undefined) {
       chrome.sidePanel.open({ tabId: tab.id }).catch(fallback);
     } else {

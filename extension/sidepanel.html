@@ -10,10 +10,49 @@
   <header>
     <span class="brand">ai.spaincos.com</span>
     <span class="spacer"></span>
+    <button id="settingsBtn" title="Settings: site and model" aria-expanded="false" aria-controls="settings" type="button">Settings</button>
     <button id="reload" title="Reload chat" type="button">Reload</button>
     <button id="openTab" title="Open in a full tab (use this to sign in if the panel cannot)" type="button">Open in tab</button>
   </header>
+
+  <section id="settings" hidden aria-label="Extension settings">
+    <label>Site
+      <select id="siteSel"></select>
+    </label>
+    <label>Model
+      <select id="modelSel"><option value="">Site default (do not override)</option></select>
+    </label>
+    <p id="settingsNote" class="note">Saved automatically in this browser. The model list comes from the site itself.</p>
+  </section>
+
+  <section id="ctx" aria-label="Page context">
+    <div class="row">
+      <span class="tag">Page context</span>
+      <span id="ctxTitle" class="grow ellipsis">Reading the active tab...</span>
+      <button id="ctxRefresh" title="Re-read the active tab and selection" type="button">Refresh</button>
+    </div>
+    <div class="row" id="ctxSelRow" hidden>
+      <span class="tag sel">Selected</span>
+      <span id="ctxSel" class="grow ellipsis"></span>
+    </div>
+    <div class="row opts">
+      <label><input type="checkbox" id="incPage" checked> Include page</label>
+      <label><input type="checkbox" id="incSel" checked> Include selection</label>
+    </div>
+    <div class="row" id="ctxHint" hidden>
+      <span id="ctxHintText" class="grow note"></span>
+      <button id="grantBtn" type="button" hidden>Allow page access</button>
+    </div>
+    <form id="askForm" autocomplete="off">
+      <input id="askInput" type="text" maxlength="1000" placeholder="Ask about this page..." aria-label="Question about the active page">
+      <button id="askBtn" type="submit">Ask</button>
+      <button id="sumBtn" type="button" title="Send 'Read and summarize this page' for the active tab">Summarize page</button>
+    </form>
+    <div id="preview" class="note" aria-live="polite"></div>
+  </section>
+
   <iframe id="site" title="ai.spaincos.com chat" allow="microphone *; clipboard-read *; clipboard-write *"></iframe>
+  <script src="lib.js"></script>
   <script src="sidepanel.js"></script>
 </body>
 </html>
