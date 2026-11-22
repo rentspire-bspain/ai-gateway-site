@@ -31,3 +31,8 @@
 .dv-title,.dv-title a,.dv-meta,.dv-sub{overflow-wrap:anywhere}
 .dv-row .dv-btn{flex:0 0 auto}
 @media(max-width:640px){.dv-head{padding-top:max(12px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}.dv-body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .dv-btn, .dv-x { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}

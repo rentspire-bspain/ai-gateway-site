@@ -1,56 +1,20 @@
 /* mobile-375.css — 375px responsive pass (parity §26e item 1 / 34b mobile).
-   A single additive stylesheet: no existing selectors are redefined, only scoped
-   mobile overrides inside one max-width media query. Loaded alongside the app CSS;
-   safe to ship even while the sidebar toggle is a follow-up (the drawer needs the
-   hamburger button in modules/mobile-375.js). */
+   Additive stylesheet of scoped mobile overrides, loaded after the app CSS. v311 adds the
+   touch-target, safe-area, bottom-sheet and reduced-motion layers at the bottom of this file. */
 
-/* ---- off-canvas drawer + hamburger (max-width: 420px) ---- */
+/* ---- 420px phone pass (max-width: 420px) ----
+   v311: the duplicate off-canvas drawer + injected hamburger that lived here were removed.
+   They fought the app's own drawer (index.html: .sidebar.collapsed + #expandSidebar +
+   .sidebar-scrim, active at <=768px): at <=420px #expandSidebar opened nothing (a rule here pinned
+   #sidebar at translateX(-102%)), and the hamburger revealed the drawer still in its icon-only
+   "collapsed" skin. One drawer, one opener now (see modules/mobile-375.js + mobile-focus-trap.js). */
 @media (max-width: 420px) {
   /* body text floor: nothing below 14px on phones */
-  body, input, textarea, select, button { font-size: 14px !important; }
+  body, button { font-size: 14px !important; }
+  /* form controls must be >=16px or iOS Safari zooms the page on focus (was 14px !important on every
+     input, which re-introduced the zoom everywhere except the two composer inputs) */
+  input, textarea, select { font-size: 16px !important; }
   .stg-desc, .sec-device-meta, .stg-pane-sub { font-size: 14px !important; }
-
-  /* sidebar becomes an off-canvas drawer, revealed by the .m375-open body class
-     the hamburger button toggles */
-  #sidebar, .sidebar, nav.sidebar {
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    width: min(84vw, 320px);
-    z-index: 60;
-    transform: translateX(-102%);
-    transition: transform 180ms ease;
-    overflow-y: auto;
-    box-shadow: none;
-  }
-  body.m375-open #sidebar, body.m375-open .sidebar, body.m375-open nav.sidebar {
-    transform: translateX(0);
-    box-shadow: 0 0 40vw rgba(0,0,0,.45);
-  }
-  body.m375-open::after { /* scrim — tap to close */
-    content: "";
-    position: fixed; inset: 0; z-index: 59;
-    background: rgba(0,0,0,.35);
-  }
-
-  /* hamburger button (injected by modules/mobile-375.js) */
-  .m375-burger {
-    display: inline-flex;
-    align-items: center; justify-content: center;
-    position: relative; /* stay above the scrim (z-index below) so the burger can close the drawer too */
-    width: 40px; height: 40px;
-    border: 1px solid var(--border, #ccc);
-    border-radius: 8px;
-    background: var(--bg, #fff);
-    cursor: pointer;
-    z-index: 61;
-  }
-  .m375-burger span, .m375-burger span::before, .m375-burger span::after {
-    content: ""; display: block;
-    width: 16px; height: 2px;
-    background: var(--fg, #333);
-    margin: 2px auto;
-    border-radius: 1px;
-  }
 
   /* main content: full width, 12px gutters */
   main, #main, .thread-pane, .composer, #composer {
@@ -109,10 +73,13 @@
   .composer, .composer-bar, [class*="composer"] {
     padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
-  /* modals never wider than the viewport (thread restore, settings) */
-  .modal, dialog, [role="dialog"] {
-    width: min(92vw, 480px); max-width: 92vw;
-  }
+  /* modals never wider than the viewport (thread restore, settings).
+     v311: the old rule also forced width:min(92vw,480px) on EVERY [role="dialog"], which includes the
+     full-screen roots (Tasks, Library, Discover, Research, Fleet, Hubs, the onboarding backdrop, ...) —
+     they stopped 8% short of the right edge and showed the page through a 30px strip at 375px.
+     Only legacy .modal/dialog elements keep the 92vw width; every role=dialog just may not exceed the viewport. */
+  .modal, dialog { width: min(92vw, 480px); max-width: 92vw; }
+  [role="dialog"] { max-width: 100vw; }
   /* library cards stack at phone widths */
   .library-grid, .cards, .card-grid {
     grid-template-columns: 1fr;
@@ -152,4 +119,102 @@
   .answer-content .table-wrap, .answer-content pre { min-width: 0; }
   .answer-content pre code { word-break: normal; }
   .answer-content video, .answer-content iframe { max-width: 100%; }
+}
+
+/* ======================================================================================
+   v311 MOBILE ERGONOMICS (touch targets >=44px, safe-area insets, bottom sheets, reduced motion)
+   Specificity note: index.html sets many controls to 38/40px with class selectors such as
+   `.main-header .width-toggle`; the generic `button { min-height:44px }` rule above lost to them
+   (that is why the 44px floor never actually applied). Each rule below therefore repeats the
+   original selector so the cascade (this file loads later) decides in favour of 44px.
+   ====================================================================================== */
+
+/* ---- 1. touch targets: >=44px on every primary action (phones and any coarse pointer) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .main-header .width-toggle, .main-header .theme-toggle, .main-header .icon-btn { min-width: 44px; min-height: 44px; }
+  .icon-btn { min-width: 44px; min-height: 44px; }
+  .attach-btn, .followup-send, .search-submit { min-width: 44px; min-height: 44px; }
+  .model-select, #modelSel { min-height: 44px; }
+  .composer-pills .model-select, .composer-pills .width-toggle, #followupPills .width-toggle { min-height: 44px; }
+  /* icon-only pills (incognito, image, video, labs, local file) were 37-42px wide */
+  .composer-pills .width-toggle { min-width: 44px; justify-content: center; }
+  .search-input, #followupInput { min-height: 44px; }
+  .followup-box { min-height: 52px; align-items: center; }
+  .answer-tab { min-height: 44px; }
+  .action-btn { min-height: 44px; }
+  .action-btn.ex-up, .action-btn.ex-down { min-width: 44px; justify-content: center; }
+  .suggestion-chip, .related-item { min-height: 44px; }
+  .thread-item { min-height: 44px; }
+  .space-item { min-height: 44px; }
+  .space-add-btn { min-width: 44px; min-height: 44px; }
+  .move-menu button { min-height: 44px; }
+  .import-modal button.primary, .space-modal .btn { min-height: 44px; }
+  .stv-x, .ob-tour-x { min-width: 44px; min-height: 44px; }
+  .code-copy-btn { min-width: 44px; min-height: 44px; }
+}
+@media (hover: none) {
+  .thread-item.active .thread-actions button, .thread-item.active .thread-move,
+  .space-item .space-gear { min-width: 44px; min-height: 44px; }
+}
+
+/* ---- 2. safe-area insets (needs viewport-fit=cover in the viewport meta; 0 otherwise) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  /* landscape notch: keep every column out of the cut-out */
+  .app { box-sizing: border-box; padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  /* portrait notch / Dynamic Island: pad the main column; the header sits below the cut-out */
+  .main { padding-top: env(safe-area-inset-top); }
+  .followup-wrapper { padding-bottom: max(16px, calc(env(safe-area-inset-bottom) + 6px)); }
+  /* the off-canvas drawer is position:fixed, so it needs its own insets */
+  .sidebar { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); box-sizing: border-box; }
+  .incognito-bar { top: max(8px, calc(env(safe-area-inset-top) + 4px)); }
+  .auth-overlay, .import-modal-backdrop, .space-modal-overlay {
+    padding-top: max(12px, env(safe-area-inset-top)); padding-bottom: max(12px, env(safe-area-inset-bottom));
+    padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right));
+  }
+  #staleBar { padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important; } /* inline-styled bar pinned to bottom:0 */
+}
+@media (max-width: 480px) {
+  /* account menu is a bottom sheet here; its JS pins bottom:12px inline, so lift it clear of the home indicator */
+  .account-menu { bottom: calc(12px + env(safe-area-inset-bottom)) !important; max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+}
+
+/* ---- 3. bottom-sheet ergonomics at 375px ---- */
+@media (max-width: 480px) {
+  .account-menu { overscroll-behavior: contain; }
+  .account-item { min-height: 48px; }
+  .account-scrim { -webkit-tap-highlight-color: transparent; }
+  .move-menu { max-height: min(60dvh, calc(100dvh - 24px)); overscroll-behavior: contain; }
+  /* sheets/dialogs: never taller than the visible viewport, scroll inside, do not chain to the page */
+  .import-modal, .space-modal, .auth-modal { max-height: calc(100dvh - 24px); overflow-y: auto; overscroll-behavior: contain; }
+}
+
+/* ---- 3b. phone layout defects found while measuring ---- */
+@media (max-width: 768px) {
+  /* answer view: the 7-pill composer row wrapped onto 3-4 lines (about 30% of the screen once the pills are 44px).
+     One horizontally scrollable line keeps the reading area; the landing view still wraps (it has room). */
+  #followupPills { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity; overscroll-behavior-x: contain; padding-bottom: 4px; }
+  #followupPills > * { scroll-snap-align: start; }
+  #followupPills .model-select { flex: 0 0 auto; max-width: 150px; }
+  /* modules/student-verify.js banner: position:fixed;left:50% with no width, so it only had ~187px (50% of the
+     viewport) to lay out in and stacked its text one word per line (237x337 at 375px), covered the composer, and
+     painted over the open drawer (z-index 900 vs the drawer's 90). Make it a full-width strip above the composer. */
+  .stv-banner { left: 12px; right: 12px; transform: none; width: auto; max-width: none; box-sizing: border-box;
+    bottom: calc(var(--followup-h, 0px) + 12px + env(safe-area-inset-bottom)); padding: 10px 12px; gap: 8px; }
+  .stv-banner > div { min-width: 0; flex: 1 1 auto; }
+  .stv-banner button { min-height: 44px; }
+  body.sidebar-open .stv-banner { display: none; }
+}
+
+/* ---- 4. reduced motion: one global switch (was 4 scattered, class-specific rules) ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  html.pre-boot body::before { animation: none; } /* the boot shimmer is decorative */
 }
