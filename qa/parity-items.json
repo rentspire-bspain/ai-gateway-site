@@ -1,5 +1,5 @@
 {
- "version": "v307",
+ "version": "v308",
  "generated_at": "2026-11-16T00:00:00Z",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE — GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90→95. | 2026-11-18: owner-blocker audit — 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped — server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
@@ -130,8 +130,8 @@
   {
    "name": "Legal/Compliance",
    "weight": 2,
-   "score": 55,
-   "note": "v293 re-score: TERMS OF SERVICE DRAFT LIVE on both domains (PR #290: /terms 200, per-host brand guard, all ten sections, AI-output disclaimer, honest \"Draft pending owner legal review\" card top+footer naming exactly what is open: governing law/venue, liability cap, refund policy, billing details, consumer-law requirements). REMAINING: owner legal review + the open items; refund policy unpublished (checkout wiring pending)."
+   "score": 60,
+   "note": "v293 re-score: TERMS OF SERVICE DRAFT LIVE on both domains (PR #290: /terms 200, per-host brand guard, all ten sections, AI-output disclaimer, honest \"Draft pending owner legal review\" card top+footer naming exactly what is open: governing law/venue, liability cap, refund policy, billing details, consumer-law requirements). REMAINING: owner legal review + the open items; refund policy unpublished (checkout wiring pending). v308: ENTITY ASSIGNMENT DONE (owner directive: boundview.com under CanonIntel LLC, not RentSpire): BoundView terms name CanonIntel LLC as operator (+copyright line), privacy names CanonIntel LLC as data controller, structured data carries legalName CanonIntel LLC — all live-verified on boundview.com; ai.spaincos.com unchanged (Spain Companies). Legal pages are now HOST-AWARE server-side (boundview serves its own terms/privacy/docs to crawlers too — was a JS-only guard leaking the ai.spaincos terms to non-JS clients). Draft review by counsel still pending (governing law, liability cap, refund policy)."
   },
   {
    "name": "Docs/Support",
@@ -187,6 +187,11 @@
   }
  ],
  "changelog": [
+  {
+   "version": "v308",
+   "date": "2026-11-21",
+   "change": "Legal 55->60: boundview.com entity assigned to CanonIntel LLC (operator, data controller, copyright, structured-data legalName) + host-aware legal pages (crawler leak fixed, incident hotfixed)."
+  },
   {
    "version": "v307",
    "date": "2026-11-21",

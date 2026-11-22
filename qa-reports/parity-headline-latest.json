@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-22T05:43:55+00:00",
- "version": "v307",
+ "ts": "2026-11-22T06:16:19+00:00",
+ "version": "v308",
  "headline_pct": 87.5,
- "weighted_sum": 11196,
+ "weighted_sum": 11206,
  "total_weight": 128,
  "categories": {
   "Features": 99,
@@ -27,7 +27,7 @@
   "Marketing": 75,
   "Security": 80,
   "Accessibility": 70,
-  "Legal/Compliance": 55,
+  "Legal/Compliance": 60,
   "Docs/Support": 70,
   "Observability": 82,
   "Fleet": 65,
