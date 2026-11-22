@@ -46,6 +46,46 @@
     return i;
   }
 
+  // ---------- Teammate templates + shared profile preview (pure helpers, exported for tests) ----------
+  var PRESETS = [
+    { id: "research-analyst", name: "Research Analyst", instructions: "Research the question across multiple sources, cross-check claims, and cite every source. Separate facts from inference and state confidence and gaps." },
+    { id: "code-reviewer", name: "Code Reviewer", instructions: "Review code for correctness, security, and maintainability. List issues by severity with file/line references and a concrete fix for each. Do not rewrite unrelated code." },
+    { id: "data-extractor", name: "Data Extractor", instructions: "Extract the requested fields from the supplied material into a structured table or JSON. Never guess: mark missing values as null and quote the source text for each." },
+    { id: "summarizer", name: "Summarizer", instructions: "Summarize the material in a short brief: key points, decisions, open questions, and next steps. Keep it faithful to the source and under 200 words unless asked." }
+  ];
+  var TPL_KEY = "teammate-templates:v1:";
+  function presetById(id) { for (var i = 0; i < PRESETS.length; i++) if (PRESETS[i].id === id) return PRESETS[i]; return null; }
+  function tplStore(owner) {
+    var ls = typeof localStorage !== "undefined" ? localStorage : null;
+    var k = TPL_KEY + String(owner || "me").toLowerCase();
+    return {
+      load: function () { try { var o = JSON.parse(ls.getItem(k) || "{}"); return o && typeof o === "object" ? o : {}; } catch (_e) { return {}; } },
+      save: function (o) { try { ls.setItem(k, JSON.stringify(o)); return true; } catch (_e) { return false; } }
+    };
+  }
+  // applyTemplate(assignments, email, templateId) -> new assignments (pure); unknown template or blank email = unchanged; "" clears.
+  function applyTemplate(a, email, id) {
+    var out = {}; Object.keys(a || {}).forEach(function (k) { out[k] = a[k]; });
+    var e = String(email || "").trim().toLowerCase();
+    if (!e) return out;
+    if (id === "") { delete out[e]; return out; }
+    var t = presetById(id); if (!t) return out;
+    out[e] = { templateId: t.id, instructions: t.instructions };
+    return out;
+  }
+  // effectiveProfile — what a teammate will actually get; read-only. Memory is honest: none is stored for teammates.
+  function effectiveProfile(member, a) {
+    var m = member || {}, e = String(m.email || "").toLowerCase();
+    var asg = (a || {})[e], t = asg && presetById(asg.templateId);
+    return {
+      name: String(m.name || m.full_name || e.split("@")[0] || "Teammate"),
+      email: e, role: String(m.role || "member"),
+      template: t ? t.name : null,
+      instructions: t ? t.instructions : "No template applied — default assistant behavior.",
+      memory: "No shared memory is stored for this teammate."
+    };
+  }
+
   // ---------- Teammates pane (management, owner/admin gated server-side) ----------
   function buildTeammates() {
     var pane = el("div", "stg-pane");
@@ -73,6 +113,22 @@
     pane.appendChild(inviteTitle);
     pane.appendChild(inviteRow);
     pane.appendChild(inviteMsg);
+
+    // templates + read-only profile preview (local to this account; no network calls)
+    var store = tplStore(), assigns = store.load();
+    pane.appendChild(el("div", "stg-group-label", "Teammate templates"));
+    pane.appendChild(el("p", "stg-desc", "Reusable instruction presets. Pick a preset to preview it, then apply it to a teammate from the roster."));
+    var preview = el("div", "stg-desc"); preview.setAttribute("role", "status");
+    function showProfile(pf, pre) {
+      preview.textContent = (pre ? "Preview (read-only): " : "Profile (read-only): ") + pf.name + (pf.email ? " <" + pf.email + ">" : "") + " · " + pf.role + " · Template: " + (pf.template || "none") + " · Instructions: " + pf.instructions + " · Memory: " + pf.memory;
+    }
+    var presetRow = el("div", "stg-controls");
+    PRESETS.forEach(function (t) {
+      var b = btn(t.name, ""); b.setAttribute("aria-label", "Preview template " + t.name);
+      b.addEventListener("click", function () { showProfile({ name: t.name, email: "", role: "member", template: t.name, instructions: t.instructions, memory: "No shared memory is stored for this teammate." }, true); });
+      presetRow.appendChild(b);
+    });
+    pane.appendChild(presetRow); pane.appendChild(preview);
 
     // member list (with role controls when permitted)
     var list = el("div", "");
@@ -119,6 +175,16 @@
           left.appendChild(el("div", "stg-desc", "Added: " + joined + " · Last active: " + activity));
         }
         row.appendChild(left);
+        if (myRole === "owner" || myRole === "admin") {
+          var tsel = el("select", "stg-input"); tsel.setAttribute("aria-label", "Template for " + (m.email || "member"));
+          var none = el("option", "", "No template"); none.value = ""; tsel.appendChild(none);
+          PRESETS.forEach(function (t) { var o = el("option", "", t.name); o.value = t.id; o.selected = !!(assigns[String(m.email || "").toLowerCase()] && assigns[String(m.email || "").toLowerCase()].templateId === t.id); tsel.appendChild(o); });
+          tsel.addEventListener("change", function () { assigns = applyTemplate(assigns, m.email, tsel.value); store.save(assigns); inviteMsg.textContent = "Template updated for " + m.email + "."; showProfile(effectiveProfile(m, assigns)); });
+          row.appendChild(tsel);
+        }
+        var pv = btn("Preview profile", ""); pv.setAttribute("aria-label", "Preview profile for " + (m.email || "member"));
+        pv.addEventListener("click", function () { showProfile(effectiveProfile(m, assigns)); });
+        row.appendChild(pv);
         if (myRole === "owner" && m.email && (m.role === "member" || m.role === "admin")) {
           var role = el("select", "stg-input");
           role.setAttribute("aria-label", "Role for " + m.email);
@@ -221,6 +287,7 @@
   }
 
   window.SettingsTeammatesPane = { render: buildTeammates };
+  window.TeammateTemplates = { PRESETS: PRESETS, applyTemplate: applyTemplate, effectiveProfile: effectiveProfile };
   function register() {
     if (!window.SettingsUI || typeof window.SettingsUI.registerPane !== "function") return;
     window.SettingsUI.registerPane({ id: "premium", label: "Premium", render: buildPremium, after: "billing" });
