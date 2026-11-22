@@ -1,5 +1,5 @@
 {
- "version": 9,
+ "version": 10,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -781,13 +781,13 @@
    "status": {
     "BV": "U",
     "TT": "U",
-    "AG": "U",
+    "AG": "R",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT toast is fixed bottom:18px with no inset (overlaps iPhone home indicator)",
+   "evidence": "TT toast is fixed bottom:18px with no inset (overlaps iPhone home indicator) | worker AG 2026-11-22: Fetched ai.spaincos.com and its repo reference (GitHub rentspire-bspain/ai-gateway-site [[2](https://github.com/rentspire-bspain/ai-gateway-site)]); the app is identified but no served HTML/CSS was observable containing env(safe-area-inset-*) or dvh usage for full-height layouts. No viewport-fit=cov",
    "fix": "Use padding-bottom: max(18px, env(safe-area-inset-bottom))"
   },
   {
@@ -824,10 +824,10 @@
     "AG": "G",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Live boundview.com/manifest.webmanifest returns name \"ai.spaincos\" (brand leak). ai.spaincos manifest is correct with shortcuts + share_target",
+   "evidence": "Live boundview.com/manifest.webmanifest returns name \"ai.spaincos\" (brand leak). ai.spaincos manifest is correct with shortcuts + share_target | worker CT 2026-11-22: Comptrove is a rent-comparison site titled 'Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps - Comptrove' (comptrove.com) [[1](https://comptrove.com/m/austin/)], so the brand/name element matches the host. However, the available results do not surface a web app manifest \u2014 no `<link rel",
    "fix": "Serve per-host manifest (build-time brand param); verify via Lighthouse PWA"
   },
   {
