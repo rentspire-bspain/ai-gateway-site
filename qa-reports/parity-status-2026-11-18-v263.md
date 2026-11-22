@@ -2983,3 +2983,9 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Standing gates this session: eval-replay 10/10 through gateway-chat v309; UX master 100.0.
 
 **HEADLINE: 88.2% (11290/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner), store presence (owner), Legal counsel review (delivered), Wave-1 external-account integration (owner-gated).
+
+### 32. §30q addendum — v316: THE MOBILE ACCESSIBILITY PASS (Mobile 82)
+
+- ~~Mobile a11y + polish (PR #347)~~ — LIVE both domains (root-verified: viewport-fit=cover, v311 mobile CSS): every v291-audit item closed code-side — zero under-44px touch targets across 14 views at 375px and 320px (baseline 23 in-thread + 17 landing), safe-area insets on app/composer/sidebar/overlays (CDP-verified), the drawer focus trap REWRITTEN (the v229 trap was a no-op — now 40 Tab + 40 Shift+Tab contained, Esc closes, inert restored), prefers-reduced-motion honored, iOS input-zoom stopped, the legacy permanent offline-bar bug fixed, the composer-blocking banner fixed, duplicate burger drawer removed. Honest limits: no real-device/keyboard/notch test, Lighthouse pending — the lane's 80-85 estimate is unmeasured; scored 82 on the closed audit items + verified DOM evidence.
+
+**HEADLINE: 88.3% (11294/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner), store presence (owner), Legal counsel review (delivered), Wave-1 external-account integration (owner-gated). In flight: Comet sidepanel enrichment.
