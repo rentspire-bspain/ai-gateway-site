@@ -2917,3 +2917,11 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Stripe live key for ai.spaincos.com: form still open with the owner.
 
 **HEADLINE: 87.5% (11198/128, 29 categories) — 🟡 YELLOW band. UX MASTER 100.0 GREEN. Cap $500 live.** Remaining REDs: Email (owner OAuth + Stripe live key), Wave-1 webapp rebuild; Legal now 🟡 (draft counsel review pending).
+
+### 25. §30q addendum — v309: BROWSER-VERIFIED CANONINTEL PAGES + THE COUNSEL CHECKLIST
+
+- ~~Real-browser verification of the boundview CanonIntel pages~~ — PASSED (Playwright, full navigation): terms title "Terms of Service — BoundView", operator line "operated by CanonIntel LLC" + © line, privacy data-controller line, zero JS errors, home navigable after the legal pages. ONE LEAK FOUND AND FIXED (PR #326): a mailto:bspain@spaincos.com contact link on the terms — now support@boundview.com, live-verified clean (zero spaincos mentions on the routed /terms).
+- ~~Legal counsel review checklist DRAFTED~~ — qa-reports/boundview-canonintel-legal-review-checklist.md: eight sections (entity/authority, governing law + disputes, liability caps + AI-output disclaimers, billing/refunds/auto-renewal, content + data + AI-specific terms, consumer-law markets, operational consistency, sign-off), built from the draft's own open-items list plus the deployed surface. Includes the merchant-of-record gate: BoundView sales must use a CanonIntel LLC Stripe account, never the current RentSpire-account checkout.
+- Stripe live key for ai.spaincos.com: form STILL OPEN with the owner (vault holds only the test-mode key).
+
+**HEADLINE: 87.5% (11206/128, 29 categories) — 🟡 YELLOW band. UX MASTER 100.0 GREEN.** Remaining REDs: Email (owner OAuth + Stripe live key), Wave-1 webapp rebuild.

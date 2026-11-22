@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-22T01:12:19+00:00",
+ "ts": "2026-11-22T02:22:08+00:00",
  "base": "https://ai.spaincos.com",
  "passed": 36,
  "failed": 0,
@@ -37,7 +37,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "23.5s"
+   "detail": "16.2s"
   },
   {
    "name": "current-events answered",
@@ -52,7 +52,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "22.7s"
+   "detail": "15.4s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -157,7 +157,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\n1 FAILED\n\u00b7 35/36 checks \u00b7 11/21/2026, 7:51:2"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 36/36 checks \u00b7 11/22/2026, 1:12:"
   },
   {
    "name": "Fleet Automations tab renders",
@@ -177,7 +177,7 @@
   {
    "name": "Follow-up chip submits full command",
    "ok": true,
-   "detail": "q=2 msg='ury yields at November 2025, mid-2026, and November 20, 2026' payload='ury yields at November 2025, mid-2026, and November 20, 2026'"
+   "detail": "q=2 msg='FRED release for the updated 10-year constant maturity yield' payload='FRED release for the updated 10-year constant maturity yield'"
   },
   {
    "name": "zero JS/CSP errors",
