@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-22T07:51:08+00:00",
- "version": "v313",
- "headline_pct": 88.1,
- "weighted_sum": 11283,
+ "ts": "2026-11-22T07:58:26+00:00",
+ "version": "v314",
+ "headline_pct": 88.2,
+ "weighted_sum": 11286,
  "total_weight": 128,
  "categories": {
   "Features": 99,
@@ -21,7 +21,7 @@
   "Desktop": 80,
   "Billing": 93,
   "Mobile": 75,
-  "Teammates": 72,
+  "Teammates": 75,
   "UX": 91,
   "SEO": 85,
   "Marketing": 75,

@@ -1,5 +1,5 @@
 {
- "version": "v313",
+ "version": "v314",
  "generated_at": "2026-11-16T00:00:00Z",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE — GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90→95. | 2026-11-18: owner-blocker audit — 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped — server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
@@ -95,8 +95,8 @@
   {
    "name": "Teammates",
    "weight": 1,
-   "score": 72,
-   "note": "v295 (was 68): onboarding unification + pending-invite filter + Account profile shortcut (PR #294, 446b214) live-verified on ai.spaincos.com (cache-busted fetch matches master; node --check + 5 Node tests green). Honest limits: no browser validation yet; templates and shared profile parity still gaps. v313: templates + profile preview (PR #343) live both domains: four instruction presets (Research Analyst/Code Reviewer/Data Extractor/Summarizer) with per-teammate apply in the roster, and a read-only effective-instructions preview. HONEST LIMITS: assignments are browser-local (localStorage) — not synced across devices and NOT enforced server-side on the teammate; no shared memory source exists. Server-side enforcement needs a migration + team edge-function change (the PR #333 RLS pattern is the path). 6/6 tests."
+   "score": 75,
+   "note": "v295 (was 68): onboarding unification + pending-invite filter + Account profile shortcut (PR #294, 446b214) live-verified on ai.spaincos.com (cache-busted fetch matches master; node --check + 5 Node tests green). Honest limits: no browser validation yet; templates and shared profile parity still gaps. v313: templates + profile preview (PR #343) live both domains: four instruction presets (Research Analyst/Code Reviewer/Data Extractor/Summarizer) with per-teammate apply in the roster, and a read-only effective-instructions preview. HONEST LIMITS: assignments are browser-local (localStorage) — not synced across devices and NOT enforced server-side on the teammate; no shared memory source exists. Server-side enforcement needs a migration + team edge-function change (the PR #333 RLS pattern is the path). 6/6 tests. v314: SERVER-SIDE ENFORCEMENT (PR #345): teammate_template_assignments table (RLS deny-all, advisory-lock bootstrap, DDL in qa/teammate-templates-schema.sql), team function v17 (template_set owner/admin-only, template_get), gateway-chat v309 injects the caller's assigned template first in STANDING INSTRUCTIONS via the existing personalization path; UI saves server-side with localStorage as offline fallback and honest 'not enforced' notice. Verified: 401/403 boundaries live (eval-bot: not-a-member, owners/admins-only), both domains 200, eval-replay 10/10 through the new gateway (no regression). NOT verified: the admin 200 assign path and a live chat demonstrating behavior change (no owner token; credit discipline)."
   },
   {
    "name": "UX",
@@ -188,6 +188,11 @@
   }
  ],
  "changelog": [
+  {
+   "version": "v314",
+   "date": "2026-11-22",
+   "change": "Teammates 72->75 (server-side template enforcement deployed; eval-replay 10/10)."
+  },
   {
    "version": "v313",
    "date": "2026-11-22",
