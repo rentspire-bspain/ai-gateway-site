@@ -1,5 +1,5 @@
 {
- "version": 8,
+ "version": 9,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -2722,12 +2722,12 @@
     "BV": "Y",
     "TT": "U",
     "AG": "Y",
-    "GH": "U",
+    "GH": "R",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "brand.js supportEmail support@boundview.com",
+   "evidence": "brand.js supportEmail support@boundview.com | worker CT 2026-11-22: comptrove.com is live and crawlable \u2014 the only indexed Comptrove page surfaced was the Austin rent report (Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps, comptrove.com [[18](https://comptrove.com/m/austin/)]) \u2014 but no support contact route and no response SLA are visible on the doma | worker GH 2026-11-22: No support route or stated SLA is observable for minutegig.com. The live research pass found no Minutegig contact or support page, no help center, and no publicly indexed support-response SLA for the domain; standard sub-page locations (/help, /docs, /robots.txt, /sitemap.xml) could not be verified ",
    "fix": "Add Help \u2192 Contact + SLA"
   },
   {
@@ -2822,12 +2822,12 @@
     "BV": "U",
     "TT": "U",
     "AG": "R",
-    "GH": "U",
+    "GH": "R",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not found | worker AG 2026-11-22: ai.spaincos.com serves its homepage (the Perplexity-history import page) [[1](https://ai.spaincos.com/)] and its repo rentspire-bspain/ai-gateway-site is indexed [[2](https://github.com/rentspire-bspain/ai-gateway-site)], but /.well-known/security.txt is not indexed or retrievable, no vulnerability ",
+   "evidence": "Not found | worker AG 2026-11-22: ai.spaincos.com serves its homepage (the Perplexity-history import page) [[1](https://ai.spaincos.com/)] and its repo rentspire-bspain/ai-gateway-site is indexed [[2](https://github.com/rentspire-bspain/ai-gateway-site)], but /.well-known/security.txt is not indexed or retrievable, no vulnerability | worker GH 2026-11-22: No /.well-known/security.txt could be observed for minutegig.com, and no monitored vulnerability-reporting inbox exists for that domain. The only disclosure contact surfaced anywhere was vulnreports@minut.com, published in the Bug Bounty Program Policy on minut.com [[1](https://www.minut.com/legal/b",
    "fix": "Add security.txt"
   },
   {
@@ -2862,12 +2862,12 @@
     "BV": "U",
     "TT": "U",
     "AG": "Y",
-    "GH": "U",
+    "GH": "R",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "docs/soc2-retention-and-governance.md; RentSpire SOC 2 readiness is a separate gate",
+   "evidence": "docs/soc2-retention-and-governance.md; RentSpire SOC 2 readiness is a separate gate | worker CT 2026-11-22: Fetching comptrove.com and its obvious sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) surfaced none of the three PASS-benchmark elements: (1) no trust page \u2014 the only trust-center result found was for a different entity, AcaTrove at acatrove.com [[11](https://apis.io/security/ | worker GH 2026-11-22: No buyer-facing security/compliance evidence could be observed for minutegig.com: search results did not surface any minutegig.com trust page, SOC 2 status, or security questionnaire pack [[1](https://oneminutego.com/sitemap.xml?lang=en)][[2](https://www.minutegroup.com/policies/terms-and-conditions",
    "fix": "Trust center page per product"
   },
   {
@@ -3002,12 +3002,12 @@
     "BV": "R",
     "TT": "-",
     "AG": "Y",
-    "GH": "U",
+    "GH": "R",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "Local grep: 0 ld+json blocks | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
+   "evidence": "Local grep: 0 ld+json blocks | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item) | worker GH 2026-11-22: Attempted to fetch https://minutegig.com and its obvious sub-pages to inspect the served markup for <script type=\"application/ld+json\"> blocks; the retrieval did not surface the site's markup or any relevant pages, so none of the five required types \u2014 Organization, WebSite+SearchAction, SoftwareAppl",
    "fix": "Add and validate with Rich Results Test"
   },
   {
@@ -3241,13 +3241,13 @@
    "status": {
     "BV": "U",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not audited",
+   "evidence": "Not audited | worker CT 2026-11-22: Observed the live Comptrove page ('Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps' at comptrove.com): acronyms appear unexpanded at first use \u2014 'BR' in bedroom-count labels, 'HUD FMR' as a rent benchmark, and 'Pro' as a product tier \u2014 with no full-term-then-parenthetical definition a | worker AG 2026-11-22: Fetched the live ai.spaincos.com landing copy: most visible consumer-facing prompts are plain-language, but the page also serves technical wording such as \"open-weight models\" without a plain-language definition at first use [[1](https://ai.spaincos.com/)]. The site's GitHub repo (rentspire-bspain/a",
    "fix": "Copy lint + readability check"
   },
   {
@@ -3284,10 +3284,10 @@
     "AG": "R",
     "GH": "R",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Three values in docs: TT says 1 N \u2248 $0.004; pricing doc catalog (500 N = 1,000 credits; 2,500 credits = $1) gives \u2248 $0.0008; D5 (2,500 N \u2248 $0.25) gives \u2248 $0.0001",
+   "evidence": "Three values in docs: TT says 1 N \u2248 $0.004; pricing doc catalog (500 N = 1,000 credits; 2,500 credits = $1) gives \u2248 $0.0008; D5 (2,500 N \u2248 $0.25) gives \u2248 $0.0001 | worker CT 2026-11-22: Fetched comptrove.com and its implied sub-page surfaces (help/docs/terms). What is served right now identifies Comptrove as a rent-comps product; the only pricing signal observed is a Pro price of $179/month during a launch offer [[1](https://comptrove.com/m/austin/)]. No served page defines 'neuron",
    "fix": "Decide one constant in earn_actions/model_costs; render from API; legal reviews any $ claim"
   },
   {
@@ -3362,12 +3362,12 @@
     "BV": "Y",
     "TT": "U",
     "AG": "Y",
-    "GH": "U",
+    "GH": "R",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "AI answers cite sources; Terminal pages unverified",
+   "evidence": "AI answers cite sources; Terminal pages unverified | worker GH 2026-11-22: No minutegig.com document could be observed containing a link at its point of reference, and no source or filtered evidence view was found. Searches for https://minutegig.com plus its obvious sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) returned no minutegig.com content at a",
    "fix": "Apply to ST, CT, DG evidence references"
   },
   {
