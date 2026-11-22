@@ -1,5 +1,5 @@
 {
- "version": "v319-product-surface-inventory-1",
+ "version": "v319-product-surface-inventory-2",
  "note": "Fresh product-surface inventory \u2014 priority areas first (checkout, Comet, OAuth, restore, mobile). Stable IDs PI-###; FK to the 29-category scoring table; acceptance test per item; last evidence = live check at 2026-11-22T21:30Z unless noted. Does NOT force the 157; does not change weights or scores.",
  "items": [
   {
@@ -64,6 +64,51 @@
    "acceptance": "status page 200 both domains; health endpoint ok:true",
    "last_evidence": "live 2026-11-22T21:30Z batch checks (PR #340)",
    "status": "live"
+  },
+  {
+   "id": "PI-008",
+   "surface": "voice conversation UI + states",
+   "fk": "Voice",
+   "scope": "modules/voice-convo.js/.css: amber processing state, visible errors, unsupported-browser explanations, rate control",
+   "acceptance": "module + css serve 200; states render (20/20 headless checks in PR #289); server STT/TTS on Render",
+   "last_evidence": "live 2026-11-22T22:00Z: module 200, css 200; voice-service/health 404 (Render deploy owner-gated)",
+   "status": "UI live; server voice-service UNAVAILABLE (owner gate)"
+  },
+  {
+   "id": "PI-009",
+   "surface": "enterprise admin (audit log + role gates)",
+   "fk": "Enterprise",
+   "scope": "modules/enterprise-admin.js + settings-org.js: audit preview + CSV export (250 rows, sentinel warning), role-gate vs entitlement clarity, team function v17 template actions",
+   "acceptance": "modules serve 200; team function enforces auth (401 unauth, 403 non-member on template actions); audit export SHA-verified",
+   "last_evidence": "live 2026-11-22T22:00Z: both modules 200; team unauth 401; eval-bot 403 non-member (this session)",
+   "status": "live; admin 200-path unverified (no owner token)"
+  },
+  {
+   "id": "PI-010",
+   "surface": "docs panel + artifacts library",
+   "fk": "Features",
+   "scope": "modules/docs-panel.js (markdown/sheets/docs/web-app views, download) + modules/library.js (search, collections, archive)",
+   "acceptance": "modules serve 200; doc panel opens on chip click (UX master B10 PASS); library overlay renders",
+   "last_evidence": "live 2026-11-22T22:00Z: both modules 200; doc-panel interaction verified in UX master 100.0 run",
+   "status": "live"
+  },
+  {
+   "id": "PI-011",
+   "surface": "share + fleet-dispatch functions",
+   "fk": "Computer",
+   "scope": "supabase/functions/share (thread share links) + fleet-dispatch (webapp job dispatch)",
+   "acceptance": "both functions enforce auth boundaries (401/403 unauth)",
+   "last_evidence": "live 2026-11-22T22:00Z: share 401, fleet-dispatch 403 unauth \u2014 boundaries enforced",
+   "status": "live boundaries; positive-path dispatch verified in prior batches"
+  },
+  {
+   "id": "PI-012",
+   "surface": "fleet sweep + webapp surfaces",
+   "fk": "Fleet",
+   "scope": "modules/fleet.js + webapps.js + qa/fleet-sweep runner",
+   "acceptance": "both modules 200; sweep JSON current with honest NOT_MEASURED for bot-gated domains",
+   "last_evidence": "live 2026-11-22T22:00Z: modules 200; sweep counts {PASS:3, NOT_MEASURED:6} (2026-11-22T07:28Z run)",
+   "status": "live; 6/9 domains NOT_MEASURED (Vercel bot challenge)"
   }
  ]
 }
