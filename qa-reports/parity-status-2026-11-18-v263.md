@@ -2857,3 +2857,22 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - WATCH: Groq free-tier daily tokens at 99.9% (199,821/200,000 TPD) from today's QA traffic — Flint fallback active by design; resets on the UTC day roll.
 
 **HEADLINE: 87.4% (11175/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN. Cap $500 live.** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key form open), Comet 70 (browser validation), Wave-1 webapp rebuild.
+
+### 21. §30q addendum — v305: THE UX H-CATEGORY FIX — MASTER 96.8 GREEN (new record)
+
+- ~~UX master weakest category fixed (PRs #317 + #318)~~ — H went 80 -> 100: the two hardcoded ai.spaincos.com strings inside CSP-protected inline scripts (the import-status message and the allowlist comment — the scrub can never touch scripts) are now brand-neutral (CSP hash regenerated, 4/4 verified); the login placeholder rewrite now works at the attribute level server-side (the v306 whole-segment exception never fired). LIVE-VERIFIED: the boundview.com homepage has ZERO spaincos mentions. H3 verified: module bytes identical across both domains.
+- **UX MASTER BENCHMARK: 96.8 GREEN** (A 92.9, B 91.7, C 100, D 100, E 100, F 100, G 100, H 100) — new record (was 94.8 at v300, 91.4 at v290). The only sub-100 categories: A 92.9 (A7 corrupted-token refresh path partial), B 91.7 (B6 LaTeX + B11 streaming instrumentation partials).
+- Stripe live key: STILL PENDING THE OWNER — the credential form is open; the vault holds only the TEST-mode key, which cannot serve the live-mode price IDs.
+
+**v300 -> v304 summary table (owner request):**
+
+| Version | Headline | What changed |
+|---|---|---|
+| v300 | 87.2% | UX master partials executed -> 94.8 GREEN; boundview login email verified fixed; Stripe live-key form opened |
+| v301 | 87.3% | HTTP 546 root-caused (Supabase WORKER_RESOURCE_LIMIT); client retry surface + QA retry (PR #309); deployed source drift committed (PR #310); Observability 78 |
+| v302 | 87.2% | Cap-raise attempt blocked by permissions (owner steps recorded); gateway compute-diet lane fired |
+| v303 | 87.3% | x_meter cap RAISED to $500 — production call-model found in the router project, floor deployed + live-verified (PR #313); repo call-model synced to production source |
+| v304 | 87.4% | 546 FIXED (PR #315): false-positive completion-doc regex ran an 8s evidence stage on EVERY request; A/B zero 546s, median 23s -> 13.5s; Observability 82 |
+| v305 | 87.4% | UX H-category 80 -> 100 (PRs #317/#318) — MASTER 96.8 GREEN, new record |
+
+**HEADLINE: 87.4% (11181/128, 29 categories) — 🟡 YELLOW band. UX MASTER 96.8 GREEN (record). Cap $500 live.**
