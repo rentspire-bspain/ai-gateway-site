@@ -1,5 +1,5 @@
 {
- "version": "v319-product-surface-inventory-2",
+ "version": "v320-product-surface-inventory-3",
  "note": "Fresh product-surface inventory \u2014 priority areas first (checkout, Comet, OAuth, restore, mobile). Stable IDs PI-###; FK to the 29-category scoring table; acceptance test per item; last evidence = live check at 2026-11-22T21:30Z unless noted. Does NOT force the 157; does not change weights or scores.",
  "items": [
   {
@@ -109,6 +109,51 @@
    "acceptance": "both modules 200; sweep JSON current with honest NOT_MEASURED for bot-gated domains",
    "last_evidence": "live 2026-11-22T22:00Z: modules 200; sweep counts {PASS:3, NOT_MEASURED:6} (2026-11-22T07:28Z run)",
    "status": "live; 6/9 domains NOT_MEASURED (Vercel bot challenge)"
+  },
+  {
+   "id": "PI-013",
+   "surface": "public entry / onboarding gate (root)",
+   "fk": "GettingStarted",
+   "scope": "/ root on both hosts: login wall, brand title, OAuth/file examples popover, no cross-brand leakage",
+   "acceptance": "both roots 200; titles ai.spaincos.com vs BoundView; zero dead internal links; keyboard focus visible",
+   "last_evidence": "live 2026-11-22T23:05Z: both 200; ai title 'ai.spaincos.com \u2014 Where knowledge begins', bv title 'BoundView'; no brand-name leakage either direction (body-text scan); tab focus visible on OAuth examples popover",
+   "status": "live"
+  },
+  {
+   "id": "PI-014",
+   "surface": "docs + help surfaces, both hosts",
+   "fk": "Docs/Support",
+   "scope": "/docs and /help on both hosts via bv-render ?page=; host-aware contact email and branding",
+   "acceptance": "4 surfaces 200; help contact host-aware; zero dead links",
+   "last_evidence": "live 2026-11-22T23:05Z: 4/4 200; ai help shows bspain@spaincos.com, bv help shows support@boundview.com + CanonIntel LLC; 0 dead links across all pages",
+   "status": "live"
+  },
+  {
+   "id": "PI-015",
+   "surface": "status page, both hosts",
+   "fk": "Observability",
+   "scope": "/status on both hosts: service status view, back-to-app nav",
+   "acceptance": "both 200; back link present",
+   "last_evidence": "live 2026-11-22T23:05Z: both 200, '\u2190 Back to the app' first tabbable element, focus visible",
+   "status": "live"
+  },
+  {
+   "id": "PI-016",
+   "surface": "legal navigation (terms/privacy), both hosts",
+   "fk": "Legal",
+   "scope": "/terms and /privacy on both hosts: canonical host separation, entity naming",
+   "acceptance": "4 surfaces 200; canonical+og:url host-correct on privacy; CanonIntel LLC on bv legal only; RentSpire/Spain Companies on neither",
+   "last_evidence": "live 2026-11-22T23:05Z: 4/4 200; canonical https://boundview.com/privacy vs https://ai.spaincos.com/privacy both correct; CanonIntal true on bv terms/privacy/help, false on all ai pages; spaincos false on all bv pages",
+   "status": "live"
+  },
+  {
+   "id": "PI-017",
+   "surface": "keyboard + empty/error states, public surfaces",
+   "fk": "Accessibility",
+   "scope": "tab-order/focus-visibility across all 12 public surfaces; unknown-path handling",
+   "acceptance": "every surface reaches a focus-visible element within 6 tabs; unknown paths handled without a dead end",
+   "last_evidence": "live 2026-11-22T23:05Z: 12/12 surfaces tab-focus visible (legal pages expose a minimal mailto-only focus surface \u2014 nav links are plain text on legal pages, recorded as observation); unknown path /definitely-not-a-page-xyz returns the app shell (HTTP 200 SPA fallback, no dedicated 404 page) on both hosts",
+   "status": "live; NOTED: no dedicated 404 page; legal-page nav is non-focusable text"
   }
  ]
 }
