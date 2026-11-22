@@ -1,0 +1,7 @@
+Contact: mailto:bspain@spaincos.com
+Contact: mailto:support@boundview.com
+Expires: 2027-11-22T08:00:00.000Z
+Preferred-Languages: en
+Canonical: https://ai.spaincos.com/.well-known/security.txt
+Canonical: https://boundview.com/.well-known/security.txt
+Policy: Report security vulnerabilities to the Contact addresses. Include reproduction steps and affected URLs. We aim to acknowledge within 72 hours. Please do not test against live user accounts; a free-tier test account is acceptable. Coordinated disclosure requested — we will credit researchers who wish.
