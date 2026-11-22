@@ -84,7 +84,8 @@ test("Settings roster searches locally and only owners can change a teammate's r
     search.value = "missing";
     search.events.input();
     assert.ok(all(pane).some((n) => n.textContent === "No teammates match your search."));
-    assert.equal(calls.length, 2);
+    assert.equal(calls.length, role === "member" ? 2 : 3);
+    if (role !== "member") assert.deepEqual(calls[2], { action: "template_get" });
     if (select) {
       search.value = "";
       search.events.input();
@@ -113,4 +114,22 @@ test("teammate templates: presets, apply/clear, effective profile preview", () =
   assert.equal(p.template, "Code Reviewer"); assert.match(p.instructions, /Review code/); assert.equal(p.name, "ada");
   const none = T.effectiveProfile({ email: "x@y.co" }, a);
   assert.equal(none.template, null); assert.match(none.instructions, /No template/); assert.match(none.memory, /No shared memory/);
+});
+
+test("team edge function: template actions are admin-gated, id-only, server-resolved", () => {
+  const src = require("fs").readFileSync(__dirname + "/../supabase/functions/team/index.ts", "utf8");
+  const ui = require("fs").readFileSync(__dirname + "/settings-premium.js", "utf8");
+  const set = src.slice(src.indexOf('case "template_set"'), src.indexOf("default:", src.indexOf('case "template_set"')));
+  assert.match(set, /myRole !== "owner" && myRole !== "admin"/);
+  assert.match(set, /hasOwnProperty/);               // unknown/proto ids rejected
+  assert.doesNotMatch(set, /b\.instructions/);       // client text is never trusted
+  assert.match(set, /roleOf\(target\)/);             // only existing members
+  // presets in UI and server must agree
+  for (const id of ["research-analyst", "code-reviewer", "data-extractor", "summarizer"]) {
+    assert.ok(src.includes('"' + id + '"') && ui.includes('"' + id + '"'), id);
+  }
+  const sql = require("fs").readFileSync(__dirname + "/../qa/teammate-templates-schema.sql", "utf8");
+  assert.match(sql, /IF NOT EXISTS/); assert.match(sql, /ENABLE ROW LEVEL SECURITY/); assert.doesNotMatch(sql, /CREATE POLICY/);
+  const gw = require("fs").readFileSync(__dirname + "/../supabase/functions/gateway-chat/index.ts", "utf8");
+  assert.match(gw, /teammate_template_assignments\?member_email=eq/);
 });

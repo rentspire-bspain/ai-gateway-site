@@ -179,7 +179,15 @@
           var tsel = el("select", "stg-input"); tsel.setAttribute("aria-label", "Template for " + (m.email || "member"));
           var none = el("option", "", "No template"); none.value = ""; tsel.appendChild(none);
           PRESETS.forEach(function (t) { var o = el("option", "", t.name); o.value = t.id; o.selected = !!(assigns[String(m.email || "").toLowerCase()] && assigns[String(m.email || "").toLowerCase()].templateId === t.id); tsel.appendChild(o); });
-          tsel.addEventListener("change", function () { assigns = applyTemplate(assigns, m.email, tsel.value); store.save(assigns); inviteMsg.textContent = "Template updated for " + m.email + "."; showProfile(effectiveProfile(m, assigns)); });
+          tsel.addEventListener("change", function () {
+            var v = tsel.value; tsel.disabled = true;
+            team("template_set", { email: m.email, template_id: v }).then(function () {
+              assigns = applyTemplate(assigns, m.email, v); store.save(assigns); inviteMsg.textContent = "Template saved for " + m.email + " (enforced on their chats)."; showProfile(effectiveProfile(m, assigns));
+            }).catch(function (e) {
+              assigns = applyTemplate(assigns, m.email, v); store.save(assigns); // offline fallback only; NOT enforced server-side
+              inviteMsg.textContent = "Saved on this device only (not enforced): " + String(e && e.message || e).slice(0, 100); showProfile(effectiveProfile(m, assigns));
+            }).then(function () { tsel.disabled = false; });
+          });
           row.appendChild(tsel);
         }
         var pv = btn("Preview profile", ""); pv.setAttribute("aria-label", "Preview profile for " + (m.email || "member"));
@@ -246,7 +254,14 @@
         return team("members").then(function (d) {
           roster = d && Array.isArray(d.members) ? d.members.filter(Boolean) : [];
           filters.hidden = !roster.length;
-          renderList();
+          if (!canManage) { renderList(); return; }
+          return team("template_get").then(function (t) {
+            if (t && Array.isArray(t.assignments)) {
+              var srv = {};
+              t.assignments.forEach(function (r) { var tp = r && presetById(r.template_id); if (tp) srv[String(r.member_email).toLowerCase()] = { templateId: tp.id, instructions: tp.instructions }; });
+              assigns = srv; store.save(assigns); // server is the source of truth; localStorage mirrors it
+            }
+          }).catch(function () { /* keep the local fallback */ }).then(renderList);
         });
       }).catch(function (e) {
         myRole = "";
