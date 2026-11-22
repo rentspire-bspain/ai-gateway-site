@@ -1,5 +1,5 @@
 {
- "version": 16,
+ "version": 17,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -559,15 +559,15 @@
    "W": 3,
    "ircm": "2010",
    "status": {
-    "BV": "R",
+    "BV": "Y",
     "TT": "G",
-    "AG": "R",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT pending dot is paired with text | playwright AG 2026-11-22: 6/16 status indicators lack text/aria | playwright BV 2026-11-22: 6/16 status indicators lack text/aria",
+   "evidence": "TT pending dot is paired with text | playwright AG 2026-11-22: 6/16 status indicators lack text/aria | playwright BV 2026-11-22: 6/16 status indicators lack text/aria | AG fix on branch: aria-hidden on 5 decorative dots (mic-dot x2, status-dot, queued-dot, vc-dot) + role=status/aria-live on importStatus; local Playwright positive 0/16 bare, live negative 6/16 (undeployed) 2026-11-22 | BV fix on branch: aria-hidden on 5 decorative dots (mic-dot x2, status-dot, queued-dot, vc-dot) + role=status/aria-live on importStatus; local Playwright positive 0/16 bare, live negative 6/16 (undeployed) 2026-11-22",
    "fix": "Keep"
   },
   {

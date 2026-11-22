@@ -21,7 +21,7 @@
   }
   function buildUI() {
     bar = document.createElement("div"); bar.className = "vc-bar"; bar.setAttribute("role", "status"); bar.setAttribute("aria-live", "polite");
-    bar.innerHTML = '<span class="vc-dot"></span><span class="vc-state"></span><span class="vc-text"></span><button type="button" class="vc-exit">Exit</button>';
+    bar.innerHTML = '<span class="vc-dot" aria-hidden="true"></span><span class="vc-state"></span><span class="vc-text"></span><button type="button" class="vc-exit">Exit</button>';
     document.body.appendChild(bar);
     stateEl = bar.querySelector(".vc-state"); textEl = bar.querySelector(".vc-text");
     bar.querySelector(".vc-exit").onclick = stop;

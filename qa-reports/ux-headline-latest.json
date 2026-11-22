@@ -1,20 +1,20 @@
 {
- "ts": "2026-11-22T20:59:22+00:00",
- "version": 16,
- "portfolio_strict_pct": 16.4,
- "portfolio_measured_only_pct": 31.8,
+ "ts": "2026-11-22T21:00:27+00:00",
+ "version": 17,
+ "portfolio_strict_pct": 16.5,
+ "portfolio_measured_only_pct": 31.9,
  "apps": {
   "BV": {
-   "strict": 29.2,
-   "measured_only": 40.0,
+   "strict": 29.4,
+   "measured_only": 40.2,
    "coverage": 73.5,
    "counts": {
     "U": 60,
     "G": 37,
-    "R": 50,
-    "Y": 79
+    "R": 49,
+    "Y": 80
    },
-   "weighted_num": 33900,
+   "weighted_num": 34050,
    "weighted_den": 1160
   },
   "TT": {
@@ -31,16 +31,16 @@
    "weighted_den": 992
   },
   "AG": {
-   "strict": 36.0,
-   "measured_only": 49.0,
+   "strict": 36.1,
+   "measured_only": 49.2,
    "coverage": 74.1,
    "counts": {
     "U": 52,
     "G": 41,
-    "R": 32,
-    "Y": 76
+    "R": 31,
+    "Y": 77
    },
-   "weighted_num": 36100,
+   "weighted_num": 36250,
    "weighted_den": 1004
   },
   "GH": {
