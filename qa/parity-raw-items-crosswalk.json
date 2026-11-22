@@ -1,0 +1,479 @@
+{
+ "version": "v319-crosswalk",
+ "note": "Honest crosswalk of the pinned human checklist. The 29 scored categories are the complete scoring table. X-items are the doc's own explicit exclusions from the 157. The 157-item raw count has NO per-item enumeration in this tree (discrepancy reported, rows NOT manufactured).",
+ "scored_categories": [
+  {
+   "id": "R-01",
+   "kind": "scored-category",
+   "name": "Features",
+   "weight": 14,
+   "score": 99,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-02",
+   "kind": "scored-category",
+   "name": "Computer",
+   "weight": 8,
+   "score": 99,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-03",
+   "kind": "scored-category",
+   "name": "API",
+   "weight": 10,
+   "score": 95,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-04",
+   "kind": "scored-category",
+   "name": "Troubleshooting",
+   "weight": 4,
+   "score": 90,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-05",
+   "kind": "scored-category",
+   "name": "Voice",
+   "weight": 4,
+   "score": 85,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-06",
+   "kind": "scored-category",
+   "name": "Account",
+   "weight": 6,
+   "score": 95,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-07",
+   "kind": "scored-category",
+   "name": "Models",
+   "weight": 8,
+   "score": 92,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-08",
+   "kind": "scored-category",
+   "name": "Connectors",
+   "weight": 12,
+   "score": 99,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-09",
+   "kind": "scored-category",
+   "name": "Privacy",
+   "weight": 6,
+   "score": 88,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-10",
+   "kind": "scored-category",
+   "name": "Comet",
+   "weight": 3,
+   "score": 78,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-11",
+   "kind": "scored-category",
+   "name": "Premium",
+   "weight": 2,
+   "score": 80,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-12",
+   "kind": "scored-category",
+   "name": "Enterprise",
+   "weight": 3,
+   "score": 74,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-13",
+   "kind": "scored-category",
+   "name": "GettingStarted",
+   "weight": 5,
+   "score": 93,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-14",
+   "kind": "scored-category",
+   "name": "Desktop",
+   "weight": 3,
+   "score": 80,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-15",
+   "kind": "scored-category",
+   "name": "Billing",
+   "weight": 6,
+   "score": 93,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-16",
+   "kind": "scored-category",
+   "name": "Mobile",
+   "weight": 3,
+   "score": 82,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-17",
+   "kind": "scored-category",
+   "name": "Teammates",
+   "weight": 1,
+   "score": 75,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-18",
+   "kind": "scored-category",
+   "name": "UX",
+   "weight": 6,
+   "score": 91,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-19",
+   "kind": "scored-category",
+   "name": "SEO",
+   "weight": 3,
+   "score": 85,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-20",
+   "kind": "scored-category",
+   "name": "Marketing",
+   "weight": 3,
+   "score": 75,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-21",
+   "kind": "scored-category",
+   "name": "Security",
+   "weight": 4,
+   "score": 82,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-22",
+   "kind": "scored-category",
+   "name": "Accessibility",
+   "weight": 2,
+   "score": 70,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-23",
+   "kind": "scored-category",
+   "name": "Legal/Compliance",
+   "weight": 2,
+   "score": 60,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-24",
+   "kind": "scored-category",
+   "name": "Docs/Support",
+   "weight": 2,
+   "score": 78,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-25",
+   "kind": "scored-category",
+   "name": "Observability",
+   "weight": 2,
+   "score": 85,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-26",
+   "kind": "scored-category",
+   "name": "Fleet",
+   "weight": 3,
+   "score": 70,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-27",
+   "kind": "scored-category",
+   "name": "Email/Notifications",
+   "weight": 1,
+   "score": 30,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-28",
+   "kind": "scored-category",
+   "name": "i18n",
+   "weight": 1,
+   "score": 40,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  },
+  {
+   "id": "R-29",
+   "kind": "scored-category",
+   "name": "NativeMobile",
+   "weight": 1,
+   "score": 48,
+   "fk": "self (scoring table)",
+   "source": "qa/parity-items.json @ master",
+   "status": "scored"
+  }
+ ],
+ "excluded_audit_items": [
+  {
+   "id": "X-01",
+   "kind": "excluded-audit-item",
+   "feature": "**Project \"Brain\"** \u2014 self-improving per-project memory that studies files/sessi",
+   "fk": "Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udfe1 we have project context + memory; the self-updating Brain "
+  },
+  {
+   "id": "X-02",
+   "kind": "excluded-audit-item",
+   "feature": "**Project automations** \u2014 recurring tasks (hourly/daily/weekly), source monitori",
+   "fk": "Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udfe1 our fleet runs scheduled jobs server-side; the in-product "
+  },
+  {
+   "id": "X-03",
+   "kind": "excluded-audit-item",
+   "feature": "**Create files and apps: XLSX, PPTX, HTML apps** with edit history, preview, sha",
+   "fk": "Features/Premium",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udfe1 DOCX/PDF covered; spreadsheet/deck/app creation not tracke"
+  },
+  {
+   "id": "X-04",
+   "kind": "excluded-audit-item",
+   "feature": "**Learn Mode**",
+   "fk": "Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-05",
+   "kind": "excluded-audit-item",
+   "feature": "**Model Council** (multi-model deliberation mode)",
+   "fk": "Models",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udfe1 we have writer A/B infra; council mode not tracked"
+  },
+  {
+   "id": "X-06",
+   "kind": "excluded-audit-item",
+   "feature": "**Personal Computer for Windows** (desktop app)",
+   "fk": "Desktop",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udfe1 tracked as \"Desktop app\" generally; v295 adds the installa"
+  },
+  {
+   "id": "X-07",
+   "kind": "excluded-audit-item",
+   "feature": "**Audio/video transcription + speaker labeling** in uploads",
+   "fk": "Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-08",
+   "kind": "excluded-audit-item",
+   "feature": "**File connectors sync** (Google Docs/Slides/Sheets live sync)",
+   "fk": "Connectors",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udfe1 covered by the Google OAuth item"
+  },
+  {
+   "id": "X-09",
+   "kind": "excluded-audit-item",
+   "feature": "**API: Decisions API, Monitor API, Context API** (we track Search/Agent API pari",
+   "fk": "API",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 the three newer API surfaces not tracked"
+  },
+  {
+   "id": "X-10",
+   "kind": "excluded-audit-item",
+   "feature": "**Artifacts space with MCP + persistent storage** (embed AI into artifacts)",
+   "fk": "Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-11",
+   "kind": "excluded-audit-item",
+   "feature": "**Claude Motion** (animated explainers)",
+   "fk": "Premium",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-12",
+   "kind": "excluded-audit-item",
+   "feature": "**Whiteboards / Sheets / Data templates** (beta artifact types)",
+   "fk": "Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-13",
+   "kind": "excluded-audit-item",
+   "feature": "**Incognito chats**",
+   "fk": "Privacy",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-14",
+   "kind": "excluded-audit-item",
+   "feature": "**Dots** (always-on goal-driven agents across connected apps)",
+   "fk": "Teammates/Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-15",
+   "kind": "excluded-audit-item",
+   "feature": "**ChatGPT Space** (Pages + files + sharing hub)",
+   "fk": "Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-16",
+   "kind": "excluded-audit-item",
+   "feature": "**ChatGPT Work** (long-job agent producing docs/decks/sites)",
+   "fk": "Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-17",
+   "kind": "excluded-audit-item",
+   "feature": "**MCP Events** (monitor external servers, act on events)",
+   "fk": "API/Connectors",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-18",
+   "kind": "excluded-audit-item",
+   "feature": "**Scheduled Tasks** (one-time/recurring with push/email)",
+   "fk": "Features",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udfe1 our automations cover the server side; in-product task sch"
+  },
+  {
+   "id": "X-19",
+   "kind": "excluded-audit-item",
+   "feature": "**Parental Controls**",
+   "fk": "Account",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udd34 not tracked"
+  },
+  {
+   "id": "X-20",
+   "kind": "excluded-audit-item",
+   "feature": "**Custom GPTs / publishable assistants**",
+   "fk": "Teammates",
+   "status": "excluded from 157 tracker",
+   "detail": "\ud83d\udfe1 Teammates tracked; publishable-to-others not itemized"
+  }
+ ],
+ "owner_gates": [
+  {
+   "id": "B-01",
+   "kind": "owner-gate",
+   "item": "Register OAuth apps: Slack/Dropbox/Outlook/Box (Connectors 58\u219285, +324 pts)",
+   "url": "https://api.slack.com/apps",
+   "status": "gate, outside denominator"
+  },
+  {
+   "id": "B-02",
+   "kind": "owner-gate",
+   "item": "Twilio credentials (Voice 65\u219280)",
+   "url": "https://console.twilio.com",
+   "status": "gate, outside denominator"
+  }
+ ],
+ "discrepancies": [
+  "raw_items count {done:104, partial:33, gap:20, total:157} in qa/parity-items.json has no enumerable per-item register in the repo (grep-verified at master b52c018 lineage); the count is batch-narrative-maintained since the 2026-11-11 17-agent audit.",
+  "The pinned human doc contains ~1500 status-icon/table rows, but the overwhelming majority are benchmark per-question EVIDENCE rows (IFEval 50-row tables, BrowseComp/DSQA/SimpleQA results), not scored parity items; enumerating them as items would manufacture rows \u2014 refused per coordinator instruction.",
+  "v194-era count 79/46/32 (157) vs today 104/33/20 (157): status promotions inside the same claimed total; since no per-item register exists, the 157 total itself is UNVERIFIABLE at item level \u2014 reported as an open discrepancy, not reconciled by invention."
+ ]
+}
