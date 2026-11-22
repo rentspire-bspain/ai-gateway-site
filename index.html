@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-AyRLyTePmIlvDdQaZ8FbwAhtuaei3TlzDCPA63ZEL5Y=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-Ax8jkQMUuZIWda9eYL2ofE12zrDe03QK9dB9qnVc5vc=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
@@ -2982,7 +2982,7 @@ function speakAnswer(text) {
         if (!r.ok) throw new Error(j?.error || ("HTTP " + r.status));
         total += j.embedded || 0; remaining = j.remaining || 0;
       }
-      setStat('<span class="ok">Imported ' + imported + ' threads — semantic index built over ' + total + ' documents.</span> Your Perplexity history is now searchable context on ai.spaincos.com.');
+      setStat('<span class="ok">Imported ' + imported + ' threads — semantic index built over ' + total + ' documents.</span> Your Perplexity history is now searchable context.');
     } catch (e) {
       setStat('<span class="ok">Imported ' + imported + ' threads.</span> Keyword search works now; semantic (vector) indexing is pending the OPENAI_API_KEY secret — paste it once on the Supabase secrets page and re-import or ask any question to activate it.');
     }
@@ -3575,7 +3575,7 @@ const AuthGuard = (function () {
   return { EXPIRED_MSG, isAuthError, makeError, expire, showGate, verify, refreshOrDead, signOut, localSignOut, clearLocal, stashQuery, restoreQuery };
 })();
 window.AuthGuard = AuthGuard;
-// v72: private-site lock — only allowlisted accounts may use ai.spaincos.com.
+// v72: private-site lock — only allowlisted accounts may use this site.
 // v91: the allowlist is now LIVE (org_allowlist table, managed from Settings → Team).
 // Invites update it instantly — no code deploy needed to admit someone.
 async function signinAllowed(email) {
