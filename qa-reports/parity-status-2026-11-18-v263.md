@@ -2798,3 +2798,16 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - New lane fired: gateway HTTP 546 investigation (outage_diagnoser) — the last unexplained flakiness class.
 
 **HEADLINE: 87.2% (11167/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 94.8 GREEN (record). Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key form open), Comet 70 (browser validation), Wave-1 webapp rebuild.
+
+### 17. §30q addendum — v301: THE 546 DIAGNOSIS (headline 87.2% + Observability 78)
+
+**The flakiness mystery solved (outage_diagnoser lane, PRs #309 + #310):**
+- HTTP 546 is NOT gateway code — it is Supabase's platform status WORKER_RESOURCE_LIMIT ("Function failed due to not having enough compute resource"). Nothing inside gateway-chat can catch it; the platform kills the worker.
+- Reproduced live with the eval account: 1 of 6 serial calls 546 (empty body ~5.5s); with 4 overlapping requests, 3 returned 546 at the identical 5.6s (worker killed together, 4th succeeded); 10 serial calls after all 200; 2-way overlap succeeds but at 22.5-26.8s vs ~11s alone — the cause of the 30.4s latency gate failure.
+- ~~Client retry surface (PR #309)~~ — live: fetchRetry retries 546 up to 2x with jittered backoff, shows the reconnecting note and a clear "briefly out of compute (HTTP 546)... press Retry" message instead of raw "Gateway error"; qa/prelaunch.py now retries 546 on POSTs so a recycled worker is no longer recorded as an outage. CSP hash updated (CI caught it, second run green).
+- ~~Deployed-source drift committed (PR #310)~~ — the IMPORTED HISTORY rule (deployed since platform 301) is now in the repo, byte-verified against the deployed tree.
+- Known side effect documented: 546 retry can double-count the usage meter slightly (retry happens before any output).
+- Open: real server-side fix = reduce per-request compute for trivial queries (skip the 400-row memory_items fetch and analyst/self-check stages) — needs function logs or a profile; the Management API logs endpoint rejected every table name tried, so the Supabase logs UI or owner action is needed. Standing guidance: never run overlapping suites against the gateway.
+- WATCH ITEM for the owner: x_meter shows month_spend_usd 315.23 of monthly_cap_usd 350 (~90%) — the cap will bind soon and needs a decision (raise cap or trim usage).
+
+**HEADLINE: 87.2% (11169/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN (record).** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live-key form open), Comet 70 (browser validation), Wave-1 webapp rebuild.
