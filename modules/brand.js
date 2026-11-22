@@ -47,6 +47,8 @@
     });
     for (var i = 0; i < MAP.length; i++) out = out.replace(MAP[i][0], MAP[i][1]);
     out = out.replace(/\u0000E(\d+)\u0000/g, function (_, n) { return emails[+n]; });
+    // exception: the login placeholder is BRAND COPY, not a real address
+    if (/^you@/.test(out) || out === "you@spaincos.com") out = "you@boundview.com";
     return out;
   }
   // v288 CRITICAL FIX: NEVER scrub text inside <script> (or <style>) elements. A script's
