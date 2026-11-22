@@ -2960,10 +2960,19 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 
 **HEADLINE: 88.1% (11275/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner OAuth + Stripe live key), store presence (owner), Legal counsel review (delivered), Wave-1 external-account integration (owner-gated).
 
-### 29. §30q addendum — v313: TEAMMATES TEMPLATES + PROFILE PREVIEW (Teammates 72)
+### 29. §30q addendum — v313: TEAMMATES TEMPLATES + PROFILE PREVIEW (Teammates 75)
 
 - ~~Teammate templates + read-only profile preview (PR #343)~~ — LIVE both domains (root-verified): four instruction presets with per-teammate apply (owners/admins) and a read-only effective-instructions preview per roster row; 6/6 tests. Teammates 70→72.
 - HONEST LIMITS (documented in the score note): assignments are browser-local (localStorage) — not synced and NOT enforced server-side on the teammate; no shared memory source. The server-side path (migration + team edge-function, PR #333 RLS pattern) is the next unlock.
 - Worktree cleanup: /home/user/workspace/tmpl-wt removed (disk hygiene).
 
 **HEADLINE: 88.1% (11283/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner), store presence (owner), Legal counsel review (delivered), Wave-1 external-account integration (owner-gated).
+
+### 30. §30q addendum — v314: TEAMMATES SERVER-SIDE ENFORCEMENT + EVAL-REPLAY GREEN
+
+- ~~Template enforcement (PR #345)~~ — DEPLOYED: teammate_template_assignments (RLS deny-all, advisory-lock bootstrap; DDL recorded), team v17 (template_set owner/admin-only, template_get), gateway-chat v309 injects the assigned template first in STANDING INSTRUCTIONS (existing personalization path). UI syncs server-side with an honest 'not enforced' offline notice. Verified: 401/403 boundaries, both domains 200, DDL applied with RLS confirmed. Teammates 72→75.
+- ~~Eval-replay standing gate~~ — 10/10 PASS through gateway-chat v309 (research 3, continuation 2, status 2, fact 2, doc 1 — the new lookup introduces no regression; latencies 12-79s).
+- NOT verified (honest): the admin 200 assign path and a live chat demonstrating the template changing a teammate's answers (no owner token; credit discipline).
+- Worktrees cleaned.
+
+**HEADLINE: 88.2% (11289/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner), store presence (owner), Legal counsel review (delivered), Wave-1 external-account integration (owner-gated).
