@@ -132,6 +132,41 @@
     "Light": "Claro", "Dark": "Oscuro", "System": "Sistema",
     "System follows your device’s light/dark setting and updates automatically.": "Sistema sigue el ajuste claro/oscuro de tu dispositivo y se actualiza automáticamente."
   };
+  /* v3 additions: Connectors/Usage/Billing/Security/Org pane bodies, credentials/devices, common toasts + buttons. */
+  var ES3 = {
+    "Billing": "Facturación", "Usage": "Uso", "Security": "Seguridad", "Team": "Equipo",
+    "Devices": "Dispositivos", "Credentials": "Credenciales", "Two-factor": "Verificación en dos pasos",
+    "Devices & sessions": "Dispositivos y sesiones", "Devices that have signed in to this app.": "Dispositivos que han iniciado sesión en esta aplicación.",
+    "Loading devices…": "Cargando dispositivos…", "No devices registered yet.": "Aún no hay dispositivos registrados.",
+    "Remove device from list": "Quitar dispositivo de la lista", "Click again to delete": "Haz clic de nuevo para eliminar",
+    "Click again to sign out ALL devices": "Haz clic de nuevo para cerrar sesión en TODOS los dispositivos",
+    "Secrets for tools and connectors, encrypted at rest.": "Secretos para herramientas y conectores, cifrados en reposo.",
+    "No credentials saved yet — add one below.": "Aún no hay credenciales guardadas — añade una abajo.",
+    "Credential name": "Nombre de la credencial", "Secret value": "Valor del secreto",
+    "Save secret": "Guardar secreto", "Delete credential": "Eliminar credencial",
+    "Overwrite value": "Sobrescribir valor", "Overwrite secret": "Sobrescribir secreto",
+    "New value (overwrites)": "Nuevo valor (sobrescribe)", "Set up authenticator": "Configurar autenticador",
+    "Authenticator": "Autenticador", "Last active": "Última actividad",
+    "MCP servers": "Servidores MCP",
+    "Billing is rolling out: ": "La facturación se está implementando: ",
+    "Starting checkout…": "Iniciando el pago…", "Checkout unavailable: ": "Pago no disponible: ",
+    "Checkout error: ": "Error de pago: ", "Claiming…": "Reclamando…",
+    "Invite link copied: ": "Enlace de invitación copiado: ", "Enter a code first.": "Introduce un código primero.",
+    "Error: ": "Error: ", "Please sign in first.": "Primero inicia sesión.",
+    "Connected": "Conectado", "Not connected": "No conectado", "Disconnect": "Desconectar",
+    "Connect": "Conectar", "Add": "Añadir", "Remove": "Quitar", "Edit": "Editar", "Open": "Abrir",
+    "Done": "Listo", "Back": "Atrás", "Continue": "Continuar", "Confirm": "Confirmar",
+    "Loading…": "Cargando…", "None": "Ninguno", "Default": "Predeterminado", "Enabled": "Activado",
+    "Disabled": "Desactivado", "Active": "Activo", "Expired": "Expirado", "Never": "Nunca",
+    "Today": "Hoy", "Yesterday": "Ayer", "Search": "Buscar", "Filter": "Filtrar", "All": "Todos",
+    "None yet": "Nada todavía", "No results": "Sin resultados", "No results found.": "No se encontraron resultados.",
+    "Your plan": "Tu plan", "Current balance": "Saldo actual", "This month": "Este mes",
+    "Manage": "Administrar", "Manage connectors": "Administrar conectores",
+    "Connected sources power cited answers about your own email, files, and calendar.": "Las fuentes conectadas permiten respuestas con citas sobre tu correo, archivos y calendario.",
+    "Registration pending": "Registro pendiente",
+    "Updated": "Actualizado", "Just now": "Ahora mismo"
+  };
+  Object.keys(ES3).forEach(function (k) { ES[k] = ES3[k]; });
   Object.keys(ES2).forEach(function (k) { ES[k] = ES2[k]; });
 
   /* Elements whose text is user/document content and must never be translated. */
