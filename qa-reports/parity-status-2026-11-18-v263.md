@@ -2799,7 +2799,7 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 
 **HEADLINE: 87.2% (11167/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 94.8 GREEN (record). Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key form open), Comet 70 (browser validation), Wave-1 webapp rebuild.
 
-### 17. §30q addendum — v301: THE 546 DIAGNOSIS (headline 87.2% + Observability 78)
+### 17. §30q addendum — v301: THE 546 DIAGNOSIS (headline 87.2% + Observability 82)
 
 **The flakiness mystery solved (outage_diagnoser lane, PRs #309 + #310):**
 - HTTP 546 is NOT gateway code — it is Supabase's platform status WORKER_RESOURCE_LIMIT ("Function failed due to not having enough compute resource"). Nothing inside gateway-chat can catch it; the platform kills the worker.
@@ -2845,3 +2845,15 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Stripe live-key form: still open with the owner.
 
 **HEADLINE: 87.3% (11173/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN (record).** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key), Comet 70 (browser validation), Wave-1 webapp rebuild.
+
+### 20. §30q addendum — v304: THE 546 FIX — ROOT CAUSE WAS A FALSE POSITIVE (Observability 82)
+
+**The compute-diet lane's finding (PR #315, gateway-chat v307, deployed + A/B verified):**
+- The 546/latency pressure was NOT the memory fetch (1ms for eval-bot). It was COMPLETION_DOC_RE matching the platform's own SYSTEM blocks (BENCHMARK GOSPEL, capability baseline — they mention "completion document"), so EVERY request — including "capital of France" — ran the v230/v244 evidence block: 3 fetches with 8s walls each, an injected 8K-char block (the ~7.2K prompt tokens), a forced tool loop, and a bogus completion-status-DATE.md auto-attached to every answer (visible in eval-replay history: "attach files — 1 file(s)" on all 10 cases). Measured: 8.0s between toolCtx build and the next stage on a trivial query.
+- ~~Fix live (PR #315)~~: completion-doc context built from user/assistant turns only; genuine doc asks covered by the new FILE_CREATE_INTENT (deterministic create-file artifact for explicit .md/.txt asks); trivial-query fast path (single turn, <=15 words, no attachment/history words) fetches 20 memory rows instead of 400; x_timing stage marks on every non-stream response.
+- A/B on the lane's repro protocol: 6 serial calls median ~23s -> ~13.5s (2.8-16.0s), ZERO 546s, including two 4-way parallel bursts 8/8 (previously 3/4 killed). Remaining time is upstream (intent analyst hitting its 6s cap under provider load; follow-ups 0.3-7s post-writer — candidate for parallelizing).
+- Quality gates: eval-replay 10/10 (research/continuation/status/fact/doc), prelaunch 36/36. The 'current-events fast path' prelaunch check can now actually reach research_sufficient (the false positive used to force the loop on every request).
+- Users no longer get the bogus completion-status-*.md attachment on ordinary answers — intended behavior, verified.
+- WATCH: Groq free-tier daily tokens at 99.9% (199,821/200,000 TPD) from today's QA traffic — Flint fallback active by design; resets on the UTC day roll.
+
+**HEADLINE: 87.4% (11175/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN. Cap $500 live.** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key form open), Comet 70 (browser validation), Wave-1 webapp rebuild.
