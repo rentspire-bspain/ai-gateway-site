@@ -47,26 +47,47 @@ test("Enterprise uses the current session and never requests admin data for memb
   const vm = require("node:vm");
   for (const role of [null, "member", "admin"]) {
     const calls = [];
-    function element() {
-      return {
-        appendChild() {}, remove() {}, setAttribute() {}, addEventListener() {}
+    const elements = [], downloads = [];
+    function element(tag) {
+      const node = {
+        tag, appendChild() {}, remove() {}, setAttribute() {},
+        addEventListener(event, fn) { this[event] = fn; },
+        click() { downloads.push(this.download); }
       };
+      elements.push(node);
+      return node;
     }
     const window = { sb: { auth: { getSession: async () => ({
       data: { session: role ? { access_token: "current-token" } : null }
     }) } } };
     vm.runInNewContext(src, {
       window,
+      Blob, URL: { createObjectURL(blob) { downloads.push(blob); return "blob:test"; } },
+      setTimeout() {},
       document: { getElementById: element, createElement: element },
       fetch: async (url, options) => {
         assert.equal(options.headers.Authorization, "Bearer current-token");
         const key = options.body ? JSON.parse(options.body).action : url.split("/").pop().split("?")[0];
         calls.push(key);
-        return { ok: true, json: async () => key === "whoami" ? { role } : key === "members" ? { members: [] } : [] };
+        return { ok: true, json: async () => key === "whoami" ? { role } : key === "members" ? { members: [] } :
+          url.endsWith("limit=251") ? Array.from({ length: 251 }, (_, i) => ({ action: "event-" + i })) : [] };
       }
     });
     window.EnterpriseAdminPane.render();
     await new Promise(setImmediate);
     assert.deepEqual(calls, role === "admin" ? ["whoami", "members", "fleet_dispatch", "audit_logs"] : role ? ["whoami"] : []);
+    const button = elements.find((node) => node.textContent === "Export latest account events (up to 250)");
+    assert.equal(Boolean(button), role === "admin");
+    if (button) {
+      button.click();
+      assert.equal(button.disabled, true);
+      await new Promise(setImmediate);
+      assert.equal(button.disabled, false);
+      assert.equal(downloads[1], "account-audit.csv");
+      const csv = await downloads[0].text();
+      assert.match(csv, /event-249/);
+      assert.doesNotMatch(csv, /event-250/);
+      assert.ok(elements.some((node) => /Older events were not included/.test(node.textContent)));
+    }
   }
 });
