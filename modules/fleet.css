@@ -15,3 +15,8 @@
 .fl-ct{display:flex;align-items:center;gap:8px;font-size:13px}.fl-m{color:var(--text-muted);font-size:12px;margin-top:4px}
 .fl-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--text-muted)}.fl-s-live{background:#2e9e5b}.fl-s-paused{background:#c98a1b}.fl-s-on_demand{background:#4a7fd0}
 .fl-tg{margin-left:8px;background:var(--bg-elevated);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px 8px;cursor:pointer;font-size:12px}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .fl-x, .fl-tab { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}

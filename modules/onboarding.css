@@ -685,3 +685,14 @@
     max-height: calc(100vh - 24px);
   }
 }
+
+/* ---- v311 touch targets: the step dots were 7x7px buttons ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .ob-tour-dots { gap: 0; }
+  /* the dot is drawn by ::before (same 7px / 20px-active size as before); the button's padding is the 44px-tall hit area */
+  .ob-tour-dot { position: relative; box-sizing: content-box; padding: 18.5px 10px; background: transparent !important; }
+  .ob-tour-dot::before { content: ""; position: absolute; inset: 18.5px 10px; border-radius: 999px; background: var(--border); transition: background 160ms ease; }
+  .ob-tour-dot:hover::before { background: var(--text-tertiary); }
+  .ob-tour-dot.active::before { background: var(--accent); }
+  .ob-tour-x, .ob-tour-btn { min-width: 44px; min-height: 44px; }
+}

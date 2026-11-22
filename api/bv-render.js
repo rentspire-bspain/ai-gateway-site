@@ -92,7 +92,7 @@ module.exports = async (req, res) => {
     const qpage = String((req.url || "").split("?")[1] || "").match(/page=([a-z]+)/);
     if (qpage) {
       const page = qpage[1];
-      const allowed = { terms: 1, privacy: 1, docs: 1, help: 1 };
+      const allowed = { terms: 1, privacy: 1, docs: 1, help: 1, status: 1 };
       if (!allowed[page]) { res.writeHead(404, headers); res.end("not found"); return; }
       const base = isBoundViewHost ? `${page}.boundview.html` : `${page}.html`;
       const cands = [path.join(__dirname, base), path.join(__dirname, "../" + base), path.join(process.cwd(), base), path.join(process.cwd(), "../" + base)];

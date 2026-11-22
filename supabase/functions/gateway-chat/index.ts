@@ -1538,6 +1538,18 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
         }
       } catch (_e) { /* memory lookup is best-effort */ }
     }
+    // TEAMMATE TEMPLATE (server-enforced): the owner/admin-assigned template for this account is merged into the
+    // STANDING INSTRUCTIONS (template first, so it survives the 1000-char cap). Read with the service role; best-effort.
+    if (!apiKeyMode && userEmail) {
+      try {
+        const tr = await fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/teammate_template_assignments?member_email=eq.${encodeURIComponent(userEmail.toLowerCase())}&select=instructions&limit=1`, { headers: { apikey: svc, Authorization: `Bearer ${svc}` }, signal: AbortSignal.timeout(2500) });
+        const tpl = tr.ok ? String(((await tr.json())?.[0]?.instructions) ?? "").trim() : "";
+        if (tpl) {
+          const base = personalization && typeof personalization === "object" ? personalization as any : {};
+          personalization = { ...base, instructions: (`${tpl}\n${typeof base.instructions === "string" ? base.instructions : ""}`).trim() };
+        }
+      } catch (_e) { /* template lookup is best-effort */ }
+    }
     mark("memory");
     const recUsage = (cost: number): Promise<void> => (incognito ? Promise.resolve() : recordUsage(token, cost, svcAuth));
     const usageNow = () => usageState(token, svcAuth);

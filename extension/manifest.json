@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "ai.spaincos.com Assistant",
-  "version": "1.1.1",
-  "description": "Open ai.spaincos.com chat in a side panel and ask about the current page or your selected text.",
+  "version": "1.2.0",
+  "description": "Open the ai.spaincos.com chat in a side panel; ask about the current page or your selected text, or summarize the page in one click.",
   "minimum_chrome_version": "114",
   "icons": {
     "16": "icons/icon16.png",
@@ -24,10 +24,13 @@
     "storage",
     "alarms",
     "notifications",
-    "downloads"
+    "downloads",
+    "scripting",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
-    "https://ai.spaincos.com/*"
+    "https://ai.spaincos.com/*",
+    "https://boundview.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -38,7 +41,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://ai.spaincos.com/*"
+        "https://ai.spaincos.com/*",
+        "https://boundview.com/*"
       ],
       "js": [
         "site-bridge.js"
@@ -48,7 +52,7 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://ai.spaincos.com"
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://ai.spaincos.com https://boundview.com"
   },
   "commands": {
     "open-sidepanel": {
@@ -65,5 +69,9 @@
       },
       "description": "Summarize the current page"
     }
-  }
+  },
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ]
 }

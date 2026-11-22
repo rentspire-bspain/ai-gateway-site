@@ -55,3 +55,8 @@
 .hb-link:hover{border-color:var(--accent)}
 .hb-err{color:var(--error);font-size:13px}
 @media(max-width:600px){.hb-head{padding:10px 12px}.hb-body{padding:14px}.hb-st{min-width:70px}}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .hb-btn, .hb-chip, .hb-tab, .hb-x { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}

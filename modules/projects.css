@@ -75,3 +75,8 @@
 .pj-head h2{flex:1 0 auto;min-width:max-content;overflow:visible;text-overflow:clip}
 .pj-head{flex-wrap:wrap}
 .pj-btn.primary{background:var(--accent-btn)!important;border-color:var(--accent-btn)!important;color:#fff!important}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .pj-btn { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}
