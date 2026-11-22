@@ -83,6 +83,26 @@ module.exports = async (req, res) => {
     return;
   }
   try {
+    const host = String(req.headers.host || "").toLowerCase();
+    const isBoundViewHost = /(^|\.)boundview\.com$/.test(host);
+    // v322: legal/docs pages are served HOST-AWARE. The old static routes gave
+    // boundview.com the raw ai.spaincos terms to every non-JS client (crawler brand
+    // leak — the brand-split guard was JavaScript-only). boundview hosts get the
+    // dedicated .boundview.html pages; every other host gets the raw page.
+    const qpage = String((req.url || "").split("?")[1] || "").match(/page=([a-z]+)/);
+    if (qpage) {
+      const page = qpage[1];
+      const allowed = { terms: 1, privacy: 1, docs: 1 };
+      if (!allowed[page]) { res.writeHead(404, headers); res.end("not found"); return; }
+      const base = isBoundViewHost ? `${page}.boundview.html` : `${page}.html`;
+      const cands = [path.join(__dirname, base), path.join(__dirname, "../" + base), path.join(process.cwd(), base), path.join(process.cwd(), "../" + base)];
+      const f = cands.find((c) => { try { return fs.existsSync(c); } catch { return false; } });
+      if (!f) { res.writeHead(404, headers); res.end("page not bundled"); return; }
+      const html = fs.readFileSync(f, "utf8");
+      res.writeHead(200, { ...headers, "Content-Type": "text/html; charset=utf-8" });
+      res.end(req.method === "HEAD" ? undefined : html);
+      return;
+    }
     // index.html is bundled into the function (vercel.json includeFiles); the exact
     // bundle layout varies by runtime — check the known candidate paths.
     const candidates = [
@@ -96,8 +116,6 @@ module.exports = async (req, res) => {
     // v290: transform ONLY for boundview hosts — every other host (ai.spaincos.com
     // included, which this same project serves) gets the RAW html. The transform is
     // the BoundView brand kit; applying it to ai.spaincos.com is a brand leak.
-    const host = String(req.headers.host || "").toLowerCase();
-    const isBoundViewHost = /(^|\.)boundview\.com$/.test(host);
     const out = isBoundViewHost ? transformHtml(html) : html;
     res.writeHead(200, headers);
     res.end(req.method === "HEAD" ? undefined : out);

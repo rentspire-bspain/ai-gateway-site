@@ -7,7 +7,7 @@
   ],
   "functions": {
     "api/bv-render.js": {
-      "includeFiles": "index.html"
+      "includeFiles": "index.html, terms.html, privacy.html, docs.html, terms.boundview.html, privacy.boundview.html, docs.boundview.html"
     }
   },
   "routes": [
@@ -30,28 +30,32 @@
     },
     {
       "src": "/docs",
-      "dest": "/docs.html",
-      "status": 307
+      "dest": "/api/bv-render?page=docs"
     },
     {
       "src": "/docs/$",
-      "dest": "/docs.html",
-      "status": 307
+      "dest": "/api/bv-render?page=docs"
     },
     {
       "src": "/terms",
-      "dest": "/terms.html",
-      "status": 307
+      "dest": "/api/bv-render?page=terms"
     },
     {
       "src": "/terms/$",
-      "dest": "/terms.html",
-      "status": 307
+      "dest": "/api/bv-render?page=terms"
     },
     {
       "src": "/verify/$",
       "dest": "/verify.html",
       "status": 307
+    },
+    {
+      "src": "/privacy",
+      "dest": "/api/bv-render?page=privacy"
+    },
+    {
+      "src": "/privacy/$",
+      "dest": "/api/bv-render?page=privacy"
     },
     {
       "handle": "filesystem"
