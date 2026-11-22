@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-22T08:00:11+00:00",
- "version": "v315",
- "headline_pct": 88.2,
- "weighted_sum": 11288,
+ "ts": "2026-11-22T08:00:52+00:00",
+ "version": "v316",
+ "headline_pct": 88.4,
+ "weighted_sum": 11309,
  "total_weight": 128,
  "categories": {
   "Features": 99,
@@ -20,7 +20,7 @@
   "GettingStarted": 93,
   "Desktop": 80,
   "Billing": 93,
-  "Mobile": 75,
+  "Mobile": 82,
   "Teammates": 75,
   "UX": 91,
   "SEO": 85,
