@@ -95,7 +95,7 @@
         }
         txt.appendChild(name);
         var meta = el("div", "sec-device-meta");
-        meta.textContent = m.role + " · added " + (m.created_at ? new Date(m.created_at).toLocaleDateString() : "—");
+        meta.textContent = m.role + " · added " + (m.created_at ? new Date(m.created_at).toLocaleDateString(window.I18N ? window.I18N.locale() : undefined) : "—");
         txt.appendChild(meta);
         row.appendChild(txt);
 

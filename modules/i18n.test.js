@@ -19,3 +19,12 @@ assert.strictEqual(i.t("Library"), "Biblioteca");
 assert.strictEqual(i.t("Unknown string"), "Unknown string");
 assert.strictEqual(i.coverage.es, "partial");
 console.log("i18n tests ok");
+// v2: patterns, new strings, Intl helpers
+const j = load("?lang=es", null, ["en"]);
+assert.strictEqual(j.t("· 2 of 4"), "· 2 de 4");
+assert.strictEqual(j.t("Delete this thread?"), "¿Eliminar este hilo?");
+assert.strictEqual(j.t("Next"), "Siguiente");
+assert.strictEqual(typeof j.fmtNumber(1234.5), "string");
+assert.ok(/nov/i.test(j.fmtDate("2026-11-21")));
+assert.strictEqual(load("", null, ["en-US"]).fmtDate("2026-11-21"), "Nov 21, 2026");
+console.log("i18n v2 tests ok");

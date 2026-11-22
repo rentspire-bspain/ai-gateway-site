@@ -71,7 +71,7 @@
     var u = (client.auth.user && client.auth.user()) || null;
     var email = (u && u.email) || "";
     var name = (u && u.user_metadata && u.user_metadata.full_name) || "";
-    var created = (u && u.created_at) ? new Date(u.created_at).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }) : "";
+    var created = (u && u.created_at) ? new Date(u.created_at).toLocaleDateString(window.I18N ? window.I18N.locale() : undefined, { month: "long", day: "numeric", year: "numeric" }) : "";
     pane.appendChild(row("Email", "Your sign-in address. Changing it sends a confirmation to both addresses.", el("span", "stg-desc", esc(email))));
     pane.appendChild(row("Member since", null, el("span", "stg-desc", esc(created))));
 

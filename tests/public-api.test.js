@@ -1,4 +1,5 @@
 // Run: node --test tests/public-api.test.js (no credentials or network required).
+process.env.PUBLIC_API_RATE_LIMIT = process.env.PUBLIC_API_RATE_LIMIT ?? '0'; // limiter has its own test below
 const { test, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const { Readable } = require('node:stream');
@@ -228,4 +229,15 @@ test('embeddings rejects incorrect dimensions, indices, values, model and count'
     route = async (url, init) => url.includes('/functions/') ? reply(d) : base(url, init);
     assert.equal((await invoke(embeddings, { body: { input: 'hello' } })).status, 502);
   }
+});
+
+test('per-IP limiter returns 429 with Retry-After after the limit, then recovers per window', () => {
+  process.env.PUBLIC_API_RATE_LIMIT = '3';
+  const { rateLimit } = require('../api/_lib/public-api');
+  const req = { headers: { 'x-forwarded-for': '203.0.113.9' }, socket: {} };
+  try {
+    assert.deepEqual([rateLimit(req), rateLimit(req), rateLimit(req)], [0, 0, 0]);
+    assert.ok(rateLimit(req) > 0);
+    assert.equal(rateLimit({ headers: { 'x-forwarded-for': '203.0.113.10' }, socket: {} }), 0);
+  } finally { process.env.PUBLIC_API_RATE_LIMIT = '0'; }
 });

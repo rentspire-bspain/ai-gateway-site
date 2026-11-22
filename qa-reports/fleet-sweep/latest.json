@@ -1,11 +1,12 @@
 {
- "ts": "2026-11-21T19:04:34+00:00",
- "fleet_score": 0.87,
+ "ts": "2026-11-22T07:28:33+00:00",
+ "fleet_score": 1.0,
  "counts": {
   "PASS": 3,
-  "PARTIAL": 6,
+  "PARTIAL": 0,
   "FAIL": 0,
-  "UNREACHABLE": 0
+  "UNREACHABLE": 0,
+  "NOT_MEASURED": 6
  },
  "apps": [
   {
@@ -23,14 +24,14 @@
   {
    "app": "CondoScores",
    "host": "condoscores.com",
-   "verdict": "PARTIAL",
-   "score": 0.833
+   "verdict": "NOT_MEASURED",
+   "score": null
   },
   {
    "app": "Comptrove (rent comps public site)",
    "host": "comptrove.com",
-   "verdict": "PARTIAL",
-   "score": 0.833
+   "verdict": "NOT_MEASURED",
+   "score": null
   },
   {
    "app": "SpainCos marketing site",
@@ -41,26 +42,26 @@
   {
    "app": "Spain Terminal (internal operating shell)",
    "host": "terminal.spaincos.com",
-   "verdict": "PARTIAL",
-   "score": 0.75
+   "verdict": "NOT_MEASURED",
+   "score": null
   },
   {
    "app": "Allowance (ICHRA plan finder)",
    "host": "allowancehealth.com",
-   "verdict": "PARTIAL",
-   "score": 0.75
+   "verdict": "NOT_MEASURED",
+   "score": null
   },
   {
    "app": "NodeGrade (agentready scorecard)",
    "host": "nodegrade.com",
-   "verdict": "PARTIAL",
-   "score": 0.833
+   "verdict": "NOT_MEASURED",
+   "score": null
   },
   {
    "app": "PERILMARK",
    "host": "perilmark.com",
-   "verdict": "PARTIAL",
-   "score": 0.833
+   "verdict": "NOT_MEASURED",
+   "score": null
   }
  ]
 }
