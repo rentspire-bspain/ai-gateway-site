@@ -96,3 +96,21 @@ test("Settings roster searches locally and only owners can change a teammate's r
     }
   }
 });
+
+test("teammate templates: presets, apply/clear, effective profile preview", () => {
+  const vm = require("node:vm");
+  const win = { SettingsUI: {} };
+  vm.runInNewContext(require("fs").readFileSync(__dirname + "/settings-premium.js", "utf8"), { window: win, document: { readyState: "complete", createElement() {}, getElementById: () => null } });
+  const T = win.TeammateTemplates;
+  assert.deepEqual(T.PRESETS.map((p) => p.name), ["Research Analyst", "Code Reviewer", "Data Extractor", "Summarizer"]);
+  let a = T.applyTemplate({}, "Ada@Example.com", "code-reviewer");
+  assert.equal(a["ada@example.com"].templateId, "code-reviewer");
+  assert.deepEqual(T.applyTemplate(a, "ada@example.com", "bogus"), a);
+  assert.deepEqual(T.applyTemplate(a, "", "summarizer"), a);
+  assert.deepEqual(T.applyTemplate(a, "ada@example.com", ""), {});
+  assert.equal(Object.keys(a).length, 1); // input not mutated
+  const p = T.effectiveProfile({ email: "ada@example.com", role: "admin" }, a);
+  assert.equal(p.template, "Code Reviewer"); assert.match(p.instructions, /Review code/); assert.equal(p.name, "ada");
+  const none = T.effectiveProfile({ email: "x@y.co" }, a);
+  assert.equal(none.template, null); assert.match(none.instructions, /No template/); assert.match(none.memory, /No shared memory/);
+});
