@@ -1,5 +1,5 @@
 {
- "version": 17,
+ "version": 18,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -4507,9 +4507,9 @@
    "W": 8,
    "ircm": "4301",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "Shell CSP has default-src 'self' and no frame-src, so embedding the wall in the host will be blocked",
+   "evidence": "Shell CSP has default-src 'self' and no frame-src, so embedding the wall in the host will be blocked | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Add frame-src, rerun node tools/gen-csp-sri.mjs, rerun prelaunch"
   },
   {
@@ -4591,9 +4591,9 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "D2 landscape only",
+   "evidence": "D2 landscape only | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Add inBrain or CPX when approved"
   },
   {
@@ -4843,9 +4843,9 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "UI never says the amount before completion; wall shows network payouts",
+   "evidence": "UI never says the amount before completion; wall shows network payouts | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Add 'Every verified offer = 150 N'"
   },
   {
@@ -5039,9 +5039,9 @@
    "W": 7,
    "ircm": "4300",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "Zero offerwall references in ai-gateway-site; component is standalone",
+   "evidence": "Zero offerwall references in ai-gateway-site; component is standalone | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Embed per README 3-line integration"
   },
   {
@@ -5067,9 +5067,9 @@
    "W": 5,
    "ircm": "3200",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "modules/tasks.js and monitors.js already own 'Tasks' (Scheduled + inbox, push opens /?tasks=inbox)",
+   "evidence": "modules/tasks.js and monitors.js already own 'Tasks' (Scheduled + inbox, push opens /?tasks=inbox) | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Rename earn tab 'Earn' or 'Free credits'"
   },
   {
