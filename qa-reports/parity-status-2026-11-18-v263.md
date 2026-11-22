@@ -2876,3 +2876,15 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 | v305 | 87.4% | UX H-category 80 -> 100 (PRs #317/#318) — MASTER 96.8 GREEN, new record |
 
 **HEADLINE: 87.4% (11181/128, 29 categories) — 🟡 YELLOW band. UX MASTER 96.8 GREEN (record). Cap $500 live.**
+
+### 22. §30q addendum — v306: THE UX MASTER 100 — EVERY CHECK LIVE-VERIFIED
+
+**Owner directives this batch:** show the remaining sub-100 UX checks; profile and close A7; Stripe key.
+
+- ~~A7 CLOSED~~ — profiled all three corruption paths with instrumented auth-call tracing: (1) corrupted access_token + valid refresh: client POSTs grant_type=refresh_token, session recovers, app loads, zero errors; (2) corrupted refresh_token + valid access: session serves, app loads; (3) BOTH corrupted: the refresh fails, the client CLEARS the stored session and shows the clean login wall with the app shell intact — never a brick, never a blank. A7 0.5 -> 1.0. Category A: 100.
+- ~~B2 CLOSED~~ — live research query (LA mayor): 27 citation/source elements, real source URLs (Wikipedia, Ballotpedia, mayor.lacity.gov). B2 0.5 -> 1.0.
+- ~~B11 CLOSED~~ — progressive streaming measured on a 500-word ask: answer grew 109 -> 3542 chars across ~8 seconds of 500ms samples, token-by-token, no blank-then-dump. (The earlier probe missed it: a short answer's tokens all arrive inside one 600ms sample window.) B11 0.5 -> 1.0.
+- **UX MASTER BENCHMARK: 100.0 GREEN — all 46 checks, all 8 categories (A-H) at 100, every check executed live on production through the eval account.** Record history: 91.4 (v290) -> 94.8 (v300) -> 96.8 (v305) -> 100.0 (v306).
+- Stripe live key: credential form RE-OPENED with the owner (second request); the vault still holds only the TEST-mode key. This remains the single checkout blocker.
+
+**HEADLINE: 87.4% (11181/128, 29 categories) — 🟡 YELLOW band. UX MASTER 100.0 GREEN. Cap $500 live.** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key), Comet 70 (browser validation), Wave-1 webapp rebuild.
