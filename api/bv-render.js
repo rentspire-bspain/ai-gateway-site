@@ -31,8 +31,19 @@ function transformHtml(html) {
   // never touch <script> blocks: the CSP carries sha256 hashes of inline scripts —
   // rewriting script content would break the CSP and kill the page.
   const parts = html.split(/(<script[\s\S]*?<\/script>)/g);
+  const scrub = (s) => {
+    // v299: email addresses are USER DATA, never brand copy — never rewrite them
+    // (the signed-in account's email must not become a fabricated boundview address).
+    const emails = [];
+    s = s.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, (m) => {
+      emails.push(m);
+      return `\u0000E${emails.length - 1}\u0000`;
+    });
+    s = MAP.reduce((acc, [re, to]) => acc.replace(re, to), s);
+    return s.replace(/\u0000E(\d+)\u0000/g, (_, n) => emails[+n]);
+  };
   return parts
-    .map((seg, i) => (i % 2 === 1 ? seg : MAP.reduce((s, [re, to]) => s.replace(re, to), seg)))
+    .map((seg, i) => (i % 2 === 1 ? seg : scrub(seg)))
     .join("")
     // PWA manifest brand fix (v297 follow-up): boundview.com linked the SHARED
     // /manifest.webmanifest — installing the PWA there would show "ai.spaincos"

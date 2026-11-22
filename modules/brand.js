@@ -33,7 +33,20 @@
   ];
   function scrubText(t) {
     var out = t;
+    // v299 CRITICAL FIX: never rewrite EMAIL ADDRESSES. The signed-in account's
+    // real email (e.g. bspain@spaincos.com) is USER DATA, not brand copy — the
+    // scrub was rewriting it to a fabricated boundview address, misrepresenting
+    // which account is logged in (owner report 2026-11-21: "why is my login now
+    // bspain@boundview.com?"). Brand copy never carries a @spaincos.com user
+    // address; support email is set directly from BRAND.supportEmail. Tokenize
+    // email-like tokens, apply the MAP around them, restore them verbatim.
+    var emails = [];
+    out = out.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, function (m) {
+      emails.push(m);
+      return "\u0000E" + (emails.length - 1) + "\u0000";
+    });
     for (var i = 0; i < MAP.length; i++) out = out.replace(MAP[i][0], MAP[i][1]);
+    out = out.replace(/\u0000E(\d+)\u0000/g, function (_, n) { return emails[+n]; });
     return out;
   }
   // v288 CRITICAL FIX: NEVER scrub text inside <script> (or <style>) elements. A script's

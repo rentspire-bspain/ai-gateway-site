@@ -1,5 +1,5 @@
 /* desktop-shell.css — offline bar + installed-app (standalone / desktop wrapper) polish. */
-#offlineBar{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:9000;max-width:min(92vw,560px);padding:8px 14px;border:1px solid var(--border,#d0d0cc);border-radius:999px;background:var(--bg-elevated,#fff);color:var(--text,#222);font-size:12.5px;line-height:1.4;box-shadow:0 4px 18px rgba(0,0,0,.18);display:flex;gap:8px;align-items:center;pointer-events:none}
+#offlineBar{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:9000;max-width:min(88vw,420px);padding:8px 14px;border:1px solid var(--border,#d0d0cc);border-radius:999px;background:var(--bg-elevated,#fff);color:var(--text,#222);font-size:12px;line-height:1.35;box-shadow:0 4px 18px rgba(0,0,0,.18);display:flex;gap:8px;align-items:center;pointer-events:none}
 #offlineBar[hidden]{display:none}
 #offlineBar .ob-dot{width:8px;height:8px;border-radius:50%;background:#F59E0B;flex:0 0 auto}
 #offlineBar.back .ob-dot{background:var(--accent,#14646B)}
