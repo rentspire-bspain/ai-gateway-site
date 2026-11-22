@@ -1,0 +1,168 @@
+{
+ "version": "v321-product-surface-inventory-4",
+ "note": "Fresh product-surface inventory \u2014 priority areas first (checkout, Comet, OAuth, restore, mobile). Stable IDs PI-###; FK to the 29-category scoring table; acceptance test per item; last evidence = live check at 2026-11-22T21:30Z unless noted. Does NOT force the 157; does not change weights or scores.",
+ "items": [
+  {
+   "id": "PI-001",
+   "surface": "checkout / three-tier plans",
+   "fk": "Billing",
+   "scope": "supabase functions checkout v6 + stripe-webhook v8; plans starter/pro/unlimited",
+   "acceptance": "POST /functions/v1/checkout {plan} accepted with live price IDs; honest not_configured until STRIPE_SECRET_KEY; webhook grants 2500/10000/25000",
+   "last_evidence": "live 2026-11-22T21:30Z: starter/pro/unlimited all accepted_not_configured (this session); Stripe test-key query confirms all 3 price IDs live-mode",
+   "status": "code-complete, owner key gate"
+  },
+  {
+   "id": "PI-002",
+   "surface": "Comet extension sidepanel",
+   "fk": "Comet",
+   "scope": "extension v1.2.0: page-context Q&A, summarize, settings persistence, DNR frame rule",
+   "acceptance": "extension loads in Chromium; SW alive; DNR rule registered scoped to own id on sub_frame; sidepanel iframe renders in a real browser",
+   "last_evidence": "live 2026-11-22T21:30Z: version.json 1.2.0, zip 200; real-browser load+SW+rule PASS; iframe render UNRESOLVED in headless (owner 1-min check pending)",
+   "status": "partial \u2014 iframe render unverified"
+  },
+  {
+   "id": "PI-003",
+   "surface": "OAuth provider matrix",
+   "fk": "Connectors",
+   "scope": "/api/oauth-config + connect flows (Slack, Dropbox, Outlook, Google, GitHub)",
+   "acceptance": "registered providers expose clientId and route to real OAuth; unregistered return null and show Registration pending",
+   "last_evidence": "live 2026-11-22T21:30Z: slack+dropbox clientId present; outlook/google/github null (honest)",
+   "status": "live, 2 of 5 registered (owner gate for the rest)"
+  },
+  {
+   "id": "PI-004",
+   "surface": "session/thread restore",
+   "fk": "Features",
+   "scope": "spa-restore.js, sw.js v3 precache, offline.html fallback chain, session restore A5/A7",
+   "acceptance": "all restore assets serve 200; corrupted-token paths recover; offline fallback chain works",
+   "last_evidence": "live 2026-11-22T21:30Z: spa-restore.js/sw.js/offline.html all 200; A5/A7 verified in the UX master run",
+   "status": "live"
+  },
+  {
+   "id": "PI-005",
+   "surface": "mobile PWA + TWA readiness",
+   "fk": "NativeMobile",
+   "scope": "manifests (screenshots+shortcuts), assetlinks.json, install-prompt UX, 375px surfaces",
+   "acceptance": "manifest valid with 2 screenshots + 3 shortcuts; assetlinks 200; touch targets >=44px at 375",
+   "last_evidence": "live 2026-11-22T21:30Z: manifest ai.spaincos (2 screenshots, 3 shortcuts), assetlinks 200; PR #347 DOM-verified 0 under-44px targets",
+   "status": "live, store presence owner-gated"
+  },
+  {
+   "id": "PI-006",
+   "surface": "imported-history restore (Perplexity import)",
+   "fk": "Features",
+   "scope": "import modal + semantic index + search_my_context gateway rule",
+   "acceptance": "import completes; IMPORTED HISTORY rule forces search_my_context before any 'not available' claim",
+   "last_evidence": "gateway-chat v309 carries the rule (deployed, source-committed PR #310); import flow tested in prior batches",
+   "status": "live"
+  },
+  {
+   "id": "PI-007",
+   "surface": "/status + uptime monitor",
+   "fk": "Observability",
+   "scope": "status.html host-aware, pg_cron 10-min monitor, /api/health",
+   "acceptance": "status page 200 both domains; health endpoint ok:true",
+   "last_evidence": "live 2026-11-22T21:30Z batch checks (PR #340)",
+   "status": "live"
+  },
+  {
+   "id": "PI-008",
+   "surface": "voice conversation UI + states",
+   "fk": "Voice",
+   "scope": "modules/voice-convo.js/.css: amber processing state, visible errors, unsupported-browser explanations, rate control",
+   "acceptance": "module + css serve 200; states render (20/20 headless checks in PR #289); server STT/TTS on Render",
+   "last_evidence": "live 2026-11-22T22:00Z: module 200, css 200; voice-service/health 404 (Render deploy owner-gated)",
+   "status": "UI live; server voice-service UNAVAILABLE (owner gate)"
+  },
+  {
+   "id": "PI-009",
+   "surface": "enterprise admin (audit log + role gates)",
+   "fk": "Enterprise",
+   "scope": "modules/enterprise-admin.js + settings-org.js: audit preview + CSV export (250 rows, sentinel warning), role-gate vs entitlement clarity, team function v17 template actions",
+   "acceptance": "modules serve 200; team function enforces auth (401 unauth, 403 non-member on template actions); audit export SHA-verified",
+   "last_evidence": "live 2026-11-22T22:00Z: both modules 200; team unauth 401; eval-bot 403 non-member (this session)",
+   "status": "live; admin 200-path unverified (no owner token)"
+  },
+  {
+   "id": "PI-010",
+   "surface": "docs panel + artifacts library",
+   "fk": "Features",
+   "scope": "modules/docs-panel.js (markdown/sheets/docs/web-app views, download) + modules/library.js (search, collections, archive)",
+   "acceptance": "modules serve 200; doc panel opens on chip click (UX master B10 PASS); library overlay renders",
+   "last_evidence": "live 2026-11-22T22:00Z: both modules 200; doc-panel interaction verified in UX master 100.0 run",
+   "status": "live"
+  },
+  {
+   "id": "PI-011",
+   "surface": "share + fleet-dispatch functions",
+   "fk": "Computer",
+   "scope": "supabase/functions/share (thread share links) + fleet-dispatch (webapp job dispatch)",
+   "acceptance": "both functions enforce auth boundaries (401/403 unauth)",
+   "last_evidence": "live 2026-11-22T22:00Z: share 401, fleet-dispatch 403 unauth \u2014 boundaries enforced",
+   "status": "live boundaries; positive-path dispatch verified in prior batches"
+  },
+  {
+   "id": "PI-012",
+   "surface": "fleet sweep + webapp surfaces",
+   "fk": "Fleet",
+   "scope": "modules/fleet.js + webapps.js + qa/fleet-sweep runner",
+   "acceptance": "both modules 200; sweep JSON current with honest NOT_MEASURED for bot-gated domains",
+   "last_evidence": "live 2026-11-22T22:00Z: modules 200; sweep counts {PASS:3, NOT_MEASURED:6} (2026-11-22T07:28Z run)",
+   "status": "live; 6/9 domains NOT_MEASURED (Vercel bot challenge)"
+  },
+  {
+   "id": "PI-013",
+   "surface": "public entry / onboarding gate (root)",
+   "fk": "GettingStarted",
+   "scope": "/ root on both hosts: login wall, brand title, OAuth/file examples popover, no cross-brand leakage",
+   "acceptance": "both roots 200; titles ai.spaincos.com vs BoundView; zero dead internal links; keyboard focus visible",
+   "last_evidence": "live 2026-11-22T23:05Z: both 200; ai title 'ai.spaincos.com \u2014 Where knowledge begins', bv title 'BoundView'; no brand-name leakage either direction (body-text scan); tab focus visible on OAuth examples popover",
+   "status": "live"
+  },
+  {
+   "id": "PI-014",
+   "surface": "docs + help surfaces, both hosts",
+   "fk": "Docs/Support",
+   "scope": "/docs and /help on both hosts via bv-render ?page=; host-aware contact email and branding",
+   "acceptance": "4 surfaces 200; help contact host-aware; zero dead links",
+   "last_evidence": "live 2026-11-22T23:05Z: 4/4 200; ai help shows bspain@spaincos.com, bv help shows support@boundview.com + CanonIntel LLC; 0 dead links across all pages",
+   "status": "live"
+  },
+  {
+   "id": "PI-015",
+   "surface": "status page, both hosts",
+   "fk": "Observability",
+   "scope": "/status on both hosts: service status view, back-to-app nav",
+   "acceptance": "both 200; back link present",
+   "last_evidence": "live 2026-11-22T23:05Z: both 200, '\u2190 Back to the app' first tabbable element, focus visible",
+   "status": "live"
+  },
+  {
+   "id": "PI-016",
+   "surface": "legal navigation (terms/privacy), both hosts",
+   "fk": "Legal",
+   "scope": "/terms and /privacy on both hosts: canonical host separation, entity naming",
+   "acceptance": "4 surfaces 200; canonical+og:url host-correct on privacy; CanonIntel LLC on bv legal only; RentSpire/Spain Companies on neither",
+   "last_evidence": "live 2026-11-22T23:05Z: 4/4 200; canonical https://boundview.com/privacy vs https://ai.spaincos.com/privacy both correct; CanonIntal true on bv terms/privacy/help, false on all ai pages; spaincos false on all bv pages",
+   "status": "live"
+  },
+  {
+   "id": "PI-017",
+   "surface": "keyboard + empty/error states, public surfaces",
+   "fk": "Accessibility",
+   "scope": "tab-order/focus-visibility across all 12 public surfaces; unknown-path handling",
+   "acceptance": "every surface reaches a focus-visible element within 6 tabs; unknown paths handled without a dead end",
+   "last_evidence": "live 2026-11-22T23:05Z: 12/12 surfaces tab-focus visible (legal pages expose a minimal mailto-only focus surface \u2014 nav links are plain text on legal pages, recorded as observation); unknown path /definitely-not-a-page-xyz returns HTTP 404 while rendering the app shell (graceful SPA recovery \u2014 CORRECTED in v321: earlier '200 fallback' claim was a probe artifact) on both hosts",
+   "status": "live; NOTED: 404 renders app shell (recovery ok, no dedicated 404 page); legal-page nav is non-focusable text"
+  },
+  {
+   "id": "PI-018",
+   "surface": "unknown-route classification, both hosts",
+   "fk": "SEO",
+   "scope": "unknown public + nested URLs, SPA deep links (/t/<slug>), intentionally private routes (/qa/, /sql/); HTTP status, robots.txt, canonical, browser recovery",
+   "acceptance": "unknown + private routes return HTTP 404; /t/ deep links 200 with composer recovery; robots.txt disallows /t/ on both hosts; no indexable dead ends",
+   "last_evidence": "live 2026-11-22T23:40Z: unknown_public/unknown_nested/private_qa/private_sql all 404 on BOTH hosts while rendering the app shell (composer reachable, no dead end); /t/nonexistent-slug 200 with recovery; robots.txt identical and correct on both hosts (Allow /, Disallow /t/); ai.spaincos.com robots Sitemap + sitemap.xml point to boundview.com \u2014 INTENTIONAL per v291 SEO strategy (ai host is the private noindexed workspace; brand.js line ~158 injects noindex on the spaincos host); boundview canonical correct on all pages",
+   "status": "live; regression test codified as qa/route-classification.py (exit 1 on regression)"
+  }
+ ]
+}
