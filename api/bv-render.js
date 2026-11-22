@@ -41,8 +41,9 @@ function transformHtml(html) {
     });
     s = MAP.reduce((acc, [re, to]) => acc.replace(re, to), s);
     s = s.replace(/\u0000E(\d+)\u0000/g, (_, n) => emails[+n]);
-    // exception: the login placeholder is BRAND COPY, not a real address
-    if (/^you@/.test(s) || s === "you@spaincos.com") s = "you@boundview.com";
+    // exception: the login PLACEHOLDER is brand copy, not a real address — rewrite it
+    // at the attribute level (the segment is the whole HTML chunk, not the value).
+    s = s.replace(/placeholder="you@spaincos\.com"/g, 'placeholder="you@boundview.com"');
     return s;
   };
   return parts
