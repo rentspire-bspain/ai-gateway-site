@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-22T07:38:37+00:00",
- "version": "v310",
+ "ts": "2026-11-22T07:41:33+00:00",
+ "version": "v311",
  "headline_pct": 88.0,
- "weighted_sum": 11261,
+ "weighted_sum": 11269,
  "total_weight": 128,
  "categories": {
   "Features": 99,
@@ -16,7 +16,7 @@
   "Privacy": 88,
   "Comet": 75,
   "Premium": 80,
-  "Enterprise": 72,
+  "Enterprise": 74,
   "GettingStarted": 93,
   "Desktop": 78,
   "Billing": 93,
@@ -32,7 +32,7 @@
   "Observability": 82,
   "Fleet": 70,
   "Email/Notifications": 30,
-  "i18n": 36,
+  "i18n": 38,
   "NativeMobile": 48
  },
  "raw_items": {

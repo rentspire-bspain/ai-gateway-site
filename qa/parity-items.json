@@ -1,5 +1,5 @@
 {
- "version": "v310",
+ "version": "v311",
  "generated_at": "2026-11-16T00:00:00Z",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE — GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90→95. | 2026-11-18: owner-blocker audit — 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped — server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
@@ -65,8 +65,8 @@
   {
    "name": "Enterprise",
    "weight": 3,
-   "score": 72,
-   "note": "v293 re-score (honest, evidence-only): the enterprise evidence pass (PR #288) mapped deployed reality — PASS asset delivery (modules SHA-matched to master); PARTIAL admin access, roster/invites/roles, seats/org billing, audit/CSV; FAIL in-app SSO + SCIM (status cards only) with the exact OIDC/SAML owner dependencies documented. No unverified production changes; the dependency map is the deliverable."
+   "score": 74,
+   "note": "v293 re-score (honest, evidence-only): the enterprise evidence pass (PR #288) mapped deployed reality — PASS asset delivery (modules SHA-matched to master); PARTIAL admin access, roster/invites/roles, seats/org billing, audit/CSV; FAIL in-app SSO + SCIM (status cards only) with the exact OIDC/SAML owner dependencies documented. No unverified production changes; the dependency map is the deliverable. v311: audit-log CSV export (PR #336): on-demand export up to 250 account-visible events with a truncation warning at the 251-row sentinel; UI role-gate vs entitlement clarified; module SHA live-verified on both domains. Still not verified: signed-in download flow in a browser, org-wide history, retention wiring; SSO/OIDC/SAML/SCIM remain owner-gated IdP dependencies."
   },
   {
    "name": "GettingStarted",
@@ -160,8 +160,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 36,
-   "note": "v298 (was 10): i18n foundation live (PR #302, 9f1596a) — modules/i18n.js locale detection (?lang= > saved ai_lang > browser > en), PARTIAL Spanish chrome translation (sidebar, New Thread, search, composer placeholder, landing hero, Settings nav/pane titles, a few Preferences labels; model answers NOT translated, honestly labeled 'Español (partial)' in the Settings picker), hreflang en/es/x-default on the homepage. Curl + code verified live; lane Playwright QA (en/es switching, es-MX detection, picker round trip) but no live-browser check by root. GAPS: no other locales, no full-page translation, no translated model output, no locale-aware formatting. v310: Spanish expanded (PR #329): thread actions + native dialogs, doc panel chrome, full onboarding tour + checklist, Settings pane bodies, sign-in + error strings; locale-aware Intl formatting; hreflang en + x-default on docs/terms/privacy/verify both domains. Still 'Español (partial)': toasts, several Settings panes and overlays remain English; no native-speaker review."
+   "score": 38,
+   "note": "v298 (was 10): i18n foundation live (PR #302, 9f1596a) — modules/i18n.js locale detection (?lang= > saved ai_lang > browser > en), PARTIAL Spanish chrome translation (sidebar, New Thread, search, composer placeholder, landing hero, Settings nav/pane titles, a few Preferences labels; model answers NOT translated, honestly labeled 'Español (partial)' in the Settings picker), hreflang en/es/x-default on the homepage. Curl + code verified live; lane Playwright QA (en/es switching, es-MX detection, picker round trip) but no live-browser check by root. GAPS: no other locales, no full-page translation, no translated model output, no locale-aware formatting. v310: Spanish expanded (PR #329): thread actions + native dialogs, doc panel chrome, full onboarding tour + checklist, Settings pane bodies, sign-in + error strings; locale-aware Intl formatting; hreflang en + x-default on docs/terms/privacy/verify both domains. Still 'Español (partial)': toasts, several Settings panes and overlays remain English; no native-speaker review. v311: ES3 (PR #337, root-built): billing/checkout/claim toasts, devices & sessions, credentials/secrets, two-factor, team/org, usage pane bodies + ~60 generic UI strings — verified rendering in headless Chromium (Facturación/Uso/Compañeros/Dispositivos/Credenciales/Verificación en dos pasos), zero JS errors, live on both domains. Still partial: toasts beyond these, library/skills/tasks overlays."
   },
   {
    "name": "NativeMobile",
@@ -187,6 +187,11 @@
   }
  ],
  "changelog": [
+  {
+   "version": "v311",
+   "date": "2026-11-22",
+   "change": "i18n 36->38 (ES3 root-built), Enterprise 72->74 (audit-log CSV export)."
+  },
   {
    "version": "v310",
    "date": "2026-11-22",
