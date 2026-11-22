@@ -40,7 +40,10 @@ function transformHtml(html) {
       return `\u0000E${emails.length - 1}\u0000`;
     });
     s = MAP.reduce((acc, [re, to]) => acc.replace(re, to), s);
-    return s.replace(/\u0000E(\d+)\u0000/g, (_, n) => emails[+n]);
+    s = s.replace(/\u0000E(\d+)\u0000/g, (_, n) => emails[+n]);
+    // exception: the login placeholder is BRAND COPY, not a real address
+    if (/^you@/.test(s) || s === "you@spaincos.com") s = "you@boundview.com";
+    return s;
   };
   return parts
     .map((seg, i) => (i % 2 === 1 ? seg : scrub(seg)))
