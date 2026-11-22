@@ -7,7 +7,7 @@
   ],
   "functions": {
     "api/bv-render.js": {
-      "includeFiles": "{terms,privacy,docs,help,index}.{html,boundview.html}"
+      "includeFiles": "{terms,privacy,docs,help,status,index}.{html,boundview.html}"
     }
   },
   "routes": [
@@ -80,6 +80,14 @@
     {
       "src": "/privacy/$",
       "dest": "/api/bv-render?page=privacy"
+    },
+    {
+      "src": "/status",
+      "dest": "/api/bv-render?page=status"
+    },
+    {
+      "src": "/status/$",
+      "dest": "/api/bv-render?page=status"
     },
     {
       "handle": "filesystem"

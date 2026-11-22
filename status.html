@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service status — ai.spaincos.com</title>
+<meta name="robots" content="noindex">
+<style>
+body{max-width:720px;margin:0 auto;padding:32px 20px;font:15px/1.6 system-ui,-apple-system,sans-serif;background:#FCFCF9;color:#222}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:#666;margin:0 0 24px}
+.card{border:1px solid #e2e2de;border-radius:12px;padding:16px 18px;margin:12px 0;background:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0ec}
+.row:last-child{border-bottom:0}
+.dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+.ok{background:#16a34a}.bad{background:#dc2626}.na{background:#d4a017}
+.muted{color:#777;font-size:13px}
+.checks{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.pill{border:1px solid #e2e2de;border-radius:999px;padding:3px 10px;font-size:12.5px;background:#fff}
+a{color:#14646B}
+</style>
+</head>
+<body>
+<h1>Service status</h1>
+<p class="sub">Live snapshot — reloaded every time you open this page. Not an SLA or a guaranteed-uptime promise.</p>
+
+<div class="card">
+  <div class="row"><span><strong>Web app</strong> <span class="muted">(this page loading is itself the check)</span></span><span class="dot ok" id="d-web"></span></div>
+  <div class="row"><span><strong>Health endpoint</strong> <span class="muted">/api/health</span></span><span class="dot na" id="d-api"></span></div>
+  <div class="row"><span><strong>Answer engine (gateway)</strong> <span class="muted">sample models, live call</span></span><span class="dot na" id="d-gw"></span></div>
+</div>
+
+<div class="card">
+  <strong>Uptime monitoring</strong>
+  <p class="muted" style="margin:6px 0 0">An automated monitor hits the health endpoint every 10 minutes and records pass/fail rows server-side. This page is a point-in-time snapshot; the monitor is the history.</p>
+</div>
+
+<div class="card">
+  <strong>Estate status</strong> <span class="muted">(latest fleet sweep)</span>
+  <div id="fleet" class="muted">Loading…</div>
+</div>
+
+<div class="card">
+  <strong>Known behaviors</strong>
+  <ul class="muted" style="margin:6px 0 0;padding-left:18px">
+    <li>Occasional <strong>HTTP 546</strong> errors are a hosting-platform compute limit — the app retries automatically (up to 2 extra attempts) and shows a retry note. See the <a href="/help">help page</a>.</li>
+    <li>Connector availability per provider is shown honestly in Settings → Connectors (registration status).</li>
+  </ul>
+</div>
+
+<nav class="muted" style="margin-top:24px"><a href="/">← Back to the app</a> · <a href="/help">Help</a> · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></nav>
+
+<script>
+(function () {
+  fetch("/api/health", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject())
+    .then(() => { document.getElementById("d-api").className = "dot ok"; })
+    .catch(() => { document.getElementById("d-api").className = "dot bad"; });
+  fetch("/qa-reports/fleet-sweep/latest.json", { cache: "no-store" }).then(r => r.json()).then(d => {
+    var el = document.getElementById("fleet");
+    var rows = (d.apps || []).map(function (a) {
+      var cls = a.verdict === "PASS" ? "ok" : (a.verdict === "FAIL" || a.verdict === "UNREACHABLE") ? "bad" : "na";
+      return '<div class="row"><span>' + a.app + '</span><span class="dot ' + cls + '" title="' + a.verdict + '"></span></div>';
+    }).join("");
+    el.innerHTML = rows + '<p class="muted" style="margin:8px 0 0">Sweeped ' + (d.ts || "recently") + ". Domains behind a bot challenge are shown gray (not measured), never scored as failures.</p>";
+  }).catch(() => { document.getElementById("fleet").textContent = "Fleet data unavailable right now."; });
+  var gw = document.getElementById("d-gw");
+  fetch("/api/health", { cache: "no-store" }).then(r => {
+    if (r.ok) { gw.className = "dot ok"; gw.title = "Health endpoint reachable — the answer engine shares this serving layer; deep per-model status is in Settings."; }
+  }).catch(() => { gw.className = "dot bad"; });
+})();
+</script>
+</body>
+</html>
