@@ -1,5 +1,5 @@
 {
- "version": "v316",
+ "version": "v317",
  "generated_at": "2026-11-16T00:00:00Z",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE — GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90→95. | 2026-11-18: owner-blocker audit — 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped — server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
@@ -54,8 +54,8 @@
   {
    "name": "Comet",
    "weight": 3,
-   "score": 75,
-   "note": " v307: REAL-BROWSER VALIDATION PASSED (root, Chromium persistent context + --load-extension): extension installs, service worker registers and stays alive, manifest 1.1.1 with the corrected object-shaped commands (open-sidepanel, summarize-page), sidePanel API available. Remaining gaps: OS-level shortcut-key press and the Chrome Web Store listing (owner-gated)."
+   "score": 78,
+   "note": " v307: REAL-BROWSER VALIDATION PASSED (root, Chromium persistent context + --load-extension): extension installs, service worker registers and stays alive, manifest 1.1.1 with the corrected object-shaped commands (open-sidepanel, summarize-page), sidePanel API available. Remaining gaps: OS-level shortcut-key press and the Chrome Web Store listing (owner-gated). v317: v1.2.0 sidepanel enrichment (PR #350) LIVE both domains: page-context Q&A (title/host/selection with Include toggles and a literal 'Will send' preview), one-click Summarize page, settings persistence (site+model in chrome.storage, re-validated), optional host permissions (no tabs permission), self-updater offers 1.2.0. The v1.1.x sidepanel was likely BROKEN by the v310 security headers (XFO DENY + frame-ancestors 'none') — v1.2.0 ships a dynamic DNR rule stripping those two headers ONLY for this extension's own sub-frames. ROOT REAL-BROWSER VERIFIED: extension loads, SW alive, dynamic rule registered and scoped to the extension runtime id on sub_frame only; site headers unchanged for normal tabs. 24 node tests + mutation check. NOT verified: the live sidepanel iframe actually rendering (needs the real sidepanel open — Brett's 1-minute check), executeScript selection on real pages, Comet's side-panel API."
   },
   {
    "name": "Premium",
@@ -188,6 +188,11 @@
   }
  ],
  "changelog": [
+  {
+   "version": "v317",
+   "date": "2026-11-22",
+   "change": "Comet 75->78 (v1.2.0 sidepanel enrichment; DNR frame fix real-browser verified at rule level)."
+  },
   {
    "version": "v316",
    "date": "2026-11-22",
