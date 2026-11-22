@@ -167,12 +167,40 @@
     "Updated": "Actualizado", "Just now": "Ahora mismo"
   };
   Object.keys(ES3).forEach(function (k) { ES[k] = ES3[k]; });
+  /* v4 additions: library/skills/tasks overlays. */
+  var ES4 = {
+    "Library": "Biblioteca", "Close library": "Cerrar biblioteca", "Clear search and filters": "Limpiar búsqueda y filtros",
+    "All files": "Todos los archivos", "Search threads and messages": "Buscar hilos y mensajes",
+    "Search artifacts by filename": "Buscar artefactos por nombre de archivo",
+    "Archived": "Archivado", "Archived results": "Resultados archivados", "Archive": "Archivar", "Unarchive": "Desarchivar",
+    "Previous 7 days": "7 días previos", "Previous 30 days": "30 días previos",
+    "Collection name": "Nombre de la colección", "Add to collection": "Añadir a la colección",
+    "Rename collection": "Renombrar colección", "Delete this collection? Threads are kept.": "¿Eliminar esta colección? Los hilos se conservan.",
+    "Untitled": "Sin título", "Untitled thread": "Hilo sin título", "Unknown date": "Fecha desconocida",
+    "Version history": "Historial de versiones", "Document": "Documento", "Results": "Resultados",
+    "Use in chat": "Usar en el chat", "Start a new thread": "Iniciar un hilo nuevo",
+    "Act as analyst": "Actuar como analista", "Summarize": "Resumir", "Explain simply": "Explicar de forma sencilla",
+    "Turn Deep Research on": "Activar Deep Research", "Deep Research": "Deep Research",
+    "Create task": "Crear tarea", "Edit task": "Editar tarea", "Scheduled task": "Tarea programada",
+    "Run now": "Ejecutar ahora", "Running…": "Ejecutando…", "Schedule": "Programación", "Scheduled": "Programado",
+    "Time zone": "Zona horaria", "Deliver to": "Entregar a", "Custom (cron)": "Personalizado (cron)",
+    "Weekdays (Mon–Fri)": "Días laborables (lun–vie)", "Daily at ": "Cada día a ", "Weekly on ": "Cada semana el ",
+    "Edit skill": "Editar habilidad", "Enable ": "Activar ", "Save changes": "Guardar cambios",
+    "Saving…": "Guardando…", "Deleting…": "Eliminando…", "Refresh": "Actualizar", "Refreshing…": "Actualizando…",
+    "Monday": "Lunes", "Tuesday": "Martes", "Wednesday": "Miércoles", "Thursday": "Jueves", "Friday": "Viernes",
+    "Saturday": "Sábado", "Sunday": "Domingo",
+    "Create a Gmail draft (preview + approval)": "Crear un borrador de Gmail (vista previa + aprobación)",
+    "Create calendar event (preview + approval)": "Crear evento de calendario (vista previa + aprobación)",
+    "Draft or send email (preview + approval)": "Redactar o enviar correo (vista previa + aprobación)",
+    "Thread + email": "Hilo + correo"
+  };
+  Object.keys(ES4).forEach(function (k) { ES[k] = ES4[k]; });
   Object.keys(ES2).forEach(function (k) { ES[k] = ES2[k]; });
 
   /* Elements whose text is user/document content and must never be translated. */
   var SKIP_SEL = ".dp-md,.dp-code,.dp-tw,.dp-title,.dc-t,.dp-fname,textarea,input,[data-i18n-skip]";
   var WALK_ROOTS = [".stg-overlay", ".dp-panel", ".dp-row", "#tour", ".ob-tour-backdrop", ".ob-persuade-wrap",
-    ".ob-empty-head", ".ob-example-grid", ".thread-actions", ".sidebar-footer", ".account-menu", ".account-item", ".side-nav", ".spaces-head"];
+    ".ob-empty-head", ".ob-example-grid", ".thread-actions", ".sidebar-footer", ".account-menu", ".account-item", ".side-nav", ".spaces-head", "#moduleRoot"];
   var ATTRS = ["title", "aria-label", "placeholder"];
 
   function walkRoot(root) {
