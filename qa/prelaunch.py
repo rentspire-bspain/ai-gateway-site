@@ -72,6 +72,12 @@ def http(url, timeout=20, data=None, headers=None, _retries=4):
             if mitigated and attempt + 1 < _retries:
                 time.sleep(1.5 * (attempt + 1))
                 continue
+            # v290: HTTP 546 = Supabase WORKER_RESOURCE_LIMIT (edge worker recycled; empty body,
+            # transient, rises when requests overlap on a warm worker). Retry gateway-chat POSTs
+            # once or twice with a backoff so a single recycled worker is not recorded as an outage.
+            if e.code == 546 and data and attempt + 1 < min(_retries, 3):
+                time.sleep(8 * (attempt + 1))
+                continue
             return last
     return last
 

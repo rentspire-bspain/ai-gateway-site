@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-BrCS5dcCRgl2Y42YfiQFHbQ6yFBi8iRGsW8LSP4BmUw=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-AyRLyTePmIlvDdQaZ8FbwAhtuaei3TlzDCPA63ZEL5Y=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://frontend-cdn.perplexity.ai https://cdn.jsdelivr.net data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
@@ -5118,11 +5118,15 @@ function renderAnswerError(container, title, detail, query) {
 }
 
 // v83 (G8): retry transient network failures / gateway 502-504 on the chat POST, with a visible note
+// v290: HTTP 546 (Supabase WORKER_RESOURCE_LIMIT — the edge worker was recycled for compute/memory,
+// typically when overlapping requests share one worker; the response is empty, so a retry is safe and
+// normally lands on a fresh worker) is retried too, with a longer jittered backoff.
 async function fetchRetry(url, opts, note) {
   const delays = [1200, 2500];
   for (let i = 0; ; i++) {
     try {
       const r = await fetch(url, opts);
+      if (r.status === 546 && i < delays.length) { reconnecting(i); await new Promise(z => setTimeout(z, 3000 + Math.random() * 2500 + i * 2500)); continue; }
       if ([502, 503, 504].includes(r.status) && i < delays.length) { reconnecting(i); await new Promise(z => setTimeout(z, delays[i])); continue; }
       return r;
     } catch (e) {
@@ -5492,6 +5496,7 @@ async function performSearchInner(query) {
       if (!res.ok) {
         let data = {};
         try { data = await res.json(); } catch {}
+        if (res.status === 546) throw new Error("The gateway was briefly out of compute (HTTP 546) and retried automatically without success. Your question wasn't lost — press Retry in a moment.");
         if ([502, 503, 504].includes(res.status)) throw new Error("The gateway is temporarily unavailable (HTTP " + res.status + "). Your question wasn't lost — retry in a moment.");
         throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
       }
