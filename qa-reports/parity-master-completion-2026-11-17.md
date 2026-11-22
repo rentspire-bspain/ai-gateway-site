@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 15.5%** (app-weighted; unmeasured counts as 0; v5 re-scored 2026-11-21 after the debug-loop fixes) · **measured-only: 34.0%** · evidence coverage 36.9% of 1376 applicable app-item checks · 126✅ / 237🟡 / 174🔴 / 839⚪ across 386 line items (215 universal items scored per app + 171 app-specific items). Per-app strict: BV 27.9% · TT 15.2% · AG 32.8% · GH 10.4% · ST 7.9% · CT 1.3% · DG 2.8%.
+**Part E portfolio UX readiness, strict: None%** (app-weighted; unmeasured counts as 0; v6 re-scored by the server-side worker loop) · **measured-only: None%** · 109✅ / 213🟡 / 184🔴 / 871⚪ across 386 line items. Per-app strict: BV 27.9% · TT 15.2% · AG 32.8% · GH 10.4% · ST 7.9% · CT 1.3% · DG 2.8%. Per-app strict: BV 27.9% · TT 15.2% · AG 32.8% · GH 10.4% · ST 7.9% · CT 1.3% · DG 2.8%.
 
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
@@ -1446,3 +1446,9 @@ this workspace, and (d) nationwide data conformance behind the CR expansion (F.4
 1. **🔴 F-31 (P0): boundview.com stale deployment** — promote master @ affc61d to production in the Vercel dashboard (see Part F.3). Every merged BV fix is waiting on this.
 2. **F-05: neuron valuation conflict (S1)** — UI says $0.004/N, the redemption catalog implies ~$0.0008/N, the master doc D5 implies ~$0.0001/N. Pick one rate; it changes the entire earn-surface economics (E11 item).
 3. **E11 owner decisions** (14 items in Part E §E11) — neuron rate, Tasks tab name (collides with Scheduled Tasks), age/eligibility rule, cap-reset basis, counsel review of the new BoundView privacy policy.
+
+### F.6 BATCH LOG — server-side free-lane worker loop (overnight 2026-11-21/22)
+
+| Batch | Items measured | ✅ G | 🟡 Y | 🔴 R | Portfolio strict |
+|---|---:|---:|---:|---:|---:|
+| B1 | 0 | 0 | 0 | 0 | None% |
