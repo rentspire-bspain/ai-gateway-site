@@ -2997,3 +2997,10 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - In flight: nothing — all fired lanes have now landed.
 
 **HEADLINE: 88.5% (11313/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner), store presence (owner), Legal counsel review (delivered), Wave-1 external-account integration (owner-gated).
+
+### 34. §30q addendum — v318: THE COMET IFRAME TEST — HONEST NEGATIVE + RUBRIC LEDGER
+
+- Comet sidepanel iframe render test (root, extension-loadable Chromium, v1.2.0): the panel's site iframe FAILED to load (chrome-error://chromewebdata). ENVIRONMENT CAVEAT: DNR dynamic rules may not apply under headless=new — this is NOT proof the rule fails in a real browser. The owner's 1-minute check in real Chrome/Comet remains the decider; if the panel is blank there, the fallback is a server-side frame-ancestors exception for the extension origin (ready to ship as a one-line change). Comet stays 78 — no score change from this test.
+- The portfolio coordinator (session e533902c) was sent the full rubric-mapped evidence ledger (11 items PAR-01..PAR-11 with acceptance tests, evidence URLs, timestamps, G/Y/R, and the owner-gated blockers). Runner job: none — all work inline.
+
+**HEADLINE: 88.4% (11318/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN.
