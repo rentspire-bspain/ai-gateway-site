@@ -1,5 +1,5 @@
 {
- "version": "v320-product-surface-inventory-3",
+ "version": "v321-product-surface-inventory-4",
  "note": "Fresh product-surface inventory \u2014 priority areas first (checkout, Comet, OAuth, restore, mobile). Stable IDs PI-###; FK to the 29-category scoring table; acceptance test per item; last evidence = live check at 2026-11-22T21:30Z unless noted. Does NOT force the 157; does not change weights or scores.",
  "items": [
   {
@@ -152,8 +152,17 @@
    "fk": "Accessibility",
    "scope": "tab-order/focus-visibility across all 12 public surfaces; unknown-path handling",
    "acceptance": "every surface reaches a focus-visible element within 6 tabs; unknown paths handled without a dead end",
-   "last_evidence": "live 2026-11-22T23:05Z: 12/12 surfaces tab-focus visible (legal pages expose a minimal mailto-only focus surface \u2014 nav links are plain text on legal pages, recorded as observation); unknown path /definitely-not-a-page-xyz returns the app shell (HTTP 200 SPA fallback, no dedicated 404 page) on both hosts",
-   "status": "live; NOTED: no dedicated 404 page; legal-page nav is non-focusable text"
+   "last_evidence": "live 2026-11-22T23:05Z: 12/12 surfaces tab-focus visible (legal pages expose a minimal mailto-only focus surface \u2014 nav links are plain text on legal pages, recorded as observation); unknown path /definitely-not-a-page-xyz returns HTTP 404 while rendering the app shell (graceful SPA recovery \u2014 CORRECTED in v321: earlier '200 fallback' claim was a probe artifact) on both hosts",
+   "status": "live; NOTED: 404 renders app shell (recovery ok, no dedicated 404 page); legal-page nav is non-focusable text"
+  },
+  {
+   "id": "PI-018",
+   "surface": "unknown-route classification, both hosts",
+   "fk": "SEO",
+   "scope": "unknown public + nested URLs, SPA deep links (/t/<slug>), intentionally private routes (/qa/, /sql/); HTTP status, robots.txt, canonical, browser recovery",
+   "acceptance": "unknown + private routes return HTTP 404; /t/ deep links 200 with composer recovery; robots.txt disallows /t/ on both hosts; no indexable dead ends",
+   "last_evidence": "live 2026-11-22T23:40Z: unknown_public/unknown_nested/private_qa/private_sql all 404 on BOTH hosts while rendering the app shell (composer reachable, no dead end); /t/nonexistent-slug 200 with recovery; robots.txt identical and correct on both hosts (Allow /, Disallow /t/); ai.spaincos.com robots Sitemap + sitemap.xml point to boundview.com \u2014 INTENTIONAL per v291 SEO strategy (ai host is the private noindexed workspace; brand.js line ~158 injects noindex on the spaincos host); boundview canonical correct on all pages",
+   "status": "live; regression test codified as qa/route-classification.py (exit 1 on regression)"
   }
  ]
 }
