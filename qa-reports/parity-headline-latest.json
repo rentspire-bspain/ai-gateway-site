@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-22T06:16:19+00:00",
- "version": "v308",
- "headline_pct": 87.5,
- "weighted_sum": 11206,
+ "ts": "2026-11-22T07:38:37+00:00",
+ "version": "v310",
+ "headline_pct": 88.0,
+ "weighted_sum": 11261,
  "total_weight": 128,
  "categories": {
   "Features": 99,
@@ -25,15 +25,15 @@
   "UX": 91,
   "SEO": 85,
   "Marketing": 75,
-  "Security": 80,
+  "Security": 82,
   "Accessibility": 70,
   "Legal/Compliance": 60,
-  "Docs/Support": 70,
+  "Docs/Support": 78,
   "Observability": 82,
-  "Fleet": 65,
+  "Fleet": 70,
   "Email/Notifications": 30,
-  "i18n": 28,
-  "NativeMobile": 40
+  "i18n": 36,
+  "NativeMobile": 48
  },
  "raw_items": {
   "done": 104,
