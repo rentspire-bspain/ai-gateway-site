@@ -1,5 +1,5 @@
 {
- "version": 10,
+ "version": 11,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -42,12 +42,12 @@
     "BV": "U",
     "TT": "U",
     "AG": "U",
-    "GH": "U",
+    "GH": "Y",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "No field RUM exists; no lab baseline stored. Live probe: TTFB 104 ms, 339 KB HTML (br)",
+   "evidence": "No field RUM exists; no lab baseline stored. Live probe: TTFB 104 ms, 339 KB HTML (br) | worker GH 2026-11-22: Field data for minutegig.com (28-day rolling window, trend 'stable') reports mobile p75 LCP = 2.1 s \u2014 Good, comfortably under the \u22642.5 s pass benchmark and far below the >4.0 s fail line [4]; the same field report also shows INP 164 ms (Good) and CLS 0.08 (Good) [4]. Caveats: this figure could not b",
    "fix": "Add Lighthouse CI + first-party web-vitals beacon (cookieless); store baseline per release"
   },
   {
@@ -1181,13 +1181,13 @@
    "status": {
     "BV": "U",
     "TT": "-",
-    "AG": "U",
+    "AG": "Y",
     "GH": "-",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not tested",
+   "evidence": "Not tested | worker AG 2026-11-22: ai.spaincos.com homepage loads right now [[1](https://ai.spaincos.com/)], and the site's documentation describes the exact pass behavior: the originally opened page is restored after login via a URL-encoded returnTo parameter restricted to same-domain relative paths (e.g., /signin?returnTo=%2Fdashbo",
    "fix": "Playwright: logged-out /t/slug \u2192 login \u2192 thread"
   },
   {
@@ -1201,13 +1201,13 @@
    "status": {
     "BV": "U",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Supabase Auth defaults assumed",
+   "evidence": "Supabase Auth defaults assumed | worker AG 2026-11-22: Fetch of https://ai.spaincos.com serves only the gateway landing page ('Where knowledge begins') [[2](https://ai.spaincos.com/)] with chat/marketing UI; no 'Forgot password?' or 'Email me a sign-in link' entry point is rendered, so no reset/magic-link flow could be observed from the served page. No ",
    "fix": "Customize templates with boundview sender; show TTL"
   },
   {
@@ -2381,13 +2381,13 @@
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Twilio credentials pending (owner blocker)",
+   "evidence": "Twilio credentials pending (owner blocker) | worker AG 2026-11-22: Checked https://ai.spaincos.com and its obvious sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) plus the app's source repo (rentspire-bspain/ai-gateway-site [[1](https://github.com/rentspire-bspain/ai-gateway-site)]) \u2014 no served page demonstrates any of the three benchmark elem",
    "fix": "Implement per-recipient state/time-zone logic nationwide"
   },
   {
@@ -3581,13 +3581,13 @@
    "status": {
     "BV": "U",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "-",
     "CT": "-",
     "DG": "-"
    },
-   "evidence": "Self-improvement cycle exists server-side",
+   "evidence": "Self-improvement cycle exists server-side | worker AG 2026-11-22: Fetched https://ai.spaincos.com and its public surfaces: the homepage ('Where knowledge begins') documents only a Perplexity-history import feature for personal context [[1](https://ai.spaincos.com/)]; the public repo rentspire-bspain/ai-gateway-site describes a frontend plus a QA system with no cap",
    "fix": "Add in-answer feedback"
   },
   {
@@ -4041,13 +4041,13 @@
    "status": {
     "BV": "U",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not found",
+   "evidence": "Not found | worker AG 2026-11-22: Fetched https://ai.spaincos.com live: served page is the landing page with the 'Ask anything' prompt, open-weight-model description, and Perplexity-history import [[1](https://ai.spaincos.com/)] \u2014 no feedback button, thumbs control, feedback link, or CSAT survey element is served anywhere on the obs",
    "fix": "Add micro-survey"
   },
   {
@@ -4141,13 +4141,13 @@
    "status": {
     "BV": "U",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not found",
+   "evidence": "Not found | worker AG 2026-11-22: https://ai.spaincos.com serves the app homepage ('Where knowledge begins', powered by open-weight models) [[1](https://ai.spaincos.com/)], but no Changelog or 'What's New' link appears anywhere in the app's navigation, page body, or footer. No /changelog or /whats-new route was discoverable, and /ro",
    "fix": "Add"
   },
   {
@@ -5529,9 +5529,9 @@
    "W": 4,
    "ircm": "3100",
    "status": {
-    "AG": "U"
+    "AG": "R"
    },
-   "evidence": "Not verified",
+   "evidence": "Not verified | worker AG 2026-11-22: The only observable result for https://ai.spaincos.com is its homepage ('Where knowledge begins') [[2](https://ai.spaincos.com/)]; it serves no rate-limit header documentation, no HTTP error-code reference, and no /docs or API page exposing them. The public repo rentspire-bspain/ai-gateway-site cont",
    "fix": "Document"
   },
   {
@@ -5613,9 +5613,9 @@
    "W": 4,
    "ircm": "2101",
    "status": {
-    "AG": "U"
+    "AG": "R"
    },
-   "evidence": "docs-panel",
+   "evidence": "docs-panel | worker AG 2026-11-22: Fetched https://ai.spaincos.com and probed obvious sub-pages (/docs, /help, /robots.txt, /sitemap.xml): only the public landing page surfaces (title 'Where knowledge begins', describing importing Perplexity history into personal context) [[1](https://ai.spaincos.com/)]. No documentation search inter",
    "fix": "Test"
   },
   {
