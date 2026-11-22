@@ -1362,6 +1362,9 @@ Deno.serve(async (req) => {
 
 async function chatHandler(req: Request, progress?: ProgressSink): Promise<Response> {
   const cors = corsFor(req); // pinned to https://ai.spaincos.com, Vary: Origin
+  // v291 STAGE TIMING: per-request stage marks (ms since handler start); exposed as x_timing on non-stream responses and logged.
+  const __tm: Array<[string, number]> = []; const __t0 = performance.now();
+  const mark = (l: string) => { __tm.push([l, Math.round(performance.now() - __t0)]); };
   if (req.method === "OPTIONS") return corsPreflight(req, cors);
   if (!GW_TOKEN) return new Response(JSON.stringify({ error: "gateway not configured" }), { status: 503, headers: { ...cors, "Content-Type": "application/json" } });
 
@@ -1394,6 +1397,7 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
       return new Response(JSON.stringify({ error: "Not authenticated — sign in again." }), { status: 401, headers: jsonHdr });
     }
     authUser = await authCheck.json();
+    mark("auth");
   }
   const userEmail = authUser?.email ?? "";
   const userId = authUser?.id ?? "";
@@ -1514,9 +1518,16 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
     // v152 SERVER MEMORIES: the member's memory store lives in public.memory_items (database).
     // The gateway reads it server-side so memories apply to every answer from any browser or
     // device; client-sent memories are merged on top (dedup, server order first).
+    // v292 TRIVIAL-QUERY FAST PATH (owner-authorized 2026-11-21): a short single-turn question that does not refer to the
+    // user themselves ("capital of France", "2+2") cannot use 400 memory rows — fetch the 20 most recent instead (the
+    // payload, JSON parse and prompt block shrink ~20x). Anything personal / multi-turn / attachment-bearing keeps the full 400.
+    const __lastUser = String((Array.isArray(messages) ? [...messages].reverse().find((m: any) => m?.role === "user")?.content : "") ?? "");
+    const trivialQuery = Array.isArray(messages) && messages.length <= 1 && !attachment && !(Array.isArray(attachments) && attachments.length)
+      && __lastUser.trim().split(/\s+/).filter(Boolean).length <= 15 && !/\b(i|i'm|i've|i'll|me|my|mine|myself|we|our|ours|us|remember|remind|earlier|previous|last time|before|history|memory|memories|imported|thread|context|prefer|favorite|favourite)\b/i.test(__lastUser);
+    const memLimit = trivialQuery ? 20 : 400;
     if (!apiKeyMode && !incognito && userId) {
       try {
-        const mr = await fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/memory_items?user_id=eq.${userId}&select=text&order=created_at.desc&limit=400`, { headers: { apikey: svc, Authorization: `Bearer ${svc}` }, signal: AbortSignal.timeout(4000) });
+        const mr = await fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/memory_items?user_id=eq.${userId}&select=text&order=created_at.desc&limit=${memLimit}`, { headers: { apikey: svc, Authorization: `Bearer ${svc}` }, signal: AbortSignal.timeout(4000) });
         if (mr.ok) {
           const rows = await mr.json();
           const server = (Array.isArray(rows) ? rows : []).map((r: any) => String(r?.text || "").trim()).filter(Boolean);
@@ -1527,6 +1538,7 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
         }
       } catch (_e) { /* memory lookup is best-effort */ }
     }
+    mark("memory");
     const recUsage = (cost: number): Promise<void> => (incognito ? Promise.resolve() : recordUsage(token, cost, svcAuth));
     const usageNow = () => usageState(token, svcAuth);
 
@@ -1827,6 +1839,7 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
     // ============================================================
     // AGENT 1: INTENT ANALYST (classifies and decomposes the task)
     // ============================================================
+    mark("userctx");
     const intentPrompt = `You are an INTENT ANALYST. Analyze this question. Respond with ONLY valid JSON:
 {"intent": "explanation|data_query|analysis|code|comparison|how_to|status|creative|strategy|other", "complexity": "simple|medium|complex|extreme", "topics": ["key","topics"], "needs_search": true|false, "needs_images": true|false, "needs_code": true|false, "needs_data": true|false, "set_question": true|false, "format_constrained": true|false, "sub_tasks": ["break","down","into","subtasks"]}
 
@@ -2003,6 +2016,7 @@ Question: "${userQuery}"`;
     };
     logAnalyticsEvent("query", { purpose: String(purpose || ""), mode: requestMode || "legacy", words: String(userQuery).trim().split(/\s+/).filter(Boolean).length, complexity: String(intent?.complexity || "") }, null, 0);
 
+    mark("credit");
     let intentOk = false; // v85: true only when the analyst returned parseable JSON with a boolean needs_search
     try {
 
@@ -2024,6 +2038,7 @@ Question: "${userQuery}"`;
         try { const parsedIntent = JSON.parse(jsonMatch[0]); intent = { ...intent, ...parsedIntent }; intentOk = typeof parsedIntent?.needs_search === "boolean"; } catch (e) {}
       }
     } catch (e) { /* use defaults */ }
+    mark("intent");
     // v85 FAIL OPEN: the analyst runs on a ~1000 OTPM Groq lane that rate-limits under load. When it fails,
     // times out or returns garbage, default to SEARCH unless the query is obviously conversational.
     if (!intentOk) {
@@ -2260,6 +2275,7 @@ Question: "${userQuery}"`;
     const slotEvidence = new Map<number, string>(); // v98: findings slot number -> evidence text (title + snippets)
     let citeAlign = { rebound: 0, dropped: 0, outlet_rebound: 0 };
     const slotUrlMap = new Map<number, string>(); // v128: marker number -> canonical URL (outlet <-> marker alignment)
+    mark("decide");
     let researchSkip = needsRetrieval ? "" : (personalAdvice ? "personal_advice" : "analyst_no_search");
     let researchDetail = "";
     // v173 (owner report 2026-11-12, R1 incident): a pure acknowledgment or standing-rule
@@ -2846,6 +2862,7 @@ Question: "${userQuery}"`;
 
     const now = new Date();
     const todayStr = now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    mark("research_done");
     let generalSystemPrompt = `You are an expert research assistant serving one authenticated member on a private platform. Your bar is the best answer a top analyst could give: correct, specific, and immediately usable.
 
 TODAY'S DATE: ${todayStr}. Use this for every time-sensitive judgment — never claim a dated event "has not happened yet" if its date is before today.
@@ -3080,6 +3097,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         return String(d?.choices?.[0]?.message?.content || "").trim();
       } catch { return ""; }
     };
+    mark("prompt_built");
     const lastResortAnswer = async (): Promise<string> => researchFallbackText() || await reliableModelAnswer();
 
     // ============================================================
@@ -3109,6 +3127,9 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       || /\b(commit|apply|ship|land) (these|the|them|that|it)\b.{0,40}\b(repo|repos|file|files|artifact|artifacts|sql|patch|patches|config|lane|lanes)\b/i.test(String(userQuery))
       || /\b(commit|open a pr|make a pr|ship)\b.{0,50}\b(artifact|sql|patch|wording|smoke test|coverage report)\b/i.test(String(userQuery))
       || /\bgithub_write\b/i.test(String(userQuery));
+    mark("pre_toolctx");
+    const __fleetEmail = apiKeyMode ? "" : String(await resolveFleetEmail());
+    mark("fleet_email");
     const toolCtx = {
       supabaseUrl: Deno.env.get("SUPABASE_URL") ?? "https://bnxermyboeigvwonfrzx.supabase.co",
       anonKey: sbAnonKey, userToken: apiKeyMode ? "" : token, userEmail, userId: apiKeyMode ? undefined : userId, isAdmin: apiKeyMode ? false : isAdmin, incognito, memberProfile: buildMemberProfile(personalization), userQuery: String(userQuery),
@@ -3120,7 +3141,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     // I9: default-deny egress. URL provenance = URLs the user typed this turn (+ hosts of trusted search results, added by the tool loop).
     // privateTexts = everything that must never leak into a model-chosen URL.
     initEgress(toolCtx, { userMessage: String(userQuery), repoPrEnabled: Deno.env.get("REPO_PR_ENABLED") === "1",
-      isFleet: !apiKeyMode && String(await resolveFleetEmail()) === String(userEmail || "").toLowerCase(),   // v175: runner tools for the fleet account
+      isFleet: !apiKeyMode && __fleetEmail === String(userEmail || "").toLowerCase(),   // v175: runner tools for the fleet account
       connectorTools2: !apiKeyMode && CONNECTOR2_INTENT.test(String(userQuery)),   // wave 2 tools: only on explicit files/repos/services intent
       dispatchTools: !apiKeyMode && !incognito && DISPATCH_INTENT.test(String(userQuery)),   // fleet dispatch: only on explicit dispatch intent
       fleetTools: !apiKeyMode && FLEET_INTENT.test(String(userQuery)),   // fleet registry tool: only on agent/fleet/guardian/org-chart intent
@@ -3254,9 +3275,20 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     // orchestration document — or a continuation turn in a thread whose recent context is one — the
     // PLATFORM gathers the registry + doctor + status evidence itself and injects it; the writer
     // composes from real data and the .md deliverable is auto-created server-side (v230b below).
-    const completionDocCtx = String(capped.slice(-6).map((m: any) => String(m?.content || "")).join("\n")).toLowerCase();
+    // v292 ROOT-CAUSE FIX (546 / 8s-latency investigation 2026-11-21): `capped` carries the platform's OWN system blocks
+    // (BENCHMARK GOSPEL, tool guidance, ... all of which mention "completion document"/"parity doc"), so scanning
+    // capped.slice(-6) matched COMPLETION_DOC_RE on EVERY request: the triple evidence fetch (3 x 8s wall) + the injected
+    // 8K-char block ran on a trivial "capital of France" question (measured: +8.0s wall, ~7K prompt tokens, worker
+    // compute pressure -> HTTP 546 WORKER_RESOURCE_LIMIT under overlap). Only the USER/ASSISTANT turns are conversation context.
+    const completionDocCtx = String(capped.filter((m: any) => m?.role !== "system").slice(-6).map((m: any) => String(m?.content || "")).join("\n")).toLowerCase();
     const COMPLETION_DOC_RE = /\b(complet(ion|e) doc|closure doc|completion document|closure document|parity doc|parity document|orchestration doc|orchestration document|completion report|closure report|closure %|closure percent|closure percentage|master doc|status doc|compile .{0,40}document for tonight|compile .{0,40}completion doc)\b/i;
     const completionDocIntent = COMPLETION_DOC_RE.test(String(userQuery)) || COMPLETION_DOC_RE.test(completionDocCtx);
+    // v292: explicit file-deliverable asks ("create a markdown document named X.md ... using create_file") need the tool loop
+    // (create_file) — web research can never substitute. Until now these only reached the loop (and got an attached file) by
+    // ACCIDENT: the completion-doc false positive (fixed in v292) forced the loop + an auto-artifact on EVERY request.
+    const FILE_CREATE_INTENT = /\bcreate_file\b|\b(create|make|write|generate|build|produce|export)\b[^.\n]{0,60}(\.(md|csv|xlsx|docx|pdf)\b|markdown (doc|document|file)|spreadsheet|\bxlsx\b|csv file|word document|pdf file)/i;
+    const fileAskName = ((String(userQuery).match(/\b([A-Za-z0-9][\w.-]{0,80}\.(?:md|txt))\b/i) || [])[1] || "");
+    const explicitFileAsk = !!fileAskName && FILE_CREATE_INTENT.test(String(userQuery));
     if (!apiKeyMode && completionDocIntent) {
       try {
         // v244 D7 replay fix (11 WORKER_RESOURCE_LIMITs on the 717-prompt replay + the owner's
@@ -3516,6 +3548,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     }
     // v95 I4: server-side auto-invocation — when the request is unambiguously "fetch/download/update the favicon|logo|file from <site>",
     // the platform runs fetch_asset itself (the writer model otherwise answers with a bare link). Independent of TOOL_LOOP.
+    mark("toolctx_built");
     let autoAsset: Awaited<ReturnType<typeof autoFetchAssets>> | null = null;
     if (tool_loop !== false) {
       try {
@@ -3550,7 +3583,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         const CAPABILITY_INTENT = /\b(is|are|do|does|can|could|have|has)\b.{0,40}\b(execution|execute|sandbox|python|tools?|connected|connection)\b/i;
         // v175: runner execution and GitHub writes are private-tool work — web research can
         // NEVER substitute for actually calling run_runner_job / github_write.
-        const privateToolIntent = FLEET_INTENT.test(String(userQuery)) || DISPATCH_INTENT.test(String(userQuery)) || CONNECTOR_INTENT.test(String(userQuery)) || CONNECTOR2_INTENT.test(String(userQuery)) || CAPABILITY_INTENT.test(String(userQuery)) || runnerAsk || ghWriteAsk || completionDocIntent || cometAsk;
+        const privateToolIntent = FLEET_INTENT.test(String(userQuery)) || DISPATCH_INTENT.test(String(userQuery)) || CONNECTOR_INTENT.test(String(userQuery)) || CONNECTOR2_INTENT.test(String(userQuery)) || CAPABILITY_INTENT.test(String(userQuery)) || runnerAsk || ghWriteAsk || completionDocIntent || cometAsk || FILE_CREATE_INTENT.test(String(userQuery));
         if (perplexityUsed && researchFindings.length >= 6 && intent.complexity !== "extreme" && !imageAttach && !agenticBypass && !privateToolIntent) {
           toolLoopSkip = "research_sufficient";
         } else {
@@ -3649,6 +3682,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     if (isDocumentAsk(String(userQuery))) capped.push({ role: "system", content: DOCUMENT_RULE });   // v145: .md/docs render as artifacts, not fenced text
     if (isWebappAsk(String(userQuery))) capped.push({ role: "system", content: WEBAPP_RULE });        // v145: webapp builder parity (live side-panel app)
     if (isVerifyAsk(String(userQuery))) capped.push({ role: "system", content: VERIFY_RULE });        // v145: verify = actually run_python/search, never claim no execution tool
+    mark("pre_writer");
     progress?.begin("draft", "Drafting your answer…", "draft", { agent: "writer", agentName: "WRITER" });
     const writerModel = councilUsed ? "z-ai/glm-5.3" : finalModel;
     const writerEffort = councilUsed ? "medium" : reasoningEffort(intent.complexity);
@@ -3922,6 +3956,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       } catch (_e) { res = new Response(null, { status: 502 }); data = {}; }
     }
 
+    mark("writer_done");
     // ============================================================
     // AGENT 4: QA AGENT (verifies and polishes if needed)
     // ============================================================
@@ -4485,6 +4520,20 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       // completion-doc request and no create_file call landed, the platform writes the artifact
       // itself from the writer's response so the deliverable is always a real file in the
       // Artifacts panel. Chat text stays the summary.
+      // v292 EXPLICIT FILE ASK: the user named a .md/.txt deliverable and asked for it to be created; when the loop model answered
+      // without calling create_file (measured: GLM text-only on a tiny create_file ask), the platform writes the named file from
+      // the response so the deliverable is a real attachment — the same guarantee v230b gives completion docs, now keyed to the ask
+      // instead of (previously) a false-positive on every request.
+      if (explicitFileAsk && !apiKeyMode && !(toolCtx.assets || []).some((a: any) => String(a?.name || "") === fileAskName)) {
+        try {
+          const fin = String(finalResponse?.choices?.[0]?.message?.content || "");
+          if (fin.length > 80) {
+            const fmt = /\.txt$/i.test(fileAskName) ? "txt" : "md";
+            const out = await toolCreateFile({ filename: fileAskName, format: fmt, content: fin.slice(0, 60_000), title: fileAskName }, toolCtx);
+            if (String(out).includes('"ok":true')) console.log("v292 auto explicit-file artifact:", fileAskName);
+          }
+        } catch (_ef) { /* best effort */ }
+      }
       if (completionDocIntent && !(toolCtx.assets || []).some((a: any) => String(a?.name || "").endsWith(".md"))) {
         try {
           const fin = String(finalResponse?.choices?.[0]?.message?.content || "");
@@ -4501,6 +4550,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       if (toolCtx.actions?.length) finalResponse.x_actions = toolCtx.actions; // F15: email/calendar previews; UI shows an Approve card (modules/connectors.js)
       if (toolCtx.proposals?.length) finalResponse.x_proposals = toolCtx.proposals; // UI shows diff + Approve (repo-pr.js)
       if (autoAsset?.trace?.length) finalResponse.x_auto_asset = autoAsset.trace;
+      mark("qa_done"); finalResponse.x_timing = __tm; console.log("x_timing", JSON.stringify(__tm));
       finalResponse.x_phases = buildStepPhases(false);
       if (researchFindings.length) finalResponse.x_sources = canonicalSourceItems(researchFindings, 18); // v128: the one canonical source list
       if (routed) finalResponse.x_routed_model = routed.model, finalResponse.x_routed_task = routed.task;
