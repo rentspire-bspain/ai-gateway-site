@@ -1,22 +1,20 @@
+import { corsFor as _unused, serverOnly } from "../_shared/cors.js";
+import { resolveModel, isFreeModel, capDecision, safeEqual } from "../_shared/call-model-policy.js";
 Deno.serve(async (req) => {
-  const cors = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-gateway-token",
-  };
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  const cors = serverOnly(); // no browser may call this function; gateway-chat calls it server-side
+  if (req.method === "OPTIONS") return new Response(null, { status: 403 });
   try {
     // Gateway auth: if GATEWAY_TOKEN is set, every caller must present it
     // (Authorization: Bearer <token> or x-gateway-token header). The Supabase
     // publishable key is NOT sufficient — the edge gateway accepts any bearer.
-    const gt = Deno.env.get("GATEWAY_TOKEN");
-    if (gt) {
-      const auth = req.headers.get("authorization") || "";
-      const presented = auth.startsWith("Bearer ") ? auth.slice(7) : req.headers.get("x-gateway-token") || "";
-      if (presented !== gt) {
-        return new Response(JSON.stringify({ error: "unauthorized gateway token" }), { status: 401, headers: { ...cors, "Content-Type": "application/json" } });
-      }
-    }
-    const { prompt, model, backend, messages, purpose, max_tokens, stream, reasoning_effort , tools, tool_choice, parallel_tool_calls } = await req.json();
+    // v2 auth: env GATEWAY_TOKEN preferred; a compiled-in shared token is the fallback so the
+    // endpoint is NEVER open when the env secret is unset (audit P0-1, 2026-11-09).
+    const gt = Deno.env.get("GATEWAY_TOKEN") || "";
+    if (gt.length < 32) return new Response(JSON.stringify({ error: "gateway not configured" }), { status: 503, headers: { "Content-Type": "application/json" } }); // fail closed, no compiled-in fallback
+    const auth = req.headers.get("authorization") || "";
+    const presented = auth.startsWith("Bearer ") ? auth.slice(7) : req.headers.get("x-gateway-token") || "";
+    if (!safeEqual(presented, gt)) return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
+    const { prompt, model, messages, purpose, max_tokens, stream, reasoning_effort , tools, tool_choice, parallel_tool_calls } = await req.json();
     // THE FREE HOSTED MODELS (no hardware, no cost):
     //   - OpenRouter's free Flint (recursive/flint-v1.0:free) — the coding/agent model
     //   - OpenRouter's Free Models Router — the auto-routing free tier
@@ -29,23 +27,28 @@ Deno.serve(async (req) => {
       summary: "qwen/qwen3.8-27b",   // Groq's fast free summarization
       general: "deepseek/deepseek-v4.1-flash-1017", // PINNED 2026-10-31: DeepSeek V4.1 Flash via OpenRouter (PAID, ~$0.0003/call). Eval: 74.2% vs Qwen 19.4% (eval/RESULTS.md)
     };
-    let chosen = model || DEFAULTS[purpose] || DEFAULTS.general;
-    const isGroqId = (m: string) => m.startsWith("qwen/") || m.includes("groq");
-    const isFree = (m: string) => isGroqId(m) || m.endsWith(":free");
+    const rm = resolveModel(model, DEFAULTS[purpose as keyof typeof DEFAULTS] || DEFAULTS.general);
+    // rm.rejected = requested model not on the allowlist -> silently served by the free fallback (never an arbitrary paid model)
+    let chosen: string = rm.model;
+    const isGroqId = (m: string) => m.startsWith("qwen/"); // exact prefix only; no substring match
+    const isFree = (m: string) => isFreeModel(m);
     const sbUrl = Deno.env.get("SUPABASE_URL") || "";
     const sbKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const sbHeaders = { "Authorization": `Bearer ${sbKey}`, "apikey": sbKey };
-    const custom = !!backend || !!Deno.env.get("MODEL_BACKEND_URL");
+    const custom = !!Deno.env.get("MODEL_BACKEND_URL"); // env only; the request can no longer pick the upstream or see MODEL_BACKEND_KEY
     // SPEND TRIPWIRE: every paid call writes one tiny object to the private Storage bucket 'gateway-meter'
     // under today's UTC date prefix (no DB migration needed). Past DAILY_PAID_CALL_CAP objects per UTC day
     // (default 2000, about $0.60 at $0.0003/call) paid models are downgraded to free Qwen and the response
-    // carries x_budget_exceeded. Meter errors fail open (availability over a few cents).
+    // carries x_budget_exceeded. Meter errors FAIL CLOSED (downgrade to free).
     const DAILY_CAP = Number(Deno.env.get("DAILY_PAID_CALL_CAP")) || 2000;
     // MONTHLY_SPEND_CAP: true dollar budget for the calendar month, summed from the
     // ops.llm_requests ledger (exact per-call cost from OpenRouter usage.cost; streaming
     // calls logged at a conservative token-budget estimate). Over the cap, paid models
     // downgrade to free Qwen for the rest of the month. Fails open on query error.
-    const MONTHLY_SPEND_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP")) || 20;
+    // v302 (owner directive 2026-11-21 "RAISE THE CAP X_METER"): effective monthly cap is at
+    // least $500 — the dashboard secret can still set it HIGHER, never lower (was $350 at
+    // ~90% utilization: $315.23 spent at check time).
+    const MONTHLY_SPEND_CAP = Math.max(500, Number(Deno.env.get("MONTHLY_SPEND_CAP")) || 0);
     const dayKey = new Date().toISOString().slice(0, 10);
     let budgetExceeded = false;
     const paid = !custom && !isFree(chosen);
@@ -70,8 +73,8 @@ Deno.serve(async (req) => {
           headers: { ...sbHeaders, "Content-Type": "application/json" }, body: "{}", signal: AbortSignal.timeout(5000) });
         if (mr.ok) { const t = await mr.text(); const n = Number(t); if (Number.isFinite(n)) monthSpend = n; meterDiag += ` month:${mr.status}:${monthSpend === null ? "?" : monthSpend.toFixed(4)}`; }
       } catch (_e) { meterDiag += ` montherr`; }
-      if (paidToday !== null && paidToday >= DAILY_CAP) { budgetExceeded = true; chosen = DEFAULTS.summary; }
-      else if (monthSpend !== null && monthSpend >= MONTHLY_SPEND_CAP) { budgetExceeded = true; chosen = DEFAULTS.summary; meterDiag += ` monthly_cap_hit`; }
+      const cd = capDecision({ paidToday, monthSpend, dailyCap: DAILY_CAP, monthlyCap: MONTHLY_SPEND_CAP, failClosed: true });
+      if (cd.exceeded) { budgetExceeded = true; chosen = DEFAULTS.summary; meterDiag += ` cap:${cd.reason}`; } // unknown meter state now downgrades to free instead of spending
     }
     // Ledger every paid call with its cost (single writer for cap accounting: caller='call-model').
     // Non-streaming: exact cost from OpenRouter usage.cost. Streaming: conservative estimate
@@ -93,7 +96,7 @@ Deno.serve(async (req) => {
     const estStreamCost = (mt: number) => (mt / 1e6) * EST_OUT_PRICE;
     const callOne = async (m: string, mt: number) => {
       const g = isGroqId(m);
-      const url = backend || Deno.env.get("MODEL_BACKEND_URL") || (g ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions");
+      const url = Deno.env.get("MODEL_BACKEND_URL") || (g ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions");
       const key = Deno.env.get("MODEL_BACKEND_KEY") || (g ? Deno.env.get("GROQ_API_KEY") : Deno.env.get("OPENROUTER_API_KEY")) || "";
       const msgs = messages ? messages : [{ role: "user", content: prompt || "" }];
       const toolsBody = (Array.isArray(tools) && tools.length)
@@ -125,16 +128,18 @@ Deno.serve(async (req) => {
       const _hasToolCalls = Array.isArray(_msg?.tool_calls) && _msg.tool_calls.length > 0;
       return { ok: r.ok && !d?.error && ((typeof content === "string" && content.length > 0) || _hasToolCalls), d };
     };
-    // max_tokens: Groq free tier enforces OTPM 1000 (cap 1024); OpenRouter reasoning models get 2048.
+    // max_tokens: Groq free tier enforces OTPM 1000 (cap 1024). Non-Groq (OpenRouter) cap raised
+    // v84: 2048 clipped long streamed answers mid-sentence; default 4096, ceiling 8192. The empty-
+    // completion retry already scaled to 8192, so this only removes the silent clamp.
     const effort = ["minimal", "low", "medium", "high"].includes(String(reasoning_effort)) ? String(reasoning_effort) : (Deno.env.get("REASONING_EFFORT") || "");
     const reasoningFor = (m: string) => (effort && !isGroqId(m) ? { reasoning: { effort } } : {});
-    const capFor = (m: string) => Math.min(Number(max_tokens) > 0 ? Number(max_tokens) : 2048, isGroqId(m) ? 1024 : 2048);
+    const capFor = (m: string) => Math.min(Number(max_tokens) > 0 ? Number(max_tokens) : 4096, isGroqId(m) ? 1024 : 8192);
     // STREAMING (opt-in, stream:true): pass the upstream SSE body straight through for the primary model.
     // If the upstream is not OK we fall through to the normal non-streaming path (with its fallback chain).
     if (stream === true && Array.isArray(messages)) {
       try {
         const g = isGroqId(chosen);
-        const surl = backend || Deno.env.get("MODEL_BACKEND_URL") || (g ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions");
+        const surl = Deno.env.get("MODEL_BACKEND_URL") || (g ? "https://api.groq.com/openai/v1/chat/completions" : "https://openrouter.ai/api/v1/chat/completions");
         const skey = Deno.env.get("MODEL_BACKEND_KEY") || (g ? Deno.env.get("GROQ_API_KEY") : Deno.env.get("OPENROUTER_API_KEY")) || "";
         const sr = await fetch(surl, { method: "POST", headers: { "Authorization": `Bearer ${skey}`, "Content-Type": "application/json" },
           body: JSON.stringify({ model: chosen, messages, max_tokens: capFor(chosen), stream: true, stream_options: { include_usage: true }, ...reasoningFor(chosen) }), signal: AbortSignal.timeout(55_000) });
