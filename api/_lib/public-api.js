@@ -129,6 +129,21 @@ async function upstreamJson(response) {
   try { return await response.json(); } catch { throw new ApiError(502, 'invalid_upstream_response', 'Upstream returned invalid JSON.'); }
 }
 
+// Best-effort per-IP limiter (per warm serverless instance; NOT distributed: the distributed hook below stays owner/infra gated).
+// Caps unauthenticated floods before they cost an auth-project lookup.
+const _hits = new Map();
+function rateLimit(req, limit = Number(process.env.PUBLIC_API_RATE_LIMIT ?? 30), windowMs = 60_000) {
+  if (!(limit > 0)) return 0; // PUBLIC_API_RATE_LIMIT=0 disables (unit tests only)
+  const fwd = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  const ip = fwd || req.socket?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const arr = (_hits.get(ip) || []).filter(t => now - t < windowMs);
+  if (arr.length >= limit) { _hits.set(ip, arr); return Math.ceil((windowMs - (now - arr[0])) / 1000); }
+  arr.push(now); _hits.set(ip, arr);
+  if (_hits.size > 5000) for (const k of _hits.keys()) { if (_hits.size <= 4000) break; _hits.delete(k); }
+  return 0;
+}
+
 function endpoint(docs, execute) {
   return async (req, res) => {
     try {
@@ -144,6 +159,8 @@ function endpoint(docs, execute) {
         phase: 'Phase 1: no billing or distributed rate-limit integration; private allowlist remains enforced.',
       });
       if (req.method !== 'POST') throw new ApiError(405, 'method_not_allowed', 'Use GET, POST, or OPTIONS.');
+      const wait = rateLimit(req);
+      if (wait) { res.setHeader?.('Retry-After', String(wait)); throw new ApiError(429, 'rate_limited', 'Too many requests. Try again shortly.'); }
       const principal = await authenticate(req);
       const body = await readBody(req);
       // RATE-LIMIT HOOK (owner/infra gated): await enforceDistributedLimit(principal.keyId || principal.userId, docs.endpoint);
@@ -161,4 +178,4 @@ function endpoint(docs, execute) {
   };
 }
 
-module.exports = { ApiError, endpoint, requestJson, proxyUpstream, upstreamJson };
+module.exports = { rateLimit, ApiError, endpoint, requestJson, proxyUpstream, upstreamJson };
