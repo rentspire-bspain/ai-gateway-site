@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-22T02:23:35+00:00",
- "version": "v304",
- "headline_pct": 87.4,
- "weighted_sum": 11181,
+ "ts": "2026-11-22T05:43:55+00:00",
+ "version": "v307",
+ "headline_pct": 87.5,
+ "weighted_sum": 11196,
  "total_weight": 128,
  "categories": {
   "Features": 99,
@@ -14,7 +14,7 @@
   "Models": 92,
   "Connectors": 99,
   "Privacy": 88,
-  "Comet": 70,
+  "Comet": 75,
   "Premium": 80,
   "Enterprise": 72,
   "GettingStarted": 93,

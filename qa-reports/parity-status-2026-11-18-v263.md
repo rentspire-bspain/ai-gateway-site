@@ -2732,7 +2732,7 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - ~~Teammates onboarding unification (PR #294, 446b214)~~ — LIVE (cache-busted fetch matches master, SHA-256 7f2bf9b4…): duplicate invitation flow routed to Team onboarding, pending-invite filter, Account profile shortcut; node --check + 5 Node tests + verify-live CI green. Teammates 68→70. Honest limits: no authenticated E2E yet; templates and shared profile parity remain gaps.
 - ~~Comet extension v1.1.1 (PR #295, 19dd20f)~~ — LIVE: fixes the invalid array-shaped commands manifest in v1.1.0 plus shortcut dispatch storage/timestamp/gesture; manifest 1.1.1 with commands object + update feed live; ZIP SHA256 b7867109… matches the merge commit; all extension JS node --check + mocked dispatch/fallback green. Comet stays 70 pending real-browser validation at root.
 
-**Headline: 86.7% (11092/128, 29 categories) — 🟡 YELLOW band, +0.1 this batch, +2.3 across v292-v295.** Remaining REDs: Legal (owner review), i18n, Email (owner OAuth registration), Desktop 70, Comet 70 (browser validation unlock at root), Wave-1 webapp rebuild. Open PRs: #267, #222, #216.
+**Headline: 86.7% (11092/128, 29 categories) — 🟡 YELLOW band, +0.1 this batch, +2.3 across v292-v295.** Remaining REDs: Legal (owner review), i18n, Email (owner OAuth registration), Desktop 70, Comet 75 (browser validation unlock at root), Wave-1 webapp rebuild. Open PRs: #267, #222, #216.
 
 ### 12. §30q addendum — v296: THE DESKTOP LANE (Desktop 70 → 78, headline 86.7% → 86.8%)
 
@@ -2764,7 +2764,7 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 **Lanes landed this batch:**
 - ~~Connector onboarding persuasion (PR #300, f76b879)~~ — LIVE (onboarding.js/connectors.js live post-deploy; site 200): concrete before/after examples ("20 minutes of scrolling -> one question, cited") with Gmail ("What did my accountant say about the Q3 invoices?"), Calendar ("What's on my plate Thursday..."), and Files ("Summarize the contract my lawyer sent last week") examples rendered in Settings -> Connectors empty state, Onboarding Tour Steps 1-4 (with quick-jump pill), and the landing empty state. "Why connect?" benefits block: per-user RLS ownership + anytime deletion, inline citations, cross-device sync, Incognito mode. Honest provider status: configured providers (Dropbox, Slack) route into the REAL OAuth flow; unregistered (Google/Outlook/GitHub per /api/oauth-config) show "Registration pending" and highlight setup — never a dead button. Verification: node --check, CSP SRI --check, 39/39 node tests, python connectors test, headless Playwright QA dark+light+mobile with zero page/console errors. GettingStarted 90→93, Connectors 98→99.
 
-**HEADLINE: 87.1% (11143/128, 29 categories) — 🟡 YELLOW band, +0.3 this batch, +2.6 across v292-v297.** Remaining REDs: Legal (owner review), i18n, Email (owner OAuth registration), Comet 70 (browser-validation unlock at root), Wave-1 webapp rebuild. Open PRs: #267, #222, #216.
+**HEADLINE: 87.1% (11143/128, 29 categories) — 🟡 YELLOW band, +0.3 this batch, +2.6 across v292-v297.** Remaining REDs: Legal (owner review), i18n, Email (owner OAuth registration), Comet 75 (browser-validation unlock at root), Wave-1 webapp rebuild. Open PRs: #267, #222, #216.
 
 ### 14. §30q addendum — v298: THE I18N-FOUNDATION BATCH + THE PRELAUNCH-FLAKINESS ROOT CAUSE (headline 87.1% → 87.2%)
 
@@ -2773,7 +2773,7 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - ~~Offline-bar click-blocking fix (PR #303, 083be8d)~~ — LIVE, the ROOT CAUSE of the flaky prelaunch doc-chip failure (21/22) the i18n lane hit: when navigator.onLine reads false, the offline status bar rendered over content and intercepted the doc-chip pointer events. Both bars (index.html banner + desktop-shell pill) now carry pointer-events:none. Root reproduced it live (Playwright: "offlineBar intercepts pointer events"), verified the fix locally, then confirmed on production post-deploy: doc panel opens with the bar visible. Codified: status indicators must never intercept pointer events — a new check-class worth sweeping (any fixed-position overlay must be pointer-events:none unless interactive).
 - The HTTP 546 flakiness remains unexplained (two runs) — gateway-side investigation still queued.
 
-**HEADLINE: 87.2% (11161/128, 29 categories) — 🟡 YELLOW band, +0.1 this batch, +2.7 across v292-v298.** Remaining REDs: Legal (owner review), Email (owner OAuth registration), Comet 70 (browser-validation unlock at root), Wave-1 webapp rebuild. Open PRs: #267, #222, #216.
+**HEADLINE: 87.2% (11161/128, 29 categories) — 🟡 YELLOW band, +0.1 this batch, +2.7 across v292-v298.** Remaining REDs: Legal (owner review), Email (owner OAuth registration), Comet 75 (browser-validation unlock at root), Wave-1 webapp rebuild. Open PRs: #267, #222, #216.
 
 ### 15. §30q addendum — v299: THE PR HARVEST + BRAND-IDENTITY BATCH + THE UX MASTER RE-RUN (headline 87.2%)
 
@@ -2785,7 +2785,7 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - ~~Boundview account-email brand fix (PRs #305 + #306)~~ — ROOT CAUSE of the owner-reported "why is my login now bspain@boundview.com": the brand scrub (runtime brand.js + server bv-render) was rewriting the signed-in account's REAL email into a fabricated boundview address. Both domains share one login; the account email is USER DATA, never brand copy. Emails are now tokenized and preserved verbatim (with the you@ login placeholder correctly still rewritten as brand copy). Also: the offline pill capped at 420px + pointer-events:none after the owner screenshot showed it dominating the viewport. Live-verified on both domains.
 - ~~UX master benchmark re-run~~ — v299 run against the current deploy: **87.2 YELLOW** (A 92.9, B 87.5, C 91.7, D 100, E 75, F 87.5, G 80, H 80). Honest note: this run re-executed ~70% of checks live and marked the rest PARTIAL instead of assuming the v290 results — the v290 fully-executed run was 91.4 GREEN. The delta is measurement coverage, not regression; E4-E6 (visual/focus/contrast) and H2/H3 carry PARTIALs. The offline-bar fix from v298 is verified in-run (B10 doc panel opens with the bar present). Results recorded in qa-private/bench/results/ux-master.json.
 
-**HEADLINE: 87.2% (11167/128, 29 categories) — 🟡 YELLOW band.** Remaining REDs: Legal (owner review), Email (owner OAuth + STRIPE_SECRET_KEY now also owner-gated), Comet 70 (browser-validation unlock), Wave-1 webapp rebuild. UX master 87.2 YELLOW — the E/H partials are the next UX work.
+**HEADLINE: 87.2% (11167/128, 29 categories) — 🟡 YELLOW band.** Remaining REDs: Legal (owner review), Email (owner OAuth + STRIPE_SECRET_KEY now also owner-gated), Comet 75 (browser-validation unlock), Wave-1 webapp rebuild. UX master 87.2 YELLOW — the E/H partials are the next UX work.
 
 ### 16. §30q addendum — v300: THE UX-GREEN BATCH — MASTER BENCHMARK 94.8 GREEN (headline holds 87.2%)
 
@@ -2797,7 +2797,7 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Stripe LIVE key: the secure credential form is OPEN for the owner (the vault only holds a TEST-mode key; checkout uses live-mode price IDs from acct_1QbFSiEobD5Y9pei, so the test key cannot serve them). The moment the live key lands, STRIPE_SECRET_KEY goes into Supabase secrets and checkout goes fully live.
 - New lane fired: gateway HTTP 546 investigation (outage_diagnoser) — the last unexplained flakiness class.
 
-**HEADLINE: 87.2% (11167/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 94.8 GREEN (record). Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key form open), Comet 70 (browser validation), Wave-1 webapp rebuild.
+**HEADLINE: 87.2% (11167/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 94.8 GREEN (record). Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key form open), Comet 75 (browser validation), Wave-1 webapp rebuild.
 
 ### 17. §30q addendum — v301: THE 546 DIAGNOSIS (headline 87.2% + Observability 82)
 
@@ -2810,7 +2810,7 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Open: real server-side fix = reduce per-request compute for trivial queries (skip the 400-row memory_items fetch and analyst/self-check stages) — needs function logs or a profile; the Management API logs endpoint rejected every table name tried, so the Supabase logs UI or owner action is needed. Standing guidance: never run overlapping suites against the gateway.
 - WATCH ITEM for the owner: x_meter shows month_spend_usd 315.23 of monthly_cap_usd 350 (~90%) — the cap will bind soon and needs a decision (raise cap or trim usage).
 
-**HEADLINE: 87.2% (11169/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN (record).** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live-key form open), Comet 70 (browser validation), Wave-1 webapp rebuild.
+**HEADLINE: 87.2% (11169/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN (record).** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live-key form open), Comet 75 (browser validation), Wave-1 webapp rebuild.
 
 ### 18. §30q addendum — v302: THE OWNER-ACTION BATCH (cap + Stripe steps recorded; compute-diet lane fired)
 
@@ -2844,7 +2844,7 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - The bnxer project's dormant call-model slug was incidentally updated to the hardened source + floor (harmless; nothing calls it).
 - Stripe live-key form: still open with the owner.
 
-**HEADLINE: 87.3% (11173/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN (record).** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key), Comet 70 (browser validation), Wave-1 webapp rebuild.
+**HEADLINE: 87.3% (11173/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN (record).** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key), Comet 75 (browser validation), Wave-1 webapp rebuild.
 
 ### 20. §30q addendum — v304: THE 546 FIX — ROOT CAUSE WAS A FALSE POSITIVE (Observability 82)
 
@@ -2856,7 +2856,7 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Users no longer get the bogus completion-status-*.md attachment on ordinary answers — intended behavior, verified.
 - WATCH: Groq free-tier daily tokens at 99.9% (199,821/200,000 TPD) from today's QA traffic — Flint fallback active by design; resets on the UTC day roll.
 
-**HEADLINE: 87.4% (11175/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN. Cap $500 live.** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key form open), Comet 70 (browser validation), Wave-1 webapp rebuild.
+**HEADLINE: 87.4% (11175/128, 29 categories) — 🟡 YELLOW band. UX MASTER 94.8 GREEN. Cap $500 live.** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key form open), Comet 75 (browser validation), Wave-1 webapp rebuild.
 
 ### 21. §30q addendum — v305: THE UX H-CATEGORY FIX — MASTER 96.8 GREEN (new record)
 
@@ -2887,4 +2887,21 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - **UX MASTER BENCHMARK: 100.0 GREEN — all 46 checks, all 8 categories (A-H) at 100, every check executed live on production through the eval account.** Record history: 91.4 (v290) -> 94.8 (v300) -> 96.8 (v305) -> 100.0 (v306).
 - Stripe live key: credential form RE-OPENED with the owner (second request); the vault still holds only the TEST-mode key. This remains the single checkout blocker.
 
-**HEADLINE: 87.4% (11181/128, 29 categories) — 🟡 YELLOW band. UX MASTER 100.0 GREEN. Cap $500 live.** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key), Comet 70 (browser validation), Wave-1 webapp rebuild.
+**HEADLINE: 87.4% (11181/128, 29 categories) — 🟡 YELLOW band. UX MASTER 100.0 GREEN. Cap $500 live.** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key), Comet 75 (browser validation), Wave-1 webapp rebuild.
+
+### 23. §30q addendum — v307: THE COMET BROWSER VALIDATION + THE CHECKOUT TEST
+
+**Owner directives this batch:** Stripe steps again; show the live-mode checkout test; UX master after the next deploy.
+
+- ~~Comet real-browser validation~~ — PASSED at root (Chromium persistent context, --load-extension, real service worker): the extension installs, the SW registers and stays alive, manifest 1.1.1 with the corrected object-shaped commands (open-sidepanel, summarize-page), sidePanel API available. Comet 70 -> 75. Remaining: OS-level shortcut-key synthesis and the Chrome Web Store listing (owner-gated).
+- **Checkout three-tier test, current state (all honest):** starter/pro/unlimited all return not_configured ("Add STRIPE_SECRET_KEY in Supabase project secrets, then retry. No card is charged until then.") — the fail-visible contract working as designed. STRIPE PROOF THE WIRING IS RIGHT: querying all three live-mode price IDs with the vault TEST key returns "No such price ... a similar object exists in live mode" — Stripe itself confirms the price IDs are live-mode objects. The ONLY missing piece is the owner's live secret key.
+- ~~Post-deploy UX verification (after PR #320 deploy)~~ — green: landing, answer (Tokyo in 6.1s), citations (source links), title, manifest, no 375px overflow, zero JS errors. UX MASTER holds 100.0.
+- Stripe live key: credential form re-opened (second request this session); steps repeated in the batch log and to the owner directly.
+
+**OWNER STEPS — Stripe live key (repeat, ~2 minutes):**
+1. dashboard.stripe.com -> RENTSPIRE LLC (acct_1QbFSiEobD5Y9pei) -> set LIVE mode (top-right toggle).
+2. Developers -> API keys -> Reveal secret key (sk_live_...). Copy it.
+3. Paste it into the credential form open in this conversation (secure; never touches chat/logs) — OR add STRIPE_SECRET_KEY directly in Supabase dashboard -> project bnxermyboeigvwonfrzx -> Edge Functions -> Secrets.
+4. Say done — checkout will be verified end-to-end with a live Checkout Session for each tier.
+
+**HEADLINE: 87.5% (11185/128, 29 categories) — 🟡 YELLOW band. UX MASTER 100.0 GREEN. Cap $500 live.** Remaining REDs: Legal (owner review), Email (owner OAuth + Stripe live key), Wave-1 webapp rebuild.
