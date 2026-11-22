@@ -1,271 +1,276 @@
 {
-  "version": "v308",
-  "generated_at": "2026-11-16T00:00:00Z",
-  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE \u2014 GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90\u219295. | 2026-11-18: owner-blocker audit \u2014 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped \u2014 server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
-  "categories": [
-    {
-      "name": "Features",
-      "weight": 14,
-      "score": 99
-    },
-    {
-      "name": "Computer",
-      "weight": 8,
-      "score": 99
-    },
-    {
-      "name": "API",
-      "weight": 10,
-      "score": 95
-    },
-    {
-      "name": "Troubleshooting",
-      "weight": 4,
-      "score": 90
-    },
-    {
-      "name": "Voice",
-      "weight": 4,
-      "score": 85,
-      "note": "v293 re-score: voice states shipped (PR #289, merged + deployed) \u2014 amber processing state, VISIBLE error notices (mic denied / no speech / no mic / network \u2014 previously silent failures), unsupported-browser explanations on mic/Voice/Talk (no dead buttons), alert() replaced with notices, 20/20 headless-Chromium checks at 390/1024px with CSP enforced. REMAINING: server STT/TTS (Kokoro/whisper voice-service) owner-gated (Render deploy + VOICE_URL \u2014 exact dependency documented in docs/voice-status.md); Firefox dictation blocked on it; read-aloud end-to-end untested."
-    },
-    {
-      "name": "Account",
-      "weight": 6,
-      "score": 95,
-      "note": "v242 (2026-11-15): auth email codes WORKING \u2014 Resend domain ai.spaincos.com verified (3 DNS records live at GoDaddy), fresh API key vaulted, RESEND_FROM fixed to login@ai.spaincos.com, live send DELIVERED to bspain@spaincos.com. Password login + logout fixed in v240. Passkeys enabled by owner in dashboard (enrollment test pending)."
-    },
-    {
-      "name": "Models",
-      "weight": 8,
-      "score": 92
-    },
-    {
-      "name": "Connectors",
-      "weight": 12,
-      "score": 99,
-      "note": " v297: empty-state persuasion + honest live provider status (registered routes to real OAuth; unregistered shows 'Registration pending', never a dead button) \u2014 PR #300 live-verified."
-    },
-    {
-      "name": "Privacy",
-      "weight": 6,
-      "score": 88
-    },
-    {
-      "name": "Comet",
-      "weight": 3,
-      "score": 75,
-      "note": " v307: REAL-BROWSER VALIDATION PASSED (root, Chromium persistent context + --load-extension): extension installs, service worker registers and stays alive, manifest 1.1.1 with the corrected object-shaped commands (open-sidepanel, summarize-page), sidePanel API available. Remaining gaps: OS-level shortcut-key press and the Chrome Web Store listing (owner-gated)."
-    },
-    {
-      "name": "Premium",
-      "weight": 2,
-      "score": 80
-    },
-    {
-      "name": "Enterprise",
-      "weight": 3,
-      "score": 72,
-      "note": "v293 re-score (honest, evidence-only): the enterprise evidence pass (PR #288) mapped deployed reality \u2014 PASS asset delivery (modules SHA-matched to master); PARTIAL admin access, roster/invites/roles, seats/org billing, audit/CSV; FAIL in-app SSO + SCIM (status cards only) with the exact OIDC/SAML owner dependencies documented. No unverified production changes; the dependency map is the deliverable."
-    },
-    {
-      "name": "GettingStarted",
-      "weight": 5,
-      "score": 93,
-      "note": " v297: onboarding tour Steps 1-4 carry connector before/after examples with quick-jump pill and wired demos (PR #300) \u2014 live-verified."
-    },
-    {
-      "name": "Desktop",
-      "weight": 3,
-      "score": 78
-    },
-    {
-      "name": "Billing",
-      "weight": 6,
-      "score": 93,
-      "note": " v299: four-tier checkout wiring LIVE (PR #216; Supabase functions checkout v6 + stripe-webhook v8 deployed and live-verified \u2014 starter/pro/unlimited accepted with live-mode price IDs; core/max legacy grants kept). Remaining gate: STRIPE_SECRET_KEY secret (owner action) \u2014 checkout returns honest not_configured until then."
-    },
-    {
-      "name": "Mobile",
-      "weight": 3,
-      "score": 75,
-      "note": "v292 re-score: mobile hardening shipped (PR #281) \u2014 44px touch floors on sidebar/model-picker/install controls, long-token + media overflow containment in answers, SW caches namespaced + scoped (no more global cache deletion), duplicate install handler hidden; PWA manifest/assets PASS (192/512/maskable icons, 3 shortcuts, share target; all icon URLs 200 correct MIME, PNG IHDR sizes verified). REMAINING: native install prompt/keyboard behaviors NOT-VERIFIABLE-HERE; store apps owner-gated (Play Console, Apple Developer)."
-    },
-    {
-      "name": "Teammates",
-      "weight": 1,
-      "score": 70,
-      "note": "v295 (was 68): onboarding unification + pending-invite filter + Account profile shortcut (PR #294, 446b214) live-verified on ai.spaincos.com (cache-busted fetch matches master; node --check + 5 Node tests green). Honest limits: no browser validation yet; templates and shared profile parity still gaps."
-    },
-    {
-      "name": "UX",
-      "weight": 6,
-      "score": 91,
-      "note": "v290 UX master benchmark first live run: 91.4 (8 categories, 46 checks, weighted) \u2014 qa/e2e-ux-master.py; results qa-private/bench/results/ux-master.json"
-    },
-    {
-      "name": "SEO",
-      "weight": 3,
-      "score": 85,
-      "note": "v292 re-score (live-verified): structured data LIVE server-side on boundview.com (Organization + WebSite + WebApplication + BreadcrumbList JSON-LD, crawler-visible without JS, client fallback only if server copy missing); per-route metas live on /privacy and /verify (title/description/canonical/og/twitter per brand); /docs in sitemap; robots.txt with sitemap pointer. REMAINING: no SSR for SPA content (deliberate \u2014 /t/ noindexed)."
-    },
-    {
-      "name": "Marketing",
-      "weight": 3,
-      "score": 75,
-      "note": "v294 (was 60): connector-benefits marketing live (PR #292, master a9f5b48) \u2014 connected-context docs section + landing benefit lines incl. 'What did my accountant say' example, honest live matrix (slack/dropbox LIVE, google/outlook/github PENDING per /api/oauth-config) on BOTH ai.spaincos.com and boundview.com, live-verified 2026-11-21. Benchmark brief + brand kit + social cards + PWA still standing. GAPS: no campaigns, no launch copy, no distribution."
-    },
-    {
-      "name": "Security",
-      "weight": 4,
-      "score": 82,
-      "note": "v291b re-score: the four security headers now LIVE on function-routed paths too (bv-render carries them; vercel.json headers alone do not reach function routes \u2014 found and fixed). CSP+hashes, HSTS, invite-only, RLS present. REMAINING GAPS: no pen test, no distributed rate limit. v310 (PR #328, curl-verified live on ai.spaincos.com and boundview.com): nosniff/XFO/Referrer/Permissions plus frame-ancestors, object-src, base-uri headers now on static assets, sw.js, manifest and /api/*; internal source dirs (/qa, /browser-service, etc.) return 404; per-IP limiter on public POST API returns 429 with Retry-After (best-effort, per instance). Secret scan of tracked deployable files found only public Supabase publishable keys. NOT verified: browser behavior, distributed rate limiting, pen test. privacy/terms/docs/verify/offline have no page CSP; HSTS preload, includeSubDomains and external scanning are owner-gated; style-src unsafe-inline remains."
-    },
-    {
-      "name": "Accessibility",
-      "weight": 2,
-      "score": 70,
-      "note": "v292 re-score (all live-verified): WCAG 2.1 AA pass shipped (PR #279) \u2014 axe-core dark theme 0 violations (button-name, color-contrast 7->0, link-in-text-block 2->0), custom 2px accent focus ring live in the browser (was UA default), contrast tokens fixed (text-faint dark/light), labelled landing submit + send buttons. REMAINING: light-mode live check PARTIAL, an H3 precedes H1 in import dialog, skip-link unaudited."
-    },
-    {
-      "name": "Legal/Compliance",
-      "weight": 2,
-      "score": 60,
-      "note": "v293 re-score: TERMS OF SERVICE DRAFT LIVE on both domains (PR #290: /terms 200, per-host brand guard, all ten sections, AI-output disclaimer, honest \"Draft pending owner legal review\" card top+footer naming exactly what is open: governing law/venue, liability cap, refund policy, billing details, consumer-law requirements). REMAINING: owner legal review + the open items; refund policy unpublished (checkout wiring pending). v308: ENTITY ASSIGNMENT DONE (owner directive: boundview.com under CanonIntel LLC, not RentSpire): BoundView terms name CanonIntel LLC as operator (+copyright line), privacy names CanonIntel LLC as data controller, structured data carries legalName CanonIntel LLC \u2014 all live-verified on boundview.com; ai.spaincos.com unchanged (Spain Companies). Legal pages are now HOST-AWARE server-side (boundview serves its own terms/privacy/docs to crawlers too \u2014 was a JS-only guard leaking the ai.spaincos terms to non-JS clients). Draft review by counsel still pending (governing law, liability cap, refund policy)."
-    },
-    {
-      "name": "Docs/Support",
-      "weight": 2,
-      "score": 78,
-      "note": "v310 re-score (code + curl, no browser): SUPPORT SURFACE LIVE on both domains \u2014 /help route (host-aware: help.html on ai.spaincos.com, help.boundview.html on boundview.com), honest FAQ (account/invite-only+email-code, connectors per live /api/oauth-config: slack+dropbox LIVE, google/outlook/github PENDING; billing: checkout not live, refund policy unpublished \u2014 stated as-is; limits: no published numbers, only acceptable-use), 546 section (what it is, auto-retry 2x jittered backoff + 'reconnecting' note + Retry advice, Nov 2026 root-cause fix noted), 5 troubleshooting guides (sign-in code, mid-answer errors, voice/mic, connector, offline), contact cards (bspain@spaincos.com / support@boundview.com), /api/health status note (no user-facing status page \u2014 said so). Linked from landing + auth footers on both domains and docs/terms navs; sitemap entry (boundview). REMAINING: no ticketing/helpdesk or inbound email triage system (email-only), no full guide tree (docs still one page), FAQ not yet tested with real user questions."
-    },
-    {
-      "name": "Observability",
-      "weight": 2,
-      "score": 82,
-      "note": "v292 re-score (live-verified): the UPTIME MONITOR IS LIVE \u2014 ops-health v22 runs every 10 min (pg_cron), api_health_ai_spaincos + api_health_boundview checks PASS in the deployed run (19:10Z: HTTP 200 in 195ms/213ms), alert path proven by the lane (transition-only, deduplicated, owner-notified), results in ops_health_runs for the nightly board. Plus /api/health on both domains + the nightly parity board. REMAINING: no user-facing status page. v301: HTTP 546 ROOT-CAUSED (Supabase WORKER_RESOURCE_LIMIT \u2014 the platform kills the worker under overlapping requests on a warm worker; 1/6 serial repro, 3/4 concurrent killed, +12s latency under 2-way overlap) \u2014 not a gateway code defect. Client retry surface (2x jittered backoff, clear 'out of compute' message with Retry) + QA-suite 546 retry shipped (PR #309); deployed source committed (PR #310). Remaining: per-request compute reduction needs logs/profile; suites must not overlap. v304: 546 FULLY FIXED (PR #315, gateway-chat v307 deployed): root cause was NOT compute of the memory fetch \u2014 COMPLETION_DOC_RE matched the platform's own system blocks (which mention 'completion document'), so EVERY request ran the v230/v244 evidence block (3 fetches x 8s walls, 8K injected chars, forced tool loop, bogus completion-status-*.md attach on every answer incl. 'capital of France'). Fix: completion-doc context from user/assistant turns only + FILE_CREATE_INTENT for genuine doc asks + trivial-query 20-row memory fetch. A/B: 6 serial calls median 23s -> 13.5s, ZERO 546s incl. two 4-way parallel bursts (was 3/4 killed). x_timing stage marks now on every non-stream response. Quality gates: eval-replay 10/10, prelaunch 36/36. Remaining: intent-analyst 6s timeouts under provider load; follow-ups could be parallelized."
-    },
-    {
-      "name": "Fleet",
-      "weight": 3,
-      "score": 65,
-      "note": "v292 re-score (live-verified): THE FLEET-SWEEP RUNNER IS LIVE (PR #284) \u2014 first run swept 9 estate apps: fleet score 87% (3 PASS / 6 PARTIAL / 0 FAIL), honest partials (Vercel bot-challenge-gated domains get H2 not_measured, excluded from denominator \u2014 not failures), per-app scores in qa-private/bench/results/fleet-sweep.json, surfaced in the Webapps explorer. REMAINING: webapp_catalog undercounts the estate (5 of 9 swept apps missing \u2014 backfill lane queued); Wave-1 Boundview acceptance found all 3 top apps DRAFT-WITH-BLOCKERS (no persistence, no routes, seeded-stat inconsistencies \u2014 honest, unlaunchable as-is)."
-    },
-    {
-      "name": "Email/Notifications",
-      "weight": 1,
-      "score": 30,
-      "note": "PRESENT: in-app Notifications button, notifications function. GAPS: email reads blocked on Google OAuth client registration (owner form open), Twilio/Play Console owner blockers from v282 \u00a730i."
-    },
-    {
-      "name": "i18n",
-      "weight": 1,
-      "score": 28,
-      "note": "v298 (was 10): i18n foundation live (PR #302, 9f1596a) \u2014 modules/i18n.js locale detection (?lang= > saved ai_lang > browser > en), PARTIAL Spanish chrome translation (sidebar, New Thread, search, composer placeholder, landing hero, Settings nav/pane titles, a few Preferences labels; model answers NOT translated, honestly labeled 'Espa\u00f1ol (partial)' in the Settings picker), hreflang en/es/x-default on the homepage. Curl + code verified live; lane Playwright QA (en/es switching, es-MX detection, picker round trip) but no live-browser check by root. GAPS: no other locales, no full-page translation, no translated model output, no locale-aware formatting."
-    },
-    {
-      "name": "NativeMobile",
-      "weight": 1,
-      "score": 40,
-      "note": "PRESENT: PWA (manifest + SW + installable, mobile 375px benchmark-verified clean). GAPS: no store presence (TWA/Capacitor wrapper documented as the path, not built); Play Console + Apple Developer owner blockers from \u00a730i."
-    }
-  ],
-  "raw_items": {
-    "done": 104,
-    "partial": 33,
-    "gap": 20,
-    "total": 157
+ "version": "v310",
+ "generated_at": "2026-11-16T00:00:00Z",
+ "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE — GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90→95. | 2026-11-18: owner-blocker audit — 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped — server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
+ "categories": [
+  {
+   "name": "Features",
+   "weight": 14,
+   "score": 99
   },
-  "owner_blockers": [
-    {
-      "item": "Register OAuth apps: Slack/Dropbox/Outlook/Box (Connectors 58\u219285, +324 pts)",
-      "url": "https://api.slack.com/apps"
-    },
-    {
-      "item": "Twilio credentials (Voice 65\u219280)",
-      "url": "https://console.twilio.com"
-    }
-  ],
-  "changelog": [
-    {
-      "version": "v308",
-      "date": "2026-11-21",
-      "change": "Legal 55->60: boundview.com entity assigned to CanonIntel LLC (operator, data controller, copyright, structured-data legalName) + host-aware legal pages (crawler leak fixed, incident hotfixed)."
-    },
-    {
-      "version": "v307",
-      "date": "2026-11-21",
-      "change": "Comet 70->75 (real-browser extension validation passed); checkout three-tier test shown (live price IDs confirmed by Stripe; awaiting owner live key); post-deploy UX verification green."
-    },
-    {
-      "version": "v304",
-      "date": "2026-11-21",
-      "change": "Observability 78->82 (546 fully fixed, PR #315): false-positive completion-doc context ran an 8s evidence stage on every request."
-    },
-    {
-      "version": "v301",
-      "date": "2026-11-21",
-      "change": "Observability 75->78 (546 root-caused + retry surface, PRs #309/#310); source drift committed; UX master 94.8 GREEN."
-    },
-    {
-      "version": "v299",
-      "date": "2026-11-21",
-      "change": "Billing 92->93 (four-tier checkout deployed, live-verified); PRs #267/#222/#216 merged; account-email brand fix (PRs #305/#306); UX master re-run 87.2 YELLOW."
-    },
-    {
-      "version": "v298",
-      "date": "2026-11-21",
-      "change": "i18n 10->28 (PR #302 partial Spanish foundation, live-verified); offline-bar pointer-events fix (PR #303) \u2014 root cause of the flaky prelaunch doc-chip failure, fixed live."
-    },
-    {
-      "version": "v297",
-      "date": "2026-11-21",
-      "change": "GettingStarted 90->93, Connectors 98->99 (PR #300 connector onboarding persuasion, live-verified)."
-    },
-    {
-      "version": "v295",
-      "date": "2026-11-21",
-      "change": "Teammates 68->70 (PR #294 live-verified); Comet PR #295 shipped+live-verified (manifest 1.1.1, ZIP SHA match) \u2014 Comet stays 70 pending real-browser validation at root."
-    },
-    {
-      "version": "v294",
-      "date": "2026-11-21",
-      "change": "Marketing 60->75: connector-benefits surfaces (PR #292) live-verified both domains; headline recomputed."
-    },
-    {
-      "version": "v293",
-      "date": "2026-11-21",
-      "change": "The G/R/Y icon batch: the category status table (icon law) added to the doc; ToS draft live both domains (Legal 45->55); voice states shipped (Voice 80->85); enterprise evidence + dependency map (Enterprise 70->72); eval-replay promoted to standing post-deploy gate with rolling history (PR #286); enterprise evidence PR #288. Connector-benefit lanes (onboarding + marketing) in flight."
-    },
-    {
-      "version": "v292",
-      "date": "2026-11-21",
-      "change": "The parallel-lane harvest, all live-verified before scoring: WCAG AA pass (Accessibility 55->70), public docs page (Docs 50->70), uptime monitor live (Observability 65->75), mobile hardening (Mobile 60->75), structured data + per-route metas (SEO 75->85), fleet-sweep runner + first 9-app run (Fleet 55->65). Also: response-diff previous-answer evolution + total-count badges live, eval-replay standing gate, self-verify lane merged."
-    },
-    {
-      "version": "v291b",
-      "date": "2026-11-21",
-      "change": "Re-scored 5 dimensions after the v291 fixes went LIVE (all live-verified): SEO 60->75, Legal 25->45 (privacy policy live both domains), Observability 55->65 (/api/health), Security 70->80 (headers on function routes), Fleet 50->55 (boundview.com moved to the auto-deploying project \u2014 the public-host staleness is permanently fixed). Plus the full-tree deploy to the boundview project + domain consolidation."
-    },
-    {
-      "version": "v291",
-      "date": "2026-11-21",
-      "change": "Exhaustive rebalance per owner directive (be exhaustive on every dimension): +Security w4 70, +Accessibility w2 55, +Legal/Compliance w2 25 (privacy/terms 404 \u2014 live-verified gap), +Docs/Support w2 50, +Observability w2 55, +Fleet w3 50 (no per-webapp gates yet), +Email w1 30 (owner-gated), +i18n w1 10, +NativeMobile w1 40. Weight 110 -> 128. v291 also ships: /api/health, sitemap.xml, robots.txt update, security headers, and the context digest behind a double feature flag (deployed platform 301, OFF-path live-verified)."
-    },
-    {
-      "version": "v290",
-      "date": "2026-11-21",
-      "change": "Added UX (w6), SEO (w3), Marketing (w3) per owner directive \"the new UX/SEO/marketing all weighed/rolled into the completion doc\". Weight total 98 -> 110; EXPECTED_WEIGHT updated in generate-parity-headline.py. UX score = the measured UX master benchmark (91.4 first live run). SEO/Marketing scored from live evidence (robots/og/canonical present; sitemap 404; brief+brand kit shipped, no campaigns)."
-    },
-    {
-      "version": "v296",
-      "date": "2026-11-21",
-      "change": "Desktop 70 -> 78 (code + curl evidence, no browser). Manifest shortcuts/share_target/protocol/file handlers now have real handlers (modules/desktop-shell.js, previously none); single install owner (duplicate #installAppBtn removed) plus macOS Safari Add to Dock help; sw.js v3 with offline.html fallback and an offline/back-online bar; Electron wrapper scaffold in desktop/ (unbuilt, unsigned). Not credited: real-browser install/handler behavior, built or signed installers, window-controls-overlay. Detail: docs/DESKTOP.md."
-    },
-    {
-      "version": "v310",
-      "date": "2026-11-22",
-      "change": "Docs/Support 70 -> 78 (code + curl evidence, no browser): /help support surface shipped (host-aware pages, bv-render allow-list + includeFiles glob extended, vercel.json /help routes, footers on both domains, sitemap). Honest content: connector status matches live /api/oauth-config; billing honestly 'not live'; 546 retry advice matches the shipped client retry code; contact bspain@spaincos.com / support@boundview.com. Live-verified post-merge via curl on ai.spaincos.com and boundview.com. Not credited: real-browser rendering, real support-email responsiveness, ticketing (none exists)."
-    }
-  ]
+  {
+   "name": "Computer",
+   "weight": 8,
+   "score": 99
+  },
+  {
+   "name": "API",
+   "weight": 10,
+   "score": 95
+  },
+  {
+   "name": "Troubleshooting",
+   "weight": 4,
+   "score": 90
+  },
+  {
+   "name": "Voice",
+   "weight": 4,
+   "score": 85,
+   "note": "v293 re-score: voice states shipped (PR #289, merged + deployed) — amber processing state, VISIBLE error notices (mic denied / no speech / no mic / network — previously silent failures), unsupported-browser explanations on mic/Voice/Talk (no dead buttons), alert() replaced with notices, 20/20 headless-Chromium checks at 390/1024px with CSP enforced. REMAINING: server STT/TTS (Kokoro/whisper voice-service) owner-gated (Render deploy + VOICE_URL — exact dependency documented in docs/voice-status.md); Firefox dictation blocked on it; read-aloud end-to-end untested."
+  },
+  {
+   "name": "Account",
+   "weight": 6,
+   "score": 95,
+   "note": "v242 (2026-11-15): auth email codes WORKING — Resend domain ai.spaincos.com verified (3 DNS records live at GoDaddy), fresh API key vaulted, RESEND_FROM fixed to login@ai.spaincos.com, live send DELIVERED to bspain@spaincos.com. Password login + logout fixed in v240. Passkeys enabled by owner in dashboard (enrollment test pending)."
+  },
+  {
+   "name": "Models",
+   "weight": 8,
+   "score": 92
+  },
+  {
+   "name": "Connectors",
+   "weight": 12,
+   "score": 99,
+   "note": " v297: empty-state persuasion + honest live provider status (registered routes to real OAuth; unregistered shows 'Registration pending', never a dead button) — PR #300 live-verified."
+  },
+  {
+   "name": "Privacy",
+   "weight": 6,
+   "score": 88
+  },
+  {
+   "name": "Comet",
+   "weight": 3,
+   "score": 75,
+   "note": " v307: REAL-BROWSER VALIDATION PASSED (root, Chromium persistent context + --load-extension): extension installs, service worker registers and stays alive, manifest 1.1.1 with the corrected object-shaped commands (open-sidepanel, summarize-page), sidePanel API available. Remaining gaps: OS-level shortcut-key press and the Chrome Web Store listing (owner-gated)."
+  },
+  {
+   "name": "Premium",
+   "weight": 2,
+   "score": 80
+  },
+  {
+   "name": "Enterprise",
+   "weight": 3,
+   "score": 72,
+   "note": "v293 re-score (honest, evidence-only): the enterprise evidence pass (PR #288) mapped deployed reality — PASS asset delivery (modules SHA-matched to master); PARTIAL admin access, roster/invites/roles, seats/org billing, audit/CSV; FAIL in-app SSO + SCIM (status cards only) with the exact OIDC/SAML owner dependencies documented. No unverified production changes; the dependency map is the deliverable."
+  },
+  {
+   "name": "GettingStarted",
+   "weight": 5,
+   "score": 93,
+   "note": " v297: onboarding tour Steps 1-4 carry connector before/after examples with quick-jump pill and wired demos (PR #300) — live-verified."
+  },
+  {
+   "name": "Desktop",
+   "weight": 3,
+   "score": 78
+  },
+  {
+   "name": "Billing",
+   "weight": 6,
+   "score": 93,
+   "note": " v299: four-tier checkout wiring LIVE (PR #216; Supabase functions checkout v6 + stripe-webhook v8 deployed and live-verified — starter/pro/unlimited accepted with live-mode price IDs; core/max legacy grants kept). Remaining gate: STRIPE_SECRET_KEY secret (owner action) — checkout returns honest not_configured until then."
+  },
+  {
+   "name": "Mobile",
+   "weight": 3,
+   "score": 75,
+   "note": "v292 re-score: mobile hardening shipped (PR #281) — 44px touch floors on sidebar/model-picker/install controls, long-token + media overflow containment in answers, SW caches namespaced + scoped (no more global cache deletion), duplicate install handler hidden; PWA manifest/assets PASS (192/512/maskable icons, 3 shortcuts, share target; all icon URLs 200 correct MIME, PNG IHDR sizes verified). REMAINING: native install prompt/keyboard behaviors NOT-VERIFIABLE-HERE; store apps owner-gated (Play Console, Apple Developer)."
+  },
+  {
+   "name": "Teammates",
+   "weight": 1,
+   "score": 70,
+   "note": "v295 (was 68): onboarding unification + pending-invite filter + Account profile shortcut (PR #294, 446b214) live-verified on ai.spaincos.com (cache-busted fetch matches master; node --check + 5 Node tests green). Honest limits: no browser validation yet; templates and shared profile parity still gaps."
+  },
+  {
+   "name": "UX",
+   "weight": 6,
+   "score": 91,
+   "note": "v290 UX master benchmark first live run: 91.4 (8 categories, 46 checks, weighted) — qa/e2e-ux-master.py; results qa-private/bench/results/ux-master.json"
+  },
+  {
+   "name": "SEO",
+   "weight": 3,
+   "score": 85,
+   "note": "v292 re-score (live-verified): structured data LIVE server-side on boundview.com (Organization + WebSite + WebApplication + BreadcrumbList JSON-LD, crawler-visible without JS, client fallback only if server copy missing); per-route metas live on /privacy and /verify (title/description/canonical/og/twitter per brand); /docs in sitemap; robots.txt with sitemap pointer. REMAINING: no SSR for SPA content (deliberate — /t/ noindexed)."
+  },
+  {
+   "name": "Marketing",
+   "weight": 3,
+   "score": 75,
+   "note": "v294 (was 60): connector-benefits marketing live (PR #292, master a9f5b48) — connected-context docs section + landing benefit lines incl. 'What did my accountant say' example, honest live matrix (slack/dropbox LIVE, google/outlook/github PENDING per /api/oauth-config) on BOTH ai.spaincos.com and boundview.com, live-verified 2026-11-21. Benchmark brief + brand kit + social cards + PWA still standing. GAPS: no campaigns, no launch copy, no distribution."
+  },
+  {
+   "name": "Security",
+   "weight": 4,
+   "score": 82,
+   "note": "v291b re-score: the four security headers now LIVE on function-routed paths too (bv-render carries them; vercel.json headers alone do not reach function routes — found and fixed). CSP+hashes, HSTS, invite-only, RLS present. REMAINING GAPS: no pen test, no distributed rate limit. v310 (PR #328, curl-verified live on ai.spaincos.com and boundview.com): nosniff/XFO/Referrer/Permissions plus frame-ancestors, object-src, base-uri headers now on static assets, sw.js, manifest and /api/*; internal source dirs (/qa, /browser-service, etc.) return 404; per-IP limiter on public POST API returns 429 with Retry-After (best-effort, per instance). Secret scan of tracked deployable files found only public Supabase publishable keys. NOT verified: browser behavior, distributed rate limiting, pen test. privacy/terms/docs/verify/offline have no page CSP; HSTS preload, includeSubDomains and external scanning are owner-gated; style-src unsafe-inline remains."
+  },
+  {
+   "name": "Accessibility",
+   "weight": 2,
+   "score": 70,
+   "note": "v292 re-score (all live-verified): WCAG 2.1 AA pass shipped (PR #279) — axe-core dark theme 0 violations (button-name, color-contrast 7->0, link-in-text-block 2->0), custom 2px accent focus ring live in the browser (was UA default), contrast tokens fixed (text-faint dark/light), labelled landing submit + send buttons. REMAINING: light-mode live check PARTIAL, an H3 precedes H1 in import dialog, skip-link unaudited."
+  },
+  {
+   "name": "Legal/Compliance",
+   "weight": 2,
+   "score": 60,
+   "note": "v293 re-score: TERMS OF SERVICE DRAFT LIVE on both domains (PR #290: /terms 200, per-host brand guard, all ten sections, AI-output disclaimer, honest \"Draft pending owner legal review\" card top+footer naming exactly what is open: governing law/venue, liability cap, refund policy, billing details, consumer-law requirements). REMAINING: owner legal review + the open items; refund policy unpublished (checkout wiring pending). v308: ENTITY ASSIGNMENT DONE (owner directive: boundview.com under CanonIntel LLC, not RentSpire): BoundView terms name CanonIntel LLC as operator (+copyright line), privacy names CanonIntel LLC as data controller, structured data carries legalName CanonIntel LLC — all live-verified on boundview.com; ai.spaincos.com unchanged (Spain Companies). Legal pages are now HOST-AWARE server-side (boundview serves its own terms/privacy/docs to crawlers too — was a JS-only guard leaking the ai.spaincos terms to non-JS clients). Draft review by counsel still pending (governing law, liability cap, refund policy)."
+  },
+  {
+   "name": "Docs/Support",
+   "weight": 2,
+   "score": 78,
+   "note": "v310 re-score (code + curl, no browser): SUPPORT SURFACE LIVE on both domains — /help route (host-aware: help.html on ai.spaincos.com, help.boundview.html on boundview.com), honest FAQ (account/invite-only+email-code, connectors per live /api/oauth-config: slack+dropbox LIVE, google/outlook/github PENDING; billing: checkout not live, refund policy unpublished — stated as-is; limits: no published numbers, only acceptable-use), 546 section (what it is, auto-retry 2x jittered backoff + 'reconnecting' note + Retry advice, Nov 2026 root-cause fix noted), 5 troubleshooting guides (sign-in code, mid-answer errors, voice/mic, connector, offline), contact cards (bspain@spaincos.com / support@boundview.com), /api/health status note (no user-facing status page — said so). Linked from landing + auth footers on both domains and docs/terms navs; sitemap entry (boundview). REMAINING: no ticketing/helpdesk or inbound email triage system (email-only), no full guide tree (docs still one page), FAQ not yet tested with real user questions."
+  },
+  {
+   "name": "Observability",
+   "weight": 2,
+   "score": 82,
+   "note": "v292 re-score (live-verified): the UPTIME MONITOR IS LIVE — ops-health v22 runs every 10 min (pg_cron), api_health_ai_spaincos + api_health_boundview checks PASS in the deployed run (19:10Z: HTTP 200 in 195ms/213ms), alert path proven by the lane (transition-only, deduplicated, owner-notified), results in ops_health_runs for the nightly board. Plus /api/health on both domains + the nightly parity board. REMAINING: no user-facing status page. v301: HTTP 546 ROOT-CAUSED (Supabase WORKER_RESOURCE_LIMIT — the platform kills the worker under overlapping requests on a warm worker; 1/6 serial repro, 3/4 concurrent killed, +12s latency under 2-way overlap) — not a gateway code defect. Client retry surface (2x jittered backoff, clear 'out of compute' message with Retry) + QA-suite 546 retry shipped (PR #309); deployed source committed (PR #310). Remaining: per-request compute reduction needs logs/profile; suites must not overlap. v304: 546 FULLY FIXED (PR #315, gateway-chat v307 deployed): root cause was NOT compute of the memory fetch — COMPLETION_DOC_RE matched the platform's own system blocks (which mention 'completion document'), so EVERY request ran the v230/v244 evidence block (3 fetches x 8s walls, 8K injected chars, forced tool loop, bogus completion-status-*.md attach on every answer incl. 'capital of France'). Fix: completion-doc context from user/assistant turns only + FILE_CREATE_INTENT for genuine doc asks + trivial-query 20-row memory fetch. A/B: 6 serial calls median 23s -> 13.5s, ZERO 546s incl. two 4-way parallel bursts (was 3/4 killed). x_timing stage marks now on every non-stream response. Quality gates: eval-replay 10/10, prelaunch 36/36. Remaining: intent-analyst 6s timeouts under provider load; follow-ups could be parallelized."
+  },
+  {
+   "name": "Fleet",
+   "weight": 3,
+   "score": 70,
+   "note": "v292 re-score (live-verified): THE FLEET-SWEEP RUNNER IS LIVE (PR #284) — first run swept 9 estate apps: fleet score 87% (3 PASS / 6 PARTIAL / 0 FAIL), honest partials (Vercel bot-challenge-gated domains get H2 not_measured, excluded from denominator — not failures), per-app scores in qa-private/bench/results/fleet-sweep.json, surfaced in the Webapps explorer. REMAINING: webapp_catalog undercounts the estate (5 of 9 swept apps missing — backfill lane queued); Wave-1 Boundview acceptance found all 3 top apps DRAFT-WITH-BLOCKERS (no persistence, no routes, seeded-stat inconsistencies — honest, unlaunchable as-is). v310: fleet-sweep honesty fix (PR #330): bot-challenge-gated domains now NOT_MEASURED, excluded from the denominator; early-exception runner defect fixed; 3 measured estate apps at 1.0. Wave-1 showcase rebuild SHIPPED (PR #333): tasks/budget/study functional with private-link persistence (RLS, hashed tokens). NOT done: fleet_registry migration unapplied (idempotent SQL ready), webapp_catalog backfill, 6 of 9 domains bot-challenge gated."
+  },
+  {
+   "name": "Email/Notifications",
+   "weight": 1,
+   "score": 30,
+   "note": "PRESENT: in-app Notifications button, notifications function. GAPS: email reads blocked on Google OAuth client registration (owner form open), Twilio/Play Console owner blockers from v282 §30i."
+  },
+  {
+   "name": "i18n",
+   "weight": 1,
+   "score": 36,
+   "note": "v298 (was 10): i18n foundation live (PR #302, 9f1596a) — modules/i18n.js locale detection (?lang= > saved ai_lang > browser > en), PARTIAL Spanish chrome translation (sidebar, New Thread, search, composer placeholder, landing hero, Settings nav/pane titles, a few Preferences labels; model answers NOT translated, honestly labeled 'Español (partial)' in the Settings picker), hreflang en/es/x-default on the homepage. Curl + code verified live; lane Playwright QA (en/es switching, es-MX detection, picker round trip) but no live-browser check by root. GAPS: no other locales, no full-page translation, no translated model output, no locale-aware formatting. v310: Spanish expanded (PR #329): thread actions + native dialogs, doc panel chrome, full onboarding tour + checklist, Settings pane bodies, sign-in + error strings; locale-aware Intl formatting; hreflang en + x-default on docs/terms/privacy/verify both domains. Still 'Español (partial)': toasts, several Settings panes and overlays remain English; no native-speaker review."
+  },
+  {
+   "name": "NativeMobile",
+   "weight": 1,
+   "score": 48,
+   "note": "PRESENT: PWA (manifest + SW + installable, mobile 375px benchmark-verified clean). GAPS: no store presence (TWA/Capacitor wrapper documented as the path, not built); Play Console + Apple Developer owner blockers from §30i. v310: TWA readiness (PR #334): fail-closed assetlinks.json + generator tool, deferred install-prompt UX, native-mobile build README. Honest: no production package fingerprint, no store presence — Play Console/Apple Developer owner-gated."
+  }
+ ],
+ "raw_items": {
+  "done": 104,
+  "partial": 33,
+  "gap": 20,
+  "total": 157
+ },
+ "owner_blockers": [
+  {
+   "item": "Register OAuth apps: Slack/Dropbox/Outlook/Box (Connectors 58→85, +324 pts)",
+   "url": "https://api.slack.com/apps"
+  },
+  {
+   "item": "Twilio credentials (Voice 65→80)",
+   "url": "https://console.twilio.com"
+  }
+ ],
+ "changelog": [
+  {
+   "version": "v310",
+   "date": "2026-11-22",
+   "change": "Six-lane harvest: Security 82 (#328/#331), Docs/Support 78 (#332 /help), i18n 36 (#329), Fleet 70 (#330 + #333 showcase), NativeMobile 48 (#334)."
+  },
+  {
+   "version": "v308",
+   "date": "2026-11-21",
+   "change": "Legal 55->60: boundview.com entity assigned to CanonIntel LLC (operator, data controller, copyright, structured-data legalName) + host-aware legal pages (crawler leak fixed, incident hotfixed)."
+  },
+  {
+   "version": "v307",
+   "date": "2026-11-21",
+   "change": "Comet 70->75 (real-browser extension validation passed); checkout three-tier test shown (live price IDs confirmed by Stripe; awaiting owner live key); post-deploy UX verification green."
+  },
+  {
+   "version": "v304",
+   "date": "2026-11-21",
+   "change": "Observability 78->82 (546 fully fixed, PR #315): false-positive completion-doc context ran an 8s evidence stage on every request."
+  },
+  {
+   "version": "v301",
+   "date": "2026-11-21",
+   "change": "Observability 75->78 (546 root-caused + retry surface, PRs #309/#310); source drift committed; UX master 94.8 GREEN."
+  },
+  {
+   "version": "v299",
+   "date": "2026-11-21",
+   "change": "Billing 92->93 (four-tier checkout deployed, live-verified); PRs #267/#222/#216 merged; account-email brand fix (PRs #305/#306); UX master re-run 87.2 YELLOW."
+  },
+  {
+   "version": "v298",
+   "date": "2026-11-21",
+   "change": "i18n 10->28 (PR #302 partial Spanish foundation, live-verified); offline-bar pointer-events fix (PR #303) — root cause of the flaky prelaunch doc-chip failure, fixed live."
+  },
+  {
+   "version": "v297",
+   "date": "2026-11-21",
+   "change": "GettingStarted 90->93, Connectors 98->99 (PR #300 connector onboarding persuasion, live-verified)."
+  },
+  {
+   "version": "v295",
+   "date": "2026-11-21",
+   "change": "Teammates 68->70 (PR #294 live-verified); Comet PR #295 shipped+live-verified (manifest 1.1.1, ZIP SHA match) — Comet stays 70 pending real-browser validation at root."
+  },
+  {
+   "version": "v294",
+   "date": "2026-11-21",
+   "change": "Marketing 60->75: connector-benefits surfaces (PR #292) live-verified both domains; headline recomputed."
+  },
+  {
+   "version": "v293",
+   "date": "2026-11-21",
+   "change": "The G/R/Y icon batch: the category status table (icon law) added to the doc; ToS draft live both domains (Legal 45->55); voice states shipped (Voice 80->85); enterprise evidence + dependency map (Enterprise 70->72); eval-replay promoted to standing post-deploy gate with rolling history (PR #286); enterprise evidence PR #288. Connector-benefit lanes (onboarding + marketing) in flight."
+  },
+  {
+   "version": "v292",
+   "date": "2026-11-21",
+   "change": "The parallel-lane harvest, all live-verified before scoring: WCAG AA pass (Accessibility 55->70), public docs page (Docs 50->70), uptime monitor live (Observability 65->75), mobile hardening (Mobile 60->75), structured data + per-route metas (SEO 75->85), fleet-sweep runner + first 9-app run (Fleet 55->65). Also: response-diff previous-answer evolution + total-count badges live, eval-replay standing gate, self-verify lane merged."
+  },
+  {
+   "version": "v291b",
+   "date": "2026-11-21",
+   "change": "Re-scored 5 dimensions after the v291 fixes went LIVE (all live-verified): SEO 60->75, Legal 25->45 (privacy policy live both domains), Observability 55->65 (/api/health), Security 70->80 (headers on function routes), Fleet 50->55 (boundview.com moved to the auto-deploying project — the public-host staleness is permanently fixed). Plus the full-tree deploy to the boundview project + domain consolidation."
+  },
+  {
+   "version": "v291",
+   "date": "2026-11-21",
+   "change": "Exhaustive rebalance per owner directive (be exhaustive on every dimension): +Security w4 70, +Accessibility w2 55, +Legal/Compliance w2 25 (privacy/terms 404 — live-verified gap), +Docs/Support w2 50, +Observability w2 55, +Fleet w3 50 (no per-webapp gates yet), +Email w1 30 (owner-gated), +i18n w1 10, +NativeMobile w1 40. Weight 110 -> 128. v291 also ships: /api/health, sitemap.xml, robots.txt update, security headers, and the context digest behind a double feature flag (deployed platform 301, OFF-path live-verified)."
+  },
+  {
+   "version": "v290",
+   "date": "2026-11-21",
+   "change": "Added UX (w6), SEO (w3), Marketing (w3) per owner directive \"the new UX/SEO/marketing all weighed/rolled into the completion doc\". Weight total 98 -> 110; EXPECTED_WEIGHT updated in generate-parity-headline.py. UX score = the measured UX master benchmark (91.4 first live run). SEO/Marketing scored from live evidence (robots/og/canonical present; sitemap 404; brief+brand kit shipped, no campaigns)."
+  },
+  {
+   "version": "v296",
+   "date": "2026-11-21",
+   "change": "Desktop 70 -> 78 (code + curl evidence, no browser). Manifest shortcuts/share_target/protocol/file handlers now have real handlers (modules/desktop-shell.js, previously none); single install owner (duplicate #installAppBtn removed) plus macOS Safari Add to Dock help; sw.js v3 with offline.html fallback and an offline/back-online bar; Electron wrapper scaffold in desktop/ (unbuilt, unsigned). Not credited: real-browser install/handler behavior, built or signed installers, window-controls-overlay. Detail: docs/DESKTOP.md."
+  },
+  {
+   "version": "v310",
+   "date": "2026-11-22",
+   "change": "Docs/Support 70 -> 78 (code + curl evidence, no browser): /help support surface shipped (host-aware pages, bv-render allow-list + includeFiles glob extended, vercel.json /help routes, footers on both domains, sitemap). Honest content: connector status matches live /api/oauth-config; billing honestly 'not live'; 546 retry advice matches the shipped client retry code; contact bspain@spaincos.com / support@boundview.com. Live-verified post-merge via curl on ai.spaincos.com and boundview.com. Not credited: real-browser rendering, real support-email responsiveness, ticketing (none exists)."
+  }
+ ]
 }
