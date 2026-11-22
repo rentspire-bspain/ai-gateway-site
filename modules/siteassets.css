@@ -34,3 +34,8 @@
 .sa-row .sa-btn{flex:0 0 auto}
 @media(max-width:768px){.sa-input,.sa-sel{font-size:16px}}
 @media(max-width:480px){.sa-overlay{align-items:flex-end;padding:0}.sa-panel{max-width:100%;border-radius:var(--radius) var(--radius) 0 0;max-height:92dvh;padding-bottom:max(16px,calc(env(safe-area-inset-bottom) + 8px))}}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .sa-btn, .sa-x { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}

@@ -38,3 +38,8 @@
 .mg-head h3{min-width:0}
 .mg-card img,.mg-vcard img{max-width:100%}
 @media (max-width:768px){.mg-prompt{font-size:16px}}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .mg-btn, .mg-x { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}

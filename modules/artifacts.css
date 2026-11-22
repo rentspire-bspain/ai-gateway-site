@@ -65,3 +65,8 @@
 .artifact-card .af-title{max-width:min(260px,52vw)}
 .artifact-card{min-width:0}
 @media (max-width:640px){.artifact-bar{gap:6px;padding-top:max(8px,env(safe-area-inset-top));padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}.artifact-bar .ab-kind{display:none}.artifact-btn{padding:6px 9px;min-height:40px}.artifact-card .af-title{max-width:min(180px,46vw)}}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .artg-chip, .artifact-btn { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}

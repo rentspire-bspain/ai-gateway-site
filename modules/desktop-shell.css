@@ -1,6 +1,12 @@
 /* desktop-shell.css — offline bar + installed-app (standalone / desktop wrapper) polish. */
 #offlineBar{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:9000;max-width:min(88vw,420px);padding:8px 14px;border:1px solid var(--border,#d0d0cc);border-radius:999px;background:var(--bg-elevated,#fff);color:var(--text,#222);font-size:12px;line-height:1.35;box-shadow:0 4px 18px rgba(0,0,0,.18);display:flex;gap:8px;align-items:center;pointer-events:none}
 #offlineBar[hidden]{display:none}
+/* v311: index.html ALSO ships a legacy #offlineBar (class .offline-bar, toggled by .show). Its id-level rule above
+   (display:flex) beat the legacy .offline-bar{display:none}, so a 420x716 "You're offline" pill covered the page at all
+   times — online or not — and its top:0/right:0 from the legacy class stretched it to full height. The scripted
+   desktop-shell bar (no .offline-bar class, [hidden]-driven) above is the single offline notice; keep the legacy one off. */
+#offlineBar.offline-bar{display:none !important}
+@supports (bottom:env(safe-area-inset-bottom)){#offlineBar{bottom:calc(84px + env(safe-area-inset-bottom))}}
 #offlineBar .ob-dot{width:8px;height:8px;border-radius:50%;background:#F59E0B;flex:0 0 auto}
 #offlineBar.back .ob-dot{background:var(--accent,#14646B)}
 /* installed app windows: no text-selection on chrome, no pull-to-refresh bounce */

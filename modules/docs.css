@@ -118,3 +118,8 @@
   .dx-tab{flex:0 0 auto;white-space:nowrap}
 }
 .dx-retry{background:var(--accent-btn)!important;border-color:var(--accent-btn)!important;color:#fff!important}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .dx-close, .dx-tab { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}

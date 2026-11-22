@@ -1,47 +1,59 @@
-/* mobile-375.js — hamburger toggle for the off-canvas drawer (pairs with css/mobile-375.css).
-   Injects ONE button into the top bar; tapping toggles body.m375-open (the CSS does the
-   drawer animation + scrim). The scrim click also closes. No other DOM is touched. */
+/* mobile-375.js — phone helpers (pairs with css/mobile-375.css).
+   v311: the injected hamburger + body.m375-open drawer were removed. The app already owns a drawer
+   (#sidebar.collapsed, #expandSidebar, #collapseSidebar, .sidebar-scrim in index.html, active at <=768px);
+   the second drawer opened it in its icon-only "collapsed" skin and left #expandSidebar dead at <=420px.
+   Mobile375.toggle() is kept as a thin, backwards-compatible wrapper around the real controls.
+
+   Also here: prefers-reduced-motion support for scripted smooth scrolling. CSS cannot override an
+   explicit `behavior: "smooth"` passed to scrollTo/scrollIntoView, so those calls are downgraded to
+   instant when the user has asked the OS for reduced motion. */
 (function (root) {
   "use strict";
 
-  function ready(fn) {
-    if (document.readyState !== "loading") fn();
-    else document.addEventListener("DOMContentLoaded", fn);
-  }
-
   function toggle(open) {
-    document.body.classList.toggle("m375-open", open);
-    var b = document.querySelector(".m375-burger");
-    if (b) b.setAttribute("aria-expanded", open ? "true" : "false");
+    var doc = root.document;
+    var sb = doc && doc.getElementById("sidebar");
+    if (!sb) return;
+    var isOpen = !sb.classList.contains("collapsed");
+    if (open === undefined) open = !isOpen;
+    if (!!open === isOpen) return;
+    var btn = doc.getElementById(open ? "expandSidebar" : "collapseSidebar");
+    if (btn) btn.click();
   }
 
-  function init() {
-    if (window.matchMedia && !window.matchMedia("(max-width: 420px)").matches) return; // phones only
-    if (document.querySelector(".m375-burger")) return;
-    var bar = document.getElementById("topbar") || document.querySelector(".topbar, header.topbar, .main-header, main > .main-header");
-    if (!bar) return;
-    var btn = document.createElement("button");
-    btn.className = "m375-burger";
-    btn.type = "button";
-    btn.setAttribute("aria-label", "Toggle navigation");
-    btn.setAttribute("aria-expanded", "false");
-    var lines = document.createElement("span");
-    btn.appendChild(lines);
-    btn.addEventListener("click", function (e) {
-      e.stopPropagation();
-      toggle(!document.body.classList.contains("m375-open"));
-    });
-    bar.insertBefore(btn, bar.firstChild);
-    // scrim (rendered by CSS on body.m375-open::after) — close on any tap outside the drawer
-    document.addEventListener("click", function (e) {
-      if (!document.body.classList.contains("m375-open")) return;
-      var drawer = document.getElementById("sidebar") || document.querySelector(".sidebar, nav.sidebar");
-      if (drawer && !drawer.contains(e.target) && !btn.contains(e.target)) toggle(false);
-    });
-    // swipe-open is out of scope (pointer-event work); the button is the interface.
+  function reducedMotion() {
+    try { return !!(root.matchMedia && root.matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (e) { return false; }
   }
 
-  ready(init);
-  root.Mobile375 = { init: init, toggle: toggle };
+  function calm(args) {
+    var a = args[0];
+    if (a && typeof a === "object" && a.behavior === "smooth" && reducedMotion()) {
+      var c = {};
+      for (var k in a) c[k] = a[k];
+      c.behavior = "auto";
+      var out = Array.prototype.slice.call(args);
+      out[0] = c;
+      return out;
+    }
+    return args;
+  }
+
+  function patchReducedMotion() {
+    var E = root.Element && root.Element.prototype;
+    ["scroll", "scrollTo", "scrollBy", "scrollIntoView"].forEach(function (name) {
+      [E, root].forEach(function (host) {
+        if (!host || typeof host[name] !== "function" || host[name].__calm) return;
+        var orig = host[name];
+        var wrapped = function () { return orig.apply(this, calm(arguments)); };
+        wrapped.__calm = true;
+        host[name] = wrapped;
+      });
+    });
+  }
+
+  function init() { patchReducedMotion(); }
+
+  patchReducedMotion(); // as early as possible: later scripts call scrollTo/scrollIntoView
+  root.Mobile375 = { init: init, toggle: toggle, reducedMotion: reducedMotion, _calm: calm };
   if (root.BUILD && root.BUILD.modules) root.BUILD.modules.push({ id: "mobile-375", init: init });
 })(typeof window !== "undefined" ? window : this);

@@ -13,3 +13,8 @@
 .sa-ok a{color:var(--accent);}
 .sk-btn[disabled]{opacity:.5;cursor:not-allowed;}
 @media(max-width:600px){.sa-row{grid-template-columns:1fr;gap:2px}}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .sk-btn { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}

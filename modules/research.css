@@ -60,3 +60,8 @@
   .dr-row{flex-wrap:wrap}
 }
 @media (prefers-reduced-motion:reduce){.dr-step.active .dr-dot{animation:none}}
+
+/* ---- v311 touch targets (>=44px on phones / coarse pointers) ---- */
+@media (max-width: 768px), (pointer: coarse) {
+  .dr-btn, .dr-x { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+}
