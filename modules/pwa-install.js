@@ -11,6 +11,7 @@
   const macSafari = !ios && /Macintosh/.test(ua) && /Safari/.test(ua) &&
     !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Firefox/.test(ua);
   const manual = safari || macSafari;
+  const androidApp = document.referrer.startsWith("android-app://");
   let pendingPrompt;
   let installed = false;
   let button;
@@ -18,7 +19,7 @@
 
   function update() {
     if (!button || !help) return;
-    button.hidden = installed || standalone.matches || navigator.standalone === true ||
+    button.hidden = androidApp || installed || standalone.matches || navigator.standalone === true ||
       (!pendingPrompt && !manual);
     if (button.hidden || pendingPrompt) {
       help.hidden = true;
@@ -32,8 +33,8 @@
 
   window.addEventListener("beforeinstallprompt", event => {
     if (typeof event.prompt !== "function") return;
+    if (androidApp || installed || standalone.matches || navigator.standalone === true) return;
     event.preventDefault();
-    if (installed || standalone.matches || navigator.standalone === true) return;
     pendingPrompt = event;
     update();
   });
@@ -51,6 +52,7 @@
     help = document.getElementById("pwaInstallHelp");
     if (!button || !help) return;
     if (macSafari) help.textContent = "In Safari, choose File, then Add to Dock, then Add.";
+    if (safari) help.textContent = "In Safari, open Share and choose Add to Home Screen. If shown, turn on Open as Web App, then tap Add.";
     update();
     button.addEventListener("click", async () => {
       if (button.hidden) return;
