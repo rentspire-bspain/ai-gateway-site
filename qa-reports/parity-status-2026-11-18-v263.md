@@ -2959,3 +2959,11 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Both built and verified by root directly (isolated worktree; live curl on both domains).
 
 **HEADLINE: 88.1% (11275/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner OAuth + Stripe live key), store presence (owner), Legal counsel review (delivered), Wave-1 external-account integration (owner-gated).
+
+### 29. §30q addendum — v313: TEAMMATES TEMPLATES + PROFILE PREVIEW (Teammates 72)
+
+- ~~Teammate templates + read-only profile preview (PR #343)~~ — LIVE both domains (root-verified): four instruction presets with per-teammate apply (owners/admins) and a read-only effective-instructions preview per roster row; 6/6 tests. Teammates 70→72.
+- HONEST LIMITS (documented in the score note): assignments are browser-local (localStorage) — not synced and NOT enforced server-side on the teammate; no shared memory source. The server-side path (migration + team edge-function, PR #333 RLS pattern) is the next unlock.
+- Worktree cleanup: /home/user/workspace/tmpl-wt removed (disk hygiene).
+
+**HEADLINE: 88.1% (11283/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner), store presence (owner), Legal counsel review (delivered), Wave-1 external-account integration (owner-gated).
