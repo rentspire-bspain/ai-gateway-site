@@ -1,7 +1,7 @@
 {
   "name": "ai.spaincos",
   "short_name": "ai.spaincos",
-  "description": "Where knowledge begins \u2014 answers with sources.",
+  "description": "Where knowledge begins — answers with sources.",
   "id": "/",
   "start_url": "/?source=pwa",
   "scope": "/",
@@ -124,6 +124,22 @@
           ".json"
         ]
       }
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/shot-narrow.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "ai.spaincos.com answers with citations"
+    },
+    {
+      "src": "/icons/shot-wide.png",
+      "sizes": "2560x1440",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "The full research workspace"
     }
   ]
 }
