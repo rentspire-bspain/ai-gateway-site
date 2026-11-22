@@ -1,5 +1,5 @@
 {
- "version": 12,
+ "version": 13,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -1704,10 +1704,10 @@
     "AG": "U",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not audited",
+   "evidence": "Not audited | worker CT 2026-11-22: comptrove.com is served and reachable, but the benchmark is not met on what is observable right now. The only entitlement/pricing evidence surfaced is a Comptrove Pro price of $179/month (launch offer, $299 list), appearing in a search-result snippet tied to the comptrove.com 'Average Rent in Austin",
    "fix": "Copy review against FTC dark-pattern list"
   },
   {
@@ -1764,10 +1764,10 @@
     "AG": "G",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "research_job_inbox + notify_dispatch_done + web push",
+   "evidence": "research_job_inbox + notify_dispatch_done + web push | worker CT 2026-11-22: Fetched https://comptrove.com \u2014 the served page is Comptrove's public rent-comparison surface: an 'Average Rent in Austin, TX' style report with rents by bedroom, rent history and comps tables [[1](https://comptrove.com/m/austin/)]. No long-running work exists to observe: no job queue, no async task",
    "fix": "Keep"
   },
   {
@@ -1804,10 +1804,10 @@
     "AG": "Y",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "gateway-status endpoint + Fleet page; no public status page",
+   "evidence": "gateway-status endpoint + Fleet page; no public status page | worker CT 2026-11-22: comptrove.com resolves and serves Comptrove content right now (a rendered Austin, TX rent-comparison page was fetched from comptrove.com), but the benchmark requires \u226599.9% monthly availability AND a public status page \u2014 neither is verifiable: no public Comptrove status page was found on comptrove.c",
    "fix": "Publish status.<domain>"
   },
   {
@@ -2124,10 +2124,10 @@
     "AG": "-",
     "GH": "-",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Nightly reconciliation / no auto-deduct policy documented in A4; no public page",
+   "evidence": "Nightly reconciliation / no auto-deduct policy documented in A4; no public page | worker CT 2026-11-22: No refund, reversal, or chargeback policy could be observed anywhere on comptrove.com. The only on-domain page surfaced is Comptrove's Austin rental-data report (comptrove.com) [[11](https://comptrove.com/m/austin/)], which carries no policy links. Targeted probes \u2014 site-restricted refund/reversal/c",
    "fix": "Publish refund and reversal page"
   },
   {
@@ -2224,10 +2224,10 @@
     "AG": "-",
     "GH": "-",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "\ud83d\udfe1 .edu e2e pending; 2,255 domains; live prices $4.99/$9.99/$12.99",
+   "evidence": "\ud83d\udfe1 .edu e2e pending; 2,255 domains; live prices $4.99/$9.99/$12.99 | worker CT 2026-11-22: comptrove.com serves a public rent-comparison product only: the retrievable page inventory surfaces property/rent data pages (e.g., the Austin, TX average-rent page with rents by bedroom [[17](https://comptrove.com/m/austin/)]), and no student or.edu pricing page, enrollment-verification step, disco",
    "fix": "Owner price-ID wiring + counsel decision"
   },
   {
@@ -2344,10 +2344,10 @@
     "AG": "U",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not evidenced",
+   "evidence": "Not evidenced | worker CT 2026-11-22: DNS-level email authentication for comptrove.com could not be verified: no SPF TXT record at the apex, no discoverable DKIM key under common selectors (google._domainkey, s1/s2, krs._domainkey), and no DMARC record with p=quarantine or p=reject at _dmarc.comptrove.com were observed. The benchmark re",
    "fix": "DNS audit for boundview.com and all sender domains"
   },
   {
@@ -2384,10 +2384,10 @@
     "AG": "R",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Twilio credentials pending (owner blocker) | worker AG 2026-11-22: Checked https://ai.spaincos.com and its obvious sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) plus the app's source repo (rentspire-bspain/ai-gateway-site [[1](https://github.com/rentspire-bspain/ai-gateway-site)]) \u2014 no served page demonstrates any of the three benchmark elem",
+   "evidence": "Twilio credentials pending (owner blocker) | worker AG 2026-11-22: Checked https://ai.spaincos.com and its obvious sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) plus the app's source repo (rentspire-bspain/ai-gateway-site [[1](https://github.com/rentspire-bspain/ai-gateway-site)]) \u2014 no served page demonstrates any of the three benchmark elem | worker CT 2026-11-22: No SMS consent (TCPA) language, express written consent disclosure, STOP/HELP instructions, or 8am-9pm recipient-local quiet-hours policy was observed on comptrove.com or its obvious sub-pages (/privacy, /terms, /help, /docs, /robots.txt, /sitemap.xml). The only SMS policy found in search was for kr",
    "fix": "Implement per-recipient state/time-zone logic nationwide"
   },
   {
@@ -3804,10 +3804,10 @@
     "AG": "Y",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "api/geocode.js is ZIP5-centric",
+   "evidence": "api/geocode.js is ZIP5-centric | worker CT 2026-11-22: Fetched comptrove.com: the served page is a rent-comparison result (\"Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps\") with a displayed business address \u2014 a read-only rent-data surface [[3](https://comptrove.com/m/austin/)]. No address-entry form, phone-number field, or ID-format inpu",
    "fix": "Shared address component"
   },
   {
@@ -3864,10 +3864,10 @@
     "AG": "-",
     "GH": "-",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "-"
    },
-   "evidence": "No geo messaging in TT | worker BV 2026-11-22: No boundview.com page showing a geo-eligible offers wall could be observed. The only BoundView-related result in live fetches is a Municipal Bond Screener on bondview.com [[9](https://www.bondview.com/bonds-screener)] \u2014 a different domain \u2014 and the only policy page surfaced is bound.co's Legal: Priv",
+   "evidence": "No geo messaging in TT | worker BV 2026-11-22: No boundview.com page showing a geo-eligible offers wall could be observed. The only BoundView-related result in live fetches is a Municipal Bond Screener on bondview.com [[9](https://www.bondview.com/bonds-screener)] \u2014 a different domain \u2014 and the only policy page surfaced is bound.co's Legal: Priv | worker CT 2026-11-22: comptrove.com as served right now shows no geo-availability offer wall: the only Comptrove page surfaced is its rent-data page (average rent in Austin, TX by bedroom, history & comps) with a Pro launch offer, and no geo-eligible offer list, no thin-offers fallback message, and no IP-geolocation stat",
    "fix": "Show availability note; fall back gracefully"
   },
   {
@@ -4044,10 +4044,10 @@
     "AG": "R",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not found | worker AG 2026-11-22: Fetched https://ai.spaincos.com live: served page is the landing page with the 'Ask anything' prompt, open-weight-model description, and Perplexity-history import [[1](https://ai.spaincos.com/)] \u2014 no feedback button, thumbs control, feedback link, or CSAT survey element is served anywhere on the obs",
+   "evidence": "Not found | worker AG 2026-11-22: Fetched https://ai.spaincos.com live: served page is the landing page with the 'Ask anything' prompt, open-weight-model description, and Perplexity-history import [[1](https://ai.spaincos.com/)] \u2014 no feedback button, thumbs control, feedback link, or CSAT survey element is served anywhere on the obs | worker CT 2026-11-22: Fetched https://comptrove.com plus the check-relevant sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt). comptrove.com serves a public rent-comparison app: an address/ZIP search entry point and static market pages such as the Austin, TX rent-by-bedroom/comps page [[11](https://co",
    "fix": "Add micro-survey"
   },
   {
@@ -4104,10 +4104,10 @@
     "AG": "U",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not found",
+   "evidence": "Not found | worker CT 2026-11-22: Fetched https://comptrove.com \u2014 it serves a normal public rent-comparison page ('Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps') [[1](https://comptrove.com/m/austin/)], not an error or support surface. No error page could be observed, and the served page shows no error-reference-ID ",
    "fix": "Add"
   },
   {
@@ -4144,10 +4144,10 @@
     "AG": "R",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not found | worker AG 2026-11-22: https://ai.spaincos.com serves the app homepage ('Where knowledge begins', powered by open-weight models) [[1](https://ai.spaincos.com/)], but no Changelog or 'What's New' link appears anywhere in the app's navigation, page body, or footer. No /changelog or /whats-new route was discoverable, and /ro | worker BV 2026-11-22: No changelog or what's-new page is observable on boundview.com or its obvious sub-paths (/help, /docs, /sitemap.xml, /robots.txt): no Bound-owned changelog, help-docs page, or sitemap surfaced for the domain, and search results pointed only to unrelated sites, so no changelog was observable at the a",
+   "evidence": "Not found | worker AG 2026-11-22: https://ai.spaincos.com serves the app homepage ('Where knowledge begins', powered by open-weight models) [[1](https://ai.spaincos.com/)], but no Changelog or 'What's New' link appears anywhere in the app's navigation, page body, or footer. No /changelog or /whats-new route was discoverable, and /ro | worker BV 2026-11-22: No changelog or what's-new page is observable on boundview.com or its obvious sub-paths (/help, /docs, /sitemap.xml, /robots.txt): no Bound-owned changelog, help-docs page, or sitemap surfaced for the domain, and search results pointed only to unrelated sites, so no changelog was observable at the a | worker CT 2026-11-22: Fetched and searched https://comptrove.com plus obvious sub-paths (sitemap.xml, robots.txt, help/docs-style pages) and observed no changelog or 'What's new' page served or linked from the app. The only Compt-branded product-updates page located is 'What's New in Compt: Product Updates, June 2026' on",
    "fix": "Add"
   },
   {
@@ -6271,9 +6271,9 @@
    "W": 7,
    "ircm": "4201",
    "status": {
-    "CT": "U"
+    "CT": "R"
    },
-   "evidence": "Forecast input, not validated",
+   "evidence": "Forecast input, not validated | worker CT 2026-11-22: comptrove.com does not serve the benchmark scenario. Observed: a Pro plan at $179/month under a launch offer against a $299/month list price \u2014 no $149/month plan at any tier anywhere on the site [[4](https://comptrove.com/m/austin/)]. The public surface is rent-data content (rent by bedroom, history",
    "fix": "Test with 10 customers"
   },
   {
@@ -6299,9 +6299,9 @@
    "W": 7,
    "ircm": "3202",
    "status": {
-    "CT": "U"
+    "CT": "Y"
    },
-   "evidence": "None evidenced",
+   "evidence": "None evidenced | worker CT 2026-11-22: Comptrove's Austin page (comptrove.com) advertises a free rent check with no account required and a sample lookup that can be tried without signing up, plus a worked Austin comp set [[1](https://comptrove.com/m/austin/)] \u2014 satisfying the 'sample lookup' benchmark for free access. The paywall exists ",
    "fix": "Add"
   },
   {
@@ -6313,9 +6313,9 @@
    "W": 7,
    "ircm": "3103",
    "status": {
-    "CT": "U"
+    "CT": "Y"
    },
-   "evidence": "None evidenced",
+   "evidence": "None evidenced | worker CT 2026-11-22: comptrove.com serves at least one indexed, location-specific programmatic SEO page \u2014 'Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps' [[1](https://comptrove.com/m/austin/)] \u2014 with rent observations and local content, confirming the CITY tier of the state/county/city/parcel benchmark.",
    "fix": "Build"
   },
   {
@@ -6355,9 +6355,9 @@
    "W": 6,
    "ircm": "3300",
    "status": {
-    "CT": "U"
+    "CT": "R"
    },
-   "evidence": "Owner standard",
+   "evidence": "Owner standard | worker CT 2026-11-22: Fetched comptrove.com and its obvious sub-page probes (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) plus targeted methodology searches. What is actually served right now: the Austin rent page 'Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps' [[1](https://comptrove.com/m/",
    "fix": "Add"
   },
   {
@@ -6383,9 +6383,9 @@
    "W": 8,
    "ircm": "3302",
    "status": {
-    "CT": "U"
+    "CT": "R"
    },
-   "evidence": "RentSpire SOC 2 gate",
+   "evidence": "RentSpire SOC 2 gate | worker CT 2026-11-22: No trust/security page is observable at comptrove.com or its obvious sub-pages (/privacy, /terms, /help, /docs). Nothing served right now shows a SOC 2 status, SOC 2 report reference (no report type, audit period, or auditor named), security questionnaire, trust-center link, or SOC 2 badge.",
    "fix": "Publish"
   },
   {
