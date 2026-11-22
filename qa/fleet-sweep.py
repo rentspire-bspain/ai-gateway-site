@@ -19,10 +19,10 @@ SOURCES (union; every row records where it came from — never vibes):
 
 BATTERY per webapp (the reduced H-category set):
   H1  LIVENESS: HTTPS GET — status + TTFB. 200 = PASS. 403/429 carrying
-      x-vercel-mitigated = PARTIAL (P=0.5): the Vercel edge answered with a bot
-      mitigation decision, which proves the domain is deployed + TLS-healthy (the
-      domain_uptime rail precedent, 2026-11-20), but the browser battery is NOT
-      runnable from this runner — honest partial, never a pass.
+      x-vercel-mitigated = NOT_MEASURED: the Vercel edge answered with a bot
+      mitigation decision (deployed + TLS-healthy per the domain_uptime rail
+      precedent), but no battery check is runnable from this runner, so the app is
+      excluded from the fleet denominator — never a pass, never a partial.
   H2  ZERO JS ERRORS + ZERO CSP VIOLATIONS on load (real headless Chromium):
       window.onerror + securitypolicyviolation captured pre-document (the v288
       silent-CSP-death class). Only for apps the browser can actually load.
@@ -119,6 +119,7 @@ FORBIDDEN_BRAND = {
 HEALTH_KNOWN = {"ai.spaincos.com", "boundview.com"}
 
 VERDICT_PASS, VERDICT_PARTIAL, VERDICT_FAIL, VERDICT_UNREACHABLE = "PASS", "PARTIAL", "FAIL", "UNREACHABLE"
+VERDICT_NOT_MEASURED = "NOT_MEASURED"   # bot-challenge-gated: excluded from the fleet denominator
 
 
 def now_iso():
@@ -240,8 +241,8 @@ def check_liveness(host, timeout):
         return VERDICT_PASS, 1.0, ev, {"status": status, "headers": headers, "body": body}
     if mitigated:
         ev["note"] = ("Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail "
-                       "precedent); the browser battery is not runnable from this runner — honest partial")
-        return VERDICT_PARTIAL, 0.5, ev, {"status": status, "headers": headers, "body": body}
+                       "precedent); the battery is not runnable from this runner — NOT_MEASURED, excluded from the denominator, never a pass")
+        return VERDICT_NOT_MEASURED, None, ev, {"status": status, "headers": headers, "body": body}
     ev["note"] = f"HTTP {status} without mitigation header"
     return VERDICT_FAIL, 0.0, ev, {"status": status, "headers": headers, "body": body}
 
@@ -380,6 +381,12 @@ def sweep_app(app, args):
         row["score"] = None
         return row
 
+    if v == VERDICT_NOT_MEASURED:
+        row["verdict"] = VERDICT_NOT_MEASURED
+        row["score"] = None
+        row["not_measured_reason"] = "Vercel bot-challenge (x-vercel-mitigated) from this runner; H2-H5 cannot run and are not scored"
+        return row
+
     # H2/H3 browser battery — only when the browser can reach the app (H1 PASS).
     if v == VERDICT_PASS:
         brow = check_browser(host, args.browser_timeout)
@@ -387,7 +394,8 @@ def sweep_app(app, args):
         row["checks"].append({"check": h2["check"], "verdict": h2["verdict"], "score": h2["score"],
                               "evidence": h2["evidence"]})
         # H3b brand in rendered DOM
-        dom_text, title = brow[1].get("_dom_text", ""), brow[1].get("_title", "")
+        b3 = brow[1] if len(brow) > 1 else {}
+        dom_text, title = b3.get("_dom_text", ""), b3.get("_title", "")
         forbidden, wanted = brand_for(host, app.get("brand"))
         if dom_text:
             cross = (forbidden in dom_text.lower()) if forbidden else False
@@ -460,11 +468,11 @@ def main():
                          "sweep_error": f"{type(e).__name__}: {str(e)[:200]}"})
         time.sleep(1.0)  # politeness — never trip the edges we are measuring
 
-    swept = [r for r in rows if r["verdict"] != VERDICT_UNREACHABLE]
+    swept = [r for r in rows if r["verdict"] not in (VERDICT_UNREACHABLE, VERDICT_NOT_MEASURED)]
     scored = [r["score"] for r in swept if r["score"] is not None]
     fleet_score = round(sum(scored) / len(scored), 3) if scored else None
     counts = {v: sum(1 for r in rows if r["verdict"] == v) for v in
-              (VERDICT_PASS, VERDICT_PARTIAL, VERDICT_FAIL, VERDICT_UNREACHABLE)}
+              (VERDICT_PASS, VERDICT_PARTIAL, VERDICT_FAIL, VERDICT_UNREACHABLE, VERDICT_NOT_MEASURED)}
 
     rec = {
         "ts": now_iso(),
@@ -477,7 +485,7 @@ def main():
             "swept": len(swept),
             "fleet_score": fleet_score,
             "verdict_counts": counts,
-            "not_measured_reason": "Vercel bot-challenge-gated domains (x-vercel-mitigated) cannot run the browser battery from this runner; recorded as honest partials on liveness, never scored on unmeasurable checks",
+            "not_measured_reason": "Vercel bot-challenge-gated domains (x-vercel-mitigated) cannot run the browser battery from this runner; recorded as NOT_MEASURED and excluded from the fleet denominator (never counted as pass or partial)",
         },
         "per_app": {r["host"]: r for r in rows},
     }
@@ -494,7 +502,7 @@ def main():
     }, indent=1))
 
     print(f"\nFLEET SWEEP RESULT — {len(swept)} swept, fleet score {fleet_score}")
-    print(f"  PASS {counts[VERDICT_PASS]} | PARTIAL {counts[VERDICT_PARTIAL]} | FAIL {counts[VERDICT_FAIL]} | UNREACHABLE {counts[VERDICT_UNREACHABLE]}")
+    print(f"  PASS {counts[VERDICT_PASS]} | PARTIAL {counts[VERDICT_PARTIAL]} | FAIL {counts[VERDICT_FAIL]} | UNREACHABLE {counts[VERDICT_UNREACHABLE]} | NOT_MEASURED {counts[VERDICT_NOT_MEASURED]}")
     for r in rows:
         print(f"  {r['host']:32} {str(r['verdict']):12} score={r['score']}")
     print(f"report: {RESULTS_PATH}")

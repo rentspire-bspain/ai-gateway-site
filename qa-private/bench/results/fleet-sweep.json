@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-21T19:04:34+00:00",
+ "ts": "2026-11-22T07:28:33+00:00",
  "battery": "H1 liveness, H2 JS/CSP, H3 brand integrity (bytes+DOM), H4 serving freshness, H5 health endpoint",
  "scoring": "per applicable check 1.0/0.5/0.0; app score = mean; partials P=0.5 by contract; not_measured checks excluded from the denominator and recorded",
  "sources": [
@@ -15,15 +15,16 @@
  ],
  "summary": {
   "apps_total": 9,
-  "swept": 9,
-  "fleet_score": 0.87,
+  "swept": 3,
+  "fleet_score": 1.0,
   "verdict_counts": {
    "PASS": 3,
-   "PARTIAL": 6,
+   "PARTIAL": 0,
    "FAIL": 0,
-   "UNREACHABLE": 0
+   "UNREACHABLE": 0,
+   "NOT_MEASURED": 6
   },
-  "not_measured_reason": "Vercel bot-challenge-gated domains (x-vercel-mitigated) cannot run the browser battery from this runner; recorded as honest partials on liveness, never scored on unmeasurable checks"
+  "not_measured_reason": "Vercel bot-challenge-gated domains (x-vercel-mitigated) cannot run the browser battery from this runner; recorded as NOT_MEASURED and excluded from the fleet denominator (never counted as pass or partial)"
  },
  "per_app": {
   "ai.spaincos.com": {
@@ -39,9 +40,9 @@
      "evidence": {
       "url": "https://ai.spaincos.com/",
       "status": 200,
-      "ttfb_ms": 146,
+      "ttfb_ms": 113,
       "server": "Vercel",
-      "x_vercel_id": "iad1::iad1::dh4v6-1795287839086-03d3a8b51400",
+      "x_vercel_id": "iad1::iad1::xc5br-1795332482707-2b197e15f1ff",
       "x_vercel_mitigated": ""
      }
     },
@@ -54,7 +55,7 @@
       "title": "ai.spaincos.com \u2014 Where knowledge begins",
       "js_errors": [],
       "csp_violations": [],
-      "dom_chars": 2702
+      "dom_chars": 4990
      }
     },
     {
@@ -72,7 +73,7 @@
      "verdict": "PASS",
      "score": 1.0,
      "evidence": {
-      "bytes": 340750,
+      "bytes": 348581,
       "forbidden_brand": "boundview",
       "wanted_brand": "spaincos",
       "cross_serve": false,
@@ -85,7 +86,7 @@
      "score": 1.0,
      "evidence": {
       "server": "Vercel",
-      "x_vercel_id": "iad1::iad1::dh4v6-179528",
+      "x_vercel_id": "iad1::iad1::xc5br-179533",
       "cache_control": "no-store",
       "etag": "",
       "age": "0",
@@ -104,12 +105,12 @@
      "evidence": {
       "url": "https://ai.spaincos.com/api/health",
       "status": 200,
-      "ttfb_ms": 128,
+      "ttfb_ms": 90,
       "body": {
        "ok": true,
        "service": "ai-gateway-site",
        "check": "health",
-       "ts": "2026-11-21T19:04:08.056Z"
+       "ts": "2026-11-22T07:28:10.749Z"
       }
      }
     }
@@ -130,9 +131,9 @@
      "evidence": {
       "url": "https://boundview.com/",
       "status": 200,
-      "ttfb_ms": 925,
+      "ttfb_ms": 120,
       "server": "Vercel",
-      "x_vercel_id": "iad1::iad1::lpmq5-1795287849915-85cda6a3d756",
+      "x_vercel_id": "iad1::iad1::c8z6g-1795332491817-8e6926150969",
       "x_vercel_mitigated": ""
      }
     },
@@ -145,7 +146,7 @@
       "title": "BoundView \u2014 Where knowledge begins",
       "js_errors": [],
       "csp_violations": [],
-      "dom_chars": 2698
+      "dom_chars": 4986
      }
     },
     {
@@ -163,7 +164,7 @@
      "verdict": "PASS",
      "score": 1.0,
      "evidence": {
-      "bytes": 340715,
+      "bytes": 349592,
       "forbidden_brand": "spaincos",
       "wanted_brand": "boundview",
       "cross_serve": false,
@@ -176,7 +177,7 @@
      "score": 1.0,
      "evidence": {
       "server": "Vercel",
-      "x_vercel_id": "iad1::iad1::lpmq5-179528",
+      "x_vercel_id": "iad1::iad1::c8z6g-179533",
       "cache_control": "no-store",
       "etag": "",
       "age": "0",
@@ -190,12 +191,12 @@
      "evidence": {
       "url": "https://boundview.com/api/health",
       "status": 200,
-      "ttfb_ms": 915,
+      "ttfb_ms": 122,
       "body": {
        "ok": true,
        "service": "ai-gateway-site",
        "check": "health",
-       "ts": "2026-11-21T19:04:18.313Z"
+       "ts": "2026-11-22T07:28:17.788Z"
       }
      }
     }
@@ -211,77 +212,22 @@
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
-     "verdict": "PARTIAL",
-     "score": 0.5,
+     "verdict": "NOT_MEASURED",
+     "score": null,
      "evidence": {
       "url": "https://condoscores.com/",
       "status": 429,
-      "ttfb_ms": 119,
+      "ttfb_ms": 116,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795287859-nDUJMGXln3JLEJw7vtjartPBPaf6sTpI",
+      "x_vercel_id": "iad1::1795332498-w7CQZjZKQprPs8V7JeiEHfClqyRZqrYx",
       "x_vercel_mitigated": "challenge",
-      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the browser battery is not runnable from this runner \u2014 honest partial"
-     }
-    },
-    {
-     "check": "H2 zero JS errors + zero CSP violations on load (headless Chromium)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "domain is bot-challenge-gated from this runner (x-vercel-mitigated); the browser battery cannot run here \u2014 recorded, never scored"
-     }
-    },
-    {
-     "check": "H3b rendered DOM carries the right brand (no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "same reason as H2"
-     }
-    },
-    {
-     "check": "H3a network bytes carry the right brand (script-stripped, no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "no 200 network bytes to inspect (status 429)"
-     }
-    },
-    {
-     "check": "H4 serving freshness (deploy answers; headers/etag/x-vercel-id evidence)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "server": "Vercel",
-      "x_vercel_id": "iad1::1795287859-nDUJMGX",
-      "cache_control": "private, no-store, max-age=0",
-      "etag": "",
-      "age": "",
-      "serving_layer": "Vercel edge (x-vercel-id present)"
-     }
-    },
-    {
-     "check": "H5 health endpoint (/api/health)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "url": "https://condoscores.com/api/health",
-      "status": 200,
-      "ttfb_ms": 260,
-      "body": {
-       "ok": true,
-       "store": "supabase",
-       "prefillAvailable": true,
-       "rulesets": [
-        "fnma_2026_08_03",
-        "fnma_2027_01_04"
-       ]
-      }
+      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
     }
    ],
-   "verdict": "PARTIAL",
-   "score": 0.833
+   "verdict": "NOT_MEASURED",
+   "score": null,
+   "not_measured_reason": "Vercel bot-challenge (x-vercel-mitigated) from this runner; H2-H5 cannot run and are not scored"
   },
   "comptrove.com": {
    "app": "Comptrove (rent comps public site)",
@@ -291,74 +237,22 @@
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
-     "verdict": "PARTIAL",
-     "score": 0.5,
+     "verdict": "NOT_MEASURED",
+     "score": null,
      "evidence": {
       "url": "https://comptrove.com/",
       "status": 429,
-      "ttfb_ms": 111,
+      "ttfb_ms": 134,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795287860-ypLRtXRfOBnkX9Ov1gDJ7tf8SIMoMm5K",
+      "x_vercel_id": "iad1::1795332500-7v93DnWj06fctJutOiHMQlrjJimSrbnj",
       "x_vercel_mitigated": "challenge",
-      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the browser battery is not runnable from this runner \u2014 honest partial"
-     }
-    },
-    {
-     "check": "H2 zero JS errors + zero CSP violations on load (headless Chromium)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "domain is bot-challenge-gated from this runner (x-vercel-mitigated); the browser battery cannot run here \u2014 recorded, never scored"
-     }
-    },
-    {
-     "check": "H3b rendered DOM carries the right brand (no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "same reason as H2"
-     }
-    },
-    {
-     "check": "H3a network bytes carry the right brand (script-stripped, no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "no 200 network bytes to inspect (status 429)"
-     }
-    },
-    {
-     "check": "H4 serving freshness (deploy answers; headers/etag/x-vercel-id evidence)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "server": "Vercel",
-      "x_vercel_id": "iad1::1795287860-ypLRtXR",
-      "cache_control": "private, no-store, max-age=0",
-      "etag": "",
-      "age": "",
-      "serving_layer": "Vercel edge (x-vercel-id present)"
-     }
-    },
-    {
-     "check": "H5 health endpoint (/api/health)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "url": "https://comptrove.com/api/health",
-      "status": 200,
-      "ttfb_ms": 136,
-      "body": {
-       "ok": true,
-       "state": "healthy",
-       "timestamp": "2026-11-21T19:04:20.936Z",
-       "service": "comptrove"
-      }
+      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
     }
    ],
-   "verdict": "PARTIAL",
-   "score": 0.833
+   "verdict": "NOT_MEASURED",
+   "score": null,
+   "not_measured_reason": "Vercel bot-challenge (x-vercel-mitigated) from this runner; H2-H5 cannot run and are not scored"
   },
   "spaincos.com": {
    "app": "SpainCos marketing site",
@@ -373,7 +267,7 @@
      "evidence": {
       "url": "https://spaincos.com/",
       "status": 200,
-      "ttfb_ms": 238,
+      "ttfb_ms": 662,
       "server": "Squarespace",
       "x_vercel_id": "",
       "x_vercel_mitigated": ""
@@ -406,7 +300,7 @@
      "verdict": "PASS",
      "score": 1.0,
      "evidence": {
-      "bytes": 840314,
+      "bytes": 1484394,
       "forbidden_brand": "boundview",
       "wanted_brand": "spaincos",
       "cross_serve": false,
@@ -421,8 +315,8 @@
       "server": "Squarespace",
       "x_vercel_id": "",
       "cache_control": "",
-      "etag": "W/\"8917fc74fd34291e1ae8573a37ba7dbc\"",
-      "age": "160",
+      "etag": "W/\"8917fc74fd34291e1ae8573a37ba7dbc--gzip\"",
+      "age": "0",
       "serving_layer": "Squarespace with etag revalidation",
       "etag_304_revalidation": true
      }
@@ -434,7 +328,7 @@
      "evidence": {
       "url": "https://spaincos.com/api/health",
       "status": 404,
-      "ttfb_ms": 339,
+      "ttfb_ms": 484,
       "note": "no health endpoint on this app \u2014 not applicable (not a failure)"
      }
     }
@@ -450,69 +344,22 @@
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
-     "verdict": "PARTIAL",
-     "score": 0.5,
+     "verdict": "NOT_MEASURED",
+     "score": null,
      "evidence": {
       "url": "https://terminal.spaincos.com/",
       "status": 429,
-      "ttfb_ms": 204,
+      "ttfb_ms": 209,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795287869-6lRcf9cD08DnyON0sV8kHNZVfmnUaC6u",
+      "x_vercel_id": "iad1::1795332508-ghX0cFXHimhDBKba8L3VCeM8BfFayMHu",
       "x_vercel_mitigated": "challenge",
-      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the browser battery is not runnable from this runner \u2014 honest partial"
-     }
-    },
-    {
-     "check": "H2 zero JS errors + zero CSP violations on load (headless Chromium)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "domain is bot-challenge-gated from this runner (x-vercel-mitigated); the browser battery cannot run here \u2014 recorded, never scored"
-     }
-    },
-    {
-     "check": "H3b rendered DOM carries the right brand (no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "same reason as H2"
-     }
-    },
-    {
-     "check": "H3a network bytes carry the right brand (script-stripped, no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "no 200 network bytes to inspect (status 429)"
-     }
-    },
-    {
-     "check": "H4 serving freshness (deploy answers; headers/etag/x-vercel-id evidence)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "server": "Vercel",
-      "x_vercel_id": "iad1::1795287869-6lRcf9c",
-      "cache_control": "private, no-store, max-age=0",
-      "etag": "",
-      "age": "",
-      "serving_layer": "Vercel edge (x-vercel-id present)"
-     }
-    },
-    {
-     "check": "H5 health endpoint (/api/health)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "url": "https://terminal.spaincos.com/api/health",
-      "status": 404,
-      "ttfb_ms": 270,
-      "note": "no health endpoint on this app \u2014 not applicable (not a failure)"
+      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
     }
    ],
-   "verdict": "PARTIAL",
-   "score": 0.75
+   "verdict": "NOT_MEASURED",
+   "score": null,
+   "not_measured_reason": "Vercel bot-challenge (x-vercel-mitigated) from this runner; H2-H5 cannot run and are not scored"
   },
   "allowancehealth.com": {
    "app": "Allowance (ICHRA plan finder)",
@@ -522,69 +369,22 @@
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
-     "verdict": "PARTIAL",
-     "score": 0.5,
+     "verdict": "NOT_MEASURED",
+     "score": null,
      "evidence": {
       "url": "https://allowancehealth.com/",
       "status": 429,
-      "ttfb_ms": 92,
+      "ttfb_ms": 190,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795287871-grbn2YxpimJpZHhNkERlXYJVTUhLYZGm",
+      "x_vercel_id": "iad1::1795332509-UNVhSBrAPzYqLa8MA6rvyga77FH6J092",
       "x_vercel_mitigated": "challenge",
-      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the browser battery is not runnable from this runner \u2014 honest partial"
-     }
-    },
-    {
-     "check": "H2 zero JS errors + zero CSP violations on load (headless Chromium)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "domain is bot-challenge-gated from this runner (x-vercel-mitigated); the browser battery cannot run here \u2014 recorded, never scored"
-     }
-    },
-    {
-     "check": "H3b rendered DOM carries the right brand (no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "same reason as H2"
-     }
-    },
-    {
-     "check": "H3a network bytes carry the right brand (script-stripped, no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "no 200 network bytes to inspect (status 429)"
-     }
-    },
-    {
-     "check": "H4 serving freshness (deploy answers; headers/etag/x-vercel-id evidence)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "server": "Vercel",
-      "x_vercel_id": "iad1::1795287871-grbn2Yx",
-      "cache_control": "private, no-store, max-age=0",
-      "etag": "",
-      "age": "",
-      "serving_layer": "Vercel edge (x-vercel-id present)"
-     }
-    },
-    {
-     "check": "H5 health endpoint (/api/health)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "url": "https://allowancehealth.com/api/health",
-      "status": 404,
-      "ttfb_ms": 110,
-      "note": "no health endpoint on this app \u2014 not applicable (not a failure)"
+      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
     }
    ],
-   "verdict": "PARTIAL",
-   "score": 0.75
+   "verdict": "NOT_MEASURED",
+   "score": null,
+   "not_measured_reason": "Vercel bot-challenge (x-vercel-mitigated) from this runner; H2-H5 cannot run and are not scored"
   },
   "nodegrade.com": {
    "app": "NodeGrade (agentready scorecard)",
@@ -594,74 +394,22 @@
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
-     "verdict": "PARTIAL",
-     "score": 0.5,
+     "verdict": "NOT_MEASURED",
+     "score": null,
      "evidence": {
       "url": "https://nodegrade.com/",
       "status": 429,
-      "ttfb_ms": 93,
+      "ttfb_ms": 115,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795287872-n22wgIHVR340mR6NGDptcTa1UYvZqsuW",
+      "x_vercel_id": "iad1::1795332510-qXJPzbqnqueho1NgdaHF81oSdwJkeXac",
       "x_vercel_mitigated": "challenge",
-      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the browser battery is not runnable from this runner \u2014 honest partial"
-     }
-    },
-    {
-     "check": "H2 zero JS errors + zero CSP violations on load (headless Chromium)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "domain is bot-challenge-gated from this runner (x-vercel-mitigated); the browser battery cannot run here \u2014 recorded, never scored"
-     }
-    },
-    {
-     "check": "H3b rendered DOM carries the right brand (no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "same reason as H2"
-     }
-    },
-    {
-     "check": "H3a network bytes carry the right brand (script-stripped, no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "no 200 network bytes to inspect (status 429)"
-     }
-    },
-    {
-     "check": "H4 serving freshness (deploy answers; headers/etag/x-vercel-id evidence)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "server": "Vercel",
-      "x_vercel_id": "iad1::1795287872-n22wgIH",
-      "cache_control": "private, no-store, max-age=0",
-      "etag": "",
-      "age": "",
-      "serving_layer": "Vercel edge (x-vercel-id present)"
-     }
-    },
-    {
-     "check": "H5 health endpoint (/api/health)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "url": "https://nodegrade.com/api/health",
-      "status": 200,
-      "ttfb_ms": 163,
-      "body": {
-       "ok": true,
-       "app": "nodegrade-scanner",
-       "scanner": "in-process",
-       "budgetMs": 12000
-      }
+      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
     }
    ],
-   "verdict": "PARTIAL",
-   "score": 0.833
+   "verdict": "NOT_MEASURED",
+   "score": null,
+   "not_measured_reason": "Vercel bot-challenge (x-vercel-mitigated) from this runner; H2-H5 cannot run and are not scored"
   },
   "perilmark.com": {
    "app": "PERILMARK",
@@ -671,74 +419,22 @@
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
-     "verdict": "PARTIAL",
-     "score": 0.5,
+     "verdict": "NOT_MEASURED",
+     "score": null,
      "evidence": {
       "url": "https://perilmark.com/",
       "status": 429,
-      "ttfb_ms": 126,
+      "ttfb_ms": 191,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795287873-6v9qJ2E1x89qZs7nr8SH3dyBV21ZqepE",
+      "x_vercel_id": "iad1::1795332512-SG6DJ3SX1jFcUjGcpe9paDmV7P0NPU5p",
       "x_vercel_mitigated": "challenge",
-      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the browser battery is not runnable from this runner \u2014 honest partial"
-     }
-    },
-    {
-     "check": "H2 zero JS errors + zero CSP violations on load (headless Chromium)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "domain is bot-challenge-gated from this runner (x-vercel-mitigated); the browser battery cannot run here \u2014 recorded, never scored"
-     }
-    },
-    {
-     "check": "H3b rendered DOM carries the right brand (no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "same reason as H2"
-     }
-    },
-    {
-     "check": "H3a network bytes carry the right brand (script-stripped, no cross-serve)",
-     "verdict": null,
-     "score": null,
-     "evidence": {
-      "not_measured": "no 200 network bytes to inspect (status 429)"
-     }
-    },
-    {
-     "check": "H4 serving freshness (deploy answers; headers/etag/x-vercel-id evidence)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "server": "Vercel",
-      "x_vercel_id": "iad1::1795287873-6v9qJ2E",
-      "cache_control": "private, no-store, max-age=0",
-      "etag": "",
-      "age": "",
-      "serving_layer": "Vercel edge (x-vercel-id present)"
-     }
-    },
-    {
-     "check": "H5 health endpoint (/api/health)",
-     "verdict": "PASS",
-     "score": 1.0,
-     "evidence": {
-      "url": "https://perilmark.com/api/health",
-      "status": 200,
-      "ttfb_ms": 198,
-      "body": {
-       "ok": true,
-       "state": "healthy",
-       "timestamp": "2026-11-21T19:04:33.673Z",
-       "service": "perilmark"
-      }
+      "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
     }
    ],
-   "verdict": "PARTIAL",
-   "score": 0.833
+   "verdict": "NOT_MEASURED",
+   "score": null,
+   "not_measured_reason": "Vercel bot-challenge (x-vercel-mitigated) from this runner; H2-H5 cannot run and are not scored"
   }
  }
 }
