@@ -1,5 +1,5 @@
 {
- "version": 15,
+ "version": 16,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -359,15 +359,15 @@
    "W": 7,
    "ircm": "4021",
    "status": {
-    "BV": "U",
+    "BV": "Y",
     "TT": "Y",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit",
+   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint)",
    "fix": "Keyboard walkthrough per CUJ each release; record in qa-reports"
   },
   {
@@ -559,15 +559,15 @@
    "W": 3,
    "ircm": "2010",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "G",
-    "AG": "U",
+    "AG": "R",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT pending dot is paired with text",
+   "evidence": "TT pending dot is paired with text | playwright AG 2026-11-22: 6/16 status indicators lack text/aria | playwright BV 2026-11-22: 6/16 status indicators lack text/aria",
    "fix": "Keep"
   },
   {
@@ -739,15 +739,15 @@
    "W": 2,
    "ircm": "2000",
    "status": {
-    "BV": "U",
+    "BV": "G",
     "TT": "U",
-    "AG": "U",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "No tablet/wide captures",
+   "evidence": "No tablet/wide captures | playwright AG 2026-11-22: wide-desktop scrollWidth 2560 vs innerWidth 2560 | playwright BV 2026-11-22: wide-desktop scrollWidth 2560 vs innerWidth 2560",
    "fix": "Extend visual-parity matrix"
   },
   {
@@ -779,7 +779,7 @@
    "W": 2,
    "ircm": "2000",
    "status": {
-    "BV": "U",
+    "BV": "G",
     "TT": "U",
     "AG": "R",
     "GH": "U",
@@ -787,7 +787,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT toast is fixed bottom:18px with no inset (overlaps iPhone home indicator) | worker AG 2026-11-22: Fetched ai.spaincos.com and its repo reference (GitHub rentspire-bspain/ai-gateway-site [[2](https://github.com/rentspire-bspain/ai-gateway-site)]); the app is identified but no served HTML/CSS was observable containing env(safe-area-inset-*) or dvh usage for full-height layouts. No viewport-fit=cov",
+   "evidence": "TT toast is fixed bottom:18px with no inset (overlaps iPhone home indicator) | worker AG 2026-11-22: Fetched ai.spaincos.com and its repo reference (GitHub rentspire-bspain/ai-gateway-site [[2](https://github.com/rentspire-bspain/ai-gateway-site)]); the app is identified but no served HTML/CSS was observable containing env(safe-area-inset-*) or dvh usage for full-height layouts. No viewport-fit=cov | playwright BV 2026-11-22: viewport meta='width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content', scrollWidth 375 vs innerWidth 375, dvh units: False",
    "fix": "Use padding-bottom: max(18px, env(safe-area-inset-bottom))"
   },
   {
@@ -799,15 +799,15 @@
    "W": 2,
    "ircm": "2000",
    "status": {
-    "BV": "U",
+    "BV": "G",
     "TT": "U",
-    "AG": "U",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not measured",
+   "evidence": "Not measured | playwright AG 2026-11-22: min input font-size 16px (need >=16) | playwright BV 2026-11-22: min input font-size 16px (need >=16)",
    "fix": "Lint: input font-size \u226516 px on mobile"
   },
   {
@@ -839,15 +839,15 @@
    "W": 2,
    "ircm": "2000",
    "status": {
-    "BV": "U",
+    "BV": "Y",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not audited",
+   "evidence": "Not audited | playwright AG 2026-11-22: 6/60 interactive elements under 24px | playwright BV 2026-11-22: 6/60 interactive elements under 24px",
    "fix": "Audit hover-only tooltips (owner prefers hover-first secondary info, so provide tap equivalent)"
   },
   {
