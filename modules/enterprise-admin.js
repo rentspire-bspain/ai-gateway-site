@@ -72,7 +72,7 @@
     if (!host) return null;
     host.innerHTML = "";
     host.appendChild(el("h3", "stg-pane-title", "Enterprise"));
-    host.appendChild(el("p", "stg-pane-sub", "Seats, members, and the organization activity trail — read-only."));
+    host.appendChild(el("p", "stg-pane-sub", "Read-only workspace overview for owners and admins. Opening this pane does not grant access to additional records."));
     var status = el("p", "stg-desc", "Checking your organization role…");
     status.setAttribute("role", "status");
     host.appendChild(status);
@@ -109,7 +109,7 @@
     billing.addEventListener("click", function () { root.SettingsUI.open("billing"); });
     host.appendChild(billing);
     var trail = el("div");
-    host.appendChild(el("div", "stg-group-label", "Recent org activity (fleet dispatches)"));
+    host.appendChild(el("div", "stg-group-label", "Recent fleet dispatches visible to your account"));
     host.appendChild(trail);
 
     // members + seats (team edge function — same source as Settings > Organization)
@@ -180,12 +180,37 @@
     // v230: security audit trail (audit_logs, RLS-scoped to the signed-in user)
     var auditBox = el("div");
     host.appendChild(el("div", "stg-group-label", "Security audit trail (your account actions)"));
+    host.appendChild(el("p", "stg-desc", "Preview: latest 20 events. The larger CSV export is limited to 250 events visible to your account, not an organization-wide audit log."));
+    var auditHeaders = { Authorization: "Bearer " + tok, apikey: ak || "" };
+    var auditUrl = SB + "/rest/v1/audit_logs?select=action,detail,created_at&order=created_at.desc&limit=";
+    var historyButton = el("button", "stg-btn", "Export latest account events (up to 250)");
+    var historyStatus = el("p", "stg-desc");
+    historyStatus.setAttribute("role", "status");
+    historyButton.type = "button";
+    historyButton.addEventListener("click", function () {
+      historyButton.disabled = true;
+      historyStatus.textContent = "Preparing account audit CSV…";
+      fetch(auditUrl + "251", { headers: auditHeaders })
+        .then(function (r) { if (!r.ok) throw new Error("Export unavailable"); return r.json(); })
+        .then(function (rows) {
+          if (!Array.isArray(rows)) throw new Error("Invalid export data");
+          if (!rows.length) { historyStatus.textContent = "No account audit events to export."; return; }
+          var exported = rows.slice(0, 250);
+          downloadAudit(host, exported);
+          historyStatus.textContent = "Prepared " + exported.length + " account audit rows." +
+            (rows.length > exported.length ? " Older events were not included." : "");
+        })
+        .catch(function () { historyStatus.textContent = "Account audit export unavailable. Try again."; })
+        .finally(function () { historyButton.disabled = false; });
+    });
     var exportButton = el("button", "stg-btn", "Download visible audit rows (CSV)");
     exportButton.type = "button";
     exportButton.hidden = true;
     host.appendChild(exportButton);
+    host.appendChild(historyButton);
+    host.appendChild(historyStatus);
     host.appendChild(auditBox);
-    fetch(SB + "/rest/v1/audit_logs?select=action,detail,created_at&order=created_at.desc&limit=20", { headers: { Authorization: "Bearer " + tok, apikey: ak || "" } })
+    fetch(auditUrl + "20", { headers: auditHeaders })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("audit " + r.status)); })
       .then(function (rows) {
         auditBox.innerHTML = "";
@@ -207,14 +232,7 @@
         });
         exportButton.hidden = false;
         exportButton.addEventListener("click", function () {
-          var url = URL.createObjectURL(new Blob([auditCsv(rows)], { type: "text/csv;charset=utf-8" }));
-          var link = el("a");
-          link.href = url;
-          link.download = "account-audit.csv";
-          host.appendChild(link);
-          link.click();
-          link.remove();
-          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+          downloadAudit(host, rows);
         });
       })
       .catch(function () {
@@ -222,6 +240,17 @@
         auditBox.appendChild(el("p", "stg-empty-note", "Audit trail unavailable right now."));
       });
     return host;
+  }
+
+  function downloadAudit(host, rows) {
+    var url = URL.createObjectURL(new Blob([auditCsv(rows)], { type: "text/csv;charset=utf-8" }));
+    var link = el("a");
+    link.href = url;
+    link.download = "account-audit.csv";
+    host.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
 
   root.EnterpriseAdminPane = { render: render, dispatchRow: dispatchRow, seatUsage: seatUsage, fmtAt: fmtAt, isAdminRole: isAdminRole, auditCsv: auditCsv };

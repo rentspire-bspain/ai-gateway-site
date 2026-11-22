@@ -20,3 +20,7 @@ Server-side GETs returned the production [Enterprise](https://ai.spaincos.com/mo
 - Organization audit and full export: Require an organization-scoped event source, verified tenant isolation, and an explicit cursor and retention contract. Browser export of the current account snapshot cannot supply this.
 
 Do not raise the category score from static evidence alone. Resume with read-only checks in a signed-in owner/admin browser, a separate member account to verify denial, and an approved scratch workspace for invite or role mutations.
+
+## Follow-up: bounded account audit export
+
+The Enterprise UI retains its 20-event preview and adds an explicit export of the latest 250 account-visible audit events, using the same signed-in request and no elevated credential. The extra response row detects truncation when the API returns it. The export is not a guarantee of complete history, tenant-wide access, or configurable retention; those capabilities remain unverified. The pane now labels fleet activity as records visible to the current account, not a whole-organization audit trail. A client role check governs UI visibility only; backend permission enforcement must be verified independently.
