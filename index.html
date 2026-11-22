@@ -5118,11 +5118,15 @@ function renderAnswerError(container, title, detail, query) {
 }
 
 // v83 (G8): retry transient network failures / gateway 502-504 on the chat POST, with a visible note
+// v290: HTTP 546 (Supabase WORKER_RESOURCE_LIMIT — the edge worker was recycled for compute/memory,
+// typically when overlapping requests share one worker; the response is empty, so a retry is safe and
+// normally lands on a fresh worker) is retried too, with a longer jittered backoff.
 async function fetchRetry(url, opts, note) {
   const delays = [1200, 2500];
   for (let i = 0; ; i++) {
     try {
       const r = await fetch(url, opts);
+      if (r.status === 546 && i < delays.length) { reconnecting(i); await new Promise(z => setTimeout(z, 3000 + Math.random() * 2500 + i * 2500)); continue; }
       if ([502, 503, 504].includes(r.status) && i < delays.length) { reconnecting(i); await new Promise(z => setTimeout(z, delays[i])); continue; }
       return r;
     } catch (e) {
@@ -5492,6 +5496,7 @@ async function performSearchInner(query) {
       if (!res.ok) {
         let data = {};
         try { data = await res.json(); } catch {}
+        if (res.status === 546) throw new Error("The gateway was briefly out of compute (HTTP 546) and retried automatically without success. Your question wasn't lost — press Retry in a moment.");
         if ([502, 503, 504].includes(res.status)) throw new Error("The gateway is temporarily unavailable (HTTP " + res.status + "). Your question wasn't lost — retry in a moment.");
         throw new Error(data?.error?.message ?? data?.error ?? "Gateway error");
       }
