@@ -1,5 +1,5 @@
 {
- "version": 11,
+ "version": 12,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -1104,10 +1104,10 @@
     "AG": "U",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Reported production email surfaces; deliverability not evidenced",
+   "evidence": "Reported production email surfaces; deliverability not evidenced | worker CT 2026-11-22: Observed https://comptrove.com and obvious sub-pages (/privacy, /terms, /sitemap.xml, /robots.txt) as served right now: no signup/onboarding flow referencing a U-ONB-09 welcome or lifecycle email is exposed, no brand-correct sender identity (e.g. an @comptrove.com welcome address or Comptrove displa",
    "fix": "Seed-list test (Gmail, Outlook, Yahoo, iCloud) before launch"
   },
   {
@@ -1224,10 +1224,10 @@
     "AG": "Y",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "\ud83d\udfe1 per master (owner enable steps pending)",
+   "evidence": "\ud83d\udfe1 per master (owner enable steps pending) | worker CT 2026-11-22: No passkey register or sign-in flow is observable on https://comptrove.com. The served site is the public Comptrove rent-comparison app (rentspire-comps on Vercel) \u2014 a public rent-lookup surface with no account UI, no 'Add passkey'/'Passkey' control, no WebAuthn API usage (navigator.credentials.crea",
    "fix": "Owner: Supabase auth_config_write; then e2e"
   },
   {
@@ -1284,10 +1284,10 @@
     "AG": "G",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Connectors 98% in master; 4 OAuth apps still unregistered (Slack/Dropbox/Outlook/Box)",
+   "evidence": "Connectors 98% in master; 4 OAuth apps still unregistered (Slack/Dropbox/Outlook/Box) | worker CT 2026-11-22: Fetched live coverage of https://comptrove.com and probed the implied sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt). The only observable Comptrove page is the Austin rent data page 'Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps' (comptrove.com) [[11](https://",
    "fix": "Owner registers apps"
   },
   {
@@ -3579,7 +3579,7 @@
    "W": 5,
    "ircm": "3101",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "-",
     "AG": "R",
     "GH": "-",
@@ -3587,7 +3587,7 @@
     "CT": "-",
     "DG": "-"
    },
-   "evidence": "Self-improvement cycle exists server-side | worker AG 2026-11-22: Fetched https://ai.spaincos.com and its public surfaces: the homepage ('Where knowledge begins') documents only a Perplexity-history import feature for personal context [[1](https://ai.spaincos.com/)]; the public repo rentspire-bspain/ai-gateway-site describes a frontend plus a QA system with no cap",
+   "evidence": "Self-improvement cycle exists server-side | worker AG 2026-11-22: Fetched https://ai.spaincos.com and its public surfaces: the homepage ('Where knowledge begins') documents only a Perplexity-history import feature for personal context [[1](https://ai.spaincos.com/)]; the public repo rentspire-bspain/ai-gateway-site describes a frontend plus a QA system with no cap | worker BV 2026-11-22: Fetched the live results for the site and its retrievable pages: the public entry point is BondView's marketing/signup page ('Municipal Bond Market Access for Everyone - Join BondView') plus an About Us page and a BondView 500 Liquid Municipal Bond Index page on join.bondview.com [[2](https://join.b",
    "fix": "Add in-answer feedback"
   },
   {
@@ -3859,7 +3859,7 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "R",
     "AG": "-",
     "GH": "-",
@@ -3867,7 +3867,7 @@
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "No geo messaging in TT",
+   "evidence": "No geo messaging in TT | worker BV 2026-11-22: No boundview.com page showing a geo-eligible offers wall could be observed. The only BoundView-related result in live fetches is a Municipal Bond Screener on bondview.com [[9](https://www.bondview.com/bonds-screener)] \u2014 a different domain \u2014 and the only policy page surfaced is bound.co's Legal: Priv",
    "fix": "Show availability note; fall back gracefully"
   },
   {
@@ -4139,7 +4139,7 @@
    "W": 3,
    "ircm": "1101",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "-",
     "AG": "R",
     "GH": "-",
@@ -4147,7 +4147,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not found | worker AG 2026-11-22: https://ai.spaincos.com serves the app homepage ('Where knowledge begins', powered by open-weight models) [[1](https://ai.spaincos.com/)], but no Changelog or 'What's New' link appears anywhere in the app's navigation, page body, or footer. No /changelog or /whats-new route was discoverable, and /ro",
+   "evidence": "Not found | worker AG 2026-11-22: https://ai.spaincos.com serves the app homepage ('Where knowledge begins', powered by open-weight models) [[1](https://ai.spaincos.com/)], but no Changelog or 'What's New' link appears anywhere in the app's navigation, page body, or footer. No /changelog or /whats-new route was discoverable, and /ro | worker BV 2026-11-22: No changelog or what's-new page is observable on boundview.com or its obvious sub-paths (/help, /docs, /sitemap.xml, /robots.txt): no Bound-owned changelog, help-docs page, or sitemap surfaced for the domain, and search results pointed only to unrelated sites, so no changelog was observable at the a",
    "fix": "Add"
   },
   {
@@ -5459,9 +5459,9 @@
    "W": 5,
    "ircm": "3200",
    "status": {
-    "BV": "U"
+    "BV": "R"
    },
-   "evidence": "Address configured in brand.js",
+   "evidence": "Address configured in brand.js | worker BV 2026-11-22: The live evidence does not establish that support@boundview.com receives mail. No boundview.com page was captured: the ten retrieved results are all unrelated domains \u2014 leadiq.com (BondView profile) [[1](https://leadiq.com/c/bondview/5a1d9a412300005300894c30)], support.blackview.hk [[2](https://supp",
    "fix": "Send test"
   },
   {
