@@ -1,5 +1,5 @@
 {
- "version": "v299",
+ "version": "v301",
  "generated_at": "2026-11-16T00:00:00Z",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE — GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90→95. | 2026-11-18: owner-blocker audit — 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped — server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
@@ -141,8 +141,8 @@
   {
    "name": "Observability",
    "weight": 2,
-   "score": 75,
-   "note": "v292 re-score (live-verified): the UPTIME MONITOR IS LIVE — ops-health v22 runs every 10 min (pg_cron), api_health_ai_spaincos + api_health_boundview checks PASS in the deployed run (19:10Z: HTTP 200 in 195ms/213ms), alert path proven by the lane (transition-only, deduplicated, owner-notified), results in ops_health_runs for the nightly board. Plus /api/health on both domains + the nightly parity board. REMAINING: no user-facing status page."
+   "score": 78,
+   "note": "v292 re-score (live-verified): the UPTIME MONITOR IS LIVE — ops-health v22 runs every 10 min (pg_cron), api_health_ai_spaincos + api_health_boundview checks PASS in the deployed run (19:10Z: HTTP 200 in 195ms/213ms), alert path proven by the lane (transition-only, deduplicated, owner-notified), results in ops_health_runs for the nightly board. Plus /api/health on both domains + the nightly parity board. REMAINING: no user-facing status page. v301: HTTP 546 ROOT-CAUSED (Supabase WORKER_RESOURCE_LIMIT — the platform kills the worker under overlapping requests on a warm worker; 1/6 serial repro, 3/4 concurrent killed, +12s latency under 2-way overlap) — not a gateway code defect. Client retry surface (2x jittered backoff, clear 'out of compute' message with Retry) + QA-suite 546 retry shipped (PR #309); deployed source committed (PR #310). Remaining: per-request compute reduction needs logs/profile; suites must not overlap."
   },
   {
    "name": "Fleet",
@@ -186,6 +186,11 @@
   }
  ],
  "changelog": [
+  {
+   "version": "v301",
+   "date": "2026-11-21",
+   "change": "Observability 75->78 (546 root-caused + retry surface, PRs #309/#310); source drift committed; UX master 94.8 GREEN."
+  },
   {
    "version": "v299",
    "date": "2026-11-21",
