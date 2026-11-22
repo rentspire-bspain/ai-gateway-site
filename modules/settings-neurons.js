@@ -93,7 +93,7 @@
         streak = root.querySelector("#nrnStreak"), shop = root.querySelector("#nrnShop"),
         claimBtn = root.querySelector("#nrnClaim");
 
-    function fmt(n) { return Number(n || 0).toLocaleString(); }
+    function fmt(n) { return Number(n || 0).toLocaleString(window.I18N ? window.I18N.locale() : undefined); }
 
     function refresh() {
       neurons("balance").then(function (d) {

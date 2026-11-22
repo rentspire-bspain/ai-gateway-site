@@ -68,7 +68,7 @@
         btn.disabled = false;
         if (r.error) throw r.error;
         on = r.data !== false; paint();
-        note.textContent = on ? "" : "Opt-out recorded at " + new Date().toLocaleTimeString() + ". Prior content leaves the training corpus within 24 hours.";
+        note.textContent = on ? "" : "Opt-out recorded at " + new Date().toLocaleTimeString(window.I18N ? window.I18N.locale() : undefined) + ". Prior content leaves the training corpus within 24 hours.";
       }).catch(function (e) {
         btn.disabled = false;
         note.textContent = "Could not save right now (" + esc(String(e.message || e)).slice(0, 120) + "). Try again.";
