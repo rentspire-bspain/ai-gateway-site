@@ -1,5 +1,5 @@
 {
- "version": 7,
+ "version": 8,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -2464,10 +2464,10 @@
     "AG": "G",
     "GH": "R",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "LIVE: boundview.com/privacy.html is the ai.spaincos.com policy (\"private site\u2026 no public sign-up, no advertising, no analytics trackers\"). BV has a Free tier and an ad-network offer wall. Contradiction = deceptive-practice exposure | 2026-11-21 live re-verification (post PR #264 merge): public BV policy written + merged (privacy.boundview.html, host guard); NOT live \u2014 boundview.com is pinned to a stale deployment (see F.3); AG live",
+   "evidence": "LIVE: boundview.com/privacy.html is the ai.spaincos.com policy (\"private site\u2026 no public sign-up, no advertising, no analytics trackers\"). BV has a Free tier and an ad-network offer wall. Contradiction = deceptive-practice exposure | 2026-11-21 live re-verification (post PR #264 merge): public BV policy written + merged (privacy.boundview.html, host guard); NOT live \u2014 boundview.com is pinned to a stale deployment (see F.3); AG live | worker CT 2026-11-22: No privacy policy is served or discoverable on comptrove.com in current results: the only comptrove.com page retrieved is a rent-comparison content page (Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps) [[5](https://comptrove.com/m/austin/)], not a /privacy or policy page, so nothing ",
    "fix": "Write BV policy: offer-wall partners, subid sharing, cookies, retention; per-host policy file"
   },
   {
@@ -2541,13 +2541,13 @@
    "status": {
     "BV": "Y",
     "TT": "Y",
-    "AG": "U",
+    "AG": "Y",
     "GH": "Y",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT banner exists but is 11.5 px muted gray; GH mockup disclosure at text-xs; D5 requires disclosure on every link | 2026-11-21 live re-verification (post PR #264 merge): prominent FTC disclosure shipped in the Tasks tab component (PR #15 branch) + policy section 3; BV page still stale-deployed",
+   "evidence": "TT banner exists but is 11.5 px muted gray; GH mockup disclosure at text-xs; D5 requires disclosure on every link | 2026-11-21 live re-verification (post PR #264 merge): prominent FTC disclosure shipped in the Tasks tab component (PR #15 branch) + policy section 3; BV page still stale-deployed | worker AG 2026-11-22: Fetched the currently served page at https://ai.spaincos.com: it presents only the AI-assistant branding \"Where knowledge begins\" / \"Ask anything\" and advertises importing Perplexity conversation history [[1](https://ai.spaincos.com/)], with no affiliate links, incentive offers, or sponsored recomme",
    "fix": "Raise to \u226514 px ink color; repeat on interstitial, toast, email, share"
   },
   {
@@ -2559,15 +2559,15 @@
    "W": 8,
    "ircm": "4301",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "-",
     "AG": "-",
     "GH": "-",
     "ST": "-",
-    "CT": "U",
+    "CT": "Y",
     "DG": "U"
    },
-   "evidence": "Not evidenced",
+   "evidence": "Not evidenced | worker BV 2026-11-22: No negative-option/auto-renew disclosure could be observed for https://boundview.com itself. The retrievable pages resolve only to a similarly named but different service \u2014 BondView at join.bondview.com \u2014 whose pricing page lists $69/month or $759/year (Investors and Advisors) and $120/month or $1,3 | worker CT 2026-11-22: Fetched comptrove.com plus probes of /terms, /privacy, /help, /sitemap.xml and /robots.txt. The served content is a free rent-comparison data surface only (average rent by bedroom, rent history, comps \u2014 e.g. the Austin, TX rent page [[11](https://comptrove.com/m/austin/)]); no pricing page, no check",
    "fix": "Add to checkout; screenshot evidence per state template"
   },
   {
@@ -2701,13 +2701,13 @@
    "status": {
     "BV": "R",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "PPLX-Sans/Serif variable fonts loaded from frontend-cdn.perplexity.ai (licensing and reliability risk; also leaks a third-party relationship)",
+   "evidence": "PPLX-Sans/Serif variable fonts loaded from frontend-cdn.perplexity.ai (licensing and reliability risk; also leaks a third-party relationship) | worker AG 2026-11-22: Fetched https://ai.spaincos.com [[1](https://ai.spaincos.com/)]: the retrieved page describes the gateway's own app and content, and no third-party CDN hotlink (cdnjs, jsDelivr, unpkg, Google Fonts, or any other vendor asset host) was observed anywhere in the retrievable page result [[1](https://ai.",
    "fix": "Replace with licensed or open fonts self-hosted"
   },
   {
@@ -2781,13 +2781,13 @@
    "status": {
     "BV": "U",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "None published yet",
+   "evidence": "None published yet | worker AG 2026-11-22: Observed https://ai.spaincos.com served as its landing page ('Where knowledge begins'), presenting the gateway as a place to import Perplexity conversation history as personal context; the available page result contains no reviews, testimonials, star ratings, customer quotes, endorsements, or incent",
    "fix": "Policy before marketing launch"
   },
   {
@@ -2821,13 +2821,13 @@
    "status": {
     "BV": "U",
     "TT": "U",
-    "AG": "U",
+    "AG": "R",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not found",
+   "evidence": "Not found | worker AG 2026-11-22: ai.spaincos.com serves its homepage (the Perplexity-history import page) [[1](https://ai.spaincos.com/)] and its repo rentspire-bspain/ai-gateway-site is indexed [[2](https://github.com/rentspire-bspain/ai-gateway-site)], but /.well-known/security.txt is not indexed or retrievable, no vulnerability ",
    "fix": "Add security.txt"
   },
   {
