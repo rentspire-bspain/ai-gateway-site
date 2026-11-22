@@ -1,5 +1,5 @@
 {
- "version": "v311",
+ "version": "v312",
  "generated_at": "2026-11-16T00:00:00Z",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE — GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90→95. | 2026-11-18: owner-blocker audit — 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped — server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
@@ -77,7 +77,8 @@
   {
    "name": "Desktop",
    "weight": 3,
-   "score": 78
+   "score": 80,
+   "note": " v312: PWA manifest screenshots shipped (PR #339, root-built) — narrow 1280x720 + wide 2560x1440 on both manifests; rich install UI enabled in Chromium browsers."
   },
   {
    "name": "Billing",
@@ -142,8 +143,8 @@
   {
    "name": "Observability",
    "weight": 2,
-   "score": 82,
-   "note": "v292 re-score (live-verified): the UPTIME MONITOR IS LIVE — ops-health v22 runs every 10 min (pg_cron), api_health_ai_spaincos + api_health_boundview checks PASS in the deployed run (19:10Z: HTTP 200 in 195ms/213ms), alert path proven by the lane (transition-only, deduplicated, owner-notified), results in ops_health_runs for the nightly board. Plus /api/health on both domains + the nightly parity board. REMAINING: no user-facing status page. v301: HTTP 546 ROOT-CAUSED (Supabase WORKER_RESOURCE_LIMIT — the platform kills the worker under overlapping requests on a warm worker; 1/6 serial repro, 3/4 concurrent killed, +12s latency under 2-way overlap) — not a gateway code defect. Client retry surface (2x jittered backoff, clear 'out of compute' message with Retry) + QA-suite 546 retry shipped (PR #309); deployed source committed (PR #310). Remaining: per-request compute reduction needs logs/profile; suites must not overlap. v304: 546 FULLY FIXED (PR #315, gateway-chat v307 deployed): root cause was NOT compute of the memory fetch — COMPLETION_DOC_RE matched the platform's own system blocks (which mention 'completion document'), so EVERY request ran the v230/v244 evidence block (3 fetches x 8s walls, 8K injected chars, forced tool loop, bogus completion-status-*.md attach on every answer incl. 'capital of France'). Fix: completion-doc context from user/assistant turns only + FILE_CREATE_INTENT for genuine doc asks + trivial-query 20-row memory fetch. A/B: 6 serial calls median 23s -> 13.5s, ZERO 546s incl. two 4-way parallel bursts (was 3/4 killed). x_timing stage marks now on every non-stream response. Quality gates: eval-replay 10/10, prelaunch 36/36. Remaining: intent-analyst 6s timeouts under provider load; follow-ups could be parallelized."
+   "score": 85,
+   "note": "v292 re-score (live-verified): the UPTIME MONITOR IS LIVE — ops-health v22 runs every 10 min (pg_cron), api_health_ai_spaincos + api_health_boundview checks PASS in the deployed run (19:10Z: HTTP 200 in 195ms/213ms), alert path proven by the lane (transition-only, deduplicated, owner-notified), results in ops_health_runs for the nightly board. Plus /api/health on both domains + the nightly parity board. REMAINING: no user-facing status page. v301: HTTP 546 ROOT-CAUSED (Supabase WORKER_RESOURCE_LIMIT — the platform kills the worker under overlapping requests on a warm worker; 1/6 serial repro, 3/4 concurrent killed, +12s latency under 2-way overlap) — not a gateway code defect. Client retry surface (2x jittered backoff, clear 'out of compute' message with Retry) + QA-suite 546 retry shipped (PR #309); deployed source committed (PR #310). Remaining: per-request compute reduction needs logs/profile; suites must not overlap. v304: 546 FULLY FIXED (PR #315, gateway-chat v307 deployed): root cause was NOT compute of the memory fetch — COMPLETION_DOC_RE matched the platform's own system blocks (which mention 'completion document'), so EVERY request ran the v230/v244 evidence block (3 fetches x 8s walls, 8K injected chars, forced tool loop, bogus completion-status-*.md attach on every answer incl. 'capital of France'). Fix: completion-doc context from user/assistant turns only + FILE_CREATE_INTENT for genuine doc asks + trivial-query 20-row memory fetch. A/B: 6 serial calls median 23s -> 13.5s, ZERO 546s incl. two 4-way parallel bursts (was 3/4 killed). x_timing stage marks now on every non-stream response. Quality gates: eval-replay 10/10, prelaunch 36/36. Remaining: intent-analyst 6s timeouts under provider load; follow-ups could be parallelized. v312: public /status page (PR #340, root-built) — live health snapshot (/api/health client-side), uptime-monitor note (pg_cron 10-min history is the record; the page is a snapshot), latest fleet sweep with gated domains honestly gray, and the 546 explainer; host-aware on both domains (BoundView variant, zero cross-brand mentions)."
   },
   {
    "name": "Fleet",
@@ -187,6 +188,11 @@
   }
  ],
  "changelog": [
+  {
+   "version": "v312",
+   "date": "2026-11-22",
+   "change": "Observability 82->85 (/status page), Desktop 78->80 (manifest screenshots) — both root-built."
+  },
   {
    "version": "v311",
    "date": "2026-11-22",
