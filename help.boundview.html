@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help & Support — BoundView</title>
+<meta name="robots" content="index, follow">
+<meta name="description" content="Help and support for BoundView: contact, FAQ for accounts, connectors, billing and limits, transient error 546 and retry advice, and troubleshooting guides.">
+<style>
+  :root { --bg: #0C0E14; --fg: #E8ECF4; --muted: #9AA4B8; --border: #232A3A; --surface: #141824; --accent: #5B8CFF; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.65; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 650; margin: 0 0 6px; }
+  .updated { color: var(--muted); font-size: 13px; margin-bottom: 36px; }
+  h2 { font-size: 17px; font-weight: 600; margin: 32px 0 8px; color: var(--accent); }
+  h3 { font-size: 15px; font-weight: 600; margin: 22px 0 6px; }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin: 20px 0; }
+  a { color: #7FB4FF; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav { font-size: 14px; margin-bottom: 24px; }
+  nav a { margin-right: 14px; }
+  code { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 13px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .owner-note { color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); margin-top: 40px; padding-top: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <nav><a href="/">&larr; BoundView</a><a href="/docs.boundview.html">Docs</a><a href="/terms.boundview.html">Terms</a><a href="/privacy.boundview.html">Privacy</a><strong>Help</strong></nav>
+  <h1>Help & Support</h1>
+  <p class="updated">BoundView &middot; Updated November 21, 2026</p>
+
+  <div class="card"><strong>Contact:</strong> email <a href="mailto:support@boundview.com">support@boundview.com</a> and you will get a reply from a human. There is no ticketing system &mdash; BoundView is a small, invite-only product and support is handled directly by email.</div>
+
+  <h2 id="faq">FAQ</h2>
+
+  <h3>Account & access</h3>
+  <ul>
+    <li><strong>How do I get an account?</strong> Access is invite-only; there is no open sign-up. Existing invites are sent by email.</li>
+    <li><strong>How do I sign in?</strong> Enter your email on the sign-in screen and you will be sent a short one-time code. There is no password to remember; a password-reset link is also available if you ever need it.</li>
+    <li><strong>School or work email?</strong> School-email verification is available at <a href="/verify.boundview.html">/verify</a>: enter your school email, then the code it sends you.</li>
+    <li><strong>Where is my data?</strong> Threads, files, and settings are stored in an account-scoped database, visible only to your account and enforced by row-level security. You can delete threads and stored files at any time. See <a href="/privacy.boundview.html">Privacy</a>.</li>
+  </ul>
+
+  <h3>Connectors (your own context)</h3>
+  <ul>
+    <li><strong>What can I connect today?</strong> <strong>Slack</strong> (channel, group, and direct-message history and search) and <strong>Dropbox</strong> (your files) are live &mdash; one-click connect in <strong>Settings &rarr; Connectors</strong>.</li>
+    <li><strong>What is coming?</strong> Google (Gmail/Drive), Outlook (mail/calendar), and GitHub are shown in Settings but are not connectable yet &mdash; their OAuth registrations are still pending, so their connect buttons are not available. This page will be updated as each goes live.</li>
+    <li><strong>How do I disconnect?</strong> Any provider can be disconnected at any time in <strong>Settings &rarr; Connectors</strong>; indexed context rows are your own data and can be deleted.</li>
+    <li><strong>Who can see my connected data?</strong> Only you. Credentials and indexed context are stored as your own rows under row-level security, and OAuth authorization codes are exchanged server-side, so secrets never reach browser JavaScript. Only snippets needed for your active query are used to generate an answer. There are no ads and no third-party trackers.</li>
+  </ul>
+
+  <h3>Billing & credits</h3>
+  <ul>
+    <li><strong>Do you take payments?</strong> Not yet. Paid checkout is not live, no card is required, and a refund policy is not published (the Terms draft says exactly that). If and when billing goes live, this page and the Terms will be updated first.</li>
+    <li><strong>What are Neurons?</strong> Neurons are earned loyalty credits for verified activity (such as daily use). They are earned only &mdash; never purchased, never transferable, no cash-out &mdash; and can be redeemed in <strong>Settings &rarr; Neurons</strong> for bonus query credits.</li>
+  </ul>
+
+  <h3>Limits & performance</h3>
+  <ul>
+    <li><strong>Are there rate limits?</strong> We do not publish specific rate-limit numbers. Access is invite-only and capacity is managed per account; the acceptable-use rules (no bulk scraping, no overloading the service) are in the <a href="/terms.boundview.html">Terms</a>.</li>
+    <li><strong>Why was my answer slow?</strong> Complex prompts can run long multi-step research with large token budgets. If an answer is taking a while it is usually still working; you can press the stop button and resend a shorter question at any time.</li>
+  </ul>
+
+  <h2 id="errors">Transient errors and retries</h2>
+  <h3>The <code>546</code> error</h3>
+  <p>HTTP <code>546</code> is this service's status code for an edge-worker resource limit: the compute worker handling your request was recycled mid-request (a platform-level <code>WORKER_RESOURCE_LIMIT</code>), typically when several overlapping requests share one warm worker. The failed response is empty, so <strong>retrying is always safe</strong> and normally lands on a fresh worker &mdash; your question was not half-executed and you will not be double-billed for it.</p>
+  <ul>
+    <li><strong>The app retries for you.</strong> On a 546 the client automatically retries up to two more times with a jittered backoff, and you will see &ldquo;reconnecting (attempt 2 of 3)&rdquo; under the loading indicator while it does.</li>
+    <li><strong>If you still see it:</strong> press <strong>Retry</strong> on the error card, or send your question again. 546s are transient; waiting a few seconds helps if several parallel requests are running.</li>
+    <li><strong>Why it happens less now:</strong> the main trigger (a context step that ran on every request instead of only when a document was actually requested) was fixed at the gateway in November 2026, and verified 546-free under parallel bursts. Rare recurrences under heavy overlap are the platform limit above, not data loss.</li>
+  </ul>
+  <h3>Other transient errors</h3>
+  <ul>
+    <li><strong>502 / 503 / 504 and network drops:</strong> also retried automatically (up to two extra attempts with backoff). If an error card still appears, Retry usually resolves it.</li>
+    <li><strong>Stuck follow-up:</strong> if a response fails while you have typed a follow-up, it is kept and re-sent automatically &mdash; no typed text is lost.</li>
+  </ul>
+
+  <h2 id="troubleshooting">Troubleshooting guides</h2>
+  <h3>1. The sign-in code never arrived</h3>
+  <ol>
+    <li>Check your spam folder.</li>
+    <li>Make sure you entered the email address your invite was sent to.</li>
+    <li>Request the code again on the sign-in screen (codes expire; a fresh one is fine).</li>
+    <li>If it still does not arrive, email <a href="mailto:support@boundview.com">support@boundview.com</a> from the same address.</li>
+  </ol>
+  <h3>2. An answer errored mid-way (546, 502&ndash;504, network)</h3>
+  <ol>
+    <li>Press <strong>Retry</strong> on the error card, or resend the question. These errors are transient and safe to retry (see above).</li>
+    <li>If you were running several parallel questions, let the first ones finish and retry the failed one.</li>
+    <li>If retries keep failing for more than a few minutes, check <code>/api/health</code> (below) and email us with the time of the failure.</li>
+  </ol>
+  <h3>3. Voice input is not working</h3>
+  <ul>
+    <li><strong>&ldquo;Microphone access was blocked&rdquo;</strong> &mdash; allow the microphone in your browser's site settings for this site, then tap the mic again.</li>
+    <li><strong>&ldquo;No microphone found&rdquo;</strong> &mdash; connect a microphone and try again.</li>
+    <li><strong>&ldquo;Speech recognition needs a network connection&rdquo;</strong> &mdash; voice input requires an internet connection; check yours and retry.</li>
+    <li><strong>Nothing was heard</strong> &mdash; speak after tapping the mic; the mic only listens while it is active.</li>
+  </ul>
+  <h3>4. A connector will not connect</h3>
+  <ol>
+    <li>Confirm it is one of the live providers: <strong>Slack</strong> or <strong>Dropbox</strong>. Google, Outlook, and GitHub are not connectable yet (see the FAQ above) &mdash; their buttons are intentionally unavailable rather than broken.</li>
+    <li>For Slack, make sure you can authorize the requested read scopes in the Slack consent screen.</li>
+    <li>If a connection looks wrong, disconnect it in <strong>Settings &rarr; Connectors</strong> and connect again.</li>
+  </ol>
+  <h3>5. The app says you are offline</h3>
+  <p>The offline bar appears when your device has no connection. Previously loaded pages remain readable, but sending questions and syncing need a connection. Reconnect and the bar clears by itself; anything you typed is kept.</p>
+
+  <h2 id="status">Service status</h2>
+  <p>Service health is exposed at <code>/api/health</code> (JSON) and checked automatically every 10 minutes on both domains. There is no user-facing status page yet; if you suspect an outage, email us and include the time.</p>
+  <p class="muted">This page only documents what is actually live today. Features marked pending above are in progress and will be added here as they ship. For what BoundView is and how it is measured, see <a href="/docs.boundview.html">Docs</a>.</p>
+
+  <p class="owner-note">Questions about anything on this page: <a href="mailto:support@boundview.com">support@boundview.com</a> &middot; &copy; 2026 CanonIntel LLC</p>
+</main>
+</body>
+</html>

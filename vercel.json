@@ -7,10 +7,26 @@
   ],
   "functions": {
     "api/bv-render.js": {
-      "includeFiles": "{terms,privacy,docs,index}.{html,boundview.html}"
+      "includeFiles": "{terms,privacy,docs,help,index}.{html,boundview.html}"
     }
   },
   "routes": [
+    {
+      "src": "/(qa|qa-private|browser-service|voice-service|supabase|sql|tests|tools)/.*",
+      "status": 404
+    },
+    {
+      "src": "/(.*)",
+      "headers": {
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(self), geolocation=()",
+        "Content-Security-Policy": "frame-ancestors 'none'; object-src 'none'; base-uri 'none'",
+        "X-Permitted-Cross-Domain-Policies": "none"
+      },
+      "continue": true
+    },
     {
       "src": "/",
       "dest": "/api/bv-render"
@@ -35,6 +51,14 @@
     {
       "src": "/docs/$",
       "dest": "/api/bv-render?page=docs"
+    },
+    {
+      "src": "/help",
+      "dest": "/api/bv-render?page=help"
+    },
+    {
+      "src": "/help/$",
+      "dest": "/api/bv-render?page=help"
     },
     {
       "src": "/terms",
