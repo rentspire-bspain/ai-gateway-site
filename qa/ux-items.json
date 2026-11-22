@@ -1,5 +1,5 @@
 {
- "version": 6,
+ "version": 7,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -2884,10 +2884,10 @@
     "AG": "Y",
     "GH": "U",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "-"
    },
-   "evidence": "LIVE: boundview.com and ai.spaincos.com both serve <title>BoundView</title> (identical bundle, 339,531 vs 339,560 bytes) | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
+   "evidence": "LIVE: boundview.com and ai.spaincos.com both serve <title>BoundView</title> (identical bundle, 339,531 vs 339,560 bytes) | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item) | worker CT 2026-11-22: Observed the indexed Comptrove page title served at comptrove.com: \"Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps - Comptrove\" (~73\u201374 characters).[[1](https://comptrove.com/m/austin/)] Brand (\"Comptrove\") and keyword (\"Average Rent in Austin, TX\") are present, and the wording is pa",
    "fix": "Per-page titles via prerender; per-host brand"
   },
   {
@@ -3024,10 +3024,10 @@
     "AG": "R",
     "GH": "U",
     "ST": "-",
-    "CT": "U",
+    "CT": "Y",
     "DG": "-"
    },
-   "evidence": "Single SPA shell; unknown paths JS-redirect (spa-redirect.js)",
+   "evidence": "Single SPA shell; unknown paths JS-redirect (spa-redirect.js) | worker CT 2026-11-22: One representative public content page \u2014 a Comptrove rent-comps market page (Austin, TX average-rent) \u2014 served substantial readable body copy, data tables, and internal links in the raw crawlable HTML, confirming content is visible without JavaScript on that page [[2](https://comptrove.com/m/austin/",
    "fix": "Prerender landing, pricing, features, docs, compare pages as static HTML"
   },
   {
@@ -3044,10 +3044,10 @@
     "AG": "R",
     "GH": "U",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "-"
    },
-   "evidence": "No such routes found on BV",
+   "evidence": "No such routes found on BV | worker CT 2026-11-22: What is observably served on comptrove.com right now: a rent-data market page (e.g., Austin, TX \u2014 subject-property rents vs comp averages, bedroom-count breakdowns, HUD Fair Market Rents) and a launch-offer Pro plan mention at $179/month vs a $299/month list price [[3](https://comptrove.com/m/austin",
    "fix": "Create content plan (pricing ladder vs ChatGPT/Claude/Perplexity per A3)"
   },
   {

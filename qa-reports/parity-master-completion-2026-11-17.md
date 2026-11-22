@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: None%** (app-weighted; unmeasured counts as 0; v6 re-scored by the server-side worker loop) · **measured-only: None%** · 109✅ / 213🟡 / 184🔴 / 871⚪ across 386 line items. Per-app strict: BV 27.9% · TT 15.2% · AG 32.8% · GH 10.4% · ST 7.9% · CT 1.3% · DG 2.8%. Per-app strict: BV 27.9% · TT 15.2% · AG 32.8% · GH 10.4% · ST 7.9% · CT 1.3% · DG 2.8%.
+**Part E portfolio UX readiness, strict: None%** (app-weighted; unmeasured counts as 0; v7 re-scored by the server-side worker loop) · **measured-only: None%** · 109✅ / 214🟡 / 186🔴 / 868⚪ across 386 line items. Per-app strict: BV 27.9% · TT 15.2% · AG 32.8% · GH 10.4% · ST 7.9% · CT 1.6% · DG 2.8%. Per-app strict: BV 27.9% · TT 15.2% · AG 32.8% · GH 10.4% · ST 7.9% · CT 1.3% · DG 2.8%. Per-app strict: BV 27.9% · TT 15.2% · AG 32.8% · GH 10.4% · ST 7.9% · CT 1.3% · DG 2.8%.
 
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
@@ -1452,3 +1452,7 @@ this workspace, and (d) nationwide data conformance behind the CR expansion (F.4
 | Batch | Items measured | ✅ G | 🟡 Y | 🔴 R | Portfolio strict |
 |---|---:|---:|---:|---:|---:|
 | B1 | 0 | 0 | 0 | 0 | None% |
+| B2 | 1 | 0 | 1 | 2 | None% |
+- CT 🔴 U-SEO-01 — Observed the indexed Comptrove page title served at comptrove.com: "Average Rent in Austin, TX — Rents by Bedroom, History & Comps - Comptrove" (~73–74 characters).[[1](https://comptrove.com/m/austin/)] Brand ("Comptrove") and keyword ("Average Rent in Austin, TX") are present, and the wording is pa
+- CT 🔴 U-SEO-09 — What is observably served on comptrove.com right now: a rent-data market page (e.g., Austin, TX — subject-property rents vs comp averages, bedroom-count breakdowns, HUD Fair Market Rents) and a launch-offer Pro plan mention at $179/month vs a $299/month list price [[3](https://comptrove.com/m/austin
+- CT 🟡 U-SEO-08 — One representative public content page — a Comptrove rent-comps market page (Austin, TX average-rent) — served substantial readable body copy, data tables, and internal links in the raw crawlable HTML, confirming content is visible without JavaScript on that page [[2](https://comptrove.com/m/austin/
