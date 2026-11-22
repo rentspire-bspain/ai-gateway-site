@@ -118,8 +118,8 @@
   {
    "name": "Security",
    "weight": 4,
-   "score": 80,
-   "note": "v291b re-score: the four security headers now LIVE on function-routed paths too (bv-render carries them; vercel.json headers alone do not reach function routes — found and fixed). CSP+hashes, HSTS, invite-only, RLS present. REMAINING GAPS: no rate-limit evidence on the gateway, no pen test."
+   "score": 82,
+   "note": "v291b re-score: the four security headers now LIVE on function-routed paths too (bv-render carries them; vercel.json headers alone do not reach function routes — found and fixed). CSP+hashes, HSTS, invite-only, RLS present. REMAINING GAPS: no pen test, no distributed rate limit. v310 (PR #328, curl-verified live on ai.spaincos.com and boundview.com): nosniff/XFO/Referrer/Permissions plus frame-ancestors, object-src, base-uri headers now on static assets, sw.js, manifest and /api/*; internal source dirs (/qa, /browser-service, etc.) return 404; per-IP limiter on public POST API returns 429 with Retry-After (best-effort, per instance). Secret scan of tracked deployable files found only public Supabase publishable keys. NOT verified: browser behavior, distributed rate limiting, pen test. privacy/terms/docs/verify/offline have no page CSP; HSTS preload, includeSubDomains and external scanning are owner-gated; style-src unsafe-inline remains."
   },
   {
    "name": "Accessibility",
