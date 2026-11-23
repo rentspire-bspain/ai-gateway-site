@@ -1,0 +1,59 @@
+{
+ "ts": "2026-11-23T22:45Z",
+ "deploy": "ba4402b",
+ "live": {
+  "A4/A5": {
+   "score": 1.0,
+   "note": "session restored, overlay hidden: True"
+  },
+  "B1/B7": {
+   "score": 1.0,
+   "note": "answer at 6.0s"
+  },
+  "B2/B3": {
+   "score": 1.0,
+   "note": "sources present: True"
+  },
+  "B4": {
+   "score": 1.0,
+   "note": "markdown clean"
+  },
+  "B9": {
+   "score": 1.0,
+   "note": "composer cleared"
+  },
+  "C1/C2": {
+   "score": 1.0,
+   "note": "0 threads sidebar"
+  },
+  "E1": {
+   "score": 1.0,
+   "note": "375px overflow 0"
+  },
+  "E2": {
+   "score": 1.0,
+   "note": "768px overflow 0"
+  },
+  "E3": {
+   "score": 1.0,
+   "note": "1440px overflow 0"
+  },
+  "E5": {
+   "score": 1.0,
+   "note": "focus reachable"
+  },
+  "F2/F3": {
+   "score": 1.0,
+   "note": "0 JS errors"
+  },
+  "F4": {
+   "score": 1.0,
+   "note": "SW registered"
+  },
+  "H2": {
+   "score": 1.0,
+   "note": "clean"
+  }
+ },
+ "carried": "A1-A3,A6,A7,B5,B6,B8,B10-B12,C3-C6,D1-D5,E4,E6,F1,G1-G5,H1,H3-H5 carried from prior live evidence (v329 + v289-318 register)"
+}
