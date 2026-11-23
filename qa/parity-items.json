@@ -161,8 +161,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 40,
-   "note": "v298 (was 10): i18n foundation live (PR #302, 9f1596a) \u2014 modules/i18n.js locale detection (?lang= > saved ai_lang > browser > en), PARTIAL Spanish chrome translation (sidebar, New Thread, search, composer placeholder, landing hero, Settings nav/pane titles, a few Preferences labels; model answers NOT translated, honestly labeled 'Espa\u00f1ol (partial)' in the Settings picker), hreflang en/es/x-default on the homepage. Curl + code verified live; lane Playwright QA (en/es switching, es-MX detection, picker round trip) but no live-browser check by root. GAPS: no other locales, no full-page translation, no translated model output, no locale-aware formatting. v310: Spanish expanded (PR #329): thread actions + native dialogs, doc panel chrome, full onboarding tour + checklist, Settings pane bodies, sign-in + error strings; locale-aware Intl formatting; hreflang en + x-default on docs/terms/privacy/verify both domains. Still 'Espa\u00f1ol (partial)': toasts, several Settings panes and overlays remain English; no native-speaker review. v311: ES3 (PR #337, root-built): billing/checkout/claim toasts, devices & sessions, credentials/secrets, two-factor, team/org, usage pane bodies + ~60 generic UI strings \u2014 verified rendering in headless Chromium (Facturaci\u00f3n/Uso/Compa\u00f1eros/Dispositivos/Credenciales/Verificaci\u00f3n en dos pasos), zero JS errors, live on both domains. Still partial: toasts beyond these, library/skills/tasks overlays. v315: ES4 (PR #348, root-built): library/skills/tasks overlays (collections, archive, scheduling, weekdays/timezones, skill actions) via the #moduleRoot walk root; verified Biblioteca/Archivado/Skills-overlay rendering, zero JS errors. Remaining honestly unverified: overlay strings that render after async data loads; toasts beyond the covered set."
+   "score": 50,
+   "note": "v325 re-score (live-verified): FIRST STATIC ES SURFACES (PR #368, worker lane i18n_es5_lane) \u2014 /es/docs, /es/status, /es/terms, /es/privacy live 200 on ai.spaincos.com with Spanish titles/content, brand-split guards intact (bv host redirects to English boundview pages); on top of the v298/ES3/ES4 in-app dictionary. Honest limits: /help, verify, offline, app shell and all *.boundview.html pages NOT translated; translations have no native or legal review (matters for ES terms/privacy \u2014 counsel gate applies); in-app model answers not translated. REMAINING labeled 'Espa\u00f1ol (partial)'."
   },
   {
    "name": "NativeMobile",
@@ -312,6 +312,11 @@
    "version": "v325",
    "date": "2026-11-23",
    "change": "Docs/Support 78 -> 84 (live-verified both domains): /help expanded with 5 grounded sections (keyboard shortcuts, 12-month retention policy, voice states, offline behavior, plan tiers) \u2014 PR #366, worker lane docs_help_expansion_lane; honest omissions recorded (prices unpublished, no a11y statement, no rate-limit numbers). Post-merge curl-verified on ai.spaincos.com and boundview.com."
+  },
+  {
+   "version": "v325",
+   "date": "2026-11-23",
+   "change": "i18n 40 -> 50: first static Spanish surfaces shipped (/es/docs, /es/status, /es/terms, /es/privacy \u2014 PR #368) live-verified 200 both hosts with Spanish titles on ai; honest omissions recorded (help/verify/offline/app-shell/boundview untranslated; no native or legal review)."
   }
  ]
 }
