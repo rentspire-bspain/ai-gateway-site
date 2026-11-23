@@ -90,6 +90,22 @@
       "dest": "/api/bv-render?page=status"
     },
     {
+      "src": "/es/docs/?",
+      "dest": "/docs.es.html"
+    },
+    {
+      "src": "/es/status/?",
+      "dest": "/status.es.html"
+    },
+    {
+      "src": "/es/terms/?",
+      "dest": "/terms.es.html"
+    },
+    {
+      "src": "/es/privacy/?",
+      "dest": "/privacy.es.html"
+    },
+    {
       "handle": "filesystem"
     }
   ],

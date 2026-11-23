@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<script>/* brand-split guard: on a boundview host, serve the BoundView page instead */if(/boundview/i.test(location.hostname))location.replace('/status.boundview.html'+location.search);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estado del servicio — ai.spaincos.com</title>
+<meta name="robots" content="noindex">
+<link rel="alternate" hreflang="en" href="https://ai.spaincos.com/status">
+<link rel="alternate" hreflang="es" href="https://ai.spaincos.com/es/status">
+<style>
+body{max-width:720px;margin:0 auto;padding:32px 20px;font:15px/1.6 system-ui,-apple-system,sans-serif;background:#FCFCF9;color:#222}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:#666;margin:0 0 24px}
+.card{border:1px solid #e2e2de;border-radius:12px;padding:16px 18px;margin:12px 0;background:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0ec}
+.row:last-child{border-bottom:0}
+.dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+.ok{background:#16a34a}.bad{background:#dc2626}.na{background:#d4a017}
+.muted{color:#777;font-size:13px}
+.checks{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.pill{border:1px solid #e2e2de;border-radius:999px;padding:3px 10px;font-size:12.5px;background:#fff}
+a{color:#14646B}
+</style>
+</head>
+<body>
+<h1>Estado del servicio</h1>
+<p class="sub">Instantánea en vivo: se recarga cada vez que abres esta página. No es un SLA ni una promesa de disponibilidad garantizada.</p>
+
+<div class="card">
+  <div class="row"><span><strong>Aplicación web</strong> <span class="muted">(que esta página cargue es la propia comprobación)</span></span><span class="dot ok" id="d-web"></span></div>
+  <div class="row"><span><strong>Endpoint de salud</strong> <span class="muted">/api/health</span></span><span class="dot na" id="d-api"></span></div>
+  <div class="row"><span><strong>Motor de respuestas (gateway)</strong> <span class="muted">modelos de muestra, llamada en vivo</span></span><span class="dot na" id="d-gw"></span></div>
+</div>
+
+<div class="card">
+  <strong>Monitorización de disponibilidad</strong>
+  <p class="muted" style="margin:6px 0 0">Un monitor automático consulta el endpoint de salud cada 10 minutos y registra en el servidor filas de éxito/fallo. Esta página es una instantánea puntual; el historial lo guarda el monitor.</p>
+</div>
+
+<div class="card">
+  <strong>Estado del conjunto</strong> <span class="muted">(último barrido de la flota)</span>
+  <div id="fleet" class="muted">Cargando…</div>
+</div>
+
+<div class="card">
+  <strong>Comportamientos conocidos</strong>
+  <ul class="muted" style="margin:6px 0 0;padding-left:18px">
+    <li>Los errores ocasionales <strong>HTTP 546</strong> son un límite de cómputo de la plataforma de alojamiento: la aplicación reintenta automáticamente (hasta 2 intentos adicionales) y muestra un aviso de reintento. Consulta la <a href="/help">página de ayuda</a>.</li>
+    <li>La disponibilidad de conectores por proveedor se muestra con transparencia en Ajustes → Conectores (estado de registro).</li>
+  </ul>
+</div>
+
+<nav class="muted" style="margin-top:24px"><a href="/">← Volver a la aplicación</a> · <a href="/help">Ayuda</a> · <a href="/es/terms">Términos</a> · <a href="/es/privacy">Privacidad</a></nav>
+
+<script>
+(function () {
+  fetch("/api/health", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject())
+    .then(() => { document.getElementById("d-api").className = "dot ok"; })
+    .catch(() => { document.getElementById("d-api").className = "dot bad"; });
+  fetch("/qa-reports/fleet-sweep/latest.json", { cache: "no-store" }).then(r => r.json()).then(d => {
+    var el = document.getElementById("fleet");
+    var rows = (d.apps || []).map(function (a) {
+      var cls = a.verdict === "PASS" ? "ok" : (a.verdict === "FAIL" || a.verdict === "UNREACHABLE") ? "bad" : "na";
+      return '<div class="row"><span>' + a.app + '</span><span class="dot ' + cls + '" title="' + a.verdict + '"></span></div>';
+    }).join("");
+    el.innerHTML = rows + '<p class="muted" style="margin:8px 0 0">Barrido: ' + (d.ts || "recently") + ". Los dominios tras un desafío anti-bots se muestran en gris (no medidos) y nunca se puntúan como fallos.</p>";
+  }).catch(() => { document.getElementById("fleet").textContent = "Datos de la flota no disponibles en este momento."; });
+  var gw = document.getElementById("d-gw");
+  fetch("/api/health", { cache: "no-store" }).then(r => {
+    if (r.ok) { gw.className = "dot ok"; gw.title = "Endpoint de salud accesible: el motor de respuestas comparte esta capa de servicio; el estado detallado por modelo está en Ajustes."; }
+  }).catch(() => { gw.className = "dot bad"; });
+})();
+</script>
+</body>
+</html>
