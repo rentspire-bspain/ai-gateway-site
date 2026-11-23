@@ -222,9 +222,11 @@
     var u = unread();
     root.querySelector(".tk-tabs").innerHTML =
       (window.ScheduledTasks ? '<button class="tk-tab' + (tab === "scheduled" ? " active" : "") + '" data-tab="scheduled">Scheduled</button>' : '') +
+      (window.OfferwallEarn ? '<button class="tk-tab' + (tab === "earn" ? " active" : "") + '" data-tab="earn">Earn</button>' : '') +
       '<button class="tk-tab' + (tab === "monitors" ? " active" : "") + '" data-tab="monitors">Monitors</button>' +
       '<button class="tk-tab' + (tab === "workflows" ? " active" : "") + '" data-tab="workflows">Workflows</button>' +
       '<button class="tk-tab' + (tab === "inbox" ? " active" : "") + '" data-tab="inbox">Inbox' + (u ? ' <span class="tk-count">' + u + '</span>' : "") + '</button>';
+    if (tab === "earn" && !window.OfferwallEarn) tab = "monitors";
     if (tab === "scheduled" && !window.ScheduledTasks) tab = "monitors";
     // Scheduled tab is owned by modules/tasks.js (own state/polling): mount once, never re-render it from monitor polling.
     if (tab === "scheduled") {
@@ -234,6 +236,11 @@
     var h;
     if (state.loading) h = '<div class="tk-msg">Connecting…</div>';
     else if (state.setup) h = '<div class="tk-msg">Tasks isn\'t set up yet. The monitors service is still being deployed — please check back shortly.</div>';
+    else if (tab === "earn") {
+      // Earn tab is owned by modules/offerwall-earn.js (own state/polling): mount once, never re-render from monitor polling.
+      if (!body.querySelector(".oe-wrap")) { body.textContent = ""; window.OfferwallEarn.mount(body, { close: close }); }
+      return;
+    }
     else h = tab === "monitors" ? monitorsView() : tab === "workflows" ? workflowsView() : inboxView();
     // keep create-form input while polling re-renders
     var keep = {}, keepIn = {};
