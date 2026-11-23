@@ -233,6 +233,46 @@
   };
   Object.keys(ES5).forEach(function (k) { ES[k] = ES5[k]; });
   Object.keys(ES2).forEach(function (k) { ES[k] = ES2[k]; });
+  /* v9 additions: Security/Models/Settings long descriptions, Automations + Skills static messages. */
+  var ES9 = {
+    "Optional. Add an authenticator-app code (TOTP) as a second step after your password. You will only be asked for a code if you turn this on.": "Opcional. Añade un código de una aplicación de autenticación (TOTP) como segundo paso tras tu contraseña. Solo se te pedirá un código si lo activas.",
+    "Recovery: if you lose your authenticator, use Devices \u2192 Sign out everywhere, then ask the owner to remove the factor. Keep the setup key somewhere safe.": "Recuperación: si pierdes tu autenticador, usa Dispositivos \u2192 Cerrar sesión en todas partes y pide al propietario que elimine el factor. Guarda la clave de configuración en un lugar seguro.",
+    "Supabase doesn\u2019t expose an inventory of live sessions, so this list tracks devices that signed in from this app. Removing a device only removes it from this list \u2014 use \u201cSign out everywhere\u201d to revoke all sessions.": "Supabase no expone un inventario de sesiones activas, así que esta lista registra los dispositivos que iniciaron sesión desde esta aplicación. Quitar un dispositivo solo lo elimina de esta lista \u2014 usa \u201cCerrar sesión en todas partes\u201d para revocar todas las sesiones.",
+    "Uncensored lanes answer without hedging. Model status is linked in the footer of every page.": "Los carriles sin censura responden sin rodeos. El estado de los modelos está enlazado en el pie de cada página.",
+    "Toggle changes take effect on the next answer.": "Los cambios de los interruptores se aplican en la siguiente respuesta.",
+    "Help the assistant tailor answers to you.": "Ayuda al asistente a adaptar las respuestas a ti.",
+    "Facts the assistant remembers and applies to every answer.": "Datos que el asistente recuerda y aplica a cada respuesta.",
+    "Custom instructions applied to every answer.": "Instrucciones personalizadas aplicadas a cada respuesta.",
+    "Choose how you hear about activity.": "Elige cómo te enteras de la actividad.",
+    "Appearance and behavior defaults.": "Valores predeterminados de apariencia y comportamiento.",
+    "No memories yet — add one below.": "Aún no hay recuerdos — añade uno abajo.",
+    "No connectors configured — add one below.": "No hay conectores configurados — añade uno abajo.",
+    "No teammates match your search.": "Ningún compañero coincide con tu búsqueda.",
+    "No pending invitations.": "No hay invitaciones pendientes.", "No teammates yet.": "Aún no hay compañeros.",
+    "No team membership for this account.": "Esta cuenta no pertenece a ningún equipo.",
+    "Reusable instruction presets. Pick a preset to preview it, then apply it to a teammate from the roster.": "Preajustes de instrucciones reutilizables. Elige uno para previsualizarlo y luego aplícalo a un compañero desde la lista.",
+    "Enter a name for this automation.": "Introduce un nombre para esta automatización.",
+    "Name must be 160 characters or fewer.": "El nombre debe tener 160 caracteres o menos.",
+    "Enter the instruction the fleet should run.": "Introduce la instrucción que debe ejecutar la flota.",
+    "Instruction must be 4,000 characters or fewer.": "La instrucción debe tener 4.000 caracteres o menos.",
+    "Choose a valid schedule (hourly, 2x-daily, daily, or weekly).": "Elige una programación válida (cada hora, 2 veces al día, diaria o semanal).",
+    "Enter an instruction to queue for the fleet.": "Introduce una instrucción para poner en cola para la flota.",
+    "No dispatches match the selected filter.": "Ningún envío coincide con el filtro seleccionado.",
+    "No dispatches queued yet — runs from automations and one-off dispatches appear here.": "Aún no hay envíos en cola — aquí aparecen las ejecuciones de automatizaciones y los envíos puntuales.",
+    "Please sign in to queue a fleet dispatch.": "Inicia sesión para poner en cola un envío de la flota.",
+    "Please sign in to create an automation.": "Inicia sesión para crear una automatización.",
+    "Could not load automations.": "No se pudieron cargar las automatizaciones.",
+    "Could not load fleet dispatches.": "No se pudieron cargar los envíos de la flota.",
+    "Could not create automation.": "No se pudo crear la automatización.",
+    "Could not queue dispatch.": "No se pudo poner en cola el envío.",
+    "Could not update automation.": "No se pudo actualizar la automatización.",
+    "Enter a name for this skill.": "Introduce un nombre para esta habilidad.",
+    "Enter the instructions for this skill.": "Introduce las instrucciones para esta habilidad.",
+    "Please sign in to save skills.": "Inicia sesión para guardar habilidades.",
+    "Chat is not available on this page.": "El chat no está disponible en esta página.",
+    "Not signed in — sign in again.": "No has iniciado sesión — inicia sesión de nuevo."
+  };
+  Object.keys(ES9).forEach(function (k) { ES[k] = ES9[k]; });
 
   /* Elements whose text is user/document content and must never be translated. */
   var SKIP_SEL = ".dp-md,.dp-code,.dp-tw,.dp-title,.dc-t,.dp-fname,textarea,input,[data-i18n-skip]";
