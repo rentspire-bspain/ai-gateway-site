@@ -161,8 +161,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 74,
-   "note": "v330 re-score (live-verified): +36 dictionary strings (PR #387, worker i18n_es9_lane) \u2014 Security pane 3, Models 1, settings notes/empty states 13, Automations messages 14, Skills 5; modules/i18n.js live at 38KB. Cumulative: static ES 7/7 pages + command palette + settings + security/models/automations/skills strings. Honest limits: research prompt bodies need a command-palette.js change (not done), textarea/input placeholders excluded by SKIP_SEL, dynamic interpolated toasts, template-built pane headers; label stays 'Espa\u00f1ol (partial)'; no native review."
+   "score": 78,
+   "note": "v332 re-score (live-verified): ES10 (PR #394, worker i18n_es10_lane) closes the recorded ES8/ES9 omissions \u2014 3 research prompt bodies translated at submit time via I18N.t in command-palette.js (they aren't rendered, so walk roots can't reach them), 3 pane-header strings with 4 new walk roots (.sk-head/.skm-title/.am-kicker/.am-panel-title), #followupInput placeholder+aria-label via TARGETS. Cumulative ES coverage: 7/7 static pages, full command palette incl. prompts, settings+security+models+automations+skills strings, follow-up placeholder. Honest limits remaining: unclassed Automations h2, auth-form placeholders, dynamic interpolated toasts; label stays 'Espa\u00f1ol (partial)'; no native review."
   },
   {
    "name": "NativeMobile",
@@ -342,6 +342,11 @@
    "version": "v330",
    "date": "2026-11-23",
    "change": "Marketing 75 -> 80 (PR #386: boundview.com/pricing live with real tier data from checkout source, honest no-live-checkout note, sitemap+nav; dollar prices deliberately unpublished pending owner). i18n 70 -> 74 (PR #387: +36 strings \u2014 security/models/automations/skills/notes). UX MASTER re-run on deploy 82ce445: 13 live-exercised checks all 1.0 (answer 4.5s, zero errors, no brand leak), rest carried from prior live evidence \u2014 register 100.0 GREEN."
+  },
+  {
+   "version": "v332",
+   "date": "2026-11-23",
+   "change": "i18n 74 -> 78 (PR #394: ES10 \u2014 3 research prompt bodies via I18N.t at submit time, 3 pane headers + 4 walk roots, followup placeholder; honest omissions recorded). UX MASTER re-run on deploy ba4402b: 13 live checks all 1.0 (answer 6.0s, 0 errors, no brand leak), rest carried \u2014 register 100.0 GREEN. IFEval n=100 + DSQA n=50 fresh rotation lane still RUNNING (results land in the next batch)."
   }
  ]
 }
