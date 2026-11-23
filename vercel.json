@@ -90,6 +90,10 @@
       "dest": "/api/bv-render?page=status"
     },
     {
+      "src": "/es/help/?",
+      "dest": "/help.es.html"
+    },
+    {
       "src": "/es/docs/?",
       "dest": "/docs.es.html"
     },
