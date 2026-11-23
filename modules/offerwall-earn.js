@@ -46,7 +46,7 @@
       if (!S.token || !S.user) { signedOut(body); return; }
       fetch(URL_, { method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + S.token },
-        body: JSON.stringify({ user_id: S.user }) })
+        body: JSON.stringify({ action: "balance" }) })
         .then(function (r) {
           if (r.status === 401 || r.status === 403) { signedOut(body); return null; }
           return r.ok ? r.json() : null;
