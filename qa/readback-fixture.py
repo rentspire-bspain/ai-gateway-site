@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
-"""Deterministic local (non-production) test of the PR #362 readback checklist.
+"""Deterministic local (non-production) test of the PR #362 readback checklist. v2 (hardened).
 
-Runs the three readback items that are provable without deploying:
-  1. security.txt validates (RFC 9116 fields present, Expires in the future)
-  2. CSP inline-script hashes unchanged (qa/csp-hash-check.py)
-  3. Accessibility negative-control: the branch served locally has 0/16 bare
-     color-only indicators; live production (unfixed) must show >0 so the check
-     is proven to detect failures (negative path).
+v2 hardening (coordinator review): navigation failures can no longer count as zero —
+each check REQUIRES HTTP 200, the expected final URL, and an expected DOM marker before
+counting indicators; the negative control is a PINNED LOCAL BASE (git worktree at the
+PR base SHA), not mutable production; a missing-page negative asserts that a failed
+load is reported as a failure, never as a zero-count pass.
 
-Exit 0 = all pass. No network writes; GET requests only."""
-import re, subprocess, sys, datetime, json, socket
+Prereqs (documented, reproducible):
+  git worktree add -f /tmp/base362 <PR-base-SHA>     # pinned unfixed base
+  (branch root and /tmp/base362 served on localhost:8899 and :8898)
+
+Exit 0 = all pass. GET requests only; no writes; no credentials."""
+import re, subprocess, sys, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+FIXED_URL = "http://localhost:8899/index.html"   # serves the PR head working tree
+BASE_URL = "http://localhost:8898/index.html"     # serves the pinned pre-fix base
+MISSING_URL = "http://localhost:8899/missing-page-negative.html"
+BASE_SHA_FILE = ROOT / "qa" / ".pr362-base-sha"   # records the pinned base for reproducibility
+DOM_MARKER = "navTasks"                            # app shell marker present on both head and base
 fails = []
 
 # --- 1. security.txt validation (local file) ---
@@ -36,8 +44,10 @@ if r.returncode == 0:
 else:
     fails.append("csp-hash-check failed"); print("FAIL csp-hash-check:", r.stderr[:200])
 
-# --- 3. A11Y check: local positive vs production negative control ---
-def a11y_count(url, timeout=45000):
+# --- 3. A11Y check with STRICT load gate (200 + final URL + DOM marker before counting) ---
+def load_and_count(url, expect_status=200):
+    """Returns (ok, detail, count). ok=False on any load failure — a failed navigation
+    can never be reported as a zero-count pass."""
     import asyncio
     from playwright.async_api import async_playwright
     async def run():
@@ -47,32 +57,57 @@ def a11y_count(url, timeout=45000):
                 args=["--no-sandbox"])
             pg = await (await b.new_context(viewport={"width": 375, "height": 812})).new_page()
             try:
-                await pg.goto(url, wait_until="networkidle", timeout=timeout)
-            except Exception:
-                pass
+                resp = await pg.goto(url, wait_until="domcontentloaded", timeout=45000)
+            except Exception as e:
+                await b.close(); return (False, f"navigation error: {type(e).__name__}", None)
+            if resp is None:
+                await b.close(); return (False, "no response object (blocked or empty)", None)
+            if resp.status != expect_status:
+                await b.close(); return (False, f"HTTP {resp.status} (expected {expect_status})", None)
+            if pg.url.split("?")[0] != url:
+                await b.close(); return (False, f"redirected to {pg.url}", None)
+            html = await pg.content()
+            if DOM_MARKER not in html:
+                await b.close(); return (False, f"DOM marker '{DOM_MARKER}' missing — not the app shell", None)
             n = await pg.evaluate("""() => {
                 const dots = [...document.querySelectorAll('[class*=status], [class*=dot], [role=status]')].slice(0, 40);
                 return dots.filter(e => !e.textContent.trim() && !e.getAttribute('aria-label')
                     && e.getAttribute('aria-hidden') !== 'true' && e.getAttribute('role') !== 'status').length;
             }""")
             await b.close()
-            return n
+            return (True, "loaded", n)
     return asyncio.run(run())
 
 try:
-    local = a11y_count("http://localhost:8899/index.html")
-    if local == 0:
-        print("PASS a11y local (branch): 0 bare color-only indicators")
+    base_sha = BASE_SHA_FILE.read_text().strip() if BASE_SHA_FILE.exists() else "unpinned"
+    # 3a. POSITIVE: PR head served locally -> 200, app shell, 0 bare
+    ok, why, n = load_and_count(FIXED_URL)
+    if ok and n == 0:
+        print(f"PASS a11y positive (PR head local): HTTP 200 + DOM marker + 0 bare color-only indicators")
     else:
-        fails.append(f"a11y local = {local}"); print(f"FAIL a11y local: {local} bare indicators")
-    prod = a11y_count("https://ai.spaincos.com")
-    if prod > 0:
-        print(f"PASS a11y negative control (live production, unfixed): {prod} bare indicators detected — check detects failures")
+        fails.append(f"a11y positive: ok={ok} why={why} count={n}")
+        print(f"FAIL a11y positive: ok={ok} {why} count={n}")
+
+    # 3b. NEGATIVE CONTROL: pinned pre-fix base served locally -> 200, app shell, >0 bare
+    ok, why, n = load_and_count(BASE_URL)
+    if ok and n and n > 0:
+        print(f"PASS a11y negative control (pinned local base {base_sha[:12]}): HTTP 200 + DOM marker + {n} bare indicators — check detects failures")
+    elif not ok:
+        fails.append(f"negative control did not load: {why}")
+        print(f"FAIL negative control load: {why}")
     else:
-        fails.append("negative control returned 0 (production already fixed or check broken)")
-        print("WARN negative control: production shows 0 — either already deployed or check is broken")
+        fails.append(f"negative control count = {n} (base appears fixed or check broken)")
+        print(f"FAIL negative control: count={n} — base not showing the failure signature")
+
+    # 3c. MISSING-PAGE NEGATIVE: a 404 must be reported as a failure, never zero-count
+    ok, why, n = load_and_count(MISSING_URL)
+    if not ok and n is None:
+        print(f"PASS missing-page negative: correctly rejected ({why}) — no zero-count pass")
+    else:
+        fails.append(f"missing-page negative: ok={ok} why={why} count={n}")
+        print(f"FAIL missing-page negative: ok={ok} {why} count={n} — a failed load must not count")
 except Exception as e:
-    fails.append(f"a11y: {e}"); print(f"FAIL a11y: {e}")
+    fails.append(f"a11y: {e}"); print(f"FAIL a11y harness: {e}")
 
 print("\nRESULT:", "ALL PASS" if not fails else f"FAILURES: {fails}")
 sys.exit(0 if not fails else 1)
