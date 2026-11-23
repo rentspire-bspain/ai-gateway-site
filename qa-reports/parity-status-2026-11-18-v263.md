@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-21, v290)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v324)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3004,3 +3004,36 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - The portfolio coordinator (session e533902c) was sent the full rubric-mapped evidence ledger (11 items PAR-01..PAR-11 with acceptance tests, evidence URLs, timestamps, G/Y/R, and the owner-gated blockers). Runner job: none — all work inline.
 
 **HEADLINE: 88.4% (11318/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN.
+
+### 35. §30q addendum — v319–v320: THE PRODUCT-SURFACE INVENTORY LANDED
+
+- ~~Coordinator reconciliation chain~~ — complete: rubric ledger PAR-01..11 (8G/2Y/1R), full-register reconciliation, raw-item crosswalk (R-01..29, X-01..20, B-01..02 — the 157 aggregate has NO per-item enumeration; refused to manufacture rows), product-surface inventory PI-001..PI-007 (PR #355), extension to voice/enterprise-admin/docs-artifacts/fleet-dispatch PI-008..PI-012 (PR #356) — every item live-probed with measured vs unavailable reported separately. All pinned @ master.
+
+**HEADLINE: 88.4% (11318/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. (Register-only batch; no score change.)
+
+### 36. §30q addendum — v321: PUBLIC NAV SURFACES + ROUTE CLASSIFICATION (PI-013..PI-018)
+
+- ~~Public onboarding/help/status/legal nav, both hosts~~ (PR #357) — 12 surfaces live-probed with the deterministic Playwright harness: both roots 200 with separate brands and zero cross-brand leakage; host-aware contact emails; canonical+og host-correct; ZERO dead links anywhere; keyboard focus visible on all 12 surfaces (the apparent bv/privacy keyboard gap was a tab-sampling artifact — the mailto cycles focus on both hosts).
+- ~~Unknown-route classification~~ (PR #358) — unknown public/nested URLs and intentionally private routes (/qa/, /sql/) return proper HTTP 404 on BOTH hosts while rendering the app shell with composer recovery; /t/ deep links 200 with no dead end; robots.txt disallows /t/ both hosts; the cross-host sitemap (ai -> boundview) is INTENTIONAL v291 SEO strategy (ai host noindexed by brand.js). HONEST CORRECTION: v318's PI-017 note claiming "HTTP 200 SPA fallback" for unknown URLs was a probe artifact — actual status is 404; corrected in-repo. Codified qa/route-classification.py as an exit-1 regression gate (PASS).
+
+**HEADLINE: 88.4% (11318/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN.
+
+### 37. §30q addendum — v322: PROOF POINTERS + OVERLAP ANNOTATIONS (PI-001..018)
+
+- Every inventory item now carries proofs[] (stable pointers: result files, harness scripts, PR URLs, live-probe timestamps), ux_overlap[] cross-links to the UX master register (A1/A3/A5/A7/B10/C6/D1/G1-G5 — only where real; explicit null otherwise), and overlaps[] annotations: PI-007/PI-015 and PI-010/PI-014 documented as intentional dual-lens rows, not duplicates. CanonIntal typo fixed. No weights or scores changed (PR #359).
+
+**HEADLINE: 88.4% (11318/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN.
+
+### 38. §30q addendum — v323: PRIVACY-NAV A11Y FIX (PI-017 OBSERVATION CLOSED)
+
+- ~~Privacy pages had NO nav~~ (PR #360) — root cause of the PI-017 note: privacy.html and privacy.boundview.html shipped without a nav element (terms/docs/help/status all had one); the mailto was the only tabbable element. Standard top nav added to both hosts, deploy-verified live: /privacy tab-navigates nav links first (ai 6 focusables, bv 5; an initial 2-focusable reading was CDN cache of the prior deploy — cache-busted re-probe confirmed). Fleet honest negative: real-browser re-measurement of all 6 NOT_MEASURED domains returned 429 Vercel Security Checkpoint in headless Chromium too — mitigation is runner-side, NOT_MEASURED stands with stronger evidence (PR #361).
+- ESTATE-QUEUE-321 live-queue verification answered (READY, runner NONE); ESTATE-LANE-CHAIN-v1 protocol adopted — work now chains within-turn instead of parking.
+
+**HEADLINE: 88.4% (11318/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Accessibility evidence strengthened (category re-score deferred to the next rubric pass — no unmeasured bump).
+
+### 39. §30q addendum — v324: GATED-SURFACE REGISTER (PI-019..PI-025)
+
+- The 7 owner-gated surfaces are now first-class inventory rows with explicit GATED status and exact gate evidence (PR #364): Stripe live checkout end-to-end (live key — credential form OPEN for the owner, request credential-interaction:874ee8f7), OAuth provider registrations (google/outlook/github consoles), voice-service Render deploy, Play Console + Apple Developer store distribution, CanonIntel LLC legal counsel review (checklist delivered), fleet_registry service-role migration executor, RunPod GPU key. Register: 25 items — 18 live/honest-state, 7 owner-gated. Nothing gated is scored complete.
+- Two server-side worker lanes FIRED in parallel (isolated worktrees, PR-only): i18n ES5 expansion (i18n 40) and /help content expansion grounded in repo behavior (Docs/Support 78). Results land in the next batch.
+
+**HEADLINE: 88.4% (11318/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner: OAuth), Legal 60 (owner: counsel), i18n 40 + NativeMobile 48 (owner: store/publishing), store presence (owner), Stripe live checkout (owner: live key — FORM OPEN NOW).
