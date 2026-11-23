@@ -1059,7 +1059,11 @@
 
   function wire() {
     ensureTourElement();
-    mountExamplePrompts();
+    // F-32 part 4: the onboarding mount (example prompts + persuasion panel + checklist)
+    // grows #suggestions from ~253px to ~1861px post-paint, shifting everything below it
+    // (measured: conn box pushed from y=633 to off-screen). Defer to first interaction —
+    // same gate as the composer pills; syncEmptyState on input events still fires it sooner.
+    (window.__onFirstInteraction || mountExamplePrompts)(function () { syncEmptyState(); });
     wireFooterTourLink();
 
     var input = document.getElementById("landingInput");
@@ -1089,7 +1093,8 @@
       window.addEventListener("popstate", syncEmptyState);
     }
 
-    syncEmptyState();
+    // F-32 part 4: gated above — this boot syncEmptyState was the post-paint mount that
+    // grew #suggestions to ~1877px and pushed the conn box off-screen (CLS 0.79).
     syncSidebarEmptyHint();
     preloadConnectorsReady();
 

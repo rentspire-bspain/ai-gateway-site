@@ -91,7 +91,9 @@
   function notifyOnboarding() {
     try {
       if (root && root.OnboardingUI && typeof root.OnboardingUI.syncPersuasion === "function") {
-        root.OnboardingUI.syncPersuasion();
+        // F-32 part 4: connector-status load mounts the persuasion panel into #suggestions
+        // post-paint (behind the auth overlay), shifting the landing — defer to first interaction
+        (root.__onFirstInteraction || root.OnboardingUI.syncPersuasion)(root.OnboardingUI.syncPersuasion);
       }
     } catch (e) {}
   }
