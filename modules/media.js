@@ -311,8 +311,14 @@
     [].forEach.call((root || document).querySelectorAll(".answer-tabs"), function (t) { setTimeout(function () { addVideosTab(t); }, 0); });
   }
 
-  function attach() { mountPills(); scan(document); }
-  var mo = new MutationObserver(function () { mountPills(); scan(document); });
+  function attach() {
+    // F-32 part 3: composer pills mount post-paint shifted the landing — defer to first interaction
+    (window.__onFirstInteraction || mountPills)(mountPills);
+    scan(document);
+  }
+  // F-32 part 3: observer-triggered mounts also defer to first interaction (post-interaction
+  // the gate runs immediately, so re-mount behavior is unchanged)
+  var mo = new MutationObserver(function () { (window.__onFirstInteraction || mountPills)(mountPills); scan(document); });
   function start() { attach(); mo.observe(document.body, { childList: true, subtree: true }); }
 
   /* worse-elimination (2026-11-10): "I need you to generate IMAGES - I need to actually see designs" typed as a normal chat turn used to be answered

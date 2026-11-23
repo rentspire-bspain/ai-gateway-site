@@ -50,9 +50,11 @@
     }
   }
   function wire() {
-    addBtn();
+    // F-32 part 3: composer pill insert post-paint shifted the landing — defer to first interaction
+    (root.__onFirstInteraction || addBtn)(addBtn);
     // the composer row can be re-created; keep the button present
-    new MutationObserver(function () { addBtn(); }).observe(document.body, { childList: true, subtree: false });
+    // F-32 part 3: observer-triggered mounts also defer to first interaction
+    new MutationObserver(function () { (root.__onFirstInteraction || addBtn)(addBtn); }).observe(document.body, { childList: true, subtree: false });
   }
   if (root.BUILD && root.BUILD.modules) root.BUILD.modules.push({ id: "local-files", init: wire });
   if (document.readyState !== "loading") wire();

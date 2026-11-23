@@ -237,6 +237,8 @@
   }
 
   function mount() {
+    // F-32 part 3: composer pill inserts post-paint shifted the landing — defer to first interaction
+    var insert = function () {
     ["landingPills", "followupPills"].forEach(function (id) {
       var host = document.getElementById(id);
       if (!host || host.querySelector(".ml-pill")) return;
@@ -247,6 +249,8 @@
       b.onclick = function (e) { e.stopPropagation(); open(); };
       host.appendChild(b);
     });
+    };
+    (window.__onFirstInteraction || insert)(insert);
   }
   window.MediaLabs = { open: open, close: close, build: build, assets: assets, images: images, parseHtml: parseHtml, tabs: TABS, mount: mount };
   function start() { mount(); new MutationObserver(mount).observe(document.body, { childList: true, subtree: true }); }
