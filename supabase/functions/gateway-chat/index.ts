@@ -2089,6 +2089,13 @@ Question: "${userQuery}"`;
         if (intent.complexity === "simple" || intent.complexity === "medium") intent.complexity = "complex";
       }
     }
+    // v334 COMPLETE-SET / TABLE-EXTRACTION UPGRADE (DSQA 12/50 truncations: full-enumeration questions
+    // stayed simple/medium -> 2048 budget -> work-log preamble consumed it, answer cut mid-listing).
+    {
+      const uqT = String(userQuery || "").trim();
+      const completeSet = /(?:\b(?:of|out\s+of|between|among)\s+the\b[^?]{0,120}\b(?:that|which|who|with|saw|won|had|by a margin|released|be)\b)|(?:\bthe\s+(?:two|three|four|five|\d+|[a-z]+est)\s+\w+\s+with\s+the\s+(?:highest|lowest|largest|smallest|most|fewest)\b)|(?:\bidentify\s+(?:the|all)\b[^?]{0,120}\b(?:that|which|with)\b)|(?:\bwith\s+(?:both\s+)?an?\s+above-average\b)|(?:\bwhich\b[^?]{0,80}\bwho\s+(?:had|has)\b)|(?:\baccording to\b[^?]{0,120}\b(?:report|website|data|statistics|database|table|index|study|records)\b)/i.test(uqT);
+      if (completeSet && (intent.complexity === "simple" || intent.complexity === "medium")) intent.complexity = "complex";
+    }
     // v259: declared BEFORE the v253 predicate below assigns it (a TDZ ReferenceError —
     // HTTP 500 on every set question — shipped in the v259 deploy when the declaration sat
     // after the assignment; round 8's 59 DSQA 500s were this bug).
@@ -2226,7 +2233,9 @@ Question: "${userQuery}"`;
     // caps, so the raise never reached the model. Tier caps now: simple/medium 4,000 (was 2,048),
     // complex/extreme 6,000 (was 4,000). The caller's max_tokens stays a hard cap — the frontend
     // sends 2,048 so chat behavior is UNCHANGED; only callers that ask for more get more.
-    const tokenBudget = Math.min(Number(max_tokens) || 2048, (intent.complexity === "extreme" || longMultiPart || intent.complexity === "complex") ? 6000 : 4000);
+    // v334: research-mode callers that send no max_tokens default to 4000 (frontend sends 2048 explicitly -> unchanged).
+    const researchDefault = (deep_research === true || modeRaw === "research" || /research/i.test(String(purpose || ""))) ? 4000 : 2048;
+    const tokenBudget = Math.min(Number(max_tokens) || researchDefault, (intent.complexity === "extreme" || longMultiPart || intent.complexity === "complex") ? 6000 : 4000);
     // v103 I8: one deterministic plan decision per request (plan-guidance.ts). Drives (a) whether the tool loop is even offered record_plan,
     // (b) the writer-side "Plan" block when no tool-loop plan exists.
     const planDec = planDecision(String(userQuery), String(intent.complexity));
