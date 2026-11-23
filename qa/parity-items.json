@@ -95,8 +95,8 @@
   {
    "name": "Teammates",
    "weight": 1,
-   "score": 75,
-   "note": "v295 (was 68): onboarding unification + pending-invite filter + Account profile shortcut (PR #294, 446b214) live-verified on ai.spaincos.com (cache-busted fetch matches master; node --check + 5 Node tests green). Honest limits: no browser validation yet; templates and shared profile parity still gaps. v313: templates + profile preview (PR #343) live both domains: four instruction presets (Research Analyst/Code Reviewer/Data Extractor/Summarizer) with per-teammate apply in the roster, and a read-only effective-instructions preview. HONEST LIMITS: assignments are browser-local (localStorage) \u2014 not synced across devices and NOT enforced server-side on the teammate; no shared memory source exists. Server-side enforcement needs a migration + team edge-function change (the PR #333 RLS pattern is the path). 6/6 tests. v314: SERVER-SIDE ENFORCEMENT (PR #345): teammate_template_assignments table (RLS deny-all, advisory-lock bootstrap, DDL in qa/teammate-templates-schema.sql), team function v17 (template_set owner/admin-only, template_get), gateway-chat v309 injects the caller's assigned template first in STANDING INSTRUCTIONS via the existing personalization path; UI saves server-side with localStorage as offline fallback and honest 'not enforced' notice. Verified: 401/403 boundaries live (eval-bot: not-a-member, owners/admins-only), both domains 200, eval-replay 10/10 through the new gateway (no regression). NOT verified: the admin 200 assign path and a live chat demonstrating behavior change (no owner token; credit discipline)."
+   "score": 78,
+   "note": "v340 re-score (live browser evidence, root lane with the eval session): the Teammates pane renders fully for a NON-ADMIN account \u2014 honest empty state ('You're not on a team yet \u2014 ask an owner to invite you'), explicit role gating ('Only owners/admins can make changes \u2014 the server enforces it'), 'Edit my account profile' shortcut, and the TEAMMATE TEMPLATES section with presets (Research Analyst, Code Review, ...) all on screen; ZERO JS errors. Server boundary re-verified live: team template_get -> 403 'You are not a member of this team' (enforced). This closes the 'no browser validation yet' gap from v295. Honest limits: the admin 200-path and pending-invite filter are N/A for a non-member account (owner token needed); template presets listed but the apply-to-roster flow needs a team."
   },
   {
    "name": "UX",
@@ -352,6 +352,11 @@
    "version": "v338",
    "date": "2026-11-23",
    "change": "i18n 78 -> 82 (PR #412: ES11 \u2014 auth placeholders wired with the email deliberately untranslated for brand-safety, Automations h2, notification strings). i18n_es11_lane hit the platform credit limit AFTER pushing its complete PR; teammates_validation_lane stopped before delivering (re-fired, pending credits)."
+  },
+  {
+   "version": "v340",
+   "date": "2026-11-23",
+   "change": "Teammates 75 -> 78: first live browser validation (root lane after the agent lane stalled on credits) \u2014 pane renders honestly for non-admins (empty state, role gating, profile shortcut, template presets), zero JS errors, 403 boundary enforced live. Admin paths remain owner-gated."
   }
  ]
 }
