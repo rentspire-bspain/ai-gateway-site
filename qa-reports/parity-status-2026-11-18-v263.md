@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v340)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v341)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3177,3 +3177,11 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Free-agent confirmation (owner ask): all work this batch was root-inline (no spawned agents, zero agent-credit spend); the stalled lane was superseded, not refired.
 
 **HEADLINE: 89.2% (11425/128, generator-confirmed) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
+
+### 56. §30q addendum — v341: TEAMMATES ADMIN PATH — STATIC AUDIT + PRE-POSITIONED CHECK
+
+- ~~Teammates admin path (owner directive: fix + re-score after an owner token)~~ — STATIC AUDIT COMPLETE, no defect found: the team function's admin actions all enforce owner/admin (invite, role changes, removal, allowlist, template_set); template_set validates the target email, requires the member to exist, validates the template_id against the TEMPLATES map, supports a safe clear (empty id -> DELETE), and upserts with on_conflict merge. template_get scopes rows to self for non-admins and the full list for admins. The gap is LIVE positive-path evidence, which needs an owner/admin JWT.
+- ~~Pre-positioned validation (PR #418)~~ — qa/admin-path-check.py runs the FULL positive path the moment a token is provided (OWNER_TOKEN env): admin template_get, template_set on the eval member, persistence check, clear, and a gateway-chat injection probe. Exit-2 without a token (verified). Re-score to ~82 fires on its PASS.
+- UX master: no gateway deploy this batch — the v334 run on gateway-chat v310 stands; next gateway change gets the full re-run.
+
+**HEADLINE: 89.3% (11425/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
