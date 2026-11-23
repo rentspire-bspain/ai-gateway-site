@@ -1,5 +1,5 @@
 {
- "version": 20,
+ "version": 21,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -79,15 +79,15 @@
    "W": 5,
    "ircm": "3101",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "U",
-    "AG": "U",
+    "AG": "R",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Pre-boot shimmer exists (reserves space); no CLS measurement",
+   "evidence": "Pre-boot shimmer exists (reserves space); no CLS measurement | 2026-11-23 multiroute Playwright batch (5 routes x 2 hosts, mobile/desktop/slow-4G): lab CLS 0.573 desktop / 0.793 mobile / 1.069 slow-4G (threshold 0.1) \u2014 F-32 | 2026-11-23 multiroute Playwright batch (5 routes x 2 hosts, mobile/desktop/slow-4G): lab CLS 0.793 mobile on the same build (threshold 0.1) \u2014 F-32",
    "fix": "Add CLS assert to Playwright prelaunch; reserve iframe/toast/banner space"
   },
   {
@@ -259,15 +259,15 @@
    "W": 5,
    "ircm": "3101",
    "status": {
-    "BV": "U",
+    "BV": "Y",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Never tested; rural nationwide users are on slow links",
+   "evidence": "Never tested; rural nationwide users are on slow links | 2026-11-23 multiroute Playwright batch (5 routes x 2 hosts, mobile/desktop/slow-4G): renders and interactive under 400ms/400kbps emulation, 0 console errors, but CLS degrades to 1.069 | 2026-11-23 multiroute Playwright batch (5 routes x 2 hosts, mobile/desktop/slow-4G): same build renders under slow-4G; CLS degrades",
    "fix": "Add throttled Playwright profile to nightly run"
   },
   {
@@ -367,7 +367,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): keyboard focus paths verified in host wiring; deployed",
+   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): keyboard focus paths verified in host wiring; deployed | 2026-11-23 multiroute Playwright batch (5 routes x 2 hosts, mobile/desktop/slow-4G): focus hint weak: 1/5 first focusables show visible focus styles (same build as AG)",
    "fix": "Keyboard walkthrough per CUJ each release; record in qa-reports"
   },
   {
@@ -847,7 +847,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not audited | playwright AG 2026-11-22: 6/60 interactive elements under 24px | playwright BV 2026-11-22: 6/60 interactive elements under 24px",
+   "evidence": "Not audited | playwright AG 2026-11-22: 6/60 interactive elements under 24px | playwright BV 2026-11-22: 6/60 interactive elements under 24px | 2026-11-23 multiroute Playwright batch (5 routes x 2 hosts, mobile/desktop/slow-4G): 10/80 interactive under 24px mobile; static routes clean (4-12/4-13)",
    "fix": "Audit hover-only tooltips (owner prefers hover-first secondary info, so provide tap equivalent)"
   },
   {
@@ -7119,6 +7119,18 @@
    "title": "Design tokens, copy glossary and acronym spell-outs not enforced across apps",
    "fix": "Shared token package and copy lint",
    "psc": "PSC-1 + PSC-4"
+  },
+  {
+   "id": "F-32",
+   "severity": "S1",
+   "apps": "AG, BV",
+   "items": [
+    "U-PERF-03",
+    "U-PERF-12"
+   ],
+   "title": "Landing-page layout instability: CLS 0.573-1.069 (threshold 0.1), degrading under slow networks",
+   "fix": "Reserve space for the pre-boot shimmer and landing hero before hydration; set explicit dimensions on late-loading elements (fonts, images); re-measure with the multiroute Playwright runner",
+   "psc": "PSC-3 (lab CLS check in the deterministic batch runner)"
   }
  ],
  "long_tail": {
