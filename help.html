@@ -67,6 +67,36 @@
     <li><strong>Why was my answer slow?</strong> Complex prompts can run long multi-step research with large token budgets. If an answer is taking a while it is usually still working; you can press the stop button and resend a shorter question at any time.</li>
   </ul>
 
+  <h3>Keyboard shortcuts</h3>
+  <ul>
+    <li><strong><code>/</code></strong> focuses the composer.</li>
+    <li><strong><code>j</code> / <code>k</code></strong> move to the next / previous thread in the sidebar.</li>
+    <li><strong><code>Cmd+K</code> (<code>Ctrl+K</code> on Windows/Linux)</strong> opens or closes the command palette, where you can search actions and threads. Use the up/down arrows to move, <code>Enter</code> to run, and <code>Esc</code> to close.</li>
+    <li>Single-key shortcuts (<code>/</code>, <code>j</code>, <code>k</code>) are ignored while you are typing in a text field.</li>
+  </ul>
+
+  <h3>Data retention</h3>
+  <ul>
+    <li><strong>How long is my history kept?</strong> Threads (and their messages) that have been inactive for 12 months, imported context documents older than 12 months, and shared-thread copies revoked more than 12 months ago are deleted by a scheduled retention job. You can delete your own threads and files sooner at any time. See <a href="/privacy.html">Privacy</a>.</li>
+  </ul>
+
+  <h3>Voice</h3>
+  <ul>
+    <li><strong>Voice conversation</strong> shows a status bar with one of three states: <strong>Listening</strong> (the mic is capturing you), <strong>Thinking</strong> (your question is being answered), and <strong>Speaking</strong> (the answer is read aloud). When the answer finishes, it returns to Listening.</li>
+    <li>You can interrupt a spoken answer by speaking; it stops and goes back to Listening. Press <strong>Exit</strong> on the bar to leave voice conversation.</li>
+    <li>Microphone problems are covered in troubleshooting guide 3 below.</li>
+  </ul>
+
+  <h3>Offline behavior</h3>
+  <ul>
+    <li>With no connection, an offline bar appears and previously loaded pages stay readable. Sending questions and syncing need a connection, and the bar clears when you reconnect (see troubleshooting guide 5).</li>
+  </ul>
+
+  <h3>Plan tiers</h3>
+  <ul>
+    <li><strong>What plans exist?</strong> The checkout is configured for three paid tiers with monthly credit allowances: <strong>Starter</strong> (2,500 credits), <strong>Pro</strong> (10,000 credits), and <strong>Unlimited</strong> (25,000 credits plus priority processing). As stated under Billing &amp; credits above, paid checkout is not live yet, so no payment is taken today.</li>
+  </ul>
+
   <h2 id="errors">Transient errors and retries</h2>
   <h3>The <code>546</code> error</h3>
   <p>HTTP <code>546</code> is this service's status code for an edge-worker resource limit: the compute worker handling your request was recycled mid-request (a platform-level <code>WORKER_RESOURCE_LIMIT</code>), typically when several overlapping requests share one warm worker. The failed response is empty, so <strong>retrying is always safe</strong> and normally lands on a fresh worker &mdash; your question was not half-executed and you will not be double-billed for it.</p>
