@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 16.4%** (app-weighted; unmeasured counts as 0; v16 re-scored — worker loop + deterministic Playwright audit) · **measured-only: 31.8%** · 114✅ / 230🟡 / 228🔴 / 805⚪ across 386 line items. Per-app strict: BV 29.2% · TT 15.2% · AG 36.0% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 17.1%** (app-weighted; unmeasured counts as 0; v19 re-scored — worker loop + Playwright audits + deploy verification) · **measured-only: 32.8%** · 120✅ / 231🟡 / 221🔴 / 805⚪ across 386 line items. Per-app strict: BV 30.3% · TT 16.8% · AG 37.2% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1518,3 +1518,18 @@ this workspace, and (d) nationwide data conformance behind the CR expansion (F.4
 | B9 | 0 | 0 | 0 | 0 | 16.1% |
 
 **Deterministic Playwright audit batch (2026-11-22, per coordinator directive — accessible public routes, AG + BV):** 11 item slots measured on landing/wide/error routes at mobile 375px and 2560px: ✅ ~~AG U-MOB-03/06~~ · ✅ ~~BV U-MOB-03/05/06~~ (viewport-fit=cover, no horizontal scroll, inputs ≥16px) · 🟡 U-MOB-08 AG/BV (6/60 touch targets <24px) · 🟡 U-A11Y-03 AG/BV (focus visibility runtime-dependent) · 🔴 U-A11Y-13 AG/BV (6/16 status indicators color-only, no text/aria). 0 console errors both hosts. Raw results: /home/user/workspace/completion-loop/browser-audit-results.json.
+
+### DEPLOY VERIFICATION BATCH (2026-11-23, PRs #362 + #342 + #367 merged under owner authorization)
+
+Live production readback, all credential-free:
+- ✅ ~~security.txt~~ — 200 on ai.spaincos.com (Contact/Expires 2027-11-22/Policy) — closed AG U-TRU-19
+- ✅ ~~terms~~ — terms.html + terms.boundview.html 200 on both hosts — closed U-TRU-02
+- ✅ ~~BoundView privacy policy~~ — live on boundview.com — closed BV U-TRU-01
+- ✅ ~~/verify 404~~ — 200 on both hosts (307 → page)
+- ✅ ~~color-only status indicators~~ — live production 0/16 (was 6) — closed U-A11Y-13
+- ✅ ~~Earn tab host wiring~~ — module deployed and loading; offer wall intentionally disabled pending Adscend approval; zero unauthenticated calls
+- ✅ narrow frame-src partner origins live (PR #367 — restored after the #342/master merge dropped it; narrower than the original broad https:)
+
+Register v19: portfolio strict **17.1%** (baseline 14.6% → 16.1% → 16.7% → 17.1%), measured-only 32.8%.
+Worker queue fully drained (batch 10: NO TASKS LEFT — every fetch-verifiable item measured).
+Fleet-gate ledger record posted: SHMT issue #3500 comment 7106806507.
