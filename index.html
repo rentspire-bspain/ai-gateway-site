@@ -566,6 +566,10 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   gap: 12px;
+  /* F-32 (CLS 0.793): pin the header to its settled height so the webfont swap's
+     57->61px settle cannot shift everything below it (layout-shift attribution t=1449). */
+  min-height: 61px;
+  box-sizing: border-box;
 }
 .main-header-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
 .main-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
