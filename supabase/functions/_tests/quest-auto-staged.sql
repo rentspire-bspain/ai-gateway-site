@@ -68,7 +68,7 @@ begin
     return coalesce((select sum(amount) from neuron_ledger where user_id = (select user_id from neuron_ledger where source_event_id = p_source_event_id limit 1)), 0);
   end if;
   insert into neuron_ledger (user_id, direction, amount, action_type, source_event_id)
-  values (coalesce(p_ref_user_id, (select user_id from auth_users_fixture limit 1), gen_random_uuid()), 'earn', v_award, p_action_type, p_source_event_id);
+  values (coalesce(p_ref_user_id, (select id from auth_users_fixture limit 1)), 'earn', v_award, p_action_type, p_source_event_id);
   return v_award;
 end;
 $fn$;
@@ -114,7 +114,8 @@ begin
    where user_id = v_user and event_type = v_q.metric
      and created_at >= case v_q.period
        when 'daily' then date_trunc('day', now())
-       else date_trunc('week', now()) end;
+       else date_trunc('week', now()) end
+     and created_at <= now();  -- Q6 fix: future-dated events cannot award early
   v_paid := exists (
     select 1 from public.neuron_ledger
      where user_id = v_user and action_type = v_q.action_type
@@ -154,18 +155,18 @@ begin
   insert into quests (quest_id, title, metric, threshold, period, action_type)
     values ('q1_high_bar', 'Q1', 'query', 10, 'daily', 'quest_daily_explorer');
   r := public.quest_progress('q1_high_bar');
-  assert((r->>'paid')::boolean = false, 'Q1 FAILED: paid below threshold');
-  assert((select count(*) from neuron_ledger) = 0, 'Q1 FAILED: ledger row written below threshold');
+  if not ((r->>'paid')::boolean = false) then raise exception 'Q1 FAILED: paid below threshold'; end if;
+  if not ((select count(*) from neuron_ledger) = 0) then raise exception 'Q1 FAILED: ledger row written below threshold'; end if;
   delete from quests where quest_id = 'q1_high_bar';
 
   -- Q2: threshold crossing pays EXACTLY once; replay cannot double-award; forged duplicate rejected
   r := public.quest_progress('daily_explorer');
-  assert((r->>'paid')::boolean = true, 'Q2 FAILED: did not pay at threshold');
-  assert((select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 1, 'Q2 FAILED: not exactly one row');
+  if not ((r->>'paid')::boolean = true) then raise exception 'Q2 FAILED: did not pay at threshold'; end if;
+  if not ((select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 1) then raise exception 'Q2 FAILED: not exactly one row'; end if;
   r := public.quest_progress('daily_explorer');  -- replay
   r := public.quest_progress('daily_explorer');  -- replay again
-  assert((select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 1, 'Q2 FAILED: replay wrote a second row');
-  assert((select sum(amount) from neuron_ledger where action_type = 'quest_daily_explorer') = 50, 'Q2 FAILED: wrong award total');
+  if not ((select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 1) then raise exception 'Q2 FAILED: replay wrote a second row'; end if;
+  if not ((select sum(amount) from neuron_ledger where action_type = 'quest_daily_explorer') = 50) then raise exception 'Q2 FAILED: wrong award total'; end if;
   begin
     insert into neuron_ledger (user_id, direction, amount, action_type, source_event_id)
     values ('11111111-1111-1111-1111-111111111111', 'earn', 50, 'quest_daily_explorer',
@@ -181,8 +182,8 @@ begin
   values ('11111111-1111-1111-1111-111111111111', 'earn', 50, 'quest_daily_explorer',
           'quest:daily_explorer:11111111-1111-1111-1111-111111111111:' || to_char(now() - interval '1 day', 'YYYY-MM-DD'));
   r := public.quest_progress('daily_explorer');
-  assert((r->>'paid')::boolean = true, 'Q3 FAILED: prior-period payment blocked today''s earn');
-  assert((select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 2, 'Q3 FAILED: rollover row count');
+  if not ((r->>'paid')::boolean = true) then raise exception 'Q3 FAILED: prior-period payment blocked today''s earn'; end if;
+  if not ((select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 2) then raise exception 'Q3 FAILED: rollover row count'; end if;
   delete from neuron_ledger where action_type = 'quest_daily_explorer';
 
   -- Q4: inactive quest rejected
@@ -190,15 +191,46 @@ begin
     r := public.quest_progress('retired_quest');
     raise exception 'Q4 FAILED: inactive quest accepted';
   exception when others then
-    assert(sqlerrm = 'QUEST_NOT_FOUND', 'Q4 FAILED: wrong error ' || sqlerrm);
+    if not (sqlerrm = 'QUEST_NOT_FOUND') then raise exception 'Q4 FAILED: wrong error '; end if;
   end;
 
   -- Q5: cross-user isolation — user 2's 9 events never paid user 1's quest... (both share the
   -- stub auth in this fixture; verified separately below by direct count)
-  assert((select count(*) from analytics_events where user_id = '22222222-2222-2222-2222-222222222222') = 9, 'Q5 FAILED: fixture');
-  assert((select count(*) from analytics_events where user_id = '11111111-1111-1111-1111-111111111111') = 5, 'Q5 FAILED: fixture');
-  assert(not exists (select 1 from neuron_ledger l join analytics_events a on a.user_id <> l.user_id
-     where l.action_type = 'quest_daily_explorer'), 'Q5 FAILED: cross-user payment');
+  if not ((select count(*) from analytics_events where user_id = '22222222-2222-2222-2222-222222222222') = 9) then raise exception 'Q5 FAILED: fixture'; end if;
+  if not ((select count(*) from analytics_events where user_id = '11111111-1111-1111-1111-111111111111') = 5) then raise exception 'Q5 FAILED: fixture'; end if;
+  -- Q5 (per coordinator): actual progress call scoped to user 2 only — the stub
+  -- auth resolves to user 2 after removing user 1 from the fixture table.
+  delete from analytics_events where user_id = '11111111-1111-1111-1111-111111111111';
+  delete from neuron_ledger where action_type = 'quest_daily_explorer';
+  delete from auth_users_fixture where id = '11111111-1111-1111-1111-111111111111';
+  -- auth_uid_stub() now resolves to user 2, who has 9 queries today (threshold 5)
+  r := public.quest_progress('daily_explorer');
+  if not ((r->>'paid')::boolean = true and (select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 1) then
+    raise exception 'Q5 FAILED: user 2''s own events did not pay user 2';
+  end if;
+  -- and user 2's events can never pay user 1: repin auth to user 1 (no events left)
+  delete from analytics_events where user_id = '22222222-2222-2222-2222-222222222222';
+  delete from neuron_ledger where action_type = 'quest_daily_explorer';
+  insert into auth_users_fixture (id) values ('11111111-1111-1111-1111-111111111111');
+  delete from auth_users_fixture where id = '22222222-2222-2222-2222-222222222222';
+  r := public.quest_progress('daily_explorer');
+  if not ((r->>'progress')::int = 0 and (r->>'paid')::boolean = false) then
+    raise exception 'Q5 FAILED: other user''s events paid the caller (progress=%, paid=%)', r->>'progress', r->>'paid';
+  end if;
+  if not ((select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 0) then
+    raise exception 'Q5 FAILED: ledger row written from cross-user events';
+  end if;
+
+  -- Q6 (added from the coordinator's disposable-PG verification of 850d5959):
+  -- future-dated events cannot award early.
+  insert into analytics_events (user_id, event_type, created_at)
+  select '11111111-1111-1111-1111-111111111111', 'query', now() + interval '2 hours'
+  from generate_series(0, 9) i;                          -- 10 FUTURE queries (threshold 5)
+  r := public.quest_progress('daily_explorer');
+  if not ((r->>'paid')::boolean = false) then raise exception 'Q6 FAILED: future events awarded early'; end if;
+  if not ((select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 0) then
+    raise exception 'Q6 FAILED: future events wrote a ledger row';
+  end if;
 end $$;
 
--- SUCCESS: exit 0 from psql -v ON_ERROR_STOP=1 means Q1-Q5 all passed.
+-- SUCCESS: exit 0 from psql -v ON_ERROR_STOP=1 means Q1-Q6 all passed.
