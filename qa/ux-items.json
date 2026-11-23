@@ -1,5 +1,5 @@
 {
- "version": 23,
+ "version": 24,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -359,7 +359,7 @@
    "W": 7,
    "ircm": "4021",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "Y",
     "AG": "G",
     "GH": "U",
@@ -367,7 +367,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): keyboard focus paths verified in host wiring; deployed",
+   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): keyboard focus paths verified in host wiring; deployed | 2026-11-23 real keyboard-operability test (Playwright, 15 focus steps on live production): 15/15 focused elements have :focus-visible with solid outlines on BOTH hosts (AG + BV) \u2014 tour overlay, nav buttons, form controls all keyboard-reachable with visible focus",
    "fix": "Keyboard walkthrough per CUJ each release; record in qa-reports"
   },
   {
