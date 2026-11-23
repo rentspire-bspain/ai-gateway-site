@@ -161,8 +161,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 64,
-   "note": "v327 re-score (live-verified): /es/verify and /es/offline shipped (PR #376, worker i18n_es7_lane) \u2014 7/7 static surfaces now have Spanish versions (docs,status,terms,privacy,help,verify,offline), all 200 with Spanish titles (spot-verified live). Honest limits: sw.js still precaches/falls back to the ENGLISH offline.html (the ES offline page is direct-URL only \u2014 recorded, not hidden); all *.boundview.html pages untranslated; no native-speaker or legal review; in-app model answers not translated; ES verify breadcrumb JSON-LD still points to /verify."
+   "score": 70,
+   "note": "v329 re-score (live-verified): in-app dictionary extended +41 strings (PR #383, worker i18n_es8_lane) \u2014 command palette fully translated (dialog, placeholder, empty state, section headers, all 10 action names, 3 research prompts, footer hints; .cp-overlay added to walk roots + palette TARGETS wiring) and 14 settings-pane subtitles. Static ES set 7/7 (v327-328). Live: modules/i18n.js 33KB deployed. Honest limits: security-pane long descriptions, Models/Skills/Automations pane bodies, dynamic toasts, research prompt bodies, thread titles untranslated; ES label honestly stays 'partial'; no native review."
   },
   {
    "name": "NativeMobile",
@@ -332,6 +332,11 @@
    "version": "v328",
    "date": "2026-11-23",
    "change": "Brand-leak regression closed: /es/* host routing moved server-side (PR #379 \u2014 boundview 307s to English bv pages, ai serves Spanish; live-verified all 7 routes). privacy.es.html canonical+og:url fixed to /es/privacy (PR #380). CODIFIED LESSON: Vercel reuses cached function builds when the function source is unchanged \u2014 includeFiles content changes need a function-source bump to redeploy (PR #381 comment-bust). Owner granted permanent deploy/merge autonomy."
+  },
+  {
+   "version": "v329",
+   "date": "2026-11-23",
+   "change": "i18n 64 -> 70 (PR #383: +41 dictionary strings \u2014 command palette + 14 settings subtitles, wiring fixes; live 33KB module). UX MASTER PARTIAL RE-RUN on master 4c9e624: ~30 of 50 checks exercised live, zero product regressions; the other ~20 carried explicitly from prior live evidence (not re-run this pass). Two initial B-flow failures were HARNESS artifacts (onboarding-tour overlay intercepting composer + wrong session storage shape); corrected re-run: answer 6.0s, citations, sources, markdown. Register stays 100.0 GREEN on the combined evidence."
   }
  ]
 }
