@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script>/* brand-split guard: on a boundview host, serve the BoundView page instead */if(/boundview/i.test(location.hostname))location.replace('/help.boundview.html'+location.search+location.hash);</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayuda y soporte — ai.spaincos.com</title>
+<meta name="robots" content="index, follow">
+<meta name="description" content="Ayuda y soporte de ai.spaincos.com: contacto, preguntas frecuentes sobre cuentas, conectores, facturación y límites, error transitorio 546 y consejos de reintento, y guías de solución de problemas.">
+<style>
+  :root { --bg: #0C0E14; --fg: #E8ECF4; --muted: #9AA4B8; --border: #232A3A; --surface: #141824; --accent: #5B8CFF; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.65; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 650; margin: 0 0 6px; }
+  .updated { color: var(--muted); font-size: 13px; margin-bottom: 36px; }
+  h2 { font-size: 17px; font-weight: 600; margin: 32px 0 8px; color: var(--accent); }
+  h3 { font-size: 15px; font-weight: 600; margin: 22px 0 6px; }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin: 20px 0; }
+  a { color: #7FB4FF; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  nav { font-size: 14px; margin-bottom: 24px; }
+  nav a { margin-right: 14px; }
+  code { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 13px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .owner-note { color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); margin-top: 40px; padding-top: 16px; }
+</style>
+<link rel="alternate" hreflang="en" href="https://ai.spaincos.com/help">
+<link rel="alternate" hreflang="es" href="https://ai.spaincos.com/es/help">
+<link rel="alternate" hreflang="x-default" href="https://ai.spaincos.com/help">
+</head>
+<body>
+<main>
+  <nav><a href="/">&larr; ai.spaincos.com</a><a href="/es/docs">Documentación</a><a href="/es/terms">Términos</a><a href="/es/privacy">Privacidad</a><strong>Ayuda</strong><a href="/help">English</a></nav>
+  <h1>Ayuda y soporte</h1>
+  <p class="updated">ai.spaincos.com &middot; Actualizado el 21 de noviembre de 2026</p>
+
+  <div class="card"><strong>Contacto:</strong> escribe a <a href="mailto:bspain@spaincos.com">bspain@spaincos.com</a> y recibirás respuesta de una persona. No hay sistema de tickets &mdash; es un producto pequeño, solo por invitación, y el soporte se gestiona directamente por correo.</div>
+
+  <h2 id="faq">Preguntas frecuentes</h2>
+
+  <h3>Cuenta y acceso</h3>
+  <ul>
+    <li><strong>¿Cómo consigo una cuenta?</strong> El acceso es solo por invitación; no hay registro abierto. Las invitaciones existentes se envían por correo.</li>
+    <li><strong>¿Cómo inicio sesión?</strong> Introduce tu correo en la pantalla de inicio de sesión y recibirás un código corto de un solo uso (desde <code>login@ai.spaincos.com</code>). No hay contraseña que recordar; también hay un enlace de restablecimiento de contraseña por si lo necesitas.</li>
+    <li><strong>¿Correo escolar o de trabajo?</strong> La verificación de correo escolar está disponible en <a href="/verify.html">/verify</a>: introduce tu correo escolar y luego el código que te envía.</li>
+    <li><strong>¿Dónde están mis datos?</strong> Las conversaciones, archivos y ajustes se almacenan en una base de datos limitada a la cuenta, visible solo para tu cuenta y garantizada mediante seguridad a nivel de fila. Puedes eliminar conversaciones y archivos almacenados en cualquier momento. Consulta <a href="/es/privacy">Privacidad</a>.</li>
+  </ul>
+
+  <h3>Conectores (tu propio contexto)</h3>
+  <ul>
+    <li><strong>¿Qué puedo conectar hoy?</strong> <strong>Slack</strong> (historial y búsqueda de canales, grupos y mensajes directos) y <strong>Dropbox</strong> (tus archivos) están activos &mdash; conexión con un clic en <strong>Ajustes &rarr; Conectores</strong>.</li>
+    <li><strong>¿Qué viene después?</strong> Google (Gmail/Drive), Outlook (correo/calendario) y GitHub aparecen en Ajustes pero aún no se pueden conectar &mdash; sus registros OAuth siguen pendientes, por lo que sus botones de conexión no están disponibles. Esta página se actualizará cuando cada uno se active.</li>
+    <li><strong>¿Cómo desconecto?</strong> Cualquier proveedor se puede desconectar en cualquier momento en <strong>Ajustes &rarr; Conectores</strong>; las filas de contexto indexado son tus propios datos y se pueden eliminar.</li>
+    <li><strong>¿Quién puede ver mis datos conectados?</strong> Solo tú. Las credenciales y el contexto indexado se almacenan como filas tuyas bajo seguridad a nivel de fila, y los códigos de autorización OAuth se intercambian en el servidor, así que los secretos nunca llegan al JavaScript del navegador. Solo se usan los fragmentos necesarios para tu consulta activa al generar una respuesta. No hay anuncios ni rastreadores de terceros.</li>
+  </ul>
+
+  <h3>Facturación y créditos</h3>
+  <ul>
+    <li><strong>¿Aceptan pagos?</strong> Todavía no. El pago de planes no está activo, no se requiere tarjeta y no se ha publicado una política de reembolsos (el borrador de los Términos lo dice exactamente así). Si la facturación se activa, esta página y los Términos se actualizarán primero.</li>
+    <li><strong>¿Qué son las Neuronas?</strong> Las Neuronas son créditos de fidelidad que se ganan por actividad verificada (como el uso diario). Solo se ganan &mdash; nunca se compran, no son transferibles y no se pueden cambiar por dinero &mdash; y se pueden canjear en <strong>Ajustes &rarr; Neuronas</strong> por créditos de consulta adicionales.</li>
+  </ul>
+
+  <h3>Límites y rendimiento</h3>
+  <ul>
+    <li><strong>¿Hay límites de uso?</strong> No publicamos cifras concretas de límites. El acceso es solo por invitación y la capacidad se gestiona por cuenta; las reglas de uso aceptable (sin extracción masiva, sin sobrecargar el servicio) están en los <a href="/es/terms">Términos</a>.</li>
+    <li><strong>¿Por qué fue lenta mi respuesta?</strong> Las consultas complejas pueden ejecutar investigaciones largas de varios pasos con grandes presupuestos de tokens. Si una respuesta tarda, normalmente sigue trabajando; puedes pulsar el botón de detener y reenviar una pregunta más corta en cualquier momento.</li>
+  </ul>
+
+  <h3>Atajos de teclado</h3>
+  <ul>
+    <li><strong><code>/</code></strong> enfoca el cuadro de redacción.</li>
+    <li><strong><code>j</code> / <code>k</code></strong> pasan a la conversación siguiente / anterior en la barra lateral.</li>
+    <li><strong><code>Cmd+K</code> (<code>Ctrl+K</code> en Windows/Linux)</strong> abre o cierra la paleta de comandos, donde puedes buscar acciones y conversaciones. Usa las flechas arriba/abajo para moverte, <code>Enter</code> para ejecutar y <code>Esc</code> para cerrar.</li>
+    <li>Los atajos de una sola tecla (<code>/</code>, <code>j</code>, <code>k</code>) se ignoran mientras escribes en un campo de texto.</li>
+  </ul>
+
+  <h3>Conservación de datos</h3>
+  <ul>
+    <li><strong>¿Cuánto tiempo se conserva mi historial?</strong> Las conversaciones (y sus mensajes) inactivas durante 12 meses, los documentos de contexto importados con más de 12 meses y las copias de conversaciones compartidas revocadas hace más de 12 meses se eliminan mediante una tarea programada de conservación. Puedes eliminar tus propias conversaciones y archivos antes, en cualquier momento. Consulta <a href="/es/privacy">Privacidad</a>.</li>
+  </ul>
+
+  <h3>Voz</h3>
+  <ul>
+    <li><strong>La conversación por voz</strong> muestra una barra de estado con uno de tres estados: <strong>Escuchando</strong> (el micrófono te está captando), <strong>Pensando</strong> (se está respondiendo tu pregunta) y <strong>Hablando</strong> (la respuesta se lee en voz alta). Cuando termina la respuesta, vuelve a Escuchando.</li>
+    <li>Puedes interrumpir una respuesta hablada hablando; se detiene y vuelve a Escuchando. Pulsa <strong>Salir</strong> en la barra para dejar la conversación por voz.</li>
+    <li>Los problemas del micrófono se tratan en la guía de solución de problemas 3 más abajo.</li>
+  </ul>
+
+  <h3>Comportamiento sin conexión</h3>
+  <ul>
+    <li>Sin conexión aparece una barra de sin conexión y las páginas cargadas previamente siguen siendo legibles. Enviar preguntas y sincronizar requieren conexión, y la barra desaparece al reconectar (ver guía de solución de problemas 5).</li>
+  </ul>
+
+  <h3>Planes</h3>
+  <ul>
+    <li><strong>¿Qué planes existen?</strong> El pago está configurado para tres planes de pago con asignaciones mensuales de créditos: <strong>Starter</strong> (2.500 créditos), <strong>Pro</strong> (10.000 créditos) y <strong>Unlimited</strong> (25.000 créditos más procesamiento prioritario). Como se indica en Facturación y créditos, el pago aún no está activo, así que hoy no se cobra nada.</li>
+  </ul>
+
+  <h2 id="errors">Errores transitorios y reintentos</h2>
+  <h3>El error <code>546</code></h3>
+  <p>HTTP <code>546</code> es el código de estado de este servicio para un límite de recursos del worker de borde: el worker de cómputo que gestionaba tu solicitud se reinició a mitad de la petición (un <code>WORKER_RESOURCE_LIMIT</code> a nivel de plataforma), normalmente cuando varias solicitudes superpuestas comparten un worker activo. La respuesta fallida está vacía, así que <strong>reintentar siempre es seguro</strong> y normalmente cae en un worker nuevo &mdash; tu pregunta no se ejecutó a medias y no se te cobrará dos veces.</p>
+  <ul>
+    <li><strong>La app reintenta por ti.</strong> Ante un 546 el cliente reintenta automáticamente hasta dos veces más con un retardo aleatorio, y verás &ldquo;reconectando (intento 2 de 3)&rdquo; bajo el indicador de carga mientras lo hace.</li>
+    <li><strong>Si aún lo ves:</strong> pulsa <strong>Reintentar</strong> en la tarjeta de error o envía de nuevo tu pregunta. Los 546 son transitorios; esperar unos segundos ayuda si hay varias solicitudes en paralelo.</li>
+    <li><strong>Por qué ocurre menos ahora:</strong> el desencadenante principal (un paso de contexto que se ejecutaba en cada solicitud en lugar de solo cuando realmente se pedía un documento) se corrigió en la pasarela en noviembre de 2026 y se verificó sin 546 bajo ráfagas en paralelo. Las recurrencias raras con mucha superposición son el límite de plataforma descrito arriba, no pérdida de datos.</li>
+  </ul>
+  <h3>Otros errores transitorios</h3>
+  <ul>
+    <li><strong>502 / 503 / 504 y caídas de red:</strong> también se reintentan automáticamente (hasta dos intentos extra con retardo). Si aun así aparece una tarjeta de error, Reintentar suele resolverlo.</li>
+    <li><strong>Seguimiento atascado:</strong> si una respuesta falla mientras has escrito un seguimiento, se conserva y se reenvía automáticamente &mdash; no se pierde ningún texto escrito.</li>
+  </ul>
+
+  <h2 id="troubleshooting">Guías de solución de problemas</h2>
+  <h3>1. El código de inicio de sesión no llegó</h3>
+  <ol>
+    <li>Revisa tu carpeta de spam; el correo con el código viene de <code>login@ai.spaincos.com</code>.</li>
+    <li>Asegúrate de haber introducido la dirección de correo a la que se envió tu invitación.</li>
+    <li>Solicita el código de nuevo en la pantalla de inicio de sesión (los códigos caducan; uno nuevo no hay problema).</li>
+    <li>Si sigue sin llegar, escribe a <a href="mailto:bspain@spaincos.com">bspain@spaincos.com</a> desde la misma dirección.</li>
+  </ol>
+  <h3>2. Una respuesta falló a mitad (546, 502&ndash;504, red)</h3>
+  <ol>
+    <li>Pulsa <strong>Reintentar</strong> en la tarjeta de error o reenvía la pregunta. Estos errores son transitorios y es seguro reintentar (ver arriba).</li>
+    <li>Si ejecutabas varias preguntas en paralelo, deja que terminen las primeras y reintenta la que falló.</li>
+    <li>Si los reintentos siguen fallando durante más de unos minutos, consulta <code>/api/health</code> (más abajo) y escríbenos con la hora del fallo.</li>
+  </ol>
+  <h3>3. La entrada de voz no funciona</h3>
+  <ul>
+    <li><strong>&ldquo;Se bloqueó el acceso al micrófono&rdquo;</strong> &mdash; permite el micrófono en los ajustes del sitio de tu navegador y vuelve a tocar el micrófono.</li>
+    <li><strong>&ldquo;No se encontró micrófono&rdquo;</strong> &mdash; conecta un micrófono e inténtalo de nuevo.</li>
+    <li><strong>&ldquo;El reconocimiento de voz necesita conexión a la red&rdquo;</strong> &mdash; la entrada de voz requiere conexión a internet; revisa la tuya y reintenta.</li>
+    <li><strong>No se oyó nada</strong> &mdash; habla después de tocar el micrófono; el micrófono solo escucha mientras está activo.</li>
+  </ul>
+  <h3>4. Un conector no se conecta</h3>
+  <ol>
+    <li>Confirma que es uno de los proveedores activos: <strong>Slack</strong> o <strong>Dropbox</strong>. Google, Outlook y GitHub aún no se pueden conectar (ver las preguntas frecuentes arriba) &mdash; sus botones no están disponibles a propósito, no están rotos.</li>
+    <li>En Slack, asegúrate de poder autorizar los permisos de lectura solicitados en la pantalla de consentimiento de Slack.</li>
+    <li>Si una conexión parece incorrecta, desconéctala en <strong>Ajustes &rarr; Conectores</strong> y vuelve a conectarla.</li>
+  </ol>
+  <h3>5. La app indica que estás sin conexión</h3>
+  <p>La barra de sin conexión aparece cuando tu dispositivo no tiene conexión. Las páginas cargadas previamente siguen siendo legibles, pero enviar preguntas y sincronizar requieren conexión. Reconecta y la barra desaparece sola; lo que hayas escrito se conserva.</p>
+
+  <h2 id="status">Estado del servicio</h2>
+  <p>El estado del servicio se expone en <code>/api/health</code> (JSON) y se comprueba automáticamente cada 10 minutos en ambos dominios. Todavía no hay una página de estado para usuarios; si sospechas una caída, escríbenos e incluye la hora.</p>
+  <p class="muted">Esta página solo documenta lo que realmente está activo hoy. Las funciones marcadas como pendientes arriba están en curso y se añadirán aquí cuando se lancen. Para saber qué es el servicio y cómo se mide, consulta la <a href="/es/docs">Documentación</a>.</p>
+
+  <p class="owner-note">Preguntas sobre cualquier cosa de esta página: <a href="mailto:bspain@spaincos.com">bspain@spaincos.com</a></p>
+</main>
+</body>
+</html>
