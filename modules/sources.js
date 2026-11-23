@@ -125,6 +125,9 @@
   }
 
   function attach() {
+    // F-32 part 3: the whole pill insert is deferred to the user's first interaction —
+    // post-paint inserts into the composer row shifted the landing (CLS).
+    var insert = function () {
     HOSTS.forEach(function (h) {
       var host = document.getElementById(h.id);
       if (!host) return;
@@ -146,6 +149,8 @@
     fixPlacement();
     watchPlacement();
     syncPills();
+    };
+    (window.__onFirstInteraction || insert)(insert);
   }
 
   /* ---------------- dropdown menu ---------------- */

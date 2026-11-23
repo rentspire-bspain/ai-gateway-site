@@ -6,6 +6,29 @@
 // This module runs FIRST (before every other script). It defines window.BRAND from the
 // hostname and installs a DOM scrub that guarantees the rendered BoundView UI never shows
 // the other brand, no matter what a shared string in the codebase says.
+// v323 F-32 part 3: shared first-interaction gate. Modules that insert composer
+// pills post-paint shifted the landing (CLS 0.79); shifts within 500ms of USER input
+// are excluded from CLS, so deferring insertion to pointerdown/keydown is correct.
+// focusin is deliberately excluded (autofocus fires it). Defined here because brand.js
+// is the first script in <head>, so every module can rely on it existing.
+(function () {
+  var q = [];
+  window.__onFirstInteraction = window.__onFirstInteraction || function (fn) {
+    if (window.__interactionHappened) { try { fn(); } catch (e) {} return; }
+    q.push(fn);
+  };
+  window.__fireInteraction = function () {
+    if (window.__interactionHappened) return;
+    window.__interactionHappened = true;
+    var run = q; q = [];
+    for (var i = 0; i < run.length; i++) { try { run[i](); } catch (e) {} }
+    window.removeEventListener("pointerdown", window.__fireInteraction, true);
+    window.removeEventListener("keydown", window.__fireInteraction, true);
+  };
+  window.addEventListener("pointerdown", window.__fireInteraction, { passive: true, capture: true });
+  window.addEventListener("keydown", window.__fireInteraction, { passive: true, capture: true });
+})();
+
 (function () {
   var host = (location.hostname || "").toLowerCase();
   var isBV = host.indexOf("boundview") !== -1;
