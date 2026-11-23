@@ -1,5 +1,5 @@
 {
- "version": "v324-product-surface-inventory-7",
+ "version": "v326-product-surface-inventory-8",
  "note": "Fresh product-surface inventory \u2014 priority areas first (checkout, Comet, OAuth, restore, mobile). Stable IDs PI-###; FK to the 29-category scoring table; acceptance test per item; last evidence = live check at 2026-11-22T21:30Z unless noted. Does NOT force the 157; does not change weights or scores.",
  "items": [
   {
@@ -411,8 +411,23 @@
     "gate: RunPod API key. Lane designed; all other model providers live (Flint fallb",
     "standing owner-gate register (session context)"
    ]
+  },
+  {
+   "id": "PI-026",
+   "surface": "Supabase secrets-write (owner PAT / dashboard)",
+   "fk": "Billing",
+   "scope": "set STRIPE_SECRET_KEY + other env secrets on project bnxermyboeigvwonfrzx via Management API (deploy PAT returns 'not necessary privileges' on POST /secrets)",
+   "acceptance": "secret set via API and reflected in function env; fallback: owner pastes secret directly in Supabase dashboard",
+   "last_evidence": "gate: owner-level Supabase token. Live-tested 2026-11-22: POST /v1/projects/bnxermyboeigvwonfrzx/secrets denied for deploy PAT (prior owner PAT invalid). Owner directive 2026-11-23: Stripe key handled as one of the LAST items",
+   "ux_overlap": null,
+   "overlaps": "dependency of PI-019 (live checkout) \u2014 the mechanism gate under the key gate",
+   "proofs": [
+    "live denial evidence in session log 2026-11-22",
+    "credential form open (credential-interaction:874ee8f7) awaiting sk_live key"
+   ],
+   "status": "GATED (owner: secrets-write token or dashboard entry)"
   }
  ],
  "proof_pointer_note": "v322 (coordinator directive): every item carries proofs[] (stable pointers: result files, harness scripts, PR URLs, live-probe timestamps), ux_overlap (UX master check-ID cross-links; register qa-private/bench/results/ux-master.json), and overlaps[] (explicit duplicate-lens annotations \u2014 PI-007/PI-015 and PI-010/PI-014 are intentional dual-lens rows, not duplicates). Weights and scores unchanged.",
- "gated_surfaces_note": "v324 (owner directive): gated surfaces registered as first-class rows with explicit GATED status \u2014 25 items total (18 live/honest-state, 7 owner-gated). No gated surface is scored as complete; gates are recorded with exact evidence."
+ "gated_surfaces_note": "v324 (owner directive): gated surfaces registered as first-class rows with explicit GATED status \u2014 25 items total (18 live/honest-state, 7 owner-gated). No gated surface is scored as complete; gates are recorded with exact evidence. v326: PI-026 added (Supabase secrets-write mechanism gate)."
 }
