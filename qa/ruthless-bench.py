@@ -374,13 +374,20 @@ def failure_class(q, content, bench):
     # answer ending there is COMPLETE. Only a body cut mid-sentence (after stripping trailing
     # bullets) or an unclosed code fence is a truncation.
     body = re.sub(r"(?:\n\s*[-*\d.)]\s+[^\n]*)+\s*$", "", content.rstrip())
-    # v336 GRADER FIX (async-DSQA teardown 2026-11-23): the platform's FINAL ANSWER contract
-    # line legitimately ends with bare list items ("FINAL ANSWER: Psyduck, Kingler, ...") with
-    # no terminal punctuation — the mid-sentence detector mislabeled 10/50 complete async rows
-    # as truncated. A content ending in a FINAL ANSWER line is COMPLETE by contract.
-    if re.search(r"FINAL ANSWER:\s*\S[\s\S]*$", content.rstrip()) and "```" not in content.split("FINAL ANSWER:")[-1]:
-        pass  # contract line present and terminal — not truncated
-    elif (not body or not re.search(r"[.!?`):'\"\u201d\u2019]\s*(?:\*\*)?$", body)) or content.count("```") % 2 == 1:
+    # v336b GRADER FIX v2 (coordinator offline-negative review 2026-11-23): the v336 fix
+    # correctly admitted terminal bare-list FINAL ANSWER lines, but ALSO admitted
+    # (1) a nonterminal FINAL ANSWER marker followed by incomplete prose and (2) a
+    # FINAL ANSWER marker inside an UNCLOSED code fence. v2 contract: fences must be
+    # balanced, and the FINAL nonempty line OUTSIDE code blocks must be the answer-
+    # contract line (FINAL ANSWER: ...nonblank) or end with terminal punctuation.
+    if content.count("```") % 2 == 1:
+        return "truncated"
+    outside = re.sub(r"```[\s\S]*?```", "", content)  # strip balanced code blocks
+    lines = [ln for ln in outside.rstrip().splitlines() if ln.strip()]
+    final_line = lines[-1] if lines else ""
+    if re.match(r"\s*FINAL ANSWER:\s*\S", final_line):
+        pass  # final nonempty line outside code is the contract line — complete
+    elif (not body or not re.search(r"[.!?`):'\"\u201d\u2019]\s*(?:\*\*)?$", body)):
         return "truncated"
     if (bench in ("browsecomp", "dsqa", "frames")) and "http" not in content.lower():
         return "no-sources"
