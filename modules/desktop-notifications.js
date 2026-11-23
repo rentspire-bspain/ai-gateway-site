@@ -19,12 +19,13 @@
   function disable() { try { localStorage.setItem(KEY, "0"); } catch (e) {} }
 
   /** Fire a native notification (only when enabled + granted + tab hidden). */
+  function tr(x) { try { return root.I18N && root.I18N.t ? root.I18N.t(x) : x; } catch (e) { return x; } }
   function notify(title, body, onclickFocus) {
     if (!enabled() || !supported() || root.Notification.permission !== "granted") return false;
     if (!document.hidden) return false; // only when backgrounded — foreground has its own UI
     try {
-      var n = new root.Notification(String(title || "ai.spaincos.com").slice(0, 120), {
-        body: String(body || "").slice(0, 200), tag: "ai-thread-done", silent: false,
+      var n = new root.Notification(tr(String(title || "ai.spaincos.com").slice(0, 120)), {
+        body: tr(String(body || "")).slice(0, 200), tag: "ai-thread-done", silent: false,
       });
       n.onclick = function () { try { root.focus(); } catch (e) {} if (onclickFocus) onclickFocus(); n.close(); };
       return true;
