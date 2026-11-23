@@ -933,13 +933,18 @@ def main():
     ap.add_argument("--async-deep", action="store_true",
                     help="v262: run the bench through the async deep-research lane (BrowseComp-class)")
     ap.add_argument("--dr-effort", default="medium", help="async lane effort: fast|low|medium|high")
+    ap.add_argument("--sync", action="store_true", help="v335: force the sync path for DSQA (async is the default since the 150s-wall A/B)")
     a = ap.parse_args()
     if a.report:
         report(); return
     sess_mint()
     benches = list(LOADERS) if a.bench == "all" else [a.bench]
     for b in benches:
-        if a.async_deep:
+        # v335: DSQA defaults to the async deep-research lane (owner-approved after the
+        # 2026-11-23 A/B: sync 68-74% with 12-15 wall-truncations vs async 80% with 10,
+        # max latency 488.7s past the 150s edge wall). Pass --sync to force the sync path.
+        use_async = a.async_deep or (b == "dsqa" and not a.sync)
+        if use_async:
             global DR_EFFORT
             DR_EFFORT = a.dr_effort
             run_bench_async(b, a.n, a.workers)
