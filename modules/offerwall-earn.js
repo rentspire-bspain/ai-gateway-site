@@ -22,7 +22,9 @@
 
   function session() {
     try {
-      var c = window.sb || (typeof supabase !== "undefined" && null);
+      // repo pattern (monitors.js): `const sb` in script scope is NOT window.sb —
+      // typeof reaches the global lexical binding instead.
+      var c = (typeof sb !== "undefined") ? sb : window.sb;
       return (c && c.auth ? c.auth.getSession() : Promise.resolve(null)).then(function (r) {
         var s = r && r.data && r.data.session;
         S.token = s && s.access_token || "";
@@ -44,7 +46,7 @@
       if (!S.token || !S.user) { signedOut(body); return; }
       fetch(URL_, { method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + S.token },
-        body: JSON.stringify({ user_id: S.user }) })
+        body: JSON.stringify({ action: "balance" }) })
         .then(function (r) {
           if (r.status === 401 || r.status === 403) { signedOut(body); return null; }
           return r.ok ? r.json() : null;
