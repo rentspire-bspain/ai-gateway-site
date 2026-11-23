@@ -2093,7 +2093,7 @@ Question: "${userQuery}"`;
     // stayed simple/medium -> 2048 budget -> work-log preamble consumed it, answer cut mid-listing).
     {
       const uqT = String(userQuery || "").trim();
-      const completeSet = /\b(?:list|name|identify|give|show)\s+(?:me\s+)?(?:all|every)\b|\ball\b[^?.]{0,60}\bthat\b|\bfor each\b|\bcomplete (?:set|list)\b|\bhow many\b[^?]{0,120}\band (?:which|what|who)\b|\brank(?:ed|ing)?\b[^?.]{0,80}\bby\b|\bthe (?:top )?\d+\b[^?.]{0,40}\b(?:highest|lowest|largest|smallest|most|fewest)\b|\bevery\b[^?.]{0,60}\bthat\b|\bwhich\b[^?]{0,120}\b(?:and|plus)\b[^?]{0,60}\?/i.test(uqT);
+      const completeSet = /(?:\b(?:of|out\s+of|between|among)\s+the\b[^?]{0,120}\b(?:that|which|who|with|saw|won|had|by a margin|released|be)\b)|(?:\bthe\s+(?:two|three|four|five|\d+|[a-z]+est)\s+\w+\s+with\s+the\s+(?:highest|lowest|largest|smallest|most|fewest)\b)|(?:\bidentify\s+(?:the|all)\b[^?]{0,120}\b(?:that|which|with)\b)|(?:\bwith\s+(?:both\s+)?an?\s+above-average\b)|(?:\bwhich\b[^?]{0,80}\bwho\s+(?:had|has)\b)|(?:\baccording to\b[^?]{0,120}\b(?:report|website|data|statistics|database|table|index|study|records)\b)/i.test(uqT);
       if (completeSet && (intent.complexity === "simple" || intent.complexity === "medium")) intent.complexity = "complex";
     }
     // v259: declared BEFORE the v253 predicate below assigns it (a TDZ ReferenceError —
