@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<script>/* brand-split guard: on a boundview host, serve the BoundView page instead */if(/boundview/i.test(location.hostname))location.replace('/docs.boundview.html'+location.search+location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentación — ai.spaincos.com</title>
+<meta name="robots" content="index, follow">
+<meta name="description" content="Qué es ai.spaincos.com, cómo se mide y las puntuaciones de benchmarks con calificación estricta y justa lado a lado. Solo por invitación.">
+<style>
+  :root { --bg: #0C0E14; --fg: #E8ECF4; --muted: #9AA4B8; --border: #232A3A; --surface: #141824; --accent: #5B8CFF; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.65; }
+  main { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 32px; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 40px 0 10px; color: var(--accent); }
+  p, li { color: var(--fg); }
+  .muted { color: var(--muted); font-size: 14px; }
+  a { color: var(--accent); }
+  .tw { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--surface); }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  code { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 13px; }
+  .note { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; margin: 16px 0; }
+  .status-live { display: inline-block; font-size: 12px; font-weight: 600; color: #7EE787; background: rgba(46, 160, 67, 0.16); border: 1px solid rgba(126, 231, 135, 0.38); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+  .status-pending { display: inline-block; font-size: 12px; font-weight: 600; color: #F2CC60; background: rgba(210, 153, 34, 0.14); border: 1px solid rgba(242, 204, 96, 0.36); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+  nav a { margin-right: 14px; font-size: 14px; }
+</style>
+<link rel="alternate" hreflang="en" href="https://ai.spaincos.com/docs">
+<link rel="alternate" hreflang="es" href="https://ai.spaincos.com/es/docs">
+<link rel="alternate" hreflang="x-default" href="https://ai.spaincos.com/docs">
+</head>
+<body>
+<main>
+<nav><a href="/">&larr; Volver a ai.spaincos.com</a><a href="/es/privacy">Privacidad</a><a href="/es/terms">Términos</a><a href="/help.html">Ayuda</a></nav>
+<h1>Documentación de ai.spaincos.com</h1>
+<p class="muted">Última actualización: 2026-11-21. Cada cifra de abajo proviene de los informes de QA del repositorio; las fuentes se indican junto a cada número.</p>
+
+<h2>Qué es</h2>
+<p>ai.spaincos.com es un asistente de investigación y respuestas: haces una pregunta, busca en la web y en tus fuentes conectadas, y redacta una respuesta con citas. Funciona con modelos de pesos abiertos tras un único gateway, y los informes largos y los archivos se abren en un panel lateral junto a la conversación. El acceso es solo por invitación (ver abajo).</p>
+
+<h2 id="connected-context">Contexto conectado</h2>
+<p>Conectar tus propias cuentas convierte mensajes del espacio de trabajo, archivos, hilos de la bandeja de entrada y agendas de calendario en contexto citado y consultable junto con la búsqueda web en vivo &mdash; así una sola pregunta puede cruzar tus documentos y conversaciones con fuentes web en vivo sin copiar y pegar a mano:</p>
+<ul>
+<li><strong>Pregunta a tu Slack</strong> <span class="status-live">Activo</span> &mdash; <em>&ldquo;¿Qué decidió #ops esta semana sobre el despliegue del Q4, con enlaces a cada hilo?&rdquo;</em></li>
+<li><strong>Pregunta a tus archivos</strong> <span class="status-live">Activo</span> &mdash; <em>&ldquo;Compara las cifras de mi carpeta Q3 de Dropbox con datos de mercado en vivo.&rdquo;</em></li>
+<li><strong>Pregunta a tu propia bandeja de entrada</strong> <span class="status-pending">Registro pendiente</span> &mdash; <em>&ldquo;¿Qué dijo mi contable sobre las facturas del Q3?&rdquo;</em></li>
+</ul>
+<div class="note"><strong>Compromiso de privacidad:</strong> las credenciales de los conectores y las filas de contexto indexado se almacenan en Supabase como filas propiedad del usuario, limitadas a <code>auth.uid()</code> y garantizadas en la capa de base de datos mediante la seguridad a nivel de fila de Postgres (<code>RLS</code>) &mdash; ningún otro usuario puede leer tus filas. Los códigos de autorización OAuth se intercambian en el servidor (<code>/api/oauth-callback</code>), de modo que los secretos de cliente y los tokens de actualización nunca llegan al JavaScript del navegador. Solo los fragmentos recuperados para tu consulta activa se envían para generar la respuesta; no hay anuncios, ni rastreadores de terceros, ni venta de datos. Las acciones de escritura (enviar correo o crear eventos de calendario cuando se conecten proveedores de correo/calendario) requieren pulsar una tarjeta explícita de <strong>Aprobar</strong> en el chat. Puedes desconectar cualquier proveedor en <strong>Ajustes &rarr; Conectores</strong> o eliminar conversaciones y archivos almacenados en cualquier momento (ver <a href="/es/privacy">Privacidad</a>).</div>
+<div class="tw"><table>
+<tr><th>Proveedor</th><th>Contexto desbloqueado</th><th>Estado de OAuth</th><th>Estado actual (verificado vía <code>/api/oauth-config</code>)</th></tr>
+<tr><td>Slack</td><td>Historial y búsqueda de canales, grupos y mensajes directos como contexto citado</td><td><span class="status-live">ACTIVO</span></td><td>Aplicación OAuth 2.0 registrada; conexión con un clic en Ajustes &rarr; Conectores (<code>channels:history</code>, <code>im:history</code>, <code>search:read</code>).</td></tr>
+<tr><td>Dropbox</td><td>Carpetas, hojas de cálculo, PDF y documentos como contexto citado</td><td><span class="status-live">ACTIVO</span></td><td>Aplicación OAuth 2.0 registrada; conexión con un clic en Ajustes &rarr; Conectores con renovación sin conexión.</td></tr>
+<tr><td>Google (Gmail, Calendar, Drive, Sheets)</td><td>Hilos de correo, eventos de calendario, documentos de Drive y hojas de Sheets como contexto citado</td><td><span class="status-pending">Registro pendiente</span></td><td>Registro de cliente OAuth público y verificación de Google pendientes (<code>google: null</code>); la interfaz muestra el estado real de configuración, nunca un botón de conexión falso.</td></tr>
+<tr><td>Microsoft Outlook (Mail, Calendar)</td><td>Mensajes de correo y eventos de calendario como contexto citado</td><td><span class="status-pending">Registro pendiente</span></td><td>Registro de la aplicación OAuth de Microsoft Entra pendiente (<code>outlook: null</code>).</td></tr>
+<tr><td>GitHub</td><td>Repositorios, incidencias y pull requests</td><td><span class="status-pending">Registro pendiente</span></td><td>Registro de la aplicación OAuth pública pendiente (<code>github: null</code>); para cuentas autorizadas se puede pegar un token personal de API en Ajustes &rarr; Conectores.</td></tr>
+</table></div>
+
+<h2>El programa de finalización</h2>
+<p>El progreso se mide frente a un conjunto fijo de 29 dimensiones ponderadas, puntuadas con evidencia verificada en vivo y calculadas por <code>qa/generate-parity-headline.py</code> a partir de <code>qa/parity-items.json</code>. Nada se suma a mano. Cifra actual: <strong>84,4 %</strong> (10804 / 128 puntos ponderados, versión v291b; fuente: <code>qa-reports/parity-headline-latest.json</code>).</p>
+<ul>
+<li><strong>Paridad de funciones (17):</strong> Features, Computer, API, Troubleshooting, Voice, Account, Models, Connectors, Privacy, Comet, Premium, Enterprise, Getting Started, Desktop, Billing, Mobile, Teammates.</li>
+<li><strong>Superficies de producto (12):</strong> UX, SEO, Marketing, Security, Accessibility, Legal/Compliance, Docs/Support, Observability, Fleet, Email/Notifications, i18n, Native Mobile.</li>
+</ul>
+<p class="muted">Varias dimensiones puntúan muy por debajo de 100 (por ejemplo Mobile 60, Accessibility 55, Legal/Compliance 45, i18n 10). El crédito parcial cuenta como la mitad.</p>
+
+<h2>Puntuaciones de benchmarks</h2>
+<div class="note">Se muestran dos vías de calificación. La <strong>estricta</strong> lee solo el final de la respuesta para obtener la respuesta definitiva. La <strong>justa</strong> da crédito a una respuesta de referencia correcta indicada en el cuerpo; cada fila correcta en la vía justa se verificó a mano, y las cifras justas son el techo honesto. Cuando existe una cifra estricta, se muestra junto a la justa. Los benchmarks de búsqueda (SimpleQA, FRAMES, DSQA, BrowseComp) se califican de forma estricta con lecturas justas de la referencia añadidas (v256+).</div>
+<div class="tw"><table>
+<tr><th>Benchmark</th><th>Justa / cifra principal</th><th>Vía estricta</th><th>Fuente (ronda)</th></tr>
+<tr><td>SimpleQA</td><td>99.0%</td><td>calificación estricta</td><td>confirmación asíncrona v282; la vía dentro de la solicitud también 99</td></tr>
+<tr><td>FRAMES</td><td>89&ndash;90%</td><td>calificación estricta</td><td>r14 (90,0) y confirmación v282 (89,0)</td></tr>
+<tr><td>DSQA</td><td>84.0%</td><td>calificación estricta; banda 78&ndash;84</td><td>confirmación asíncrona v282</td></tr>
+<tr><td>BrowseComp</td><td>88.0%</td><td>calificación estricta</td><td>confirmación asíncrona v282 r17</td></tr>
+<tr><td>MATH-500</td><td>92,0 % justa (92/100)</td><td>68&ndash;79%</td><td>v288b calificación justa; estricta de las rondas v278&ndash;v286c</td></tr>
+<tr><td>AIME 2025</td><td>93,3 % justa (14/15, n=15)</td><td>46.7&ndash;53.3%</td><td>v288b calificación justa; estricta de las rondas v278&ndash;v286c</td></tr>
+<tr><td>IFEval</td><td>banda 48&ndash;60 %</td><td>mejor ronda individual 60,0 (ronda 2)</td><td>rondas r2&ndash;r8, redactor de clase GLM</td></tr>
+<tr><td>UX master benchmark</td><td>91,4, VERDE</td><td>46 comprobaciones; 9 con puntuación parcial</td><td>primera ejecución en vivo, 2026-11-21, plataforma 300</td></tr>
+</table></div>
+<p class="muted">Fuente de todas las filas: <code>qa-reports/parity-status-2026-11-18-v263.md</code> (tabla de benchmarks y registro de lotes). Los archivos de rondas están en <code>qa-private/bench/results-v*/</code>; la ejecución de UX es <code>qa-private/bench/results/ux-master.json</code>. Márgenes de ruido (estricta): SimpleQA &plusmn;2 %, FRAMES &plusmn;4,3 %, DSQA &plusmn;5 %, BrowseComp &plusmn;4,7 %; AIME, con 15 preguntas, avanza en pasos de 6,7 puntos, por lo que su banda es amplia. IFEval sigue siendo el resultado más débil; el cumplimiento del formato de instrucciones está por debajo del rango de frontera y se sigue trabajando en ello.</p>
+<p class="muted">Las reglas que siguen estas cifras están en <code>qa/BENCHMARK_GOSPEL.md</code>: todo cambio de calidad requiere una ronda completa, las mejoras deben reproducirse, las regresiones se corrigen en una ronda y el calificador no puede ajustarse para inflar puntuaciones.</p>
+
+<h2>Comprobaciones permanentes tras el despliegue</h2>
+<p>Ningún despliegue se considera terminado hasta que estas tres suites pasen contra el sitio en vivo:</p>
+<ul>
+<li><code>qa/e2e-real-flows.py</code>: 9 flujos de shell (la aplicación carga, sin violaciones de CSP, sin errores de ejecución, errores reales de autenticación visibles, sin fugas de marca).</li>
+<li><code>qa/e2e-ux-flows.py</code>: 9 flujos de UX.</li>
+<li><code>qa/e2e-ux-master.py</code>: 46 comprobaciones ponderadas, que se superan con 90 o más.</li>
+</ul>
+
+<h2>Acceso</h2>
+<p>ai.spaincos.com es <strong>solo por invitación</strong>. No hay registro abierto; iniciar sesión con un correo no invitado muestra un mensaje de solo invitación. Para solicitar acceso, contacta con el responsable del despliegue al que te dirigieron.</p>
+
+<p class="muted" style="margin-top:40px">Esta página es estática y refleja el repositorio en la fecha indicada. Si discrepa de los informes de QA, prevalecen los informes.</p>
+</main>
+</body>
+</html>
