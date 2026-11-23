@@ -22,7 +22,9 @@
 
   function session() {
     try {
-      var c = window.sb || (typeof supabase !== "undefined" && null);
+      // repo pattern (monitors.js): `const sb` in script scope is NOT window.sb —
+      // typeof reaches the global lexical binding instead.
+      var c = (typeof sb !== "undefined") ? sb : window.sb;
       return (c && c.auth ? c.auth.getSession() : Promise.resolve(null)).then(function (r) {
         var s = r && r.data && r.data.session;
         S.token = s && s.access_token || "";
