@@ -1497,6 +1497,11 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 }
 .answer-error-retry:hover { background: var(--accent-btn-hover); }
 .answer-error-retry:disabled { opacity: 0.6; cursor: default; }
+.credit-notice { position: relative; }
+.credit-notice-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.credit-notice-secondary { background: var(--bg-surface); color: var(--text); border: 1px solid var(--border); }
+.credit-notice-secondary:hover { background: var(--bg-surface); border-color: var(--accent); }
+.credit-notice-dismiss { position: absolute; top: 6px; right: 8px; background: none; border: none; color: var(--text-muted); font-size: 20px; line-height: 1; cursor: pointer; min-width: 32px; min-height: 32px; }
 .searching-phases .searching-step.done::before { content: none; }
 .searching-step.err { color: var(--error); }
 /* agentic: plan checklist (Steps box) — per-item pending / done / failed */
@@ -5100,6 +5105,27 @@ function renderAnswerError(container, title, detail, query) {
   return card;
 }
 
+// Credit-exhaustion notice. Gateway marker: HTTP 402 {error:"out_of_credits"} (gateway-chat credits_reserve).
+// Manage opens Settings > Billing; Resume re-submits the failed question via submitQuery.
+function renderCreditNotice(container, query) {
+  const card = renderAnswerError(container, "You're out of credits for this billing period", "Add credits or change your plan to keep asking. Your question wasn't lost.", "");
+  card.classList.add("credit-notice");
+  const body = card.querySelector(".answer-error-body");
+  const row = document.createElement("div"); row.className = "credit-notice-actions";
+  const manage = document.createElement("button"); manage.type = "button"; manage.className = "answer-error-retry"; manage.textContent = "Manage";
+  manage.onclick = () => { if (window.SettingsUI && window.SettingsUI.open) window.SettingsUI.open("billing"); };
+  row.appendChild(manage);
+  if (query && query.trim()) {
+    const resume = document.createElement("button"); resume.type = "button"; resume.className = "answer-error-retry credit-notice-secondary"; resume.textContent = "Resume";
+    resume.onclick = () => { if (isSearching) return; resume.disabled = true; submitQuery(query); };
+    row.appendChild(resume);
+  }
+  const dis = document.createElement("button"); dis.type = "button"; dis.className = "credit-notice-dismiss"; dis.setAttribute("aria-label", "Dismiss"); dis.textContent = "\u00d7";
+  dis.onclick = () => card.remove();
+  card.appendChild(dis); body.appendChild(row);
+  return card;
+}
+
 // v83 (G8): retry transient network failures / gateway 502-504 on the chat POST, with a visible note
 // v290: HTTP 546 (Supabase WORKER_RESOURCE_LIMIT — the edge worker was recycled for compute/memory,
 // typically when overlapping requests share one worker; the response is empty, so a retry is safe and
@@ -5558,7 +5584,9 @@ async function performSearchInner(query) {
       return;
     }
     const netFail = /failed to fetch|networkerror|load failed|network request failed/i.test(emsg);
-    if (/conversation too large/i.test(emsg)) {
+    if (/^out_of_credits$|out of credits/i.test(emsg)) {
+      renderCreditNotice(content, query);
+    } else if (/conversation too large/i.test(emsg)) {
       renderAnswerError(content, "This thread is very long", "This conversation has grown past the context limit. Start a new thread and reference this one (link it with @) — your recent messages are preserved.", query);
     } else {
       if (searchAbort && searchAbort.signal.aborted) {
