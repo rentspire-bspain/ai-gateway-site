@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 17.4%** (app-weighted; unmeasured counts as 0; v21 — worker loop + multiroute Playwright batches) · **measured-only: 32.9%** · 120✅ / 236🟡 / 221🔴 / 800⚪ across 386 line items. Per-app strict: BV 30.6% · TT 17.7% · AG 37.8% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 17.2%** (app-weighted; unmeasured counts as 0; v21 — worker loop + Playwright audits + F-32 fix series live) · **measured-only: 32.8%** · 120✅ / 233🟡 / 221🔴 / 803⚪ across 386 line items. Per-app strict: BV 30.6% · TT 16.8% · AG 37.5% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1542,3 +1542,14 @@ All routes 200 on both hosts; 0 console errors everywhere; no horizontal scroll 
 - 🟡 U-A11Y-03 BV: focus visibility weak (1/5 first focusables show visible focus styles) — same build as AG
 - 🟡 U-MOB-08 AG: 10/80 interactive elements under 24px on mobile
 Register v21: portfolio strict **17.4%**, measured-only 32.9%. Raw results: /home/user/workspace/completion-loop/multiroute-results.json.
+
+### F-32 CLOSEOUT (2026-11-23, PRs #390 + #391 + #396 + #401 + #403, all owner-authorized)
+
+Landing CLS: **0.793 → 0.355 live** (mobile 375px; slow-4G was 1.069). Fix series:
+- ✅ ~~header settle (57→61px webfont swap)~~ — pinned min-height 61px (PR #390)
+- ✅ ~~suggestions box growth (145→253px onboarding swap)~~ — post-mount height reserved (PR #391)
+- ✅ ~~composer pills mount (+92px above the fold)~~ — ALL five inserters (positionComposerPills, media, media-labs, sources, local-files) + their MutationObserver re-mounts deferred to first interaction via a shared brand.js gate (PRs #396 + #401)
+- ✅ ~~onboarding content mount (~1,600px into #suggestions behind the auth overlay)~~ — the root cause of the "connection box [0,0]" mystery: the conn box was pushed off-screen by this growth; all three mount paths deferred (PR #403)
+- 🟡 remaining single shift 0.336 at ~1.4s: coincides with lazy module loading (script nodes appended to body at 1.1-1.4s); attributed nodes are stable or out-of-viewport; no DOM mutation correlates under instrumentation — next diagnostic step is lazy-module bisection
+
+Register v21: portfolio strict 17.2%, measured-only 32.8%. U-PERF-03 AG/BV R→Y (0.793→0.355, threshold 0.1 not yet met).
