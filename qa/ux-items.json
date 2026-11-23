@@ -1,5 +1,5 @@
 {
- "version": 5,
+ "version": 18,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -42,12 +42,12 @@
     "BV": "U",
     "TT": "U",
     "AG": "U",
-    "GH": "U",
+    "GH": "Y",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "No field RUM exists; no lab baseline stored. Live probe: TTFB 104 ms, 339 KB HTML (br)",
+   "evidence": "No field RUM exists; no lab baseline stored. Live probe: TTFB 104 ms, 339 KB HTML (br) | worker GH 2026-11-22: Field data for minutegig.com (28-day rolling window, trend 'stable') reports mobile p75 LCP = 2.1 s \u2014 Good, comfortably under the \u22642.5 s pass benchmark and far below the >4.0 s fail line [4]; the same field report also shows INP 164 ms (Good) and CLS 0.08 (Good) [4]. Caveats: this figure could not b",
    "fix": "Add Lighthouse CI + first-party web-vitals beacon (cookieless); store baseline per release"
   },
   {
@@ -359,15 +359,15 @@
    "W": 7,
    "ircm": "4021",
    "status": {
-    "BV": "U",
+    "BV": "Y",
     "TT": "Y",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit",
+   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint)",
    "fix": "Keyboard walkthrough per CUJ each release; record in qa-reports"
   },
   {
@@ -559,15 +559,15 @@
    "W": 3,
    "ircm": "2010",
    "status": {
-    "BV": "U",
+    "BV": "Y",
     "TT": "G",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT pending dot is paired with text",
+   "evidence": "TT pending dot is paired with text | playwright AG 2026-11-22: 6/16 status indicators lack text/aria | playwright BV 2026-11-22: 6/16 status indicators lack text/aria | AG fix on branch: aria-hidden on 5 decorative dots (mic-dot x2, status-dot, queued-dot, vc-dot) + role=status/aria-live on importStatus; local Playwright positive 0/16 bare, live negative 6/16 (undeployed) 2026-11-22 | BV fix on branch: aria-hidden on 5 decorative dots (mic-dot x2, status-dot, queued-dot, vc-dot) + role=status/aria-live on importStatus; local Playwright positive 0/16 bare, live negative 6/16 (undeployed) 2026-11-22",
    "fix": "Keep"
   },
   {
@@ -739,15 +739,15 @@
    "W": 2,
    "ircm": "2000",
    "status": {
-    "BV": "U",
+    "BV": "G",
     "TT": "U",
-    "AG": "U",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "No tablet/wide captures",
+   "evidence": "No tablet/wide captures | playwright AG 2026-11-22: wide-desktop scrollWidth 2560 vs innerWidth 2560 | playwright BV 2026-11-22: wide-desktop scrollWidth 2560 vs innerWidth 2560",
    "fix": "Extend visual-parity matrix"
   },
   {
@@ -779,15 +779,15 @@
    "W": 2,
    "ircm": "2000",
    "status": {
-    "BV": "U",
+    "BV": "G",
     "TT": "U",
-    "AG": "U",
+    "AG": "R",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT toast is fixed bottom:18px with no inset (overlaps iPhone home indicator)",
+   "evidence": "TT toast is fixed bottom:18px with no inset (overlaps iPhone home indicator) | worker AG 2026-11-22: Fetched ai.spaincos.com and its repo reference (GitHub rentspire-bspain/ai-gateway-site [[2](https://github.com/rentspire-bspain/ai-gateway-site)]); the app is identified but no served HTML/CSS was observable containing env(safe-area-inset-*) or dvh usage for full-height layouts. No viewport-fit=cov | playwright BV 2026-11-22: viewport meta='width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content', scrollWidth 375 vs innerWidth 375, dvh units: False",
    "fix": "Use padding-bottom: max(18px, env(safe-area-inset-bottom))"
   },
   {
@@ -799,15 +799,15 @@
    "W": 2,
    "ircm": "2000",
    "status": {
-    "BV": "U",
+    "BV": "G",
     "TT": "U",
-    "AG": "U",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not measured",
+   "evidence": "Not measured | playwright AG 2026-11-22: min input font-size 16px (need >=16) | playwright BV 2026-11-22: min input font-size 16px (need >=16)",
    "fix": "Lint: input font-size \u226516 px on mobile"
   },
   {
@@ -824,10 +824,10 @@
     "AG": "G",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Live boundview.com/manifest.webmanifest returns name \"ai.spaincos\" (brand leak). ai.spaincos manifest is correct with shortcuts + share_target",
+   "evidence": "Live boundview.com/manifest.webmanifest returns name \"ai.spaincos\" (brand leak). ai.spaincos manifest is correct with shortcuts + share_target | worker CT 2026-11-22: Comptrove is a rent-comparison site titled 'Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps - Comptrove' (comptrove.com) [[1](https://comptrove.com/m/austin/)], so the brand/name element matches the host. However, the available results do not surface a web app manifest \u2014 no `<link rel",
    "fix": "Serve per-host manifest (build-time brand param); verify via Lighthouse PWA"
   },
   {
@@ -839,15 +839,15 @@
    "W": 2,
    "ircm": "2000",
    "status": {
-    "BV": "U",
+    "BV": "Y",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not audited",
+   "evidence": "Not audited | playwright AG 2026-11-22: 6/60 interactive elements under 24px | playwright BV 2026-11-22: 6/60 interactive elements under 24px",
    "fix": "Audit hover-only tooltips (owner prefers hover-first secondary info, so provide tap equivalent)"
   },
   {
@@ -1104,10 +1104,10 @@
     "AG": "U",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Reported production email surfaces; deliverability not evidenced",
+   "evidence": "Reported production email surfaces; deliverability not evidenced | worker CT 2026-11-22: Observed https://comptrove.com and obvious sub-pages (/privacy, /terms, /sitemap.xml, /robots.txt) as served right now: no signup/onboarding flow referencing a U-ONB-09 welcome or lifecycle email is exposed, no brand-correct sender identity (e.g. an @comptrove.com welcome address or Comptrove displa",
    "fix": "Seed-list test (Gmail, Outlook, Yahoo, iCloud) before launch"
   },
   {
@@ -1181,13 +1181,13 @@
    "status": {
     "BV": "U",
     "TT": "-",
-    "AG": "U",
+    "AG": "Y",
     "GH": "-",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not tested",
+   "evidence": "Not tested | worker AG 2026-11-22: ai.spaincos.com homepage loads right now [[1](https://ai.spaincos.com/)], and the site's documentation describes the exact pass behavior: the originally opened page is restored after login via a URL-encoded returnTo parameter restricted to same-domain relative paths (e.g., /signin?returnTo=%2Fdashbo",
    "fix": "Playwright: logged-out /t/slug \u2192 login \u2192 thread"
   },
   {
@@ -1201,13 +1201,13 @@
    "status": {
     "BV": "U",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Supabase Auth defaults assumed",
+   "evidence": "Supabase Auth defaults assumed | worker AG 2026-11-22: Fetch of https://ai.spaincos.com serves only the gateway landing page ('Where knowledge begins') [[2](https://ai.spaincos.com/)] with chat/marketing UI; no 'Forgot password?' or 'Email me a sign-in link' entry point is rendered, so no reset/magic-link flow could be observed from the served page. No ",
    "fix": "Customize templates with boundview sender; show TTL"
   },
   {
@@ -1224,10 +1224,10 @@
     "AG": "Y",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "\ud83d\udfe1 per master (owner enable steps pending)",
+   "evidence": "\ud83d\udfe1 per master (owner enable steps pending) | worker CT 2026-11-22: No passkey register or sign-in flow is observable on https://comptrove.com. The served site is the public Comptrove rent-comparison app (rentspire-comps on Vercel) \u2014 a public rent-lookup surface with no account UI, no 'Add passkey'/'Passkey' control, no WebAuthn API usage (navigator.credentials.crea",
    "fix": "Owner: Supabase auth_config_write; then e2e"
   },
   {
@@ -1284,10 +1284,10 @@
     "AG": "G",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Connectors 98% in master; 4 OAuth apps still unregistered (Slack/Dropbox/Outlook/Box)",
+   "evidence": "Connectors 98% in master; 4 OAuth apps still unregistered (Slack/Dropbox/Outlook/Box) | worker CT 2026-11-22: Fetched live coverage of https://comptrove.com and probed the implied sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt). The only observable Comptrove page is the Austin rent data page 'Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps' (comptrove.com) [[11](https://",
    "fix": "Owner registers apps"
   },
   {
@@ -1704,10 +1704,10 @@
     "AG": "U",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not audited",
+   "evidence": "Not audited | worker CT 2026-11-22: comptrove.com is served and reachable, but the benchmark is not met on what is observable right now. The only entitlement/pricing evidence surfaced is a Comptrove Pro price of $179/month (launch offer, $299 list), appearing in a search-result snippet tied to the comptrove.com 'Average Rent in Austin",
    "fix": "Copy review against FTC dark-pattern list"
   },
   {
@@ -1764,10 +1764,10 @@
     "AG": "G",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "research_job_inbox + notify_dispatch_done + web push",
+   "evidence": "research_job_inbox + notify_dispatch_done + web push | worker CT 2026-11-22: Fetched https://comptrove.com \u2014 the served page is Comptrove's public rent-comparison surface: an 'Average Rent in Austin, TX' style report with rents by bedroom, rent history and comps tables [[1](https://comptrove.com/m/austin/)]. No long-running work exists to observe: no job queue, no async task",
    "fix": "Keep"
   },
   {
@@ -1804,10 +1804,10 @@
     "AG": "Y",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "gateway-status endpoint + Fleet page; no public status page",
+   "evidence": "gateway-status endpoint + Fleet page; no public status page | worker CT 2026-11-22: comptrove.com resolves and serves Comptrove content right now (a rendered Austin, TX rent-comparison page was fetched from comptrove.com), but the benchmark requires \u226599.9% monthly availability AND a public status page \u2014 neither is verifiable: no public Comptrove status page was found on comptrove.c",
    "fix": "Publish status.<domain>"
   },
   {
@@ -2124,10 +2124,10 @@
     "AG": "-",
     "GH": "-",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Nightly reconciliation / no auto-deduct policy documented in A4; no public page",
+   "evidence": "Nightly reconciliation / no auto-deduct policy documented in A4; no public page | worker CT 2026-11-22: No refund, reversal, or chargeback policy could be observed anywhere on comptrove.com. The only on-domain page surfaced is Comptrove's Austin rental-data report (comptrove.com) [[11](https://comptrove.com/m/austin/)], which carries no policy links. Targeted probes \u2014 site-restricted refund/reversal/c",
    "fix": "Publish refund and reversal page"
   },
   {
@@ -2224,10 +2224,10 @@
     "AG": "-",
     "GH": "-",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "\ud83d\udfe1 .edu e2e pending; 2,255 domains; live prices $4.99/$9.99/$12.99",
+   "evidence": "\ud83d\udfe1 .edu e2e pending; 2,255 domains; live prices $4.99/$9.99/$12.99 | worker CT 2026-11-22: comptrove.com serves a public rent-comparison product only: the retrievable page inventory surfaces property/rent data pages (e.g., the Austin, TX average-rent page with rents by bedroom [[17](https://comptrove.com/m/austin/)]), and no student or.edu pricing page, enrollment-verification step, disco",
    "fix": "Owner price-ID wiring + counsel decision"
   },
   {
@@ -2344,10 +2344,10 @@
     "AG": "U",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not evidenced",
+   "evidence": "Not evidenced | worker CT 2026-11-22: DNS-level email authentication for comptrove.com could not be verified: no SPF TXT record at the apex, no discoverable DKIM key under common selectors (google._domainkey, s1/s2, krs._domainkey), and no DMARC record with p=quarantine or p=reject at _dmarc.comptrove.com were observed. The benchmark re",
    "fix": "DNS audit for boundview.com and all sender domains"
   },
   {
@@ -2381,13 +2381,13 @@
    "status": {
     "BV": "R",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Twilio credentials pending (owner blocker)",
+   "evidence": "Twilio credentials pending (owner blocker) | worker AG 2026-11-22: Checked https://ai.spaincos.com and its obvious sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) plus the app's source repo (rentspire-bspain/ai-gateway-site [[1](https://github.com/rentspire-bspain/ai-gateway-site)]) \u2014 no served page demonstrates any of the three benchmark elem | worker CT 2026-11-22: No SMS consent (TCPA) language, express written consent disclosure, STOP/HELP instructions, or 8am-9pm recipient-local quiet-hours policy was observed on comptrove.com or its obvious sub-pages (/privacy, /terms, /help, /docs, /robots.txt, /sitemap.xml). The only SMS policy found in search was for kr",
    "fix": "Implement per-recipient state/time-zone logic nationwide"
   },
   {
@@ -2464,10 +2464,10 @@
     "AG": "G",
     "GH": "R",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "LIVE: boundview.com/privacy.html is the ai.spaincos.com policy (\"private site\u2026 no public sign-up, no advertising, no analytics trackers\"). BV has a Free tier and an ad-network offer wall. Contradiction = deceptive-practice exposure | 2026-11-21 live re-verification (post PR #264 merge): public BV policy written + merged (privacy.boundview.html, host guard); NOT live \u2014 boundview.com is pinned to a stale deployment (see F.3); AG live",
+   "evidence": "LIVE: boundview.com/privacy.html is the ai.spaincos.com policy (\"private site\u2026 no public sign-up, no advertising, no analytics trackers\"). BV has a Free tier and an ad-network offer wall. Contradiction = deceptive-practice exposure | 2026-11-21 live re-verification (post PR #264 merge): public BV policy written + merged (privacy.boundview.html, host guard); NOT live \u2014 boundview.com is pinned to a stale deployment (see F.3); AG live | worker CT 2026-11-22: No privacy policy is served or discoverable on comptrove.com in current results: the only comptrove.com page retrieved is a rent-comparison content page (Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps) [[5](https://comptrove.com/m/austin/)], not a /privacy or policy page, so nothing ",
    "fix": "Write BV policy: offer-wall partners, subid sharing, cookies, retention; per-host policy file"
   },
   {
@@ -2479,15 +2479,15 @@
    "W": 10,
    "ircm": "4232",
    "status": {
-    "BV": "R",
+    "BV": "Y",
     "TT": "R",
-    "AG": "R",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "boundview.com/terms.html \u2192 404 (live)",
+   "evidence": "boundview.com/terms.html \u2192 404 (live) | 2026-11-22: terms.html published (private-workspace ToS); live on deploy of PR #342 | 2026-11-22: terms.boundview.html published (consumer ToS incl. Neurons, offers, auto-renewal, cancellation); live on deploy of PR #342",
    "fix": "Draft with counsel; link from signup and checkout"
   },
   {
@@ -2541,13 +2541,13 @@
    "status": {
     "BV": "Y",
     "TT": "Y",
-    "AG": "U",
+    "AG": "Y",
     "GH": "Y",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT banner exists but is 11.5 px muted gray; GH mockup disclosure at text-xs; D5 requires disclosure on every link | 2026-11-21 live re-verification (post PR #264 merge): prominent FTC disclosure shipped in the Tasks tab component (PR #15 branch) + policy section 3; BV page still stale-deployed",
+   "evidence": "TT banner exists but is 11.5 px muted gray; GH mockup disclosure at text-xs; D5 requires disclosure on every link | 2026-11-21 live re-verification (post PR #264 merge): prominent FTC disclosure shipped in the Tasks tab component (PR #15 branch) + policy section 3; BV page still stale-deployed | worker AG 2026-11-22: Fetched the currently served page at https://ai.spaincos.com: it presents only the AI-assistant branding \"Where knowledge begins\" / \"Ask anything\" and advertises importing Perplexity conversation history [[1](https://ai.spaincos.com/)], with no affiliate links, incentive offers, or sponsored recomme",
    "fix": "Raise to \u226514 px ink color; repeat on interstitial, toast, email, share"
   },
   {
@@ -2559,15 +2559,15 @@
    "W": 8,
    "ircm": "4301",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "-",
     "AG": "-",
     "GH": "-",
     "ST": "-",
-    "CT": "U",
+    "CT": "Y",
     "DG": "U"
    },
-   "evidence": "Not evidenced",
+   "evidence": "Not evidenced | worker BV 2026-11-22: No negative-option/auto-renew disclosure could be observed for https://boundview.com itself. The retrievable pages resolve only to a similarly named but different service \u2014 BondView at join.bondview.com \u2014 whose pricing page lists $69/month or $759/year (Investors and Advisors) and $120/month or $1,3 | worker CT 2026-11-22: Fetched comptrove.com plus probes of /terms, /privacy, /help, /sitemap.xml and /robots.txt. The served content is a free rent-comparison data surface only (average rent by bedroom, rent history, comps \u2014 e.g. the Austin, TX rent page [[11](https://comptrove.com/m/austin/)]); no pricing page, no check",
    "fix": "Add to checkout; screenshot evidence per state template"
   },
   {
@@ -2701,13 +2701,13 @@
    "status": {
     "BV": "R",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "PPLX-Sans/Serif variable fonts loaded from frontend-cdn.perplexity.ai (licensing and reliability risk; also leaks a third-party relationship)",
+   "evidence": "PPLX-Sans/Serif variable fonts loaded from frontend-cdn.perplexity.ai (licensing and reliability risk; also leaks a third-party relationship) | worker AG 2026-11-22: Fetched https://ai.spaincos.com [[1](https://ai.spaincos.com/)]: the retrieved page describes the gateway's own app and content, and no third-party CDN hotlink (cdnjs, jsDelivr, unpkg, Google Fonts, or any other vendor asset host) was observed anywhere in the retrievable page result [[1](https://ai.",
    "fix": "Replace with licensed or open fonts self-hosted"
   },
   {
@@ -2722,12 +2722,12 @@
     "BV": "Y",
     "TT": "U",
     "AG": "Y",
-    "GH": "U",
+    "GH": "R",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "brand.js supportEmail support@boundview.com",
+   "evidence": "brand.js supportEmail support@boundview.com | worker CT 2026-11-22: comptrove.com is live and crawlable \u2014 the only indexed Comptrove page surfaced was the Austin rent report (Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps, comptrove.com [[18](https://comptrove.com/m/austin/)]) \u2014 but no support contact route and no response SLA are visible on the doma | worker GH 2026-11-22: No support route or stated SLA is observable for minutegig.com. The live research pass found no Minutegig contact or support page, no help center, and no publicly indexed support-response SLA for the domain; standard sub-page locations (/help, /docs, /robots.txt, /sitemap.xml) could not be verified ",
    "fix": "Add Help \u2192 Contact + SLA"
   },
   {
@@ -2781,13 +2781,13 @@
    "status": {
     "BV": "U",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "None published yet",
+   "evidence": "None published yet | worker AG 2026-11-22: Observed https://ai.spaincos.com served as its landing page ('Where knowledge begins'), presenting the gateway as a place to import Perplexity conversation history as personal context; the available page result contains no reviews, testimonials, star ratings, customer quotes, endorsements, or incent",
    "fix": "Policy before marketing launch"
   },
   {
@@ -2821,13 +2821,13 @@
    "status": {
     "BV": "U",
     "TT": "U",
-    "AG": "U",
-    "GH": "U",
+    "AG": "Y",
+    "GH": "R",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not found",
+   "evidence": "Not found | worker AG 2026-11-22: ai.spaincos.com serves its homepage (the Perplexity-history import page) [[1](https://ai.spaincos.com/)] and its repo rentspire-bspain/ai-gateway-site is indexed [[2](https://github.com/rentspire-bspain/ai-gateway-site)], but /.well-known/security.txt is not indexed or retrievable, no vulnerability | worker GH 2026-11-22: No /.well-known/security.txt could be observed for minutegig.com, and no monitored vulnerability-reporting inbox exists for that domain. The only disclosure contact surfaced anywhere was vulnreports@minut.com, published in the Bug Bounty Program Policy on minut.com [[1](https://www.minut.com/legal/b | 2026-11-22: .well-known/security.txt created (Contact, Expires 2027-11-22, coordinated-disclosure policy) \u2014 live on deploy of PR #342",
    "fix": "Add security.txt"
   },
   {
@@ -2862,12 +2862,12 @@
     "BV": "U",
     "TT": "U",
     "AG": "Y",
-    "GH": "U",
+    "GH": "R",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "docs/soc2-retention-and-governance.md; RentSpire SOC 2 readiness is a separate gate",
+   "evidence": "docs/soc2-retention-and-governance.md; RentSpire SOC 2 readiness is a separate gate | worker CT 2026-11-22: Fetching comptrove.com and its obvious sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) surfaced none of the three PASS-benchmark elements: (1) no trust page \u2014 the only trust-center result found was for a different entity, AcaTrove at acatrove.com [[11](https://apis.io/security/ | worker GH 2026-11-22: No buyer-facing security/compliance evidence could be observed for minutegig.com: search results did not surface any minutegig.com trust page, SOC 2 status, or security questionnaire pack [[1](https://oneminutego.com/sitemap.xml?lang=en)][[2](https://www.minutegroup.com/policies/terms-and-conditions",
    "fix": "Trust center page per product"
   },
   {
@@ -2884,10 +2884,10 @@
     "AG": "Y",
     "GH": "U",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "-"
    },
-   "evidence": "LIVE: boundview.com and ai.spaincos.com both serve <title>BoundView</title> (identical bundle, 339,531 vs 339,560 bytes) | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
+   "evidence": "LIVE: boundview.com and ai.spaincos.com both serve <title>BoundView</title> (identical bundle, 339,531 vs 339,560 bytes) | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item) | worker CT 2026-11-22: Observed the indexed Comptrove page title served at comptrove.com: \"Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps - Comptrove\" (~73\u201374 characters).[[1](https://comptrove.com/m/austin/)] Brand (\"Comptrove\") and keyword (\"Average Rent in Austin, TX\") are present, and the wording is pa",
    "fix": "Per-page titles via prerender; per-host brand"
   },
   {
@@ -3002,12 +3002,12 @@
     "BV": "R",
     "TT": "-",
     "AG": "Y",
-    "GH": "U",
+    "GH": "R",
     "ST": "-",
     "CT": "U",
     "DG": "-"
    },
-   "evidence": "Local grep: 0 ld+json blocks | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
+   "evidence": "Local grep: 0 ld+json blocks | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item) | worker GH 2026-11-22: Attempted to fetch https://minutegig.com and its obvious sub-pages to inspect the served markup for <script type=\"application/ld+json\"> blocks; the retrieval did not surface the site's markup or any relevant pages, so none of the five required types \u2014 Organization, WebSite+SearchAction, SoftwareAppl",
    "fix": "Add and validate with Rich Results Test"
   },
   {
@@ -3024,10 +3024,10 @@
     "AG": "R",
     "GH": "U",
     "ST": "-",
-    "CT": "U",
+    "CT": "Y",
     "DG": "-"
    },
-   "evidence": "Single SPA shell; unknown paths JS-redirect (spa-redirect.js)",
+   "evidence": "Single SPA shell; unknown paths JS-redirect (spa-redirect.js) | worker CT 2026-11-22: One representative public content page \u2014 a Comptrove rent-comps market page (Austin, TX average-rent) \u2014 served substantial readable body copy, data tables, and internal links in the raw crawlable HTML, confirming content is visible without JavaScript on that page [[2](https://comptrove.com/m/austin/",
    "fix": "Prerender landing, pricing, features, docs, compare pages as static HTML"
   },
   {
@@ -3044,10 +3044,10 @@
     "AG": "R",
     "GH": "U",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "-"
    },
-   "evidence": "No such routes found on BV",
+   "evidence": "No such routes found on BV | worker CT 2026-11-22: What is observably served on comptrove.com right now: a rent-data market page (e.g., Austin, TX \u2014 subject-property rents vs comp averages, bedroom-count breakdowns, HUD Fair Market Rents) and a launch-offer Pro plan mention at $179/month vs a $299/month list price [[3](https://comptrove.com/m/austin",
    "fix": "Create content plan (pricing ladder vs ChatGPT/Claude/Perplexity per A3)"
   },
   {
@@ -3241,13 +3241,13 @@
    "status": {
     "BV": "U",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not audited",
+   "evidence": "Not audited | worker CT 2026-11-22: Observed the live Comptrove page ('Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps' at comptrove.com): acronyms appear unexpanded at first use \u2014 'BR' in bedroom-count labels, 'HUD FMR' as a rent benchmark, and 'Pro' as a product tier \u2014 with no full-term-then-parenthetical definition a | worker AG 2026-11-22: Fetched the live ai.spaincos.com landing copy: most visible consumer-facing prompts are plain-language, but the page also serves technical wording such as \"open-weight models\" without a plain-language definition at first use [[1](https://ai.spaincos.com/)]. The site's GitHub repo (rentspire-bspain/a",
    "fix": "Copy lint + readability check"
   },
   {
@@ -3284,10 +3284,10 @@
     "AG": "R",
     "GH": "R",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Three values in docs: TT says 1 N \u2248 $0.004; pricing doc catalog (500 N = 1,000 credits; 2,500 credits = $1) gives \u2248 $0.0008; D5 (2,500 N \u2248 $0.25) gives \u2248 $0.0001",
+   "evidence": "Three values in docs: TT says 1 N \u2248 $0.004; pricing doc catalog (500 N = 1,000 credits; 2,500 credits = $1) gives \u2248 $0.0008; D5 (2,500 N \u2248 $0.25) gives \u2248 $0.0001 | worker CT 2026-11-22: Fetched comptrove.com and its implied sub-page surfaces (help/docs/terms). What is served right now identifies Comptrove as a rent-comps product; the only pricing signal observed is a Pro price of $179/month during a launch offer [[1](https://comptrove.com/m/austin/)]. No served page defines 'neuron",
    "fix": "Decide one constant in earn_actions/model_costs; render from API; legal reviews any $ claim"
   },
   {
@@ -3362,12 +3362,12 @@
     "BV": "Y",
     "TT": "U",
     "AG": "Y",
-    "GH": "U",
+    "GH": "R",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "AI answers cite sources; Terminal pages unverified",
+   "evidence": "AI answers cite sources; Terminal pages unverified | worker GH 2026-11-22: No minutegig.com document could be observed containing a link at its point of reference, and no source or filtered evidence view was found. Searches for https://minutegig.com plus its obvious sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) returned no minutegig.com content at a",
    "fix": "Apply to ST, CT, DG evidence references"
   },
   {
@@ -3579,15 +3579,15 @@
    "W": 5,
    "ircm": "3101",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "-",
     "CT": "-",
     "DG": "-"
    },
-   "evidence": "Self-improvement cycle exists server-side",
+   "evidence": "Self-improvement cycle exists server-side | worker AG 2026-11-22: Fetched https://ai.spaincos.com and its public surfaces: the homepage ('Where knowledge begins') documents only a Perplexity-history import feature for personal context [[1](https://ai.spaincos.com/)]; the public repo rentspire-bspain/ai-gateway-site describes a frontend plus a QA system with no cap | worker BV 2026-11-22: Fetched the live results for the site and its retrievable pages: the public entry point is BondView's marketing/signup page ('Municipal Bond Market Access for Everyone - Join BondView') plus an About Us page and a BondView 500 Liquid Municipal Bond Index page on join.bondview.com [[2](https://join.b",
    "fix": "Add in-answer feedback"
   },
   {
@@ -3804,10 +3804,10 @@
     "AG": "Y",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "api/geocode.js is ZIP5-centric",
+   "evidence": "api/geocode.js is ZIP5-centric | worker CT 2026-11-22: Fetched comptrove.com: the served page is a rent-comparison result (\"Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps\") with a displayed business address \u2014 a read-only rent-data surface [[3](https://comptrove.com/m/austin/)]. No address-entry form, phone-number field, or ID-format inpu",
    "fix": "Shared address component"
   },
   {
@@ -3859,15 +3859,15 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "R",
     "AG": "-",
     "GH": "-",
     "ST": "-",
-    "CT": "U",
+    "CT": "R",
     "DG": "-"
    },
-   "evidence": "No geo messaging in TT",
+   "evidence": "No geo messaging in TT | worker BV 2026-11-22: No boundview.com page showing a geo-eligible offers wall could be observed. The only BoundView-related result in live fetches is a Municipal Bond Screener on bondview.com [[9](https://www.bondview.com/bonds-screener)] \u2014 a different domain \u2014 and the only policy page surfaced is bound.co's Legal: Priv | worker CT 2026-11-22: comptrove.com as served right now shows no geo-availability offer wall: the only Comptrove page surfaced is its rent-data page (average rent in Austin, TX by bedroom, history & comps) with a Pro launch offer, and no geo-eligible offer list, no thin-offers fallback message, and no IP-geolocation stat",
    "fix": "Show availability note; fall back gracefully"
   },
   {
@@ -4041,13 +4041,13 @@
    "status": {
     "BV": "U",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not found",
+   "evidence": "Not found | worker AG 2026-11-22: Fetched https://ai.spaincos.com live: served page is the landing page with the 'Ask anything' prompt, open-weight-model description, and Perplexity-history import [[1](https://ai.spaincos.com/)] \u2014 no feedback button, thumbs control, feedback link, or CSAT survey element is served anywhere on the obs | worker CT 2026-11-22: Fetched https://comptrove.com plus the check-relevant sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt). comptrove.com serves a public rent-comparison app: an address/ZIP search entry point and static market pages such as the Austin, TX rent-by-bedroom/comps page [[11](https://co",
    "fix": "Add micro-survey"
   },
   {
@@ -4104,10 +4104,10 @@
     "AG": "U",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not found",
+   "evidence": "Not found | worker CT 2026-11-22: Fetched https://comptrove.com \u2014 it serves a normal public rent-comparison page ('Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps') [[1](https://comptrove.com/m/austin/)], not an error or support surface. No error page could be observed, and the served page shows no error-reference-ID ",
    "fix": "Add"
   },
   {
@@ -4139,15 +4139,15 @@
    "W": 3,
    "ircm": "1101",
    "status": {
-    "BV": "U",
+    "BV": "R",
     "TT": "-",
-    "AG": "U",
+    "AG": "R",
     "GH": "-",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
-   "evidence": "Not found",
+   "evidence": "Not found | worker AG 2026-11-22: https://ai.spaincos.com serves the app homepage ('Where knowledge begins', powered by open-weight models) [[1](https://ai.spaincos.com/)], but no Changelog or 'What's New' link appears anywhere in the app's navigation, page body, or footer. No /changelog or /whats-new route was discoverable, and /ro | worker BV 2026-11-22: No changelog or what's-new page is observable on boundview.com or its obvious sub-paths (/help, /docs, /sitemap.xml, /robots.txt): no Bound-owned changelog, help-docs page, or sitemap surfaced for the domain, and search results pointed only to unrelated sites, so no changelog was observable at the a | worker CT 2026-11-22: Fetched and searched https://comptrove.com plus obvious sub-paths (sitemap.xml, robots.txt, help/docs-style pages) and observed no changelog or 'What's new' page served or linked from the app. The only Compt-branded product-updates page located is 'What's New in Compt: Product Updates, June 2026' on",
    "fix": "Add"
   },
   {
@@ -4507,9 +4507,9 @@
    "W": 8,
    "ircm": "4301",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "Shell CSP has default-src 'self' and no frame-src, so embedding the wall in the host will be blocked",
+   "evidence": "Shell CSP has default-src 'self' and no frame-src, so embedding the wall in the host will be blocked | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Add frame-src, rerun node tools/gen-csp-sri.mjs, rerun prelaunch"
   },
   {
@@ -4591,9 +4591,9 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "D2 landscape only",
+   "evidence": "D2 landscape only | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Add inBrain or CPX when approved"
   },
   {
@@ -4843,9 +4843,9 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "UI never says the amount before completion; wall shows network payouts",
+   "evidence": "UI never says the amount before completion; wall shows network payouts | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Add 'Every verified offer = 150 N'"
   },
   {
@@ -5039,9 +5039,9 @@
    "W": 7,
    "ircm": "4300",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "Zero offerwall references in ai-gateway-site; component is standalone",
+   "evidence": "Zero offerwall references in ai-gateway-site; component is standalone | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Embed per README 3-line integration"
   },
   {
@@ -5067,9 +5067,9 @@
    "W": 5,
    "ircm": "3200",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "modules/tasks.js and monitors.js already own 'Tasks' (Scheduled + inbox, push opens /?tasks=inbox)",
+   "evidence": "modules/tasks.js and monitors.js already own 'Tasks' (Scheduled + inbox, push opens /?tasks=inbox) | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
    "fix": "Rename earn tab 'Earn' or 'Free credits'"
   },
   {
@@ -5459,9 +5459,9 @@
    "W": 5,
    "ircm": "3200",
    "status": {
-    "BV": "U"
+    "BV": "R"
    },
-   "evidence": "Address configured in brand.js",
+   "evidence": "Address configured in brand.js | worker BV 2026-11-22: The live evidence does not establish that support@boundview.com receives mail. No boundview.com page was captured: the ten retrieved results are all unrelated domains \u2014 leadiq.com (BondView profile) [[1](https://leadiq.com/c/bondview/5a1d9a412300005300894c30)], support.blackview.hk [[2](https://supp",
    "fix": "Send test"
   },
   {
@@ -5529,9 +5529,9 @@
    "W": 4,
    "ircm": "3100",
    "status": {
-    "AG": "U"
+    "AG": "R"
    },
-   "evidence": "Not verified",
+   "evidence": "Not verified | worker AG 2026-11-22: The only observable result for https://ai.spaincos.com is its homepage ('Where knowledge begins') [[2](https://ai.spaincos.com/)]; it serves no rate-limit header documentation, no HTTP error-code reference, and no /docs or API page exposing them. The public repo rentspire-bspain/ai-gateway-site cont",
    "fix": "Document"
   },
   {
@@ -5613,9 +5613,9 @@
    "W": 4,
    "ircm": "2101",
    "status": {
-    "AG": "U"
+    "AG": "R"
    },
-   "evidence": "docs-panel",
+   "evidence": "docs-panel | worker AG 2026-11-22: Fetched https://ai.spaincos.com and probed obvious sub-pages (/docs, /help, /robots.txt, /sitemap.xml): only the public landing page surfaces (title 'Where knowledge begins', describing importing Perplexity history into personal context) [[1](https://ai.spaincos.com/)]. No documentation search inter",
    "fix": "Test"
   },
   {
@@ -6271,9 +6271,9 @@
    "W": 7,
    "ircm": "4201",
    "status": {
-    "CT": "U"
+    "CT": "R"
    },
-   "evidence": "Forecast input, not validated",
+   "evidence": "Forecast input, not validated | worker CT 2026-11-22: comptrove.com does not serve the benchmark scenario. Observed: a Pro plan at $179/month under a launch offer against a $299/month list price \u2014 no $149/month plan at any tier anywhere on the site [[4](https://comptrove.com/m/austin/)]. The public surface is rent-data content (rent by bedroom, history",
    "fix": "Test with 10 customers"
   },
   {
@@ -6299,9 +6299,9 @@
    "W": 7,
    "ircm": "3202",
    "status": {
-    "CT": "U"
+    "CT": "Y"
    },
-   "evidence": "None evidenced",
+   "evidence": "None evidenced | worker CT 2026-11-22: Comptrove's Austin page (comptrove.com) advertises a free rent check with no account required and a sample lookup that can be tried without signing up, plus a worked Austin comp set [[1](https://comptrove.com/m/austin/)] \u2014 satisfying the 'sample lookup' benchmark for free access. The paywall exists ",
    "fix": "Add"
   },
   {
@@ -6313,9 +6313,9 @@
    "W": 7,
    "ircm": "3103",
    "status": {
-    "CT": "U"
+    "CT": "Y"
    },
-   "evidence": "None evidenced",
+   "evidence": "None evidenced | worker CT 2026-11-22: comptrove.com serves at least one indexed, location-specific programmatic SEO page \u2014 'Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps' [[1](https://comptrove.com/m/austin/)] \u2014 with rent observations and local content, confirming the CITY tier of the state/county/city/parcel benchmark.",
    "fix": "Build"
   },
   {
@@ -6355,9 +6355,9 @@
    "W": 6,
    "ircm": "3300",
    "status": {
-    "CT": "U"
+    "CT": "R"
    },
-   "evidence": "Owner standard",
+   "evidence": "Owner standard | worker CT 2026-11-22: Fetched comptrove.com and its obvious sub-page probes (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) plus targeted methodology searches. What is actually served right now: the Austin rent page 'Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps' [[1](https://comptrove.com/m/",
    "fix": "Add"
   },
   {
@@ -6383,9 +6383,9 @@
    "W": 8,
    "ircm": "3302",
    "status": {
-    "CT": "U"
+    "CT": "R"
    },
-   "evidence": "RentSpire SOC 2 gate",
+   "evidence": "RentSpire SOC 2 gate | worker CT 2026-11-22: No trust/security page is observable at comptrove.com or its obvious sub-pages (/privacy, /terms, /help, /docs). Nothing served right now shows a SOC 2 status, SOC 2 report reference (no report type, audit period, or auditor named), security questionnaire, trust-center link, or SOC 2 badge.",
    "fix": "Publish"
   },
   {

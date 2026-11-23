@@ -1,0 +1,8 @@
+{
+ "artifact": "ux-register-rows-2026-11-22.csv",
+ "source": "qa/ux-items.json",
+ "source_version": 15,
+ "row_count": 1377,
+ "item_id_count": 386,
+ "note": "one row per item x applicable app slot"
+}
