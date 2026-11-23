@@ -28,7 +28,8 @@
     [".landing-title", "html", "Where knowledge <em>begins</em>"],
     [".stg-overlay h2", "text", "Settings"],
     [".stg-nav-btn span", "text", null], [".stg-pane-title", "text", null],
-    [".stg-pane-sub", "text", null], [".stg-label", "text", null]
+    [".stg-pane-sub", "text", null], [".stg-label", "text", null],
+    [".cp-input", "placeholder", "Search actions and threads, or type a query…"], [".cp-input", "aria-label", "Command palette input"]
   ];
 
   var ES = {
@@ -195,12 +196,48 @@
     "Thread + email": "Hilo + correo"
   };
   Object.keys(ES4).forEach(function (k) { ES[k] = ES4[k]; });
+  /* v5 additions: command palette (modules/command-palette.js) + remaining Settings pane subtitles. */
+  var ES5 = {
+    "Command palette": "Paleta de comandos", "Command palette input": "Entrada de la paleta de comandos",
+    "Search actions and threads, or type a query…": "Busca acciones y hilos, o escribe una consulta…",
+    "No matches. Try a thread title or an action like \"settings\".": "Sin coincidencias. Prueba con el título de un hilo o una acción como \"configuración\".",
+    "Results": "Resultados", "Actions": "Acciones", "Threads": "Hilos", "Research": "Investigación",
+    "navigate ·": "navegar ·", "run ·": "ejecutar ·", "close": "cerrar", "toggle": "alternar",
+    "Search threads": "Buscar hilos", "Open Settings": "Abrir Configuración",
+    "Open Settings → Connectors": "Abrir Configuración → Conectores",
+    "Open Settings → Automations": "Abrir Configuración → Automatizaciones",
+    "Open Settings → Skills": "Abrir Configuración → Habilidades",
+    "Open Settings → Artifacts": "Abrir Configuración → Artefactos",
+    "Open Library": "Abrir Biblioteca", "Open Fleet": "Abrir Flota", "Toggle theme": "Cambiar tema",
+    "Research: competitive landscape of AI gateways": "Investigación: panorama competitivo de pasarelas de IA",
+    "Research: latest AI model releases": "Investigación: últimos lanzamientos de modelos de IA",
+    "Research: best practices for RAG pipelines": "Investigación: mejores prácticas para pipelines RAG",
+    "Your profile and sign-in credentials for ai.spaincos.com.": "Tu perfil y credenciales de acceso para ai.spaincos.com.",
+    "Changing your email sends a confirmation to both the old and new address. The change applies once you confirm.": "Al cambiar tu correo se envía una confirmación a la dirección anterior y a la nueva. El cambio se aplica cuando confirmes.",
+    "Pick a strong password you don't use anywhere else.": "Elige una contraseña segura que no uses en ningún otro sitio.",
+    "Permanently delete your account and all data. This cannot be undone.": "Elimina de forma permanente tu cuenta y todos tus datos. No se puede deshacer.",
+    "Every lane in the composer, grouped by what it is best at. Free lanes cost nothing; the rest draw on your plan.": "Cada carril del compositor, agrupado según su mejor uso. Los carriles gratuitos no cuestan nada; el resto consume tu plan.",
+    "Members, roles, and the sign-in allowlist for this site.": "Miembros, roles y la lista de acceso permitido de este sitio.",
+    "Invite teammates and manage roles. Only owners/admins can make changes — the server enforces it.": "Invita a compañeros y administra roles. Solo propietarios y administradores pueden hacer cambios — el servidor lo impone.",
+    "What your plan includes on ai.spaincos.com — and what Pro adds.": "Lo que incluye tu plan en ai.spaincos.com — y lo que añade Pro.",
+    "Answers to the most common issues. Search or browse.": "Respuestas a los problemas más comunes. Busca o explora.",
+    "Data sources the assistant can reference in your answers.": "Fuentes de datos que el asistente puede citar en tus respuestas.",
+    "Activity on this device, from your local thread library.": "Actividad en este dispositivo, desde tu biblioteca local de hilos.",
+    "Export or delete the data stored on this device.": "Exporta o elimina los datos almacenados en este dispositivo.",
+    "ai.spaincos.com — a Perplexity-style gateway to open-weight models.": "ai.spaincos.com — una pasarela estilo Perplexity hacia modelos de pesos abiertos.",
+    "Everyone with access to this workspace (read-only — roles are managed in Settings > Organization).": "Todas las personas con acceso a este espacio de trabajo (solo lectura — los roles se administran en Configuración > Organización).",
+    "Your gateway activity, from your synced threads.": "Tu actividad en la pasarela, a partir de tus hilos sincronizados.",
+    "Threads per week, last 4 weeks.": "Hilos por semana, últimas 4 semanas.",
+    "Read-only workspace overview for owners and admins. Opening this pane does not grant access to additional records.": "Resumen de solo lectura del espacio de trabajo para propietarios y administradores. Abrir este panel no concede acceso a más registros.",
+    "Name": "Nombre"
+  };
+  Object.keys(ES5).forEach(function (k) { ES[k] = ES5[k]; });
   Object.keys(ES2).forEach(function (k) { ES[k] = ES2[k]; });
 
   /* Elements whose text is user/document content and must never be translated. */
   var SKIP_SEL = ".dp-md,.dp-code,.dp-tw,.dp-title,.dc-t,.dp-fname,textarea,input,[data-i18n-skip]";
   var WALK_ROOTS = [".stg-overlay", ".dp-panel", ".dp-row", "#tour", ".ob-tour-backdrop", ".ob-persuade-wrap",
-    ".ob-empty-head", ".ob-example-grid", ".thread-actions", ".sidebar-footer", ".account-menu", ".account-item", ".side-nav", ".spaces-head", "#moduleRoot"];
+    ".ob-empty-head", ".ob-example-grid", ".thread-actions", ".sidebar-footer", ".account-menu", ".account-item", ".cp-overlay", ".side-nav", ".spaces-head", "#moduleRoot"];
   var ATTRS = ["title", "aria-label", "placeholder"];
 
   function walkRoot(root) {
