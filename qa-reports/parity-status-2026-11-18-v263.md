@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v339)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v340)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3168,3 +3168,12 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - UX master: no gateway deploy this batch (static/sitemap only) — the v334 run on gateway-chat v310 stands; next gateway change gets the full re-run.
 
 **HEADLINE: 89.2% (11422/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — fresh form open).
+
+### 55. §30q addendum — v340: TEAMMATES BROWSER VALIDATION (ROOT LANE) — HEADLINE 89.2%
+
+- ~~Teammates browser validation (the v295 'no browser validation yet' gap)~~ — DONE, by the ROOT lane inline (zero agent credits — the re-fired teammates_validation_lane stalled on the session agent budget and was superseded rather than left blocking the batch). Live evidence with the eval session in real Chromium: the Settings > Teammates pane renders fully for a NON-ADMIN: honest empty state ("You're not on a team yet — ask an owner to invite you"), explicit role gating ("Only owners/admins can make changes — the server enforces it"), the "Edit my account profile" shortcut, and the TEAMMATE TEMPLATES section with presets (Research Analyst, Code Review, ...) all on screen; ZERO JS errors. Server boundary re-verified live: team template_get -> 403 "You are not a member of this team." Teammates 75->78.
+- Honest limits: the admin 200-path and pending-invite filter are N/A for a non-member (owner token needed); the apply-to-roster template flow needs a team. No code change shipped — the deliverable was evidence.
+- UX master: no gateway deploy this batch (validation only) — the v334 run on gateway-chat v310 stands; next gateway change gets the full re-run.
+- Free-agent confirmation (owner ask): all work this batch was root-inline (no spawned agents, zero agent-credit spend); the stalled lane was superseded, not refired.
+
+**HEADLINE: 89.2% (11425/128, generator-confirmed) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
