@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v326)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v327)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3053,3 +3053,11 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - PI-026 registered (PR #372): the Supabase secrets-write mechanism gate under the Stripe key gate — 26 inventory items, 8 owner-gated. Per owner: Stripe key handled as one of the LAST items (form stays open).
 
 **HEADLINE: 88.8% (11368/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN — all 50 checks at 1.0, none below 100. Remaining REDs: Email 30 (owner: OAuth), Legal 60 (owner: counsel), NativeMobile 48 (owner: store/publishing), store presence (owner), Stripe live checkout (owner: live key — LAST per owner directive).
+
+### 42. §30q addendum — v327: ES7 + SEO-META LANES — HEADLINE 89.0%
+
+- ~~i18n ES7 lane (PR #376, worker i18n_es7_lane)~~ — LIVE: /es/verify ('Verifica tu correo escolar') and /es/offline ('Sin conexión') — 7/7 static surfaces now have Spanish versions. Honest: sw.js still precaches the English offline.html (ES offline is direct-URL only, recorded); boundview pages untranslated; no native/legal review; ES verify breadcrumb JSON-LD still points to /verify. i18n 58->64.
+- ~~SEO-meta lane (PR #377, worker seo_meta_lane)~~ — LIVE: canonical + og:type/title/description/url on 13 public pages across ai/bv/ES variants (spot-verified live: ai docs, bv status, es/terms all host-correct), og:locale es_ES + alternates wired EN<->ES. Honest: privacy.es canonical still points to EN privacy (flagged); no meta description on status/terms/offline EN; sitemap unchanged. SEO 85->90. Note: the lane agent hit the platform credit limit AFTER pushing its complete PR — nothing was lost.
+- UX master: re-confirmed all 50 checks at 1.0 (100.0 GREEN) — owner asked again; nothing below 100. Gated inventory: complete at PI-019..PI-026 (8 owner-gated rows).
+
+**HEADLINE: 89.0% (11389/128, 29 categories) — 🟡 YELLOW band (0.1 from GREEN).** UX MASTER 100.0 GREEN. Remaining REDs: Email 30 (owner: OAuth), Legal 60 (owner: counsel), NativeMobile 48 (owner: store/publishing), store presence (owner), Stripe live checkout (owner: live key — LAST per owner directive).

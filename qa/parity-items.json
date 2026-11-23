@@ -107,8 +107,8 @@
   {
    "name": "SEO",
    "weight": 3,
-   "score": 85,
-   "note": "v292 re-score (live-verified): structured data LIVE server-side on boundview.com (Organization + WebSite + WebApplication + BreadcrumbList JSON-LD, crawler-visible without JS, client fallback only if server copy missing); per-route metas live on /privacy and /verify (title/description/canonical/og/twitter per brand); /docs in sitemap; robots.txt with sitemap pointer. REMAINING: no SSR for SPA content (deliberate \u2014 /t/ noindexed)."
+   "score": 90,
+   "note": "v327 re-score (live-verified): full social/SEO metadata on 13 public pages across all three variants (PR #377, worker seo_meta_lane): canonical + og:type/title/description/url everywhere (spot-verified live: ai docs, bv status, es terms all host-correct); og:locale es_ES + alternate on ES pages; og:locale:alternate es_ES on EN pages with ES counterparts; privacy/verify already had tags (skipped, no duplication). Honest limits: privacy.es.html canonical still points to the EN privacy URL (flagged for review); status/terms/offline EN have og:description but no meta description tag; sitemap unchanged (no /es entries); no live SERP/rich-result validation."
   },
   {
    "name": "Marketing",
@@ -161,8 +161,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 58,
-   "note": "v326 re-score (live-verified): full Spanish core-page set \u2014 /es/{docs,status,terms,privacy,help} all 200 with Spanish titles (PR #374, worker lane i18n_es6_lane; /es/help translates the full FAQ incl. the 5 newest sections), EN<->ES cross-links on all 10 pages, hreflang en/es/x-default on help+terms+status+privacy+docs, brand-split guards intact. Honest limits: *.boundview.html pages, /verify, offline page untranslated; no native-speaker or legal review (counsel gate applies to ES legal pages); in-app model answers not translated. Still 'Espa\u00f1ol (partial)' but now 5/5 core static surfaces."
+   "score": 64,
+   "note": "v327 re-score (live-verified): /es/verify and /es/offline shipped (PR #376, worker i18n_es7_lane) \u2014 7/7 static surfaces now have Spanish versions (docs,status,terms,privacy,help,verify,offline), all 200 with Spanish titles (spot-verified live). Honest limits: sw.js still precaches/falls back to the ENGLISH offline.html (the ES offline page is direct-URL only \u2014 recorded, not hidden); all *.boundview.html pages untranslated; no native-speaker or legal review; in-app model answers not translated; ES verify breadcrumb JSON-LD still points to /verify."
   },
   {
    "name": "NativeMobile",
@@ -322,6 +322,11 @@
    "version": "v326",
    "date": "2026-11-23",
    "change": "Accessibility 70 -> 80 (three v292 REMAINING items closed, PR #373: heading order, skip-link live-verified first tabbable, light-mode contrast computed PASS with --error token fix). i18n 50 -> 58 (PR #374: full ES core set /es/help added, cross-links + hreflang, live-verified). Both worker lanes landed; headroom honestly limited: no screen-reader suite, boundview/verify/offline untranslated."
+  },
+  {
+   "version": "v327",
+   "date": "2026-11-23",
+   "change": "i18n 58 -> 64 (PR #376: /es/verify + /es/offline live, 7/7 static ES surfaces; sw.js EN fallback recorded honestly). SEO 85 -> 90 (PR #377: canonical + full og metadata on 13 pages both hosts + ES set, live spot-verified). Both worker lanes landed; seo lane agent hit the platform credit limit AFTER pushing its complete PR."
   }
  ]
 }
