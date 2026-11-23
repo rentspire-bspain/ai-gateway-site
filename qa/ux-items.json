@@ -1,5 +1,5 @@
 {
- "version": 21,
+ "version": 24,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -87,7 +87,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Pre-boot shimmer exists (reserves space); no CLS measurement | 2026-11-23 post-#391: header pinned (61px, stable) + suggestions height reserved (253px, stable) \u2014 both verified live; remaining CLS 0.793 traced to composer pills mounting +92px above the fold and #landingConnBox collapsing at the onboarding tick (~1.8s) \u2014 owning-lane spec: defer/anchor post-paint inserts; conn-box hider not identifiable from this repo's source (no attribute/class/DOM mutation observed under instrumentation) | 2026-11-23 F-32 fix series live (PRs #390/#391/#396/#401/#403): live CLS 0.793 -> 0.355; header pinned 61px, all 5 composer-pill inserters + 3 onboarding mount paths deferred to first interaction (verified: 0 pre-interaction inserts, #suggestions at its 253px reservation); remaining single shift 0.336 at ~1.4s coincides with lazy module loading, attributed nodes stable/out-of-viewport, no DOM mutation correlates \u2014 needs lazy-module bisection (next diagnostic step)",
+   "evidence": "Pre-boot shimmer exists (reserves space); no CLS measurement | 2026-11-23 post-#391: header pinned (61px, stable) + suggestions height reserved (253px, stable) \u2014 both verified live; remaining CLS 0.793 traced to composer pills mounting +92px above the fold and #landingConnBox collapsing at the onboarding tick (~1.8s) \u2014 owning-lane spec: defer/anchor post-paint inserts; conn-box hider not identifiable from this repo's source (no attribute/class/DOM mutation observed under instrumentation) | 2026-11-23 F-32 fix series live (PRs #390/#391/#396/#401/#403): live CLS 0.793 -> 0.355; header pinned 61px, all 5 composer-pill inserters + 3 onboarding mount paths deferred to first interaction (verified: 0 pre-interaction inserts, #suggestions at its 253px reservation); remaining single shift 0.336 at ~1.4s coincides with lazy module loading, attributed nodes stable/out-of-viewport, no DOM mutation correlates \u2014 needs lazy-module bisection (next diagnostic step) | 2026-11-23 bisection: 45 lazy modules blocked one-at-a-time \u2014 NONE removes the 0.336 shift except siteassets.js (the .logo-mark/favicon runtime-swap module): blocking it eliminates the 0.336 but exposes a 0.124 sidebar-render shift (side-nav, sidebar-footer, newThreadBtn, logo). Root-cause hypothesis: the setLogo innerHTML->img swap has no reserved intrinsic dimensions, destabilizing the sidebar column. Fix spec: reserve .logo-mark dimensions (aspect-ratio/width+height) and pre-size the sidebar shell before renderThreads paints. Bisection data: completion-loop/bisect-modules.py output | CORRECTION 2026-11-23: .logo-mark is already pinned 28x28px (index.html:266) \u2014 the intrinsic-dimension hypothesis is DISPROVEN; the setLogo swap cannot change the mark's size. The siteassets.js block result therefore reflects load-order/timing effects on the sidebar render, not the logo swap itself. Remaining 0.336 requires live deploy-measure iteration (candidate fixes deployed one at a time, CLS measured live after each): 1) pre-size the sidebar shell before renderThreads paints; 2) defer renderThreads sidebar content like the pills gate",
    "fix": "Add CLS assert to Playwright prelaunch; reserve iframe/toast/banner space"
   },
   {
@@ -359,7 +359,7 @@
    "W": 7,
    "ircm": "4021",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "Y",
     "AG": "G",
     "GH": "U",
@@ -367,7 +367,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): keyboard focus paths verified in host wiring; deployed",
+   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): keyboard focus paths verified in host wiring; deployed | 2026-11-23 real keyboard-operability test (Playwright, 15 focus steps on live production): 15/15 focused elements have :focus-visible with solid outlines on BOTH hosts (AG + BV) \u2014 tour overlay, nav buttons, form controls all keyboard-reachable with visible focus",
    "fix": "Keyboard walkthrough per CUJ each release; record in qa-reports"
   },
   {
