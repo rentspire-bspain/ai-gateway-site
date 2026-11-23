@@ -110,6 +110,14 @@
       "dest": "/privacy.es.html"
     },
     {
+      "src": "/es/verify/?",
+      "dest": "/verify.es.html"
+    },
+    {
+      "src": "/es/offline/?",
+      "dest": "/offline.es.html"
+    },
+    {
       "handle": "filesystem"
     }
   ],
