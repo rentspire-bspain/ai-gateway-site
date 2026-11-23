@@ -141,12 +141,17 @@ update public.quests set active = false where quest_id = 'retired_quest';
 
 -- ---------------------------- SQL VERIFICATION (Q1-Q5) ----------------------
 insert into auth_users_fixture (id) values ('11111111-1111-1111-1111-111111111111');
+-- positive seeds distributed within the ELAPSED part of today (early-UTC-safe:
+-- at 00:30 UTC, midnight+i-hours rows would be future-dated and the Q6 bound
+-- would correctly exclude them)
 insert into analytics_events (user_id, event_type, created_at)
-select '11111111-1111-1111-1111-111111111111', 'query', date_trunc('day', now()) + (i || ' hours')::interval
-from generate_series(0, 4) i;                          -- 5 queries today for user 1
+select '11111111-1111-1111-1111-111111111111', 'query',
+       date_trunc('day', now()) + (now() - date_trunc('day', now())) * (i/10.0)
+from generate_series(1, 5) i;                          -- 5 past queries today for user 1
 insert into analytics_events (user_id, event_type, created_at)
-select '22222222-2222-2222-2222-222222222222', 'query', date_trunc('day', now()) + (i || ' hours')::interval
-from generate_series(0, 8) i;                          -- 9 queries today for user 2
+select '22222222-2222-2222-2222-222222222222', 'query',
+       date_trunc('day', now()) + (now() - date_trunc('day', now())) * (i/10.0)
+from generate_series(1, 9) i;                          -- 9 past queries today for user 2
 
 do $$
 declare r jsonb;
@@ -198,18 +203,23 @@ begin
   -- stub auth in this fixture; verified separately below by direct count)
   if not ((select count(*) from analytics_events where user_id = '22222222-2222-2222-2222-222222222222') = 9) then raise exception 'Q5 FAILED: fixture'; end if;
   if not ((select count(*) from analytics_events where user_id = '11111111-1111-1111-1111-111111111111') = 5) then raise exception 'Q5 FAILED: fixture'; end if;
-  -- Q5 (per coordinator): actual progress call scoped to user 2 only — the stub
-  -- auth resolves to user 2 after removing user 1 from the fixture table.
+  -- Q5 (per coordinator): actual progress call scoped to user 2 — user 2 MUST be
+  -- inserted into the auth fixture before its own call (the stub resolves auth
+  -- from that table); then user 2's analytics rows are RETAINED while auth is
+  -- repinned to user 1, so the cross-user denial is exercised against live rows.
   delete from analytics_events where user_id = '11111111-1111-1111-1111-111111111111';
   delete from neuron_ledger where action_type = 'quest_daily_explorer';
   delete from auth_users_fixture where id = '11111111-1111-1111-1111-111111111111';
-  -- auth_uid_stub() now resolves to user 2, who has 9 queries today (threshold 5)
+  insert into auth_users_fixture (id) values ('22222222-2222-2222-2222-222222222222');
+  -- auth_uid_stub() now resolves to user 2, who has 9 past queries today (threshold 5)
   r := public.quest_progress('daily_explorer');
   if not ((r->>'paid')::boolean = true and (select count(*) from neuron_ledger where action_type = 'quest_daily_explorer') = 1) then
     raise exception 'Q5 FAILED: user 2''s own events did not pay user 2';
   end if;
-  -- and user 2's events can never pay user 1: repin auth to user 1 (no events left)
-  delete from analytics_events where user_id = '22222222-2222-2222-2222-222222222222';
+  if not ((select count(*) from neuron_ledger where action_type = 'quest_daily_explorer' and user_id = '22222222-2222-2222-2222-222222222222') = 1) then
+    raise exception 'Q5 FAILED: user 2''s payment row is not attributed to user 2';
+  end if;
+  -- user 2's events REMAIN; auth repinned to user 1, who has none — cross-user denial
   delete from neuron_ledger where action_type = 'quest_daily_explorer';
   insert into auth_users_fixture (id) values ('11111111-1111-1111-1111-111111111111');
   delete from auth_users_fixture where id = '22222222-2222-2222-2222-222222222222';
