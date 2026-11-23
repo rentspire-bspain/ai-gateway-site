@@ -1,5 +1,5 @@
 {
- "version": "v323-product-surface-inventory-6",
+ "version": "v324-product-surface-inventory-7",
  "note": "Fresh product-surface inventory \u2014 priority areas first (checkout, Comet, OAuth, restore, mobile). Stable IDs PI-###; FK to the 29-category scoring table; acceptance test per item; last evidence = live check at 2026-11-22T21:30Z unless noted. Does NOT force the 157; does not change weights or scores.",
  "items": [
   {
@@ -306,7 +306,113 @@
     "qa-private/bench/results/route-classification.json (2026-11-22T23:40Z)",
     "https://github.com/rentspire-bspain/ai-gateway-site/pull/358"
    ]
+  },
+  {
+   "id": "PI-019",
+   "surface": "Stripe live checkout end-to-end (3 tiers)",
+   "fk": "Billing",
+   "scope": "checkout fn v6 + stripe-webhook v8 with STRIPE_SECRET_KEY live: Starter/Pro/Unlimited purchase -> session -> webhook -> quota grant (2500/10000/25000)",
+   "acceptance": "all 3 tiers complete a live-mode purchase cycle with quota grant verified server-side",
+   "last_evidence": "gate: live-mode secret key. Boundary live-verified: checkout accepts all 3 plan IDs with live price IDs (acct_1QbFSiEobD5Y9pei) and returns honest not_configured; credential form opened for owner 2026-11-23 (request credential-interaction:874ee8f7). Deploy PAT lacks Supabase secrets-write; will set via Management API on arrival",
+   "status": "GATED (owner: live key)",
+   "ux_overlap": null,
+   "overlaps": null,
+   "proofs": [
+    "gate: live-mode secret key. Boundary live-verified: checkout accepts all 3 plan ",
+    "standing owner-gate register (session context)"
+   ]
+  },
+  {
+   "id": "PI-020",
+   "surface": "OAuth provider registrations (google/outlook/github)",
+   "fk": "Connectors",
+   "scope": "registered providers on both hosts: clientIds, redirect URIs, consent screens, first real OAuth round-trip per provider",
+   "acceptance": "each provider exposes clientId and completes a real authorization code flow",
+   "last_evidence": "gate: provider consoles. Live boundary verified: all three return honest null (PI-003, 2026-11-22T21:30Z); slack+dropbox registered and working",
+   "status": "GATED (owner: console registrations)",
+   "ux_overlap": null,
+   "overlaps": null,
+   "proofs": [
+    "gate: provider consoles. Live boundary verified: all three return honest null (P",
+    "standing owner-gate register (session context)"
+   ]
+  },
+  {
+   "id": "PI-021",
+   "surface": "voice-service server STT/TTS",
+   "fk": "Voice",
+   "scope": "Render deployment of voice-service: /health ok, streaming STT/TTS round-trip from the voice-convo UI",
+   "acceptance": "voice-service/health 200 ok:true; end-to-end voice conversation with server audio",
+   "last_evidence": "gate: Render deploy (owner). UI complete + states verified (PI-008); voice-service/health 404 confirmed 2026-11-22T22:00Z",
+   "status": "GATED (owner: Render deploy)",
+   "ux_overlap": null,
+   "overlaps": null,
+   "proofs": [
+    "gate: Render deploy (owner). UI complete + states verified (PI-008); voice-servi",
+    "standing owner-gate register (session context)"
+   ]
+  },
+  {
+   "id": "PI-022",
+   "surface": "store distribution (Play Console + Apple Developer)",
+   "fk": "NativeMobile",
+   "scope": "TWA published to Play Store; iOS app or TestFlight equivalent",
+   "acceptance": "store listing live; installable from store",
+   "last_evidence": "gate: store accounts. TWA package ready: manifest valid, assetlinks.json 200 verified (PI-005)",
+   "status": "GATED (owner: store accounts)",
+   "ux_overlap": null,
+   "overlaps": null,
+   "proofs": [
+    "gate: store accounts. TWA package ready: manifest valid, assetlinks.json 200 ver",
+    "standing owner-gate register (session context)"
+   ]
+  },
+  {
+   "id": "PI-023",
+   "surface": "legal counsel review of CanonIntel LLC terms/privacy",
+   "fk": "Legal",
+   "scope": "counsel sign-off on boundview.com terms/privacy under CanonIntel LLC operator/controller structure",
+   "acceptance": "written counsel approval recorded",
+   "last_evidence": "gate: counsel engagement. Checklist delivered: qa-reports/boundview-canonintel-legal-review-checklist.md; pages live and host-correct (PI-016)",
+   "status": "GATED (owner: counsel)",
+   "ux_overlap": null,
+   "overlaps": null,
+   "proofs": [
+    "gate: counsel engagement. Checklist delivered: qa-reports/boundview-canonintel-l",
+    "standing owner-gate register (session context)"
+   ]
+  },
+  {
+   "id": "PI-024",
+   "surface": "fleet_registry service-role migration",
+   "fk": "Fleet",
+   "scope": "execution of the fleet_registry RLS migration with service-role SQL (guardian rows + showcase tables)",
+   "acceptance": "migration applied; guardian/registry queries return rows",
+   "last_evidence": "gate: service-role SQL executor. Schema + PRs landed (#330/#333); showcase table live",
+   "status": "GATED (owner: service-role SQL)",
+   "ux_overlap": null,
+   "overlaps": null,
+   "proofs": [
+    "gate: service-role SQL executor. Schema + PRs landed (#330/#333); showcase table",
+    "standing owner-gate register (session context)"
+   ]
+  },
+  {
+   "id": "PI-025",
+   "surface": "RunPod GPU key (self-hosted model lane)",
+   "fk": "Models",
+   "scope": "RunPod integration for self-hosted open-weight models on the gateway",
+   "acceptance": "configured provider serves completions through call-model",
+   "last_evidence": "gate: RunPod API key. Lane designed; all other model providers live (Flint fallback etc.)",
+   "status": "GATED (owner: RunPod key)",
+   "ux_overlap": null,
+   "overlaps": null,
+   "proofs": [
+    "gate: RunPod API key. Lane designed; all other model providers live (Flint fallb",
+    "standing owner-gate register (session context)"
+   ]
   }
  ],
- "proof_pointer_note": "v322 (coordinator directive): every item carries proofs[] (stable pointers: result files, harness scripts, PR URLs, live-probe timestamps), ux_overlap (UX master check-ID cross-links; register qa-private/bench/results/ux-master.json), and overlaps[] (explicit duplicate-lens annotations \u2014 PI-007/PI-015 and PI-010/PI-014 are intentional dual-lens rows, not duplicates). Weights and scores unchanged."
+ "proof_pointer_note": "v322 (coordinator directive): every item carries proofs[] (stable pointers: result files, harness scripts, PR URLs, live-probe timestamps), ux_overlap (UX master check-ID cross-links; register qa-private/bench/results/ux-master.json), and overlaps[] (explicit duplicate-lens annotations \u2014 PI-007/PI-015 and PI-010/PI-014 are intentional dual-lens rows, not duplicates). Weights and scores unchanged.",
+ "gated_surfaces_note": "v324 (owner directive): gated surfaces registered as first-class rows with explicit GATED status \u2014 25 items total (18 live/honest-state, 7 owner-gated). No gated surface is scored as complete; gates are recorded with exact evidence."
 }
