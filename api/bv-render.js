@@ -1,3 +1,4 @@
+// /api/bv-render — v328a (cache bust: force function rebuild so includeFiles picks up privacy.es.html fix; no logic change)
 // /api/bv-render — serves the SPA HTML with the BoundView brand applied SERVER-SIDE.
 // v283: the runtime DOM scrub (modules/brand.js) repaints ~10s after load — the owner
 // screenshot showed "Welcome to ai.spaincos" and "you@spaincos.com" painting on
