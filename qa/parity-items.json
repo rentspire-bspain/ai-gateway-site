@@ -125,8 +125,8 @@
   {
    "name": "Accessibility",
    "weight": 2,
-   "score": 70,
-   "note": "v292 re-score (all live-verified): WCAG 2.1 AA pass shipped (PR #279) \u2014 axe-core dark theme 0 violations (button-name, color-contrast 7->0, link-in-text-block 2->0), custom 2px accent focus ring live in the browser (was UA default), contrast tokens fixed (text-faint dark/light), labelled landing submit + send buttons. REMAINING: light-mode live check PARTIAL, an H3 precedes H1 in import dialog, skip-link unaudited."
+   "score": 80,
+   "note": "v326 re-score (live + computed evidence): all three v292 REMAINING items closed (PR #373, worker lane a11y_close_lane). (1) Import-dialog heading order fixed: modal moved to end of body (landing H1 first in DOM), h3->h2 with role=dialog + aria-labelledby. (2) Skip-link shipped: 'Skip to main content' is the first element in body, hidden until focus, main#main tabindex=-1 \u2014 LIVE-VERIFIED first Tab lands on it (after the onboarding tour's standard modal focus; with tour dismissed, A.skip-link is first tabbable). (3) Light-mode contrast: all token pairs computed >=4.5 (text 17-19, muted 5.4-5.9, faint 5.0-5.5, accent 6.2-6.9) and the failing --error #DC2626 (4.38 on elevated) fixed to #B91C1C (5.87); dark theme untouched. REMAINING honest limits: no screen-reader/keyboard full suite re-run, dynamic keyboard-shortcuts dialog still uses h3, hardcoded/semi-transparent colors not audited."
   },
   {
    "name": "Legal/Compliance",
@@ -161,8 +161,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 50,
-   "note": "v325 re-score (live-verified): FIRST STATIC ES SURFACES (PR #368, worker lane i18n_es5_lane) \u2014 /es/docs, /es/status, /es/terms, /es/privacy live 200 on ai.spaincos.com with Spanish titles/content, brand-split guards intact (bv host redirects to English boundview pages); on top of the v298/ES3/ES4 in-app dictionary. Honest limits: /help, verify, offline, app shell and all *.boundview.html pages NOT translated; translations have no native or legal review (matters for ES terms/privacy \u2014 counsel gate applies); in-app model answers not translated. REMAINING labeled 'Espa\u00f1ol (partial)'."
+   "score": 58,
+   "note": "v326 re-score (live-verified): full Spanish core-page set \u2014 /es/{docs,status,terms,privacy,help} all 200 with Spanish titles (PR #374, worker lane i18n_es6_lane; /es/help translates the full FAQ incl. the 5 newest sections), EN<->ES cross-links on all 10 pages, hreflang en/es/x-default on help+terms+status+privacy+docs, brand-split guards intact. Honest limits: *.boundview.html pages, /verify, offline page untranslated; no native-speaker or legal review (counsel gate applies to ES legal pages); in-app model answers not translated. Still 'Espa\u00f1ol (partial)' but now 5/5 core static surfaces."
   },
   {
    "name": "NativeMobile",
@@ -317,6 +317,11 @@
    "version": "v325",
    "date": "2026-11-23",
    "change": "i18n 40 -> 50: first static Spanish surfaces shipped (/es/docs, /es/status, /es/terms, /es/privacy \u2014 PR #368) live-verified 200 both hosts with Spanish titles on ai; honest omissions recorded (help/verify/offline/app-shell/boundview untranslated; no native or legal review)."
+  },
+  {
+   "version": "v326",
+   "date": "2026-11-23",
+   "change": "Accessibility 70 -> 80 (three v292 REMAINING items closed, PR #373: heading order, skip-link live-verified first tabbable, light-mode contrast computed PASS with --error token fix). i18n 50 -> 58 (PR #374: full ES core set /es/help added, cross-links + hreflang, live-verified). Both worker lanes landed; headroom honestly limited: no screen-reader suite, boundview/verify/offline untranslated."
   }
  ]
 }
