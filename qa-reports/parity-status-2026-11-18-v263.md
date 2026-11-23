@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v338)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v339)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3157,3 +3157,14 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - UX master: no product-code deploy beyond module/i18n changes (client-side dictionary, no gateway change) — the v334 run on gateway-chat v310 stands.
 
 **HEADLINE: 89.2% (11422/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs: Email 30 (owner: OAuth), Legal 60 (owner: counsel), NativeMobile 48 (owner: store/publishing), store presence (owner), Stripe live checkout (owner: live key — LAST per owner directive).
+
+### 54. §30q addendum — v339: INLINE HARVEST — ES BREADCRUMB + SITEMAP CANONICALS — HEADLINE 89.2%
+
+- ~~ES verify breadcrumb (recorded i18n omission)~~ — FIXED (PR #414): the verify.es.html BreadcrumbList JSON-LD now points at /es/verify (was /verify).
+- ~~Sitemap URL inconsistency (recorded pricing-lane gap)~~ — FIXED (PR #414): sitemap entries switched from .boundview.html file URLs to the clean canonical paths the routes actually serve (/docs, /help, /terms, /privacy — matching / and /pricing). Live-verified: all six locs are clean canonical URLs.
+- Stripe live key: a FRESH credential form is open for the owner (request credential-interaction:e9ff4935; the earlier 874ee8f7 form never received a paste). Owner directive in force: Stripe LAST.
+- Server-side confirmation (owner ask): all workers are server-side lanes in this session's sandbox (isolated worktrees, PRs, live probes) — no Perplexity consumer accounts. Two lanes hit the platform Computer credit limit today; both completed or were re-fired.
+- Teammates browser validation: lane re-fired and RUNNING — evidence lands in v340.
+- UX master: no gateway deploy this batch (static/sitemap only) — the v334 run on gateway-chat v310 stands; next gateway change gets the full re-run.
+
+**HEADLINE: 89.2% (11422/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — fresh form open).
