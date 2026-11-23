@@ -374,7 +374,13 @@ def failure_class(q, content, bench):
     # answer ending there is COMPLETE. Only a body cut mid-sentence (after stripping trailing
     # bullets) or an unclosed code fence is a truncation.
     body = re.sub(r"(?:\n\s*[-*\d.)]\s+[^\n]*)+\s*$", "", content.rstrip())
-    if (not body or not re.search(r"[.!?`):'\"\u201d\u2019]\s*(?:\*\*)?$", body)) or content.count("```") % 2 == 1:
+    # v336 GRADER FIX (async-DSQA teardown 2026-11-23): the platform's FINAL ANSWER contract
+    # line legitimately ends with bare list items ("FINAL ANSWER: Psyduck, Kingler, ...") with
+    # no terminal punctuation — the mid-sentence detector mislabeled 10/50 complete async rows
+    # as truncated. A content ending in a FINAL ANSWER line is COMPLETE by contract.
+    if re.search(r"FINAL ANSWER:\s*\S[\s\S]*$", content.rstrip()) and "```" not in content.split("FINAL ANSWER:")[-1]:
+        pass  # contract line present and terminal — not truncated
+    elif (not body or not re.search(r"[.!?`):'\"\u201d\u2019]\s*(?:\*\*)?$", body)) or content.count("```") % 2 == 1:
         return "truncated"
     if (bench in ("browsecomp", "dsqa", "frames")) and "http" not in content.lower():
         return "no-sources"
