@@ -30,6 +30,10 @@
     [".stg-nav-btn span", "text", null], [".stg-pane-title", "text", null],
     [".stg-pane-sub", "text", null], [".stg-label", "text", null],
     ["#followupInput", "placeholder", "Ask a follow-up..."], ["#followupInput", "aria-label", "Ask a follow-up"],
+    ["#authEmail", "placeholder", "you@spaincos.com"], ["#authPassword", "placeholder", "Password (or blank for email code)"],
+    ["#authNewPass", "placeholder", "New password (8+ characters)"], ["#authNewPass2", "placeholder", "Repeat new password"],
+    ["#authCode", "placeholder", "6-digit code"],
+    [".am-h2", "text", "Automations"],
     [".cp-input", "placeholder", "Search actions and threads, or type a query…"], [".cp-input", "aria-label", "Command palette input"]
   ];
 
@@ -282,6 +286,13 @@
     "Research the most recent AI model releases. For each, cover capabilities, benchmarks, availability and pricing, with cited sources.": "Investiga los lanzamientos más recientes de modelos de IA. Para cada uno, cubre capacidades, benchmarks, disponibilidad y precios, con fuentes citadas.",
     "Research current best practices for building retrieval-augmented generation (RAG) pipelines: chunking, embedding choice, reranking and evaluation. Summarize with sources.": "Investiga las mejores prácticas actuales para construir pipelines de generación aumentada por recuperación (RAG): fragmentación, elección de embeddings, reordenamiento y evaluación. Resume con fuentes."
   };
+  var ES11 = {
+    "Password (or blank for email code)": "Contraseña (o vacío para código por correo)",
+    "New password (8+ characters)": "Nueva contraseña (8+ caracteres)", "Repeat new password": "Repite la nueva contraseña",
+    "6-digit code": "Código de 6 dígitos", "Authenticator code": "Código del autenticador",
+    "Automations": "Automatizaciones", "Response ready": "Respuesta lista", "your thread": "tu hilo"
+  };
+  Object.keys(ES11).forEach(function (k) { if (!ES[k]) ES[k] = ES11[k]; });
   Object.keys(ES10).forEach(function (k) { if (!ES[k]) ES[k] = ES10[k]; });
   Object.keys(ES9).forEach(function (k) { ES[k] = ES9[k]; });
 

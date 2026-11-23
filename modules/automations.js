@@ -233,7 +233,7 @@
     host.innerHTML =
       '<div class="am-wrap">' +
         (showTitle
-          ? '<div><h2 style="font-size:18px;font-weight:600;margin:0 0 4px">Automations</h2>' +
+          ? '<div><h2 class="am-h2" style="font-size:18px;font-weight:600;margin:0 0 4px">Automations</h2>' +
             '<p class="am-intro">Schedule recurring instructions and monitor queued or completed runs on the 5-minute fleet-dispatch runner.</p></div>'
           : '<p class="am-intro">Create recurring automations and track live dispatches executed every 5 minutes by the gateway fleet.</p>') +
 
