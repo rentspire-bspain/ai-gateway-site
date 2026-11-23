@@ -58,6 +58,17 @@
     function fmt(n) { return (n >= 0 ? "" : "−") + Math.abs(n).toLocaleString(window.I18N ? window.I18N.locale() : undefined); }
     credits("balance").then(function (d) {
       balVal.textContent = fmt(Number(d.balance || 0) * 10) + " pts";
+      // Low-balance heads-up: once per session, inline, non-blocking (threshold 500 credits).
+      try {
+        var bal = Number(d.balance || 0);
+        if (bal > 0 && bal < 500 && !sessionStorage.getItem("lowBalShown")) {
+          sessionStorage.setItem("lowBalShown", "1");
+          var lb = document.createElement("div"); lb.className = "muted"; lb.setAttribute("role", "status");
+          lb.style.cssText = "margin-top:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface,var(--bg-elevated));pointer-events:none";
+          lb.textContent = "Heads up: your balance is running low (" + fmt(bal) + " credits left).";
+          balVal.parentNode.appendChild(lb);
+        }
+      } catch (e) {}
       if (Number(d.balance || 0) === 0) note.textContent = "No credits yet — the launch bonus grants 10,000 pts when billing goes fully live.";
     }).catch(function (e) {
       balVal.textContent = "—";

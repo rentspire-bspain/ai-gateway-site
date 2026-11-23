@@ -96,7 +96,7 @@
     RESEARCH_PROMPTS.forEach(function (r, i) {
       actions.push({
         id: "prompt-" + (i + 1), name: r.name, section: "Research", keywords: "research example prompt query", order: 20 + i,
-        run: function (ctx) { var w = (ctx && ctx.window) || root; if (typeof w.submitQuery === "function") w.submitQuery(r.prompt); }
+        run: function (ctx) { var w = (ctx && ctx.window) || root; if (typeof w.submitQuery === "function") w.submitQuery((w.I18N || root.I18N) && (w.I18N || root.I18N).t ? (w.I18N || root.I18N).t(r.prompt) : r.prompt); }
       });
     });
     return actions;

@@ -29,6 +29,7 @@
     [".stg-overlay h2", "text", "Settings"],
     [".stg-nav-btn span", "text", null], [".stg-pane-title", "text", null],
     [".stg-pane-sub", "text", null], [".stg-label", "text", null],
+    ["#followupInput", "placeholder", "Ask a follow-up..."], ["#followupInput", "aria-label", "Ask a follow-up"],
     [".cp-input", "placeholder", "Search actions and threads, or type a query…"], [".cp-input", "aria-label", "Command palette input"]
   ];
 
@@ -272,12 +273,22 @@
     "Chat is not available on this page.": "El chat no está disponible en esta página.",
     "Not signed in — sign in again.": "No has iniciado sesión — inicia sesión de nuevo."
   };
+  var ES10 = {
+    "Ask a follow-up...": "Haz una pregunta de seguimiento...", "Ask a follow-up": "Haz una pregunta de seguimiento",
+    "+ New skill": "+ Nueva habilidad", "New skill": "Nueva habilidad",
+    "Recurring automations": "Automatizaciones recurrentes", "New recurring automation": "Nueva automatización recurrente",
+    "Fleet dispatch queue": "Cola de despacho de la flota",
+    "Research the competitive landscape of AI gateways. Compare leading platforms on pricing, model coverage, rate limits and differentiation, and summarize with sources.": "Investiga el panorama competitivo de las pasarelas de IA. Compara las principales plataformas en precios, cobertura de modelos, límites de uso y diferenciación, y resume con fuentes.",
+    "Research the most recent AI model releases. For each, cover capabilities, benchmarks, availability and pricing, with cited sources.": "Investiga los lanzamientos más recientes de modelos de IA. Para cada uno, cubre capacidades, benchmarks, disponibilidad y precios, con fuentes citadas.",
+    "Research current best practices for building retrieval-augmented generation (RAG) pipelines: chunking, embedding choice, reranking and evaluation. Summarize with sources.": "Investiga las mejores prácticas actuales para construir pipelines de generación aumentada por recuperación (RAG): fragmentación, elección de embeddings, reordenamiento y evaluación. Resume con fuentes."
+  };
+  Object.keys(ES10).forEach(function (k) { if (!ES[k]) ES[k] = ES10[k]; });
   Object.keys(ES9).forEach(function (k) { ES[k] = ES9[k]; });
 
   /* Elements whose text is user/document content and must never be translated. */
   var SKIP_SEL = ".dp-md,.dp-code,.dp-tw,.dp-title,.dc-t,.dp-fname,textarea,input,[data-i18n-skip]";
   var WALK_ROOTS = [".stg-overlay", ".dp-panel", ".dp-row", "#tour", ".ob-tour-backdrop", ".ob-persuade-wrap",
-    ".ob-empty-head", ".ob-example-grid", ".thread-actions", ".sidebar-footer", ".account-menu", ".account-item", ".cp-overlay", ".side-nav", ".spaces-head", "#moduleRoot"];
+    ".ob-empty-head", ".ob-example-grid", ".thread-actions", ".sidebar-footer", ".account-menu", ".account-item", ".cp-overlay", ".side-nav", ".spaces-head", "#moduleRoot", ".sk-head", ".skm-title", ".am-kicker", ".am-panel-title"];
   var ATTRS = ["title", "aria-label", "placeholder"];
 
   function walkRoot(root) {

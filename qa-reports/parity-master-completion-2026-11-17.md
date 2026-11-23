@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 17.1%** (app-weighted; unmeasured counts as 0; v19 re-scored — worker loop + Playwright audits + deploy verification) · **measured-only: 32.8%** · 120✅ / 231🟡 / 221🔴 / 805⚪ across 386 line items. Per-app strict: BV 30.3% · TT 16.8% · AG 37.2% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 17.4%** (app-weighted; unmeasured counts as 0; v21 — worker loop + multiroute Playwright batches) · **measured-only: 32.9%** · 120✅ / 236🟡 / 221🔴 / 800⚪ across 386 line items. Per-app strict: BV 30.6% · TT 17.7% · AG 37.8% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1533,3 +1533,12 @@ Live production readback, all credential-free:
 Register v19: portfolio strict **17.1%** (baseline 14.6% → 16.1% → 16.7% → 17.1%), measured-only 32.8%.
 Worker queue fully drained (batch 10: NO TASKS LEFT — every fetch-verifiable item measured).
 Fleet-gate ledger record posted: SHMT issue #3500 comment 7106806507.
+
+### BATCH 11 — MULTIROUTE PLAYWRIGHT AUDIT (2026-11-23, deterministic runner, 5 routes x 2 hosts x mobile/desktop/slow-4G)
+
+All routes 200 on both hosts; 0 console errors everywhere; no horizontal scroll on any route (including /help.html); static subpages (terms, privacy, docs, help) CLS 0.
+- 🟡 U-PERF-12 AG/BV: renders and stays interactive under Slow-4G emulation (400 ms / 400 kbps), but layout stability degrades
+- 🔴 U-PERF-03 AG/BV + **new finding F-32 (S1)**: landing CLS 0.573 desktop / 0.793 mobile / 1.069 slow-4G vs the 0.1 threshold — real layout-instability failure on the landing page; fix = reserve space for the pre-boot shimmer/hero and dimension late-loading assets
+- 🟡 U-A11Y-03 BV: focus visibility weak (1/5 first focusables show visible focus styles) — same build as AG
+- 🟡 U-MOB-08 AG: 10/80 interactive elements under 24px on mobile
+Register v21: portfolio strict **17.4%**, measured-only 32.9%. Raw results: /home/user/workspace/completion-loop/multiroute-results.json.
