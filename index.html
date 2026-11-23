@@ -670,6 +670,11 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   gap: 8px;
   justify-content: center;
   margin-top: 24px;
+  /* F-32 part 2 (CLS): the onboarding module swaps the static chips for the example
+     grid ~1.8s after paint (class change on #suggestions), growing the box 145->253px.
+     Reserving the post-mount height pre-paint makes the swap height-neutral. */
+  min-height: 253px;
+  align-content: flex-start;
 }
 .suggestion-chip {
   padding: 8px 16px;
