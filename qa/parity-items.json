@@ -161,8 +161,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 78,
-   "note": "v332 re-score (live-verified): ES10 (PR #394, worker i18n_es10_lane) closes the recorded ES8/ES9 omissions \u2014 3 research prompt bodies translated at submit time via I18N.t in command-palette.js (they aren't rendered, so walk roots can't reach them), 3 pane-header strings with 4 new walk roots (.sk-head/.skm-title/.am-kicker/.am-panel-title), #followupInput placeholder+aria-label via TARGETS. Cumulative ES coverage: 7/7 static pages, full command palette incl. prompts, settings+security+models+automations+skills strings, follow-up placeholder. Honest limits remaining: unclassed Automations h2, auth-form placeholders, dynamic interpolated toasts; label stays 'Espa\u00f1ol (partial)'; no native review."
+   "score": 82,
+   "note": "v338 re-score (live-verified): ES11 (PR #412, worker i18n_es11_lane) \u2014 5 auth-form placeholders wired as TARGETS (email placeholder deliberately NOT translated: emails are user data + the boundview attribute-level rewrite still applies; 4 password/code placeholders translated), the unclassed Automations h2 classed (am-h2) and translated, desktop notification title/body through I18N.t (2 strings). modules/i18n.js live with ES11 block. Honest limits remaining: the Authenticator-code placeholder is set at runtime in inline script (stays EN), offerwall toasts dynamic-numeric, notification body is user thread text (untranslatable by design), model output untranslated. 'Espa\u00f1ol (partial)' label retained but the static chrome is now near-complete."
   },
   {
    "name": "NativeMobile",
@@ -347,6 +347,11 @@
    "version": "v332",
    "date": "2026-11-23",
    "change": "i18n 74 -> 78 (PR #394: ES10 \u2014 3 research prompt bodies via I18N.t at submit time, 3 pane headers + 4 walk roots, followup placeholder; honest omissions recorded). UX MASTER re-run on deploy ba4402b: 13 live checks all 1.0 (answer 6.0s, 0 errors, no brand leak), rest carried \u2014 register 100.0 GREEN. IFEval n=100 + DSQA n=50 fresh rotation lane still RUNNING (results land in the next batch)."
+  },
+  {
+   "version": "v338",
+   "date": "2026-11-23",
+   "change": "i18n 78 -> 82 (PR #412: ES11 \u2014 auth placeholders wired with the email deliberately untranslated for brand-safety, Automations h2, notification strings). i18n_es11_lane hit the platform credit limit AFTER pushing its complete PR; teammates_validation_lane stopped before delivering (re-fired, pending credits)."
   }
  ]
 }
