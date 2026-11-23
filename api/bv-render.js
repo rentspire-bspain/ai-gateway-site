@@ -1,4 +1,5 @@
-// /api/bv-render — v328a (cache bust: force function rebuild so includeFiles picks up privacy.es.html fix; no logic change)
+// /api/bv-render — v329a (adds boundview-only /pricing page; includeFiles glob extended — forces rebuild)
+// prior: v328a (cache bust: force function rebuild so includeFiles picks up privacy.es.html fix; no logic change)
 // /api/bv-render — serves the SPA HTML with the BoundView brand applied SERVER-SIDE.
 // v283: the runtime DOM scrub (modules/brand.js) repaints ~10s after load — the owner
 // screenshot showed "Welcome to ai.spaincos" and "you@spaincos.com" painting on
@@ -117,6 +118,8 @@ module.exports = async (req, res) => {
         return;
       }
       const allowed = { terms: 1, privacy: 1, docs: 1, help: 1, status: 1 };
+      if (page === "pricing" && !isBoundViewHost) { res.writeHead(404, headers); res.end("not found"); return; }
+      if (page === "pricing") allowed.pricing = 1;
       if (!allowed[page]) { res.writeHead(404, headers); res.end("not found"); return; }
       const base = isBoundViewHost ? `${page}.boundview.html` : `${page}.html`;
       const cands = [path.join(__dirname, base), path.join(__dirname, "../" + base), path.join(process.cwd(), base), path.join(process.cwd(), "../" + base)];
