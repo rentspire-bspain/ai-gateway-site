@@ -7,7 +7,7 @@
   ],
   "functions": {
     "api/bv-render.js": {
-      "includeFiles": "{terms,privacy,docs,help,status,index}.{html,boundview.html}"
+      "includeFiles": "{terms,privacy,docs,help,status,verify,offline,pricing,index}.{html,boundview.html,es.html}"
     }
   },
   "routes": [
@@ -53,6 +53,10 @@
       "dest": "/api/bv-render?page=docs"
     },
     {
+      "src": "/pricing/?",
+      "dest": "/api/bv-render?page=pricing"
+    },
+    {
       "src": "/help",
       "dest": "/api/bv-render?page=help"
     },
@@ -91,31 +95,31 @@
     },
     {
       "src": "/es/help/?",
-      "dest": "/help.es.html"
+      "dest": "/api/bv-render?page=es-help"
     },
     {
       "src": "/es/docs/?",
-      "dest": "/docs.es.html"
+      "dest": "/api/bv-render?page=es-docs"
     },
     {
       "src": "/es/status/?",
-      "dest": "/status.es.html"
+      "dest": "/api/bv-render?page=es-status"
     },
     {
       "src": "/es/terms/?",
-      "dest": "/terms.es.html"
+      "dest": "/api/bv-render?page=es-terms"
     },
     {
       "src": "/es/privacy/?",
-      "dest": "/privacy.es.html"
+      "dest": "/api/bv-render?page=es-privacy"
     },
     {
       "src": "/es/verify/?",
-      "dest": "/verify.es.html"
+      "dest": "/api/bv-render?page=es-verify"
     },
     {
       "src": "/es/offline/?",
-      "dest": "/offline.es.html"
+      "dest": "/api/bv-render?page=es-offline"
     },
     {
       "handle": "filesystem"

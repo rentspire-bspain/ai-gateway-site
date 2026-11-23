@@ -28,7 +28,8 @@
     [".landing-title", "html", "Where knowledge <em>begins</em>"],
     [".stg-overlay h2", "text", "Settings"],
     [".stg-nav-btn span", "text", null], [".stg-pane-title", "text", null],
-    [".stg-pane-sub", "text", null], [".stg-label", "text", null]
+    [".stg-pane-sub", "text", null], [".stg-label", "text", null],
+    [".cp-input", "placeholder", "Search actions and threads, or type a query…"], [".cp-input", "aria-label", "Command palette input"]
   ];
 
   var ES = {
@@ -195,12 +196,88 @@
     "Thread + email": "Hilo + correo"
   };
   Object.keys(ES4).forEach(function (k) { ES[k] = ES4[k]; });
+  /* v5 additions: command palette (modules/command-palette.js) + remaining Settings pane subtitles. */
+  var ES5 = {
+    "Command palette": "Paleta de comandos", "Command palette input": "Entrada de la paleta de comandos",
+    "Search actions and threads, or type a query…": "Busca acciones y hilos, o escribe una consulta…",
+    "No matches. Try a thread title or an action like \"settings\".": "Sin coincidencias. Prueba con el título de un hilo o una acción como \"configuración\".",
+    "Results": "Resultados", "Actions": "Acciones", "Threads": "Hilos", "Research": "Investigación",
+    "navigate ·": "navegar ·", "run ·": "ejecutar ·", "close": "cerrar", "toggle": "alternar",
+    "Search threads": "Buscar hilos", "Open Settings": "Abrir Configuración",
+    "Open Settings → Connectors": "Abrir Configuración → Conectores",
+    "Open Settings → Automations": "Abrir Configuración → Automatizaciones",
+    "Open Settings → Skills": "Abrir Configuración → Habilidades",
+    "Open Settings → Artifacts": "Abrir Configuración → Artefactos",
+    "Open Library": "Abrir Biblioteca", "Open Fleet": "Abrir Flota", "Toggle theme": "Cambiar tema",
+    "Research: competitive landscape of AI gateways": "Investigación: panorama competitivo de pasarelas de IA",
+    "Research: latest AI model releases": "Investigación: últimos lanzamientos de modelos de IA",
+    "Research: best practices for RAG pipelines": "Investigación: mejores prácticas para pipelines RAG",
+    "Your profile and sign-in credentials for ai.spaincos.com.": "Tu perfil y credenciales de acceso para ai.spaincos.com.",
+    "Changing your email sends a confirmation to both the old and new address. The change applies once you confirm.": "Al cambiar tu correo se envía una confirmación a la dirección anterior y a la nueva. El cambio se aplica cuando confirmes.",
+    "Pick a strong password you don't use anywhere else.": "Elige una contraseña segura que no uses en ningún otro sitio.",
+    "Permanently delete your account and all data. This cannot be undone.": "Elimina de forma permanente tu cuenta y todos tus datos. No se puede deshacer.",
+    "Every lane in the composer, grouped by what it is best at. Free lanes cost nothing; the rest draw on your plan.": "Cada carril del compositor, agrupado según su mejor uso. Los carriles gratuitos no cuestan nada; el resto consume tu plan.",
+    "Members, roles, and the sign-in allowlist for this site.": "Miembros, roles y la lista de acceso permitido de este sitio.",
+    "Invite teammates and manage roles. Only owners/admins can make changes — the server enforces it.": "Invita a compañeros y administra roles. Solo propietarios y administradores pueden hacer cambios — el servidor lo impone.",
+    "What your plan includes on ai.spaincos.com — and what Pro adds.": "Lo que incluye tu plan en ai.spaincos.com — y lo que añade Pro.",
+    "Answers to the most common issues. Search or browse.": "Respuestas a los problemas más comunes. Busca o explora.",
+    "Data sources the assistant can reference in your answers.": "Fuentes de datos que el asistente puede citar en tus respuestas.",
+    "Activity on this device, from your local thread library.": "Actividad en este dispositivo, desde tu biblioteca local de hilos.",
+    "Export or delete the data stored on this device.": "Exporta o elimina los datos almacenados en este dispositivo.",
+    "ai.spaincos.com — a Perplexity-style gateway to open-weight models.": "ai.spaincos.com — una pasarela estilo Perplexity hacia modelos de pesos abiertos.",
+    "Everyone with access to this workspace (read-only — roles are managed in Settings > Organization).": "Todas las personas con acceso a este espacio de trabajo (solo lectura — los roles se administran en Configuración > Organización).",
+    "Your gateway activity, from your synced threads.": "Tu actividad en la pasarela, a partir de tus hilos sincronizados.",
+    "Threads per week, last 4 weeks.": "Hilos por semana, últimas 4 semanas.",
+    "Read-only workspace overview for owners and admins. Opening this pane does not grant access to additional records.": "Resumen de solo lectura del espacio de trabajo para propietarios y administradores. Abrir este panel no concede acceso a más registros.",
+    "Name": "Nombre"
+  };
+  Object.keys(ES5).forEach(function (k) { ES[k] = ES5[k]; });
   Object.keys(ES2).forEach(function (k) { ES[k] = ES2[k]; });
+  /* v9 additions: Security/Models/Settings long descriptions, Automations + Skills static messages. */
+  var ES9 = {
+    "Optional. Add an authenticator-app code (TOTP) as a second step after your password. You will only be asked for a code if you turn this on.": "Opcional. Añade un código de una aplicación de autenticación (TOTP) como segundo paso tras tu contraseña. Solo se te pedirá un código si lo activas.",
+    "Recovery: if you lose your authenticator, use Devices \u2192 Sign out everywhere, then ask the owner to remove the factor. Keep the setup key somewhere safe.": "Recuperación: si pierdes tu autenticador, usa Dispositivos \u2192 Cerrar sesión en todas partes y pide al propietario que elimine el factor. Guarda la clave de configuración en un lugar seguro.",
+    "Supabase doesn\u2019t expose an inventory of live sessions, so this list tracks devices that signed in from this app. Removing a device only removes it from this list \u2014 use \u201cSign out everywhere\u201d to revoke all sessions.": "Supabase no expone un inventario de sesiones activas, así que esta lista registra los dispositivos que iniciaron sesión desde esta aplicación. Quitar un dispositivo solo lo elimina de esta lista \u2014 usa \u201cCerrar sesión en todas partes\u201d para revocar todas las sesiones.",
+    "Uncensored lanes answer without hedging. Model status is linked in the footer of every page.": "Los carriles sin censura responden sin rodeos. El estado de los modelos está enlazado en el pie de cada página.",
+    "Toggle changes take effect on the next answer.": "Los cambios de los interruptores se aplican en la siguiente respuesta.",
+    "Help the assistant tailor answers to you.": "Ayuda al asistente a adaptar las respuestas a ti.",
+    "Facts the assistant remembers and applies to every answer.": "Datos que el asistente recuerda y aplica a cada respuesta.",
+    "Custom instructions applied to every answer.": "Instrucciones personalizadas aplicadas a cada respuesta.",
+    "Choose how you hear about activity.": "Elige cómo te enteras de la actividad.",
+    "Appearance and behavior defaults.": "Valores predeterminados de apariencia y comportamiento.",
+    "No memories yet — add one below.": "Aún no hay recuerdos — añade uno abajo.",
+    "No connectors configured — add one below.": "No hay conectores configurados — añade uno abajo.",
+    "No teammates match your search.": "Ningún compañero coincide con tu búsqueda.",
+    "No pending invitations.": "No hay invitaciones pendientes.", "No teammates yet.": "Aún no hay compañeros.",
+    "No team membership for this account.": "Esta cuenta no pertenece a ningún equipo.",
+    "Reusable instruction presets. Pick a preset to preview it, then apply it to a teammate from the roster.": "Preajustes de instrucciones reutilizables. Elige uno para previsualizarlo y luego aplícalo a un compañero desde la lista.",
+    "Enter a name for this automation.": "Introduce un nombre para esta automatización.",
+    "Name must be 160 characters or fewer.": "El nombre debe tener 160 caracteres o menos.",
+    "Enter the instruction the fleet should run.": "Introduce la instrucción que debe ejecutar la flota.",
+    "Instruction must be 4,000 characters or fewer.": "La instrucción debe tener 4.000 caracteres o menos.",
+    "Choose a valid schedule (hourly, 2x-daily, daily, or weekly).": "Elige una programación válida (cada hora, 2 veces al día, diaria o semanal).",
+    "Enter an instruction to queue for the fleet.": "Introduce una instrucción para poner en cola para la flota.",
+    "No dispatches match the selected filter.": "Ningún envío coincide con el filtro seleccionado.",
+    "No dispatches queued yet — runs from automations and one-off dispatches appear here.": "Aún no hay envíos en cola — aquí aparecen las ejecuciones de automatizaciones y los envíos puntuales.",
+    "Please sign in to queue a fleet dispatch.": "Inicia sesión para poner en cola un envío de la flota.",
+    "Please sign in to create an automation.": "Inicia sesión para crear una automatización.",
+    "Could not load automations.": "No se pudieron cargar las automatizaciones.",
+    "Could not load fleet dispatches.": "No se pudieron cargar los envíos de la flota.",
+    "Could not create automation.": "No se pudo crear la automatización.",
+    "Could not queue dispatch.": "No se pudo poner en cola el envío.",
+    "Could not update automation.": "No se pudo actualizar la automatización.",
+    "Enter a name for this skill.": "Introduce un nombre para esta habilidad.",
+    "Enter the instructions for this skill.": "Introduce las instrucciones para esta habilidad.",
+    "Please sign in to save skills.": "Inicia sesión para guardar habilidades.",
+    "Chat is not available on this page.": "El chat no está disponible en esta página.",
+    "Not signed in — sign in again.": "No has iniciado sesión — inicia sesión de nuevo."
+  };
+  Object.keys(ES9).forEach(function (k) { ES[k] = ES9[k]; });
 
   /* Elements whose text is user/document content and must never be translated. */
   var SKIP_SEL = ".dp-md,.dp-code,.dp-tw,.dp-title,.dc-t,.dp-fname,textarea,input,[data-i18n-skip]";
   var WALK_ROOTS = [".stg-overlay", ".dp-panel", ".dp-row", "#tour", ".ob-tour-backdrop", ".ob-persuade-wrap",
-    ".ob-empty-head", ".ob-example-grid", ".thread-actions", ".sidebar-footer", ".account-menu", ".account-item", ".side-nav", ".spaces-head", "#moduleRoot"];
+    ".ob-empty-head", ".ob-example-grid", ".thread-actions", ".sidebar-footer", ".account-menu", ".account-item", ".cp-overlay", ".side-nav", ".spaces-head", "#moduleRoot"];
   var ATTRS = ["title", "aria-label", "placeholder"];
 
   function walkRoot(root) {

@@ -1,3 +1,5 @@
+// /api/bv-render — v329a (adds boundview-only /pricing page; includeFiles glob extended — forces rebuild)
+// prior: v328a (cache bust: force function rebuild so includeFiles picks up privacy.es.html fix; no logic change)
 // /api/bv-render — serves the SPA HTML with the BoundView brand applied SERVER-SIDE.
 // v283: the runtime DOM scrub (modules/brand.js) repaints ~10s after load — the owner
 // screenshot showed "Welcome to ai.spaincos" and "you@spaincos.com" painting on
@@ -89,10 +91,35 @@ module.exports = async (req, res) => {
     // boundview.com the raw ai.spaincos terms to every non-JS client (crawler brand
     // leak — the brand-split guard was JavaScript-only). boundview hosts get the
     // dedicated .boundview.html pages; every other host gets the raw page.
-    const qpage = String((req.url || "").split("?")[1] || "").match(/page=([a-z]+)/);
+    const qpage = String((req.url || "").split("?")[1] || "").match(/page=([a-z-]+)/);
     if (qpage) {
       const page = qpage[1];
+      // v328 (RESUME-20261123-1630-BND): Spanish pages routed through this function so
+      // the boundview host NEVER serves ai.spaincos-branded bytes. Pinned v326 policy
+      // (ES on boundview -> English boundview page) is preserved, but enforced with a
+      // SERVER-SIDE 307 instead of the JavaScript-only brand-split guard (which left
+      // AI titles/canonicals in the pre-JS response on boundview.com/es/*).
+      if (page.startsWith("es-")) {
+        const rest = page.slice(3);
+        const allowedEs = { terms: 1, privacy: 1, docs: 1, help: 1, status: 1, verify: 1, offline: 1 };
+        if (!allowedEs[rest]) { res.writeHead(404, headers); res.end("not found"); return; }
+        if (isBoundViewHost) {
+          res.writeHead(307, { ...headers, Location: "/" + rest, "Content-Type": "text/plain; charset=utf-8" });
+          res.end(req.method === "HEAD" ? undefined : "redirect");
+          return;
+        }
+        const baseEs = `${rest}.es.html`;
+        const candsEs = [path.join(__dirname, baseEs), path.join(__dirname, "../" + baseEs), path.join(process.cwd(), baseEs), path.join(process.cwd(), "../" + baseEs)];
+        const fEs = candsEs.find((c) => { try { return fs.existsSync(c); } catch { return false; } });
+        if (!fEs) { res.writeHead(404, headers); res.end("page not bundled"); return; }
+        const htmlEs = fs.readFileSync(fEs, "utf8");
+        res.writeHead(200, { ...headers, "Content-Type": "text/html; charset=utf-8" });
+        res.end(req.method === "HEAD" ? undefined : htmlEs);
+        return;
+      }
       const allowed = { terms: 1, privacy: 1, docs: 1, help: 1, status: 1 };
+      if (page === "pricing" && !isBoundViewHost) { res.writeHead(404, headers); res.end("not found"); return; }
+      if (page === "pricing") allowed.pricing = 1;
       if (!allowed[page]) { res.writeHead(404, headers); res.end("not found"); return; }
       const base = isBoundViewHost ? `${page}.boundview.html` : `${page}.html`;
       const cands = [path.join(__dirname, base), path.join(__dirname, "../" + base), path.join(process.cwd(), base), path.join(process.cwd(), "../" + base)];
