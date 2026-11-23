@@ -28,3 +28,4 @@ assert.strictEqual(typeof j.fmtNumber(1234.5), "string");
 assert.ok(/nov/i.test(j.fmtDate("2026-11-21")));
 assert.strictEqual(load("", null, ["en-US"]).fmtDate("2026-11-21"), "Nov 21, 2026");
 console.log("i18n v2 tests ok");
+assert.ok(/^Investiga los lanzamientos/.test(i.t("Research the most recent AI model releases. For each, cover capabilities, benchmarks, availability and pricing, with cited sources.")));
