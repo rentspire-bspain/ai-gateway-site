@@ -1,5 +1,5 @@
 {
- "version": 18,
+ "version": 19,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -361,13 +361,13 @@
    "status": {
     "BV": "Y",
     "TT": "Y",
-    "AG": "Y",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint)",
+   "evidence": "Native buttons used in TT; shell has command palette + shortcuts.js; no recorded keyboard audit | playwright AG 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | playwright BV 2026-11-22: 91 interactive elements; focus visibility is runtime-state dependent (static check: 22 have visible outline hint) | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): keyboard focus paths verified in host wiring; deployed",
    "fix": "Keyboard walkthrough per CUJ each release; record in qa-reports"
   },
   {
@@ -559,15 +559,15 @@
    "W": 3,
    "ircm": "2010",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "G",
-    "AG": "Y",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT pending dot is paired with text | playwright AG 2026-11-22: 6/16 status indicators lack text/aria | playwright BV 2026-11-22: 6/16 status indicators lack text/aria | AG fix on branch: aria-hidden on 5 decorative dots (mic-dot x2, status-dot, queued-dot, vc-dot) + role=status/aria-live on importStatus; local Playwright positive 0/16 bare, live negative 6/16 (undeployed) 2026-11-22 | BV fix on branch: aria-hidden on 5 decorative dots (mic-dot x2, status-dot, queued-dot, vc-dot) + role=status/aria-live on importStatus; local Playwright positive 0/16 bare, live negative 6/16 (undeployed) 2026-11-22",
+   "evidence": "TT pending dot is paired with text | playwright AG 2026-11-22: 6/16 status indicators lack text/aria | playwright BV 2026-11-22: 6/16 status indicators lack text/aria | AG fix on branch: aria-hidden on 5 decorative dots (mic-dot x2, status-dot, queued-dot, vc-dot) + role=status/aria-live on importStatus; local Playwright positive 0/16 bare, live negative 6/16 (undeployed) 2026-11-22 | BV fix on branch: aria-hidden on 5 decorative dots (mic-dot x2, status-dot, queued-dot, vc-dot) + role=status/aria-live on importStatus; local Playwright positive 0/16 bare, live negative 6/16 (undeployed) 2026-11-22 | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): live production 0/16 bare color-only indicators (was 6) | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): same build deployed on boundview.com",
    "fix": "Keep"
   },
   {
@@ -2459,7 +2459,7 @@
    "W": 10,
    "ircm": "4233",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "R",
     "AG": "G",
     "GH": "R",
@@ -2467,7 +2467,7 @@
     "CT": "R",
     "DG": "U"
    },
-   "evidence": "LIVE: boundview.com/privacy.html is the ai.spaincos.com policy (\"private site\u2026 no public sign-up, no advertising, no analytics trackers\"). BV has a Free tier and an ad-network offer wall. Contradiction = deceptive-practice exposure | 2026-11-21 live re-verification (post PR #264 merge): public BV policy written + merged (privacy.boundview.html, host guard); NOT live \u2014 boundview.com is pinned to a stale deployment (see F.3); AG live | worker CT 2026-11-22: No privacy policy is served or discoverable on comptrove.com in current results: the only comptrove.com page retrieved is a rent-comparison content page (Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps) [[5](https://comptrove.com/m/austin/)], not a /privacy or policy page, so nothing ",
+   "evidence": "LIVE: boundview.com/privacy.html is the ai.spaincos.com policy (\"private site\u2026 no public sign-up, no advertising, no analytics trackers\"). BV has a Free tier and an ad-network offer wall. Contradiction = deceptive-practice exposure | 2026-11-21 live re-verification (post PR #264 merge): public BV policy written + merged (privacy.boundview.html, host guard); NOT live \u2014 boundview.com is pinned to a stale deployment (see F.3); AG live | worker CT 2026-11-22: No privacy policy is served or discoverable on comptrove.com in current results: the only comptrove.com page retrieved is a rent-comparison content page (Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps) [[5](https://comptrove.com/m/austin/)], not a /privacy or policy page, so nothing | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): privacy.boundview.html live 200 (public consumer policy)",
    "fix": "Write BV policy: offer-wall partners, subid sharing, cookies, retention; per-host policy file"
   },
   {
@@ -2479,15 +2479,15 @@
    "W": 10,
    "ircm": "4232",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "R",
-    "AG": "Y",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "boundview.com/terms.html \u2192 404 (live) | 2026-11-22: terms.html published (private-workspace ToS); live on deploy of PR #342 | 2026-11-22: terms.boundview.html published (consumer ToS incl. Neurons, offers, auto-renewal, cancellation); live on deploy of PR #342",
+   "evidence": "boundview.com/terms.html \u2192 404 (live) | 2026-11-22: terms.html published (private-workspace ToS); live on deploy of PR #342 | 2026-11-22: terms.boundview.html published (consumer ToS incl. Neurons, offers, auto-renewal, cancellation); live on deploy of PR #342 | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): terms.html live 200 | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): terms.boundview.html live 200 on boundview.com",
    "fix": "Draft with counsel; link from signup and checkout"
   },
   {
@@ -2641,13 +2641,13 @@
    "status": {
     "BV": "G",
     "TT": "U",
-    "AG": "G",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "qa/csp-hash-check.py + tools/gen-csp-sri.mjs; stale CSP bricks page (README)",
+   "evidence": "qa/csp-hash-check.py + tools/gen-csp-sri.mjs; stale CSP bricks page (README) | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): CSP now carries narrow frame-src partner origins (merged #367); strictness improved",
    "fix": "Keep; add to prelaunch for every host app"
   },
   {
@@ -2821,13 +2821,13 @@
    "status": {
     "BV": "U",
     "TT": "U",
-    "AG": "Y",
+    "AG": "G",
     "GH": "R",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not found | worker AG 2026-11-22: ai.spaincos.com serves its homepage (the Perplexity-history import page) [[1](https://ai.spaincos.com/)] and its repo rentspire-bspain/ai-gateway-site is indexed [[2](https://github.com/rentspire-bspain/ai-gateway-site)], but /.well-known/security.txt is not indexed or retrievable, no vulnerability | worker GH 2026-11-22: No /.well-known/security.txt could be observed for minutegig.com, and no monitored vulnerability-reporting inbox exists for that domain. The only disclosure contact surfaced anywhere was vulnreports@minut.com, published in the Bug Bounty Program Policy on minut.com [[1](https://www.minut.com/legal/b | 2026-11-22: .well-known/security.txt created (Contact, Expires 2027-11-22, coordinated-disclosure policy) \u2014 live on deploy of PR #342",
+   "evidence": "Not found | worker AG 2026-11-22: ai.spaincos.com serves its homepage (the Perplexity-history import page) [[1](https://ai.spaincos.com/)] and its repo rentspire-bspain/ai-gateway-site is indexed [[2](https://github.com/rentspire-bspain/ai-gateway-site)], but /.well-known/security.txt is not indexed or retrievable, no vulnerability | worker GH 2026-11-22: No /.well-known/security.txt could be observed for minutegig.com, and no monitored vulnerability-reporting inbox exists for that domain. The only disclosure contact surfaced anywhere was vulnreports@minut.com, published in the Bug Bounty Program Policy on minut.com [[1](https://www.minut.com/legal/b | 2026-11-22: .well-known/security.txt created (Contact, Expires 2027-11-22, coordinated-disclosure policy) \u2014 live on deploy of PR #342 | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): security.txt live 200 with Contact/Expires/Policy (curl verified)",
    "fix": "Add security.txt"
   },
   {
