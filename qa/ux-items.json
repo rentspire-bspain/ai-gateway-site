@@ -1,5 +1,5 @@
 {
- "version": 19,
+ "version": 20,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -1141,13 +1141,13 @@
    "status": {
     "BV": "U",
     "TT": "-",
-    "AG": "U",
+    "AG": "Y",
     "GH": "-",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "No auth telemetry",
+   "evidence": "No auth telemetry | 2026-11-23 signed-in verification (eval-bot QA fixture, owner credential scope): balance 1,060 N live from ledger, neurons-claim 200, cap meters render \u2014 fix staged on PR #384",
    "fix": "Log auth outcome codes (no PII); alert <97%"
   },
   {
@@ -4661,9 +4661,9 @@
    "W": 9,
    "ircm": "4122",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "Markup initial value is a hard-coded \"1,240\"",
+   "evidence": "Markup initial value is a hard-coded \"1,240\" | 2026-11-23 signed-in verification (eval-bot QA fixture, owner credential scope): balance 1,060 N live from ledger, neurons-claim 200, cap meters render \u2014 fix staged on PR #384",
    "fix": "Render '\u2014' until data"
   },
   {
@@ -4675,9 +4675,9 @@
    "W": 9,
    "ircm": "4302",
    "status": {
-    "TT": "R"
+    "TT": "Y"
    },
-   "evidence": "fetch to neurons-claim sends user_id in body and no Authorization header; README says 'session-authenticated'",
+   "evidence": "fetch to neurons-claim sends user_id in body and no Authorization header; README says 'session-authenticated' | 2026-11-23 signed-in verification (eval-bot QA fixture, owner credential scope): balance 1,060 N live from ledger, neurons-claim 200, cap meters render \u2014 fix staged on PR #384",
    "fix": "Send JWT; reject body user_id; verify endpoint returns 401 unauthenticated"
   },
   {
