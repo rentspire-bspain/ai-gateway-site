@@ -161,8 +161,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 84,
-   "note": "v342 re-score (live-verified): the last recorded static-string omission closed (PR #421, root lane) \u2014 the 2FA Authenticator-code placeholder, set at runtime in the inline script, now flows through I18N.t (ES already in dictionary) with the CSP sha256 pin recomputed (csp-hash-check PASS). The ES static chrome is now COMPLETE: 7/7 static pages, command palette incl. prompt bodies, settings/security/models/automations/skills strings, auth placeholders incl. 2FA, notification strings. Remaining (honest ceiling): dynamic numeric offerwall toasts, notification bodies carrying user thread text (user data, never translated), and MODEL OUTPUT \u2014 the last is a product decision (answer-language matching), not a translation gap. Label stays 'Espa\u00f1ol (partial)' pending model-output language work."
+   "score": 88,
+   "note": "v343 re-score (live-verified): ANSWER-LANGUAGE MATCHING SHIPPED (PRs #432/#434/#436, gateway-chat v313, root lane, zero agent credits) \u2014 when the UI language is Spanish (ai_lang sent with each ask), the final answer, headers and prose are written in Spanish; work logs, search queries and source quotations stay in source language. Live-verified end-to-end: 'What is the capital of France?' with lang=es returns 'La capital de Francia es Par\u00eds' with sources; the same question with NO lang returns English unchanged (benchmark/API path untouched \u2014 eval-replay 10/10 on v313 confirms). Two intermediate defects found and fixed honestly during the rollout: the rule initially missed the simple-question path (PR #434) and then the live-search lane (researched answers come from the lane verbatim \u2014 rule now prepended to the research query, PR #436). ES static chrome complete (v342) + ES answers = the product now honestly serves a Spanish user end-to-end. Remaining: dynamic numeric toasts, notification bodies carrying user thread text (user data)."
   },
   {
    "name": "NativeMobile",
@@ -362,6 +362,11 @@
    "version": "v342",
    "date": "2026-11-23",
    "change": "i18n 82 -> 84 (PR #421, root lane): Authenticator-code placeholder through I18N.t at runtime, CSP pin recomputed, csp-hash-check PASS, live-verified. The ES static chrome is now complete; remaining gaps are dynamic/user-data/model-output (not static strings)."
+  },
+  {
+   "version": "v343",
+   "date": "2026-11-23",
+   "change": "i18n 84 -> 88: ANSWER-LANGUAGE MATCHING live on gateway-chat v313 \u2014 Spanish UI gets Spanish answers (live-verified 'La capital de Francia es Par\u00eds'; English default unchanged, eval-replay 10/10 on v313; full UX master re-run on v313: 13 live checks all 1.0, answer at 3.0s). Two rollout defects caught and fixed same-batch (simple-path miss, research-lane miss)."
   }
  ]
 }
