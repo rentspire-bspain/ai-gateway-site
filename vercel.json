@@ -12,6 +12,13 @@
   },
   "routes": [
     {
+      "src": "/(vendor|fonts)/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      },
+      "continue": true
+    },
+    {
       "src": "/(qa|qa-private|browser-service|voice-service|supabase|sql|tests|tools)/.*",
       "status": 404
     },
@@ -23,7 +30,9 @@
         "Referrer-Policy": "strict-origin-when-cross-origin",
         "Permissions-Policy": "camera=(), microphone=(self), geolocation=()",
         "Content-Security-Policy": "frame-ancestors 'none'; object-src 'none'; base-uri 'none'",
-        "X-Permitted-Cross-Domain-Policies": "none"
+        "X-Permitted-Cross-Domain-Policies": "none",
+        "Cross-Origin-Opener-Policy": "same-origin",
+        "Cross-Origin-Resource-Policy": "same-origin"
       },
       "continue": true
     },

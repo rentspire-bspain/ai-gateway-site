@@ -1,0 +1,29 @@
+name: perf-budget
+# U-PERF-11: block merges that break the landing performance budgets.
+# Serves the static checkout locally (no secrets, no preview URL needed) and measures
+# mobile slow-4G CLS / LCP plus the zero-third-party-first-load guard with Playwright.
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  budget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Playwright + Chromium
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+      - name: Serve static checkout
+        run: |
+          python3 -m http.server 8903 --bind 127.0.0.1 &
+          sleep 2
+          curl -fsS http://127.0.0.1:8903/index.html -o /dev/null
+      - name: Run perf budget (CLS<=0.1, LCP<=2.5s, 0 third-party origins)
+        run: python3 qa/perf-budget.py http://127.0.0.1:8903/index.html

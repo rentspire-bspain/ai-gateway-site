@@ -16,7 +16,12 @@
      Reject. Choice persists in localStorage and can be changed anytime. */
   var CONSENT_KEY = "ad_consent_v1";
   function consentState() {
-    try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; }
+    try { var v = localStorage.getItem(CONSENT_KEY); if (v) return v; } catch (e) {}
+    /* U-TRU-03/04: honor the browser's Global Privacy Control signal — a GPC opt-out
+       defaults the ad network to denied (no stored choice yet). An explicit stored
+       choice always wins over GPC, so the user can still change their mind. */
+    try { if (navigator.globalPrivacyControl === true) return "denied"; } catch (e) {}
+    return null;
   }
   function setConsent(v) {
     try { localStorage.setItem(CONSENT_KEY, v); } catch (e) {}
