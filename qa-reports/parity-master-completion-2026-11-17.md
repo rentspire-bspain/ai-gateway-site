@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 19.0%** (app-weighted; unmeasured counts as 0; v31 — FTC disclosure + consent + TRU sweep live; vendor self-hosting merged) · **measured-only: 35.1%** · 139✅ / 228🟡 / 213🔴 / 797⚪ across 386 line items. Per-app strict: BV 34.5% · TT 20.1% · AG 40.3% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 19.6%** (app-weighted; unmeasured counts as 0; v32 — zero third-party asset origins end-to-end, perf-budget CI gate live, state-rights copy live) · **measured-only: 35.7%** · 144✅ / 229🟡 / 209🔴 / 795⚪ across 386 line items. Per-app strict: BV 36.2% · TT 20.1% · AG 41.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1659,3 +1659,15 @@ Merged closeout record: https://github.com/rentspire-bspain/SHMT/issues/3500#iss
 **Headline after batch:** strict 19.0% / measured-only 35.1% — 139✅ / 228🟡 / 213🔴 / 797⚪ (v31; was 18.6% / 135✅). BV 34.5%, AG 40.3%, TT 20.1%.
 
 **Session cumulative (batches 12–17):** strict 17.3% → 19.0%, measured-only 32.9% → 35.1%, ✅ 121 → 139, with F-32 (CLS), F-02 (S0 balance), F-23 (LCP) closed and F-01's consent gate + policy work live.
+
+### Batch 19 — full vendor closure + state-rights copy + CI gate live (2026-11-24, PRs #445/#447/#448 merged, register v32)
+
+- ✅ **#445 merged + live-verified**: COOP/CORP headers on both hosts (curl-verified); /vendor/* and /fonts/* served immutable; GPC honored as default consent denial (Playwright-verified with a GPC-forcing script); perf-budget CI gate live.
+- ✅ **#447 merged + live-verified (U-TRU-13 → ✅ BV+AG)**: pdfjs, jszip, and KaTeX (js + css + all 32 fonts, SRI-verified) self-hosted; **jsdelivr removed from the CSP and the codebase entirely — zero third-party asset origins anywhere, critical or lazy**. The perf-budget gate passed on its own PR (validating the guard end-to-end).
+- ✅ **U-PERF-11 → ✅ BV+AG**: perf-budget workflow gates every PR/master push (CLS ≤0.1, LCP budget, zero third-party first-load origins); passed on #445 and #447 (54s runs).
+- 🟡 **U-PERF-07 → 🟡 BV+AG**: versioned vendor/font files served immutable (curl-verified); modules remain unhashed (build-time hashing would finish it).
+- 🟡 **U-TRU-04 → 🟡 BV+AG (#448)**: state privacy rights sections live on both privacy pages (CCPA/CPRA + comparable laws, non-discrimination, statutory windows), cross-referencing the consent gate and GPC. Counsel review pending (E11-2).
+- ✅ **U-TRU-03 → ✅ BV**: consent gate (#430) + GPC (#445) + policy cross-references (#448) — complete consent management.
+- Corrected en route: the lazy-lib references live inside inline scripts, so their CSP hashes were recomputed after the swap (csp-hash-check PASS); a broken command chain briefly skipped edits and the perf-budget script itself caught the resulting 404s (13s LCP) before anything shipped.
+
+**Headline after batch:** strict 19.6% / measured-only 35.7% — 144✅ / 229🟡 / 209🔴 / 795⚪ (v32; was 19.0% / 139✅). BV 36.2%, AG 41.7%. **Session cumulative (batches 12–19): strict 17.3% → 19.6%, ✅ 121 → 144, 🔴 221 → 209, with F-32/F-02/F-23 closed, F-01 consent+policy+GPC live, and zero third-party asset origins end-to-end.**
