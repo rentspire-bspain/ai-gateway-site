@@ -3748,7 +3748,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     let data: any;
     if (stream === true) {
       const streamMessages = intent.complexity === "simple"
-        ? capped
+        ? (answerLangRule ? [...capped, { role: "system", content: answerLangRule.trim() }] : capped)
         : [...capped, { role: "system", content: "Keep the answer COMPLETE within the token budget — concise, no filler — lead with the direct answer, state the specific figures, dates and names from the research (not vague summaries), and finish with the Suggested Follow-ups section." + (perplexityFullText ? " The LIVE SEARCH ANSWER above is your primary source: preserve its figures, dates and [N] markers." : "") + answerLangRule }];
       const sres = await fetch(callModelUrl, {
         method: "POST",
