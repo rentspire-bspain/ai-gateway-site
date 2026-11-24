@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v341)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v342)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3185,3 +3185,11 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - UX master: no gateway deploy this batch — the v334 run on gateway-chat v310 stands; next gateway change gets the full re-run.
 
 **HEADLINE: 89.3% (11425/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
+
+### 57. §30q addendum — v342: i18n ES12 (ROOT LANE) — THE STATIC CHROME IS COMPLETE
+
+- ~~Authenticator-code placeholder (the last recorded static-string i18n omission)~~ — FIXED (PR #421, root lane, zero agent credits): the 2FA code input's placeholder is set at runtime in the inline script; it now flows through I18N.t (the ES string 'Código del autenticador' was already in the dictionary). The CSP sha256 pin was recomputed — csp-hash-check PASS — and the change is live. i18n 82->84.
+- The ES static chrome is now COMPLETE: 7/7 static pages, command palette including prompt bodies, settings/security/models/automations/skills strings, all auth placeholders including 2FA, notification strings. Honest ceiling reached for static translation: what remains is dynamic numeric toasts, notification bodies carrying user thread text (user data — never translated), and MODEL OUTPUT (an answer-language-matching product decision, not a translation gap).
+- UX master: the v334 run on gateway-chat v310 stands (this was a client-side change; next gateway deploy gets the full re-run).
+
+**HEADLINE: 89.4% (11427/128, 29 categories, generator) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
