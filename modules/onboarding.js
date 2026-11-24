@@ -1099,7 +1099,24 @@
     preloadConnectorsReady();
 
     if (shouldAutoOpen()) {
-      openTour(0, { focus: false });
+      if (isAuthBlocking()) {
+        /* F-23 (v161): signed-out visitors cannot see the tour behind the auth gate,
+           but openTour still painted the tour text into the viewport — and that text,
+           rendered only after the full lazy-module tail loads (~11.4s on slow 4G),
+           was the LCP element (11.7s). Defer the auto-open until the gate lifts. */
+        var gate = document.getElementById("authOverlay");
+        if (gate && typeof MutationObserver !== "undefined") {
+          var mo = new MutationObserver(function () {
+            if (!isAuthBlocking()) {
+              mo.disconnect();
+              if (shouldAutoOpen()) openTour(0, { focus: false });
+            }
+          });
+          mo.observe(gate, { attributes: true, attributeFilter: ["style", "class"] });
+        }
+      } else {
+        openTour(0, { focus: false });
+      }
     }
   }
 
