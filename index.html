@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'sha256-x5EsZ0JgZJMDi9DiUSY6xAH78VmS5fJEo/JoUg4CFsU=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob: https://cdn.jsdelivr.net; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Us4LR0UnHp7hxCsYpQovuAXUxIcogJppFzVqwTThEfs=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
@@ -2569,8 +2569,8 @@ async function prepareImage(f) {
 // pdf.js loads lazily from CDN, only when a PDF is actually attached.
 let pdfjsLibP = null;
 function getPdfjs() {
-  if (!pdfjsLibP) pdfjsLibP = import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs").then(m => {
-    m.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+  if (!pdfjsLibP) pdfjsLibP = import("/vendor/pdfjs/pdf.min.mjs").then(m => {
+    m.GlobalWorkerOptions.workerSrc = "/vendor/pdfjs/pdf.worker.min.mjs";
     return m;
   });
   return pdfjsLibP;
@@ -2869,7 +2869,7 @@ function speakAnswer(text) {
       if (!window.JSZip) {
         await new Promise((res, rej) => {
           const sc = document.createElement("script");
-          sc.src = "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
+          sc.src = "/vendor/jszip-3.10.1.min.js";
           sc.onload = res; sc.onerror = rej;
           document.head.appendChild(sc);
         });
@@ -4576,8 +4576,8 @@ function buildCitations(content, sources) {
 }
 
 // ===== v83 (A11): LaTeX — protect math from marked, render with KaTeX (lazy, SRI-pinned) =====
-const KATEX_JS = { src: "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js", sri: "sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" };
-const KATEX_CSS = { href: "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css", sri: "sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" };
+const KATEX_JS = { src: "/vendor/katex/katex-0.16.11.min.js", sri: "sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" };
+const KATEX_CSS = { href: "/vendor/katex/katex-0.16.11.min.css", sri: "sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" };
 let katexState = null; // null | Promise
 function loadKatex() {
   if (window.katex) return Promise.resolve(true);
