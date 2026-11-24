@@ -1,5 +1,5 @@
 {
- "version": 30,
+ "version": 31,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -2539,15 +2539,19 @@
    "W": 10,
    "ircm": "4231",
    "status": {
-    "BV": "Y",
-    "TT": "Y",
-    "AG": "Y",
+    "BV": "G",
+    "TT": "G",
+    "AG": "G",
     "GH": "Y",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT banner exists but is 11.5 px muted gray; GH mockup disclosure at text-xs; D5 requires disclosure on every link | 2026-11-21 live re-verification (post PR #264 merge): prominent FTC disclosure shipped in the Tasks tab component (PR #15 branch) + policy section 3; BV page still stale-deployed | worker AG 2026-11-22: Fetched the currently served page at https://ai.spaincos.com: it presents only the AI-assistant branding \"Where knowledge begins\" / \"Ask anything\" and advertises importing Perplexity conversation history [[1](https://ai.spaincos.com/)], with no affiliate links, incentive offers, or sponsored recomme",
+   "evidence": [
+    "TT",
+    "G",
+    "2026-11-24: the FTC disclosure in the merged tasks-tab component (PR #15) is live in the host's Earn tab and was verified verbatim in the live readback. Governed-sql PR #19 adds the Terms/Privacy links."
+   ],
    "fix": "Raise to \u226514 px ink color; repeat on interstitial, toast, email, share"
   },
   {
@@ -2699,7 +2703,7 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "BV": "R",
+    "BV": "Y",
     "TT": "U",
     "AG": "Y",
     "GH": "U",
@@ -2707,7 +2711,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "2026-11-24: #416 self-hosted the fonts; PR #433 (pending merge) self-hosts supabase-js/marked/purify with SRI-verified byte-identical files and drops the jsdelivr preconnect + font-src entry \u2014 locally verified ZERO third-party asset origins on first load. Remaining hotlinks (post-merge): on-demand lazy loads only \u2014 pdfjs, jszip, KaTeX (documented; CSP keeps jsdelivr for them).",
+   "evidence": "2026-11-24 LIVE post-#433: zero third-party asset origins on first load on both hosts (Playwright-verified; only the Supabase gateway-status API call remains, which is an API not an asset CDN). Critical path fully self-hosted: fonts (#416) + supabase-js/marked/purify in /vendor with SRI-verified byte-identical files (#433). Remaining hotlinks: on-demand lazy loads only (pdfjs, jszip, KaTeX) \u2014 CSP keeps jsdelivr for those; documented for the next pass.",
    "fix": "Replace with licensed or open fonts self-hosted"
   },
   {
@@ -5039,9 +5043,9 @@
    "W": 7,
    "ircm": "4300",
    "status": {
-    "TT": "Y"
+    "TT": "G"
    },
-   "evidence": "Zero offerwall references in ai-gateway-site; component is standalone | 2026-11-22 host wiring: modules/offerwall-earn.js mounted as the Earn tab in the Tasks overlay (monitors.js), session-token contract live; deterministic Playwright: FTC role=note renders, signed-out balance state, sandboxed iframe, 0 unauthenticated neurons-claim calls in 35s \u2014 on branch, pending deploy",
+   "evidence": "2026-11-24 LIVE: the Earn tab is wired into the Tasks overlay on both hosts (modules/offerwall-earn.js, mount-once pattern), verified by live readback \u2014 balance 1,110 N matching the API, consent gate functional, zero console errors.",
    "fix": "Embed per README 3-line integration"
   },
   {
