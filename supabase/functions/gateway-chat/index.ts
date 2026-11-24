@@ -2385,7 +2385,7 @@ Question: "${userQuery}"`;
                       { type: "input_text", text: (imageAttach.name ? `(${imageAttaches.length > 1 ? "Images" : "Image"} attached: ${imageNames}. ` : "(") + `Answer the user's question about ${imageAttaches.length > 1 ? "them" : "it"}.) ` + String(qOverride ?? researchQuery).slice(0, 460) },
                       ...imageParts
                     ] }]
-                  : String(qOverride ?? researchQuery).slice(0, 460),
+                  : (answerLangRule ? answerLangRule.trim() + " " : "") + String(qOverride ?? researchQuery).slice(0, 460),
                 // v67 IMAGES TAB: image-intent questions also run image search
                 tools: imageIntent ? [webSearchTool(searchF), { type: "image_search" }] : [webSearchTool(searchF)]
               }),
