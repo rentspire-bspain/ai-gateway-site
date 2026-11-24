@@ -1,5 +1,5 @@
 {
- "version": 26,
+ "version": 28,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -4661,9 +4661,9 @@
    "W": 9,
    "ircm": "4122",
    "status": {
-    "TT": "R"
+    "TT": "G"
    },
-   "evidence": "Markup initial value is a hard-coded \"1,240\"",
+   "evidence": "2026-11-24 LIVE READBACK post-#15 merge (PR #15 merged 03:56Z): ai.spaincos.com signed-in eval-bot \u2014 Earn tab renders 1,110 N matching the neurons-claim API exactly (HTTP 200), cap meter 'Today 0/10 \u00b7 0/60 this month'; boundview.com signed-out control \u2014 'Sign in to view your balance' with ZERO neurons-claim calls. Identity contract: qa/contract_neurons_claim.py PASS (JWT-derived identity; body user_id ignored; 401 unauthenticated). F-02 closed. Correction: the batch-13 register flip R->Y was lost to a branch reset before commit; this is the first committed register change for TT-BAL.",
    "fix": "Render '\u2014' until data"
   },
   {
@@ -4675,9 +4675,9 @@
    "W": 9,
    "ircm": "4302",
    "status": {
-    "TT": "R"
+    "TT": "G"
    },
-   "evidence": "fetch to neurons-claim sends user_id in body and no Authorization header; README says 'session-authenticated'",
+   "evidence": "2026-11-24 LIVE READBACK post-#15 merge (PR #15 merged 03:56Z): ai.spaincos.com signed-in eval-bot \u2014 Earn tab renders 1,110 N matching the neurons-claim API exactly (HTTP 200), cap meter 'Today 0/10 \u00b7 0/60 this month'; boundview.com signed-out control \u2014 'Sign in to view your balance' with ZERO neurons-claim calls. Identity contract: qa/contract_neurons_claim.py PASS (JWT-derived identity; body user_id ignored; 401 unauthenticated). F-02 closed. Correction: the batch-13 register flip R->Y was lost to a branch reset before commit; this is the first committed register change for TT-BAL.",
    "fix": "Send JWT; reject body user_id; verify endpoint returns 401 unauthenticated"
   },
   {
@@ -4689,9 +4689,9 @@
    "W": 6,
    "ircm": "4101",
    "status": {
-    "TT": "R"
+    "TT": "G"
    },
-   "evidence": "!res.ok \u2192 return; catch ignored",
+   "evidence": "2026-11-24 LIVE READBACK post-#15 merge (PR #15 merged 03:56Z): ai.spaincos.com signed-in eval-bot \u2014 Earn tab renders 1,110 N matching the neurons-claim API exactly (HTTP 200), cap meter 'Today 0/10 \u00b7 0/60 this month'; boundview.com signed-out control \u2014 'Sign in to view your balance' with ZERO neurons-claim calls. Identity contract: qa/contract_neurons_claim.py PASS (JWT-derived identity; body user_id ignored; 401 unauthenticated). F-02 closed. Correction: the batch-13 register flip R->Y was lost to a branch reset before commit; this is the first committed register change for TT-BAL.",
    "fix": "Add state"
   },
   {
