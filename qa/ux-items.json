@@ -1,5 +1,5 @@
 {
- "version": 28,
+ "version": 29,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -39,15 +39,15 @@
    "W": 5,
    "ircm": "3101",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "U",
-    "AG": "Y",
+    "AG": "G",
     "GH": "Y",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "2026-11-24 lab (Playwright LCP observer, fresh signed-out): ai.spaincos.com mobile 1616ms / desktop 1896ms; boundview.com mobile 1796ms / desktop 2176ms \u2014 all \u22642.5s good. Slow-4G LCP 11.6s (LCP element waits on the webfont queued behind the 3.4MB module tail) \u2014 fails there pending the F-23 code-split. Verdict Y: normal-network good, slow-network fail.",
+   "evidence": "2026-11-24 LIVE post-#429: slow-4G LCP 1036ms (ai.spaincos.com) / 1012ms (boundview.com) \u2014 was 11.6s; now the landing conn-box lead painted with the early preloaded webfont. Root cause: the onboarding tour auto-opened behind the auth gate (invisible) and its text became the LCP element after the 65-script module tail; now deferred until sign-in lifts the gate. Unthrottled lab: mobile 1.6-1.8s, desktop 1.9-2.2s. All \u22642.5s.",
    "fix": "Add Lighthouse CI + first-party web-vitals beacon (cookieless); store baseline per release"
   },
   {
@@ -259,15 +259,15 @@
    "W": 5,
    "ircm": "3101",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "U",
-    "AG": "Y",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "2026-11-24 slow-4G lab (400kbps/150ms): auth email input present and accepting input 0.4s after nav, input-event latency 0ms \u2014 the core action (sign-in) is usable well under 6s. Full module load trails at 11.4s (77 lazy modules, F-23). Offline shell already G (U-PERF-14). Verdict Y: core action fast, full-load pending code-split.",
+   "evidence": "2026-11-24 LIVE post-#429: slow-4G (400kbps/150ms) \u2014 auth input interactive 0.4s after nav (0ms input-event latency), FCP ~1.0s, LCP ~1.0s; the deferred-module tail no longer gates the landing UX. Interactive \u22646s met on the core action with margin.",
    "fix": "Add throttled Playwright profile to nightly run"
   },
   {
@@ -2499,7 +2499,7 @@
    "W": 10,
    "ircm": "3322",
    "status": {
-    "BV": "R",
+    "BV": "Y",
     "TT": "R",
     "AG": "Y",
     "GH": "U",
@@ -2507,7 +2507,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Offer wall iframe sets third-party cookies; no CMP",
+   "evidence": "2026-11-24 LIVE post-#430: ad-network consent gate live on both hosts \u2014 the offer-wall iframe never loads without explicit acceptance; Accept/Reject share one class and style (equal prominence, computed-style verified); reject persists with a Change-choice affordance; zero adscend requests before consent (Playwright-verified on boundview.com). Remaining for G: GPC signal handling and counsel review of the consent copy.",
    "fix": "Add CMP gating the wall; honor GPC"
   },
   {
