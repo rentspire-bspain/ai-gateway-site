@@ -1,5 +1,5 @@
 {
- "version": 31,
+ "version": 32,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -159,15 +159,15 @@
    "W": 3,
    "ircm": "2100",
    "status": {
-    "BV": "R",
+    "BV": "Y",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "sw.js comments: SWR served previous deploy modules for days, so assets are network-first. Module URLs are unversioned",
+   "evidence": "2026-11-24 live: /vendor/* and /fonts/* served Cache-Control immutable (max-age=31536000) with versioned filenames (supabase-2.119.0.js, katex-0.16.11.*, PPLX-*-R6-VF.woff2); verified via curl. Remaining for G: modules/*.js are content-stable but unhashed \u2014 a build-time hashing step would finish it.",
    "fix": "Build step emits hashed filenames; sw precaches by manifest; removes the stale-deploy class permanently"
   },
   {
@@ -239,15 +239,15 @@
    "W": 5,
    "ircm": "3101",
    "status": {
-    "BV": "R",
+    "BV": "G",
     "TT": "R",
-    "AG": "R",
+    "AG": "G",
     "GH": "R",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "prelaunch.py (31 checks) gates function and integrity; no Core Web Vitals or byte-budget check",
+   "evidence": "2026-11-24: perf-budget CI gate live (.github/workflows/perf-budget.yml) \u2014 every PR/master push is gated on mobile slow-4G CLS<=0.1, LCP budget, and zero third-party first-load asset origins; passed on its own PR (#445) and on #447 (54s runs). Also applies to AG (same repo/build).",
    "fix": "Add Lighthouse CI step to qa/run.sh with budgets from this Part E"
   },
   {
@@ -2499,7 +2499,7 @@
    "W": 10,
    "ircm": "3322",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "R",
     "AG": "Y",
     "GH": "U",
@@ -2507,7 +2507,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "2026-11-24 LIVE post-#430: ad-network consent gate live on both hosts \u2014 the offer-wall iframe never loads without explicit acceptance; Accept/Reject share one class and style (equal prominence, computed-style verified); reject persists with a Change-choice affordance; zero adscend requests before consent (Playwright-verified on boundview.com). Remaining for G: GPC signal handling and counsel review of the consent copy.",
+   "evidence": "2026-11-24: consent gate live with equal-prominence reject (#430) + GPC honored as default denial (#445, verified) + state-rights policy cross-references (#448). Ad-network iframe never loads without explicit acceptance.",
    "fix": "Add CMP gating the wall; honor GPC"
   },
   {
@@ -2519,15 +2519,15 @@
    "W": 10,
    "ircm": "3322",
    "status": {
-    "BV": "R",
+    "BV": "Y",
     "TT": "R",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Sharing a user id with an ad network can be a 'share/sale'. No notice or link",
+   "evidence": "2026-11-24 live post-#448: state privacy rights sections on both privacy pages (CCPA/CPRA + comparable state laws: know, correct, delete, opt-out of sale/sharing, non-discrimination, statutory response window), cross-referencing the consent gate and GPC. Counsel review of the final copy pending (E11-2).",
    "fix": "Add notice, link, DSAR form; state matrix (U-NW-07)"
   },
   {
@@ -2703,15 +2703,15 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "U",
-    "AG": "Y",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "2026-11-24 LIVE post-#433: zero third-party asset origins on first load on both hosts (Playwright-verified; only the Supabase gateway-status API call remains, which is an API not an asset CDN). Critical path fully self-hosted: fonts (#416) + supabase-js/marked/purify in /vendor with SRI-verified byte-identical files (#433). Remaining hotlinks: on-demand lazy loads only (pdfjs, jszip, KaTeX) \u2014 CSP keeps jsdelivr for those; documented for the next pass.",
+   "evidence": "2026-11-24 LIVE post-#447: zero third-party asset origins anywhere \u2014 critical path (#433) and lazy loads (pdfjs, jszip, KaTeX+fonts, all SRI-verified) self-hosted in /vendor with versioned filenames; jsdelivr removed from the CSP and the codebase entirely (Playwright-verified on live). The perf-budget CI gate guards regressions.",
    "fix": "Replace with licensed or open fonts self-hosted"
   },
   {
