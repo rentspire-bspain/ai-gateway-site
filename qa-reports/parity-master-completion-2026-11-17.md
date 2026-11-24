@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 17.6%** (app-weighted; unmeasured counts as 0; v26 — F-32 closed + PERF batch: LCP/fonts/slow-4G measured, U-PERF-08 G on BV+AG) · **measured-only: 33.3%** · 125✅ / 234🟡 / 219🔴 / 799⚪ across 386 line items. Per-app strict: BV 31.1% · TT 16.8% · AG 37.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 17.8%** (app-weighted; unmeasured counts as 0; v27 — F-02 branch-verified on PR #15: TT-BAL-01/02/03 fixed + durable contract test) · **measured-only: 33.6%** · 125✅ / 237🟡 / 216🔴 / 799⚪ across 386 line items. Per-app strict: BV 31.1% · TT 16.8% · AG 37.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1605,3 +1605,11 @@ Merged closeout record: https://github.com/rentspire-bspain/SHMT/issues/3500#iss
 **Headline after batch:** strict 17.6% / measured-only 33.3% — 125✅ / 234🟡 / 219🔴 / 799⚪ (v26, up from 123✅/230🟡 v25).
 
 **Next highest-priority open items:** F-02 (S0, TT — governed-sql PR #15 offerwall tasks tab: authenticated balance read) and the F-23 perf debt (code-split 77 modules → clears the slow-4G LCP/interactive fails in U-PERF-01/12).
+
+### Batch 13 — F-02 (S0) verified on PR #15 branch (2026-11-24, register v27)
+
+- 🔧 **New durable test** `qa/contract_neurons_claim.py` (governed-sql, PSC-3): PASS — server derives identity from the JWT (mismatched body user_id returns the caller's own balance), unauthenticated 401, anon-key bearer 401/403.
+- 🐛 **Bug found & fixed in PR #15**: the balance poll omitted `{action:"balance"}` — every call 400'd "unknown action" and the balance element stayed "—" even though the cap pill updated. Fixed + comment pointing at the contract test.
+- ✅ Component verified locally (Playwright, eval-bot fixture): signed-out shows "Sign in to view your balance" with **zero** neurons-claim calls; signed-in renders **1,110 N** with cap meter and subId label.
+- 🟡 TT-BAL-01/02/03 flipped 🔴→🟡 (branch-verified; flip to green when PR #15 merges and the live readback passes).
+- Headline after batch: strict 17.8% / measured-only 33.6% — 125✅ / 237🟡 / 216🔴 / 799⚪ (v27). F-02 closure now blocks only on merging PR #15 + live readback.
