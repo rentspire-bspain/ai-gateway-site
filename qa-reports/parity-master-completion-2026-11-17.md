@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 17.8%** (app-weighted; unmeasured counts as 0; v27 — F-02 branch-verified on PR #15: TT-BAL-01/02/03 fixed + durable contract test) · **measured-only: 33.6%** · 125✅ / 237🟡 / 216🔴 / 799⚪ across 386 line items. Per-app strict: BV 31.1% · TT 16.8% · AG 37.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 18.0%** (app-weighted; unmeasured counts as 0; v28 — F-02 CLOSED: PR #15 merged, live balance readback passed, TT-BAL-01/02/03 G) · **measured-only: 33.9%** · 128✅ / 234🟡 / 216🔴 / 799⚪ across 386 line items. Per-app strict: BV 31.9% · TT 19.3% · AG 38.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1613,3 +1613,16 @@ Merged closeout record: https://github.com/rentspire-bspain/SHMT/issues/3500#iss
 - ✅ Component verified locally (Playwright, eval-bot fixture): signed-out shows "Sign in to view your balance" with **zero** neurons-claim calls; signed-in renders **1,110 N** with cap meter and subId label.
 - 🟡 TT-BAL-01/02/03 flipped 🔴→🟡 (branch-verified; flip to green when PR #15 merges and the live readback passes).
 - Headline after batch: strict 17.8% / measured-only 33.6% — 125✅ / 237🟡 / 216🔴 / 799⚪ (v27). F-02 closure now blocks only on merging PR #15 + live readback.
+
+### Batch 14 — F-02 CLOSED with live readback (2026-11-24, PRs #15 + #427 merged, register v28)
+
+**PR #15 (governed-sql) merged 03:56Z** — Tasks tab with the authenticated balance read, FTC disclosure, cap messaging, and `qa/contract_neurons_claim.py`. **PR #427 merged 03:56Z** (batch-13 doc).
+
+**Live balance readback (Playwright, live hosts, eval-bot QA fixture):**
+- ✅ ai.spaincos.com signed-in: Earn tab renders **1,110 N** — exactly matching the neurons-claim API (balance 1110, HTTP 200), cap meter "Today 0/10 · 0/60 this month"
+- ✅ boundview.com signed-out control: "Sign in to view your balance", **zero** neurons-claim calls
+- ✅ `qa/contract_neurons_claim.py` PASS: JWT-derived identity, body user_id ignored, 401 unauthenticated, 401/403 anon-key bearer
+
+**Register correction (honesty note):** the batch-13 claim that TT-BAL-01/02/03 flipped 🔴→🟡 was wrong — that register edit was wiped by a branch reset before it was committed; the merged v27 actually still had R. This batch flips them 🔴→✅ directly with the live-readback evidence (the branch verification in batch 13 stands as documented evidence; only the register write was lost). Register v28.
+
+**Headline after batch:** strict 18.0% / measured-only 33.9% — 128✅ / 234🟡 / 216🔴 / 799⚪. TT strict 16.8% → 19.3%. F-02 (S0) is closed pending only counsel-facing policy review (F-01's consent gate remains the other S0 thread).
