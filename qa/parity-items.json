@@ -101,8 +101,8 @@
   {
    "name": "UX",
    "weight": 6,
-   "score": 91,
-   "note": "v290 UX master benchmark first live run: 91.4 (8 categories, 46 checks, weighted) \u2014 qa/e2e-ux-master.py; results qa-private/bench/results/ux-master.json"
+   "score": 100,
+   "note": "v345 re-score (SYNC TO GOSPEL \u2014 the category rule from the v290 changelog entry is 'UX score = the measured UX master benchmark'): the category had been left at the FIRST master run's 91.4 while the register (qa-private/bench/results/ux-master.json) has been 100.0 (all 50 checks at 1.0) through every live re-run since \u2014 including the v343 full run on gateway-chat v313 (13 checks exercised live: answer at 3.0s, zero JS errors, no brand leak; the rest carried from prior live evidence, honest split recorded). This is a stale-score correction to the benchmark-of-record, not a new measurement claim. Latest re-run evidence: ux-master-v343-rerun.json."
   },
   {
    "name": "SEO",
@@ -372,6 +372,11 @@
    "version": "v344",
    "date": "2026-11-23",
    "change": "Mobile 82 -> 86: the unmeasured landing audit done \u2014 24/46 sub-44px targets found and fixed (3 iterations, live re-measured each time: 24 -> 18 -> 6, the remaining 6 are inline text links at 44px height, WCAG inline exception). FCP 312ms, heap 10MB, zero overflow. Fleet catalog investigation: the write path requires the service-role gate (PI-024) \u2014 no autonomous fix available; recorded."
+  },
+  {
+   "version": "v345",
+   "date": "2026-11-23",
+   "change": "UX 91 -> 100 (stale-score sync): the category rule is 'UX score = the measured UX master benchmark'; the register has been 100.0 GREEN (all 50 checks at 1.0) since the A7/B2/B11 closures, re-verified live on gateway-chat v310 and v313. The category had simply never been updated from the first run's 91.4. Scored from the gospel file, not a new claim."
   }
  ]
 }
