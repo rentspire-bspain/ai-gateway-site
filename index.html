@@ -548,11 +548,12 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
    offenders are 40x40 toggles, 38px New Thread, 40px chips, 14-16px footer/hero links,
    42px skip-link). Padding/min-size expansion, mobile widths only, no desktop change. */
 @media (max-width: 768px) {
-  .width-toggle, .theme-toggle { min-width: 44px; min-height: 44px; }
-  .new-thread-btn { min-width: 44px; }
-  .suggestion-chip { min-height: 44px; }
+  .composer-pills .width-toggle, .main-header .width-toggle, .width-toggle, .theme-toggle,
+  .main-header .theme-toggle { min-width: 44px !important; min-height: 44px !important; height: auto !important; }
+  .new-thread-btn { min-width: 44px !important; }
+  .suggestion-chip { min-height: 44px !important; height: auto !important; }
   .skip-link { min-height: 44px; box-sizing: border-box; }
-  #landing a, .landing-footer a, .muted a { min-height: 44px; display: inline-flex; align-items: center; padding-top: 4px; padding-bottom: 4px; }
+  #landing a, .landing-footer a, .muted a, .auth-conn-foot a { min-height: 44px; display: inline-flex; align-items: center; padding-top: 4px; padding-bottom: 4px; }
 }
 @media (max-width: 480px) {
   .account-scrim { background: rgba(0,0,0,0.35); }
