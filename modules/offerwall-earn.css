@@ -32,3 +32,31 @@
   opacity: 0; transition: all .4s ease; pointer-events: none; z-index: 60; }
 .oe-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .oe-toast .n { color: #7fe0c9; font-weight: 700; }
+
+/* ---- F-01 ad-network consent gate ---- */
+.oe-consent {
+  border: 1px solid var(--border, #232A3A);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 0 0 12px 0;
+  background: var(--bg-elevated, #141824);
+}
+.oe-consent p { margin: 0 0 10px 0; font-size: 13px; line-height: 1.5; color: var(--text-muted, #9AA4B8); }
+.oe-consent a { color: var(--accent, #5B8CFF); }
+.oe-consent-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+/* Equal prominence (F-01): Accept and Reject share one class, one style. */
+.oe-cbtn {
+  flex: 1 1 140px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--accent, #5B8CFF);
+  background: transparent;
+  color: var(--accent, #5B8CFF);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.oe-cbtn:hover { background: rgba(91, 140, 255, 0.12); }
+.oe-consent p .oe-cbtn { flex: 0 0 auto; margin-top: 8px; }
