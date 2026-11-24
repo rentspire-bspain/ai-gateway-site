@@ -544,12 +544,15 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
 .account-item em { font-style: normal; font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
 .account-item:hover, .account-item:focus-visible { background: var(--bg-elevated); outline: none; }
 .account-item.danger, .account-item.danger svg { color: var(--error); }
-/* v344 MOBILE TOUCH TARGETS (measurement finding: 24/46 landing targets < 44px at 375px):
-   bump hit areas on small landing links/buttons without changing the visual layout —
-   padding-based expansion, pointer-friendly min-heights, no layout shift. */
+/* v344b MOBILE TOUCH TARGETS (measured: 24/46 landing targets < 44px at 375px — the real
+   offenders are 40x40 toggles, 38px New Thread, 40px chips, 14-16px footer/hero links,
+   42px skip-link). Padding/min-size expansion, mobile widths only, no desktop change. */
 @media (max-width: 768px) {
-  .landing-footer a, .landing-nav a, .pill, .auth-row button, .lang-row button { min-height: 44px; padding-top: 10px; padding-bottom: 10px; display: inline-flex; align-items: center; }
-  .landing-footer { line-height: 2; }
+  .width-toggle, .theme-toggle { min-width: 44px; min-height: 44px; }
+  .new-thread-btn { min-width: 44px; }
+  .suggestion-chip { min-height: 44px; }
+  .skip-link { min-height: 44px; box-sizing: border-box; }
+  #landing a, .landing-footer a, .muted a { min-height: 44px; display: inline-flex; align-items: center; padding-top: 4px; padding-bottom: 4px; }
 }
 @media (max-width: 480px) {
   .account-scrim { background: rgba(0,0,0,0.35); }
