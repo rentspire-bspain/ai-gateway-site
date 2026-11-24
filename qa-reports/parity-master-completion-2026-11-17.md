@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 18.3%** (app-weighted; unmeasured counts as 0; v29 — F-23 LCP fix live: slow-4G 11.6s → 1.0s, U-PERF-01/12 G; F-01 consent gate live) · **measured-only: 34.2%** · 132✅ / 231🟡 / 215🔴 / 799⚪ across 386 line items. Per-app strict: BV 32.8% · TT 19.3% · AG 39.2% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 18.6%** (app-weighted; unmeasured counts as 0; v30 — TRU sweep: security headers + security.txt green on both hosts) · **measured-only: 34.5%** · 135✅ / 231🟡 / 214🔴 / 797⚪ across 386 line items. Per-app strict: BV 33.8% · TT 19.3% · AG 39.8% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1636,3 +1636,14 @@ Merged closeout record: https://github.com/rentspire-bspain/SHMT/issues/3500#iss
 **Headline after batch:** strict 18.3% / measured-only 34.2% — 132✅ / 231🟡 / 215🔴 / 799⚪ (v29; was 18.0% / 128✅). BV 31.9→32.8%, AG 38.7→39.2%.
 
 **F-01/F-02 S0 status:** F-02 closed (batch 14). F-01: policy pages live + consent gate live; remaining = GPC handling, counsel review, age-gate check (U-TRU-07).
+
+### Batch 16 — TRU sweep + vendor self-hosting (2026-11-24, register v30; stacks on PR #431)
+
+- ✅ **U-TRU-09** (security headers) 🔴/⚪→✅ on BV+AG — live curl audit of both hosts: HSTS (63072000), XCTO, XFO DENY + CSP frame-ancestors, Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy, CSP. Optional hardening still open: COOP/CORP headers.
+- ✅ **U-TRU-19** (vulnerability disclosure) ⚪→✅ on BV — /.well-known/security.txt live on both hosts, well-formed (contacts, expiry, 72h ack policy, canonical for both hosts).
+- 🔧 **PR #433 (pending merge): U-TRU-13** — supabase-js/marked/purify self-hosted in /vendor with SRI-verified byte-identical files; jsdelivr preconnect removed; CSP font-src narrowed. Locally verified: zero third-party asset origins on first load. Remaining hotlinks post-merge: on-demand pdfjs/jszip/KaTeX lazy loads only.
+- 📊 **U-PERF-05 evidence updated** — 88 requests / 65 scripts / 408 KB br JS vs ≤30/≤170 KB budget: still fails; the true module code-split remains the fix (post-#429 the tail no longer gates UX).
+- 🔴 **GH (minutegig.com) still down (FM-051)** — live probe: HTTP 502; DNS resolves to 3.33.130.190/15.197.148.33 (domain-parking/forwarding edge, not a Vercel target — Vercel serves from 76.76.21.21). The domain needs registrar/DNS action (point it at the deployment); Vercel CLI in this sandbox has no credentials, so this is owner-action-required.
+- 🔴 **CT (comptrove.com) not auditable from this sandbox** — Vercel mitigation returns 403 to datacenter IPs even in a real Chromium; needs a residential-IP run (user's local browser) or an allowlisted probe path.
+- **U-TRU-20 (AG R)** — flagged for owner decision: the only finding is the eval-bot QA fixture password hardcoded in qa/prelaunch.py (user-sanctioned as a non-secret fixture); moving it to an env var would change QA tooling behavior.
+- **Headline after batch:** strict 18.6% / measured-only 34.5% — 135✅ / 231🟡 / 214🔴 / 797⚪ (v30; was 18.3% / 132✅).
