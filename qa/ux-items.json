@@ -1,5 +1,5 @@
 {
- "version": 25,
+ "version": 26,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -39,15 +39,15 @@
    "W": 5,
    "ircm": "3101",
    "status": {
-    "BV": "U",
+    "BV": "Y",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "Y",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "No field RUM exists; no lab baseline stored. Live probe: TTFB 104 ms, 339 KB HTML (br) | worker GH 2026-11-22: Field data for minutegig.com (28-day rolling window, trend 'stable') reports mobile p75 LCP = 2.1 s \u2014 Good, comfortably under the \u22642.5 s pass benchmark and far below the >4.0 s fail line [4]; the same field report also shows INP 164 ms (Good) and CLS 0.08 (Good) [4]. Caveats: this figure could not b",
+   "evidence": "2026-11-24 lab (Playwright LCP observer, fresh signed-out): ai.spaincos.com mobile 1616ms / desktop 1896ms; boundview.com mobile 1796ms / desktop 2176ms \u2014 all \u22642.5s good. Slow-4G LCP 11.6s (LCP element waits on the webfont queued behind the 3.4MB module tail) \u2014 fails there pending the F-23 code-split. Verdict Y: normal-network good, slow-network fail.",
    "fix": "Add Lighthouse CI + first-party web-vitals beacon (cookieless); store baseline per release"
   },
   {
@@ -179,15 +179,15 @@
    "W": 5,
    "ircm": "2201",
    "status": {
-    "BV": "R",
+    "BV": "G",
     "TT": "Y",
-    "AG": "R",
+    "AG": "G",
     "GH": "Y",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "index preloads and @font-face from frontend-cdn.perplexity.ai (another company's CDN, 2 families). TT declares Switzer/Inter but never loads them",
+   "evidence": "2026-11-24 live post-#416: both fonts served same-origin from /fonts/ (PPLX-Sans/Serif-Beta-R6-VF.woff2), <link rel=preload> for both, font-display: swap, exactly 2 families, 0 third-party font requests on either host (only CSP whitelist mentions remain), metric-matched fallbacks prevent swap reflow. Verdict G.",
    "fix": "Self-host variable font (licensed) under /fonts; drop third-party preconnect; load TT fonts or use system stack deliberately"
   },
   {
@@ -259,15 +259,15 @@
    "W": 5,
    "ircm": "3101",
    "status": {
-    "BV": "U",
+    "BV": "Y",
     "TT": "U",
-    "AG": "U",
+    "AG": "Y",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Never tested; rural nationwide users are on slow links",
+   "evidence": "2026-11-24 slow-4G lab (400kbps/150ms): auth email input present and accepting input 0.4s after nav, input-event latency 0ms \u2014 the core action (sign-in) is usable well under 6s. Full module load trails at 11.4s (77 lazy modules, F-23). Offline shell already G (U-PERF-14). Verdict Y: core action fast, full-load pending code-split.",
    "fix": "Add throttled Playwright profile to nightly run"
   },
   {

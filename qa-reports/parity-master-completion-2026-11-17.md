@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 17.3%** (app-weighted; unmeasured counts as 0; v25 — F-32 CLOSED: CLS G on BV+AG after #416/#420) · **measured-only: 33.0%** · 123✅ / 230🟡 / 221🔴 / 803⚪ across 386 line items. Per-app strict: BV 31.1% · TT 16.8% · AG 37.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 17.6%** (app-weighted; unmeasured counts as 0; v26 — F-32 closed + PERF batch: LCP/fonts/slow-4G measured, U-PERF-08 G on BV+AG) · **measured-only: 33.3%** · 125✅ / 234🟡 / 219🔴 / 799⚪ across 386 line items. Per-app strict: BV 31.1% · TT 16.8% · AG 37.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1590,3 +1590,18 @@ Full F-32 series: 0.793 → 0.355 (#390 header pin, #391 suggestions reservation
 ### F-32 batch ledger record (2026-11-24)
 
 Merged closeout record: https://github.com/rentspire-bspain/SHMT/issues/3500#issuecomment-7120284077 · earlier closeout comment: https://github.com/rentspire-bspain/SHMT/issues/3500#issuecomment-7119002745
+
+### Batch 12 — post-merge audit + PERF measurement pass (2026-11-24, register v26)
+
+**Post-#420/#424 multiroute audit (both hosts, 5 routes × mobile/desktop/slow-4G):** zero console errors on every combo; landing CLS mobile 0.000 / desktop 0.054 / slow-4G 0.084; terms/privacy/docs/help all CLS 0. Confirms the F-32 closeout holds post-merge.
+
+**PERF measurement pass (Playwright lab, fresh signed-out contexts, both hosts):**
+
+- ✅ U-PERF-08 (fonts) 🟡→✅ on BV+AG — post-#416: both PPLX fonts same-origin `/fonts/`, preloaded, `font-display: swap`, exactly 2 families, 0 third-party font requests (live-verified; only CSP whitelist strings remain), metric-matched fallbacks make the swap layout-neutral.
+- 🟡 U-PERF-01 (LCP) ⚪→🟡 on BV+AG — lab LCP: ai.spaincos.com mobile 1616ms / desktop 1896ms; boundview.com mobile 1796ms / desktop 2176ms (all ≤2.5s good); slow-4G 11.6s (LCP element waits on the webfont queued behind the 3.4MB module tail) — fails there pending the F-23 code-split.
+- 🟡 U-PERF-12 (slow-4G usable) ⚪→🟡 on BV+AG — auth email input present and accepting input 0.4s after nav on slow-4G, input-event latency 0ms (core action fast); full module load trails 11.4s (77 modules, F-23).
+- ⚪ Free-lane worker queue: still drained (batch 10 = NO TASKS LEFT; every fetch-verifiable U item measured in batches 1–9). Remaining ⚪ items need new evidence types (lab audits like this pass, code inspection, or live probes).
+
+**Headline after batch:** strict 17.6% / measured-only 33.3% — 125✅ / 234🟡 / 219🔴 / 799⚪ (v26, up from 123✅/230🟡 v25).
+
+**Next highest-priority open items:** F-02 (S0, TT — governed-sql PR #15 offerwall tasks tab: authenticated balance read) and the F-23 perf debt (code-split 77 modules → clears the slow-4G LCP/interactive fails in U-PERF-01/12).
