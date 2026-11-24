@@ -3186,10 +3186,10 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 
 **HEADLINE: 89.3% (11425/128, 29 categories) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
 
-### 57. §30q addendum — v342: i18n ES12 (ROOT LANE) — THE STATIC CHROME IS COMPLETE
+### 57. §30q addendum — v342: i18n ES12 (ROOT LANE) — THE STATIC CHROME IS COMPLETE — HEADLINE 89.3%
 
 - ~~Authenticator-code placeholder (the last recorded static-string i18n omission)~~ — FIXED (PR #421, root lane, zero agent credits): the 2FA code input's placeholder is set at runtime in the inline script; it now flows through I18N.t (the ES string 'Código del autenticador' was already in the dictionary). The CSP sha256 pin was recomputed — csp-hash-check PASS — and the change is live. i18n 82->84.
 - The ES static chrome is now COMPLETE: 7/7 static pages, command palette including prompt bodies, settings/security/models/automations/skills strings, all auth placeholders including 2FA, notification strings. Honest ceiling reached for static translation: what remains is dynamic numeric toasts, notification bodies carrying user thread text (user data — never translated), and MODEL OUTPUT (an answer-language-matching product decision, not a translation gap).
 - UX master: the v334 run on gateway-chat v310 stands (this was a client-side change; next gateway deploy gets the full re-run).
 
-**HEADLINE: 89.4% (11427/128, 29 categories, generator) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
+**HEADLINE: 89.3% (11427/128, 29 categories, generator-confirmed) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v310). Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
