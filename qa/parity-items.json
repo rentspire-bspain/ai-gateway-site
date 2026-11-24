@@ -89,8 +89,8 @@
   {
    "name": "Mobile",
    "weight": 3,
-   "score": 82,
-   "note": "v292 re-score: mobile hardening shipped (PR #281) \u2014 44px touch floors on sidebar/model-picker/install controls, long-token + media overflow containment in answers, SW caches namespaced + scoped (no more global cache deletion), duplicate install handler hidden; PWA manifest/assets PASS (192/512/maskable icons, 3 shortcuts, share target; all icon URLs 200 correct MIME, PNG IHDR sizes verified). REMAINING: native install prompt/keyboard behaviors NOT-VERIFIABLE-HERE; store apps owner-gated (Play Console, Apple Developer). v316: mobile accessibility + polish (PR #347): all v291-audit items closed code-side \u2014 zero under-44px touch targets across 14 views at 375/320 (was 23+17), safe-area insets (CDP-verified), rewritten drawer focus trap (the v229 trap was a no-op \u2014 80 Tab presses contained), prefers-reduced-motion honored, iOS zoom stopped (16px inputs), legacy permanent offline-bar bug fixed, composer-blocking banner fixed. Honest limits: no real-device/keyboard/notch testing; Lighthouse pass pending; lane's 80-85 estimate unmeasured."
+   "score": 86,
+   "note": "v344 re-score (live-measured, root lane, zero agent credits): the previously UNMEASURED mobile landing audit now done \u2014 found 24/46 logged-out landing touch targets under 44px at 375px (the v316 audit covered logged-in views only; honest scope gap). FIXED in three iterations (PRs #438/#439/#440, each re-measured live): composer/header toggles, New Thread, suggestion chips, skip-link, and all footer/hero links now meet 44px. REMAINING (honest, WCAG 2.5.8 inline exception): 6 short inline text links ('Docs','Terms','Help') are 44px tall but text-width narrow \u2014 acceptable for inline links. Fresh measurements: FCP 312ms, load 1.4s, JS heap 10MB, transfer 762KB, ZERO horizontal overflow at 375px. The v316 a11y items (drawer trap, safe-area, reduced motion) remain in force."
   },
   {
    "name": "Teammates",
@@ -367,6 +367,11 @@
    "version": "v343",
    "date": "2026-11-23",
    "change": "i18n 84 -> 88: ANSWER-LANGUAGE MATCHING live on gateway-chat v313 \u2014 Spanish UI gets Spanish answers (live-verified 'La capital de Francia es Par\u00eds'; English default unchanged, eval-replay 10/10 on v313; full UX master re-run on v313: 13 live checks all 1.0, answer at 3.0s). Two rollout defects caught and fixed same-batch (simple-path miss, research-lane miss)."
+  },
+  {
+   "version": "v344",
+   "date": "2026-11-23",
+   "change": "Mobile 82 -> 86: the unmeasured landing audit done \u2014 24/46 sub-44px targets found and fixed (3 iterations, live re-measured each time: 24 -> 18 -> 6, the remaining 6 are inline text links at 44px height, WCAG inline exception). FCP 312ms, heap 10MB, zero overflow. Fleet catalog investigation: the write path requires the service-role gate (PI-024) \u2014 no autonomous fix available; recorded."
   }
  ]
 }

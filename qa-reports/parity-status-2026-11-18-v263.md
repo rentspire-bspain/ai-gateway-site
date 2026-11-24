@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v343)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v344)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3202,3 +3202,12 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - i18n 84->88. The product now serves a Spanish user end-to-end honestly: Spanish chrome, Spanish pages, Spanish answers.
 
 **HEADLINE: 89.3% (11431/128, 29 categories, generator-confirmed) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ gateway-chat v313). Eval-replay 10/10. Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
+
+### 59. §30q addendum — v344: MOBILE TOUCH-TARGET AUDIT — THE UNMEASURED GAP CLOSED (Mobile 86)
+
+- ~~Mobile landing touch-target audit (the v316 'Lighthouse pending / estimate unmeasured' gap)~~ — MEASURED AND FIXED (root lane, zero agent credits): the logged-out landing had 24/46 touch targets under 44px at 375px (the v316 audit covered logged-in views only — an honest scope gap, now closed). Fixed across three live-remeasured iterations (PRs #438/#439/#440 — v1 targeted wrong class names, v2 was beaten by fixed sizes, v3 landed): composer/header toggles, New Thread, suggestion chips, skip-link, and all footer/hero links now meet 44px. Remaining: 6 short inline text links at 44px height but text-width narrow (WCAG 2.5.8 inline exception — acceptable).
+- Fresh mobile measurements: FCP 312ms, load 1.4s, JS heap 10MB, transfer 762KB, ZERO horizontal overflow at 375px. Mobile 82->86.
+- Fleet catalog investigation: the webapp_catalog write path requires the service-role executor (PI-024 owner gate) — no autonomous fix; recorded honestly.
+- UX master: no gateway deploy this batch (CSS only) — the v343 full run on gateway-chat v313 stands; next gateway change gets the re-run.
+
+**HEADLINE: per generator (see qa/generate-parity-headline.py; Mobile +4, w3) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v313). Eval-replay 10/10. Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
