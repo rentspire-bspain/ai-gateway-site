@@ -157,6 +157,13 @@
 
     refresh();
 
+    // ---- quests card (A5): renders active quests with progress bars; fires quest_progress
+    //      at most once per pane open; quietly empty if the quests RPC is not yet applied ----
+    var questsBox = document.createElement("div");
+    questsBox.innerHTML = '<h3 style="margin-top:22px">Quests</h3><div id="nrnQuests" class="muted" style="font-size:13px"></div>';
+    root.appendChild(questsBox);
+    if (window.QuestsPane) { window.QuestsPane(questsBox.querySelector("#nrnQuests")); }
+
     // ---- live earn nodes (geospatial layer): nodes_nearby via PostgREST with the caller's JWT ----
     var nodesBox = document.createElement("div");
     nodesBox.innerHTML = '<h3 style="margin-top:22px">Nodes near you</h3>' +
