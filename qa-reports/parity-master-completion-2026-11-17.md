@@ -1586,3 +1586,7 @@ Full F-32 series: 0.793 → 0.355 (#390 header pin, #391 suggestions reservation
 - ✅ ~~#420: subtitle two-line reservation, pre-collapsed drawer via CSS, pre-visible expand button~~ (merged 00:51Z, live slow-4G 0.047)
 - ✅ ~~remaining 0.336 layout shift at 1.4s~~ — root-caused to mobile-375.css late apply, eliminated
 - ✅ ~~0.111 sidebar-render shift / 0.134 suggestions shift on slow-4G~~ — eliminated in #420
+
+### F-32 batch ledger record (2026-11-24)
+
+Merged closeout record: https://github.com/rentspire-bspain/SHMT/issues/3500#issuecomment-7120284077 · earlier closeout comment: https://github.com/rentspire-bspain/SHMT/issues/3500#issuecomment-7119002745
