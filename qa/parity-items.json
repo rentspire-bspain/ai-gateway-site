@@ -161,8 +161,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 82,
-   "note": "v338 re-score (live-verified): ES11 (PR #412, worker i18n_es11_lane) \u2014 5 auth-form placeholders wired as TARGETS (email placeholder deliberately NOT translated: emails are user data + the boundview attribute-level rewrite still applies; 4 password/code placeholders translated), the unclassed Automations h2 classed (am-h2) and translated, desktop notification title/body through I18N.t (2 strings). modules/i18n.js live with ES11 block. Honest limits remaining: the Authenticator-code placeholder is set at runtime in inline script (stays EN), offerwall toasts dynamic-numeric, notification body is user thread text (untranslatable by design), model output untranslated. 'Espa\u00f1ol (partial)' label retained but the static chrome is now near-complete."
+   "score": 84,
+   "note": "v342 re-score (live-verified): the last recorded static-string omission closed (PR #421, root lane) \u2014 the 2FA Authenticator-code placeholder, set at runtime in the inline script, now flows through I18N.t (ES already in dictionary) with the CSP sha256 pin recomputed (csp-hash-check PASS). The ES static chrome is now COMPLETE: 7/7 static pages, command palette incl. prompt bodies, settings/security/models/automations/skills strings, auth placeholders incl. 2FA, notification strings. Remaining (honest ceiling): dynamic numeric offerwall toasts, notification bodies carrying user thread text (user data, never translated), and MODEL OUTPUT \u2014 the last is a product decision (answer-language matching), not a translation gap. Label stays 'Espa\u00f1ol (partial)' pending model-output language work."
   },
   {
    "name": "NativeMobile",
@@ -357,6 +357,11 @@
    "version": "v340",
    "date": "2026-11-23",
    "change": "Teammates 75 -> 78: first live browser validation (root lane after the agent lane stalled on credits) \u2014 pane renders honestly for non-admins (empty state, role gating, profile shortcut, template presets), zero JS errors, 403 boundary enforced live. Admin paths remain owner-gated."
+  },
+  {
+   "version": "v342",
+   "date": "2026-11-23",
+   "change": "i18n 82 -> 84 (PR #421, root lane): Authenticator-code placeholder through I18N.t at runtime, CSP pin recomputed, csp-hash-check PASS, live-verified. The ES static chrome is now complete; remaining gaps are dynamic/user-data/model-output (not static strings)."
   }
  ]
 }
