@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v344)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-23, v345)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3211,3 +3211,10 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - UX master: no gateway deploy this batch (CSS only) — the v343 full run on gateway-chat v313 stands; next gateway change gets the re-run.
 
 **HEADLINE: 89.4% (11443/128, 29 categories, generator-confirmed) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v313). Eval-replay 10/10. Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
+
+### 60. §30q addendum — v345: UX CATEGORY SYNCED TO THE GOSPEL REGISTER — HEADLINE 89.8%
+
+- ~~UX category staleness~~ — CORRECTED: the category rule (v290 changelog: "UX score = the measured UX master benchmark") had never been updated from the FIRST run's 91.4. The register (qa-private/bench/results/ux-master.json) has been 100.0 — all 50 checks at 1.0 — since the A7/B2/B11 closures, re-verified live on gateway-chat v310 (v334) and v313 (v343: 13 checks exercised live — answer at 3.0s, zero JS errors, no brand leak — with the honest ~13-live/37-carried split recorded). UX 91 -> 100. This is a stale-score sync to the benchmark-of-record, not a new measurement claim.
+- Also audited the other mid-band categories for the same staleness class: Privacy 88 and Observability 85 have no defined measurement register to sync (their notes are evidence lists, current); Docs/Support 84, Mobile 86, Security 82, Desktop 80 reflect their latest re-scores. No other category is stale.
+
+**HEADLINE: 89.8% (11497/128, 29 categories, generator-confirmed) — 🟡 YELLOW band (0.2 from GREEN).** UX MASTER 100.0 GREEN (@ gateway-chat v313). Eval-replay 10/10. Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
