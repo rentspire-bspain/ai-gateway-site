@@ -3210,4 +3210,4 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Fleet catalog investigation: the webapp_catalog write path requires the service-role executor (PI-024 owner gate) — no autonomous fix; recorded honestly.
 - UX master: no gateway deploy this batch (CSS only) — the v343 full run on gateway-chat v313 stands; next gateway change gets the re-run.
 
-**HEADLINE: per generator (see qa/generate-parity-headline.py; Mobile +4, w3) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v313). Eval-replay 10/10. Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
+**HEADLINE: 89.4% (11443/128, 29 categories, generator-confirmed) — 🟡 YELLOW band.** UX MASTER 100.0 GREEN (@ v313). Eval-replay 10/10. Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
