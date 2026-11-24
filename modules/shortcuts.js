@@ -73,7 +73,7 @@
     if (!search || !search.parentElement) return;
     var hint = document.createElement("div");
     hint.id = "kbd-hint";
-    hint.style.cssText = "font-size:11px;opacity:.45;padding:4px 10px;display:none;";
+    hint.style.cssText = "font-size:12px;opacity:.78;padding:4px 10px;display:none;";
     hint.textContent = "/ composer \u00b7 j/k threads \u00b7 \u2318K commands";
     search.parentElement.appendChild(hint);
     if (window.matchMedia && window.matchMedia("(min-width:900px)").matches) hint.style.display = "block";
