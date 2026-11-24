@@ -5525,7 +5525,7 @@ async function performSearchInner(query) {
         method: "POST",
         signal: searchAbort ? searchAbort.signal : undefined,   // v181: STOP button
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
-        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, ...(currentThreadId ? { thread_id: currentThreadId } : {}), ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
+        body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, lang: (localStorage.getItem("ai_lang") || "en"), ...(currentThreadId ? { thread_id: currentThreadId } : {}), ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       if (res.authExpired) { AuthGuard.expire(); throw AuthGuard.makeError(); }
       if (res.status === 401) throw new Error("The gateway rejected this request as unauthenticated (HTTP 401) although your session is still valid. Retry; if it persists, sign out and back in.");
