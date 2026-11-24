@@ -552,7 +552,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   .new-thread-btn { min-width: 44px !important; }
   .suggestion-chip { min-height: 44px !important; height: auto !important; }
   .skip-link { min-height: 44px; box-sizing: border-box; }
-  #landing a, .landing-footer a, .muted a, .auth-conn-foot a { min-height: 44px; display: inline-flex; align-items: center; padding-top: 4px; padding-bottom: 4px; }
+  #landing a, .landing-footer a, .muted a, .auth-conn-foot a { text-decoration: underline; text-underline-offset: 3px; } .auth-conn-foot a { min-height: 44px; display: inline-flex; align-items: center; padding-top: 4px; padding-bottom: 4px; }
 }
 @media (max-width: 480px) {
   .account-scrim { background: rgba(0,0,0,0.35); }
@@ -728,7 +728,7 @@ body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-selec
   font-size: 13px;
   color: var(--text-faint);
 }
-.landing-footer a { color: var(--text-muted); }
+.landing-footer a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px; }
 .landing-footer a:hover { color: var(--text); }
 
 /* ============ SEARCH / RESULTS ============ */
@@ -1368,7 +1368,7 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
   color: var(--text-faint);
   text-align: center;
 }
-.auth-conn-foot a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.auth-conn-foot a { text-decoration: underline; text-underline-offset: 3px; } .auth-conn-foot a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 .landing-conn-box {
   margin-top: 22px;
   padding: 12px 14px;
@@ -1751,7 +1751,7 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
         <span class="breadcrumb" id="breadcrumb">Search</span>
       </div>
       <div class="main-header-right" style="display:flex;align-items:center;gap:8px">
-        <select class="model-select" id="modelSel" title="Model — uncensored options answer without hedging">
+        <select class="model-select" id="modelSel" title="Model — uncensored options answer without hedging" aria-label="Model selection">
           <!-- v129: every option carries its one-line "best at" description so the
                choice is self-explanatory in the dropdown itself. -->
           <option value="general" title="Auto — GLM-5.3, the everyday default. Best all-round quality; free Qwen fallback if the budget cap is hit.">Auto (GLM-5.3) — best all-round default</option>
