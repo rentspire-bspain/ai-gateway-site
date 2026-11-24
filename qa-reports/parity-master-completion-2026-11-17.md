@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 17.3%** (app-weighted; unmeasured counts as 0; v24 — worker loop + Playwright audits + F-32 series + keyboard verification) · **measured-only: 32.9%** · 121✅ / 232🟡 / 221🔴 / 803⚪ across 386 line items. Per-app strict: BV 30.9% · TT 16.8% · AG 37.5% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 17.3%** (app-weighted; unmeasured counts as 0; v25 — F-32 CLOSED: CLS G on BV+AG after #416/#420) · **measured-only: 33.0%** · 123✅ / 230🟡 / 221🔴 / 803⚪ across 386 line items. Per-app strict: BV 31.1% · TT 16.8% · AG 37.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1569,3 +1569,20 @@ Register v21: portfolio strict 17.2%, measured-only 32.8%. U-PERF-03 AG/BV R→Y
 Instrumented the auth overlay card child-by-child at 50ms cadence (local reproduction + live): between t≈1.4s and t≈1.5s `#authStep1` grows **330px → 372px (+42px)**, pushing `.auth-error`, `.auth-note`, `.auth-conn-pitch` and the conn rows down — exactly the shift attributed to the `.conn-tag` nodes. Drilling into children: `.auth-input` 48→52px, `.auth-link` rows 26→44px, computed line-height 20px→22.4px. **The trigger is `/css/mobile-375.css`**, loaded as a non-blocking `<link>` at the end of `<body>`: its phone-pass font-size floors (`body,button 14px !important`, inputs 16px) land after first paint on slow networks and re-flow the entire auth card. Font-swap and sidebar hypotheses are disproven (the shift reproduces with font requests route-blocked; the sidebar is off-canvas and rect-stable at 375px). The siteassets.js bisection signal was a load-order artifact.
 
 Fix in PR #416: mobile-375.css moved to `<head>` as render-blocking behind a union media attr `(max-width: 768px), (pointer: coarse), (hover: none)` (covers every inner query; desktop unchanged); both PPLX variable fonts self-hosted under `/fonts/` with preload (CSP `font-src 'self'` already permitted, no hash changes needed); metric-matched fallback `@font-face`s (ascent/descent/line-gap/size-adjust tuned to real PPLX metrics) so any font swap is layout-neutral. Local verification: auth card renders at final height from first paint, **viewport CLS 0.0** (was 0.336), desktop body font-size unchanged 16px, `qa/csp-hash-check.py` PASS. U-PERF-03 stays 🟡 until the live re-measure after merge.
+
+### F-32 CLOSED — U-PERF-03 → ✅ (2026-11-23, PRs #416 + #420, both owner-authorized)
+
+Live re-measurement after #420 deployed (fresh signed-out contexts, Playwright PerformanceObserver, both hosts):
+
+| condition | ai.spaincos.com | boundview.com | threshold | status |
+|---|---|---|---|---|
+| mobile 375×812 | 0.000 | 0.000 | ≤0.1 | ✅ |
+| desktop 1440×900 | 0.054 | 0.054 | ≤0.1 | ✅ |
+| slow-4G (400kbps, 150ms) | 0.047 | 0.047 | ≤0.1 | ✅ |
+
+Full F-32 series: 0.793 → 0.355 (#390 header pin, #391 suggestions reservation, #396/#401 pills gate, #403 onboarding deferral) → **0.000 mobile / 0.054 desktop / 0.047 slow-4G** (#416 + #420). U-PERF-03 flipped 🟡→✅ on BV and AG; register v25; headline strict 17.3% / measured-only 33.0% (123✅ / 230🟡 / 221🔴 / 803⚪).
+
+- ✅ ~~#416: mobile-375.css late reflow (the 0.336) — render-blocking in head behind union media attr; fonts self-hosted + metric-matched fallbacks~~ (merged 23:01Z, live CLS 0.0 mobile)
+- ✅ ~~#420: subtitle two-line reservation, pre-collapsed drawer via CSS, pre-visible expand button~~ (merged 00:51Z, live slow-4G 0.047)
+- ✅ ~~remaining 0.336 layout shift at 1.4s~~ — root-caused to mobile-375.css late apply, eliminated
+- ✅ ~~0.111 sidebar-render shift / 0.134 suggestions shift on slow-4G~~ — eliminated in #420
