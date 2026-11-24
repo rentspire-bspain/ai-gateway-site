@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 18.6%** (app-weighted; unmeasured counts as 0; v30 — TRU sweep: security headers + security.txt green on both hosts) · **measured-only: 34.5%** · 135✅ / 231🟡 / 214🔴 / 797⚪ across 386 line items. Per-app strict: BV 33.8% · TT 19.3% · AG 39.8% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 19.0%** (app-weighted; unmeasured counts as 0; v31 — FTC disclosure + consent + TRU sweep live; vendor self-hosting merged) · **measured-only: 35.1%** · 139✅ / 228🟡 / 213🔴 / 797⚪ across 386 line items. Per-app strict: BV 34.5% · TT 20.1% · AG 40.3% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1647,3 +1647,15 @@ Merged closeout record: https://github.com/rentspire-bspain/SHMT/issues/3500#iss
 - 🔴 **CT (comptrove.com) not auditable from this sandbox** — Vercel mitigation returns 403 to datacenter IPs even in a real Chromium; needs a residential-IP run (user's local browser) or an allowlisted probe path.
 - **U-TRU-20 (AG R)** — flagged for owner decision: the only finding is the eval-bot QA fixture password hardcoded in qa/prelaunch.py (user-sanctioned as a non-secret fixture); moving it to an env var would change QA tooling behavior.
 - **Headline after batch:** strict 18.6% / measured-only 34.5% — 135✅ / 231🟡 / 214🔴 / 797⚪ (v30; was 18.3% / 132✅).
+
+### Batch 17 — vendor self-hosting live + FTC/integration flips (2026-11-24, PRs #431/#435/#433 merged, register v31)
+
+- ✅ **#433 merged and live-verified**: all three vendor libs load (supabase, marked, DOMPurify defined; SRI intact), auth overlay renders, zero console errors, **zero third-party asset origins on first load** (only the Supabase gateway-status API call). U-TRU-13 🔴→🟡 on BV — remaining hotlinks are on-demand lazy loads only (pdfjs, jszip, KaTeX).
+- ✅ **U-TRU-05 (FTC disclosure)** →✅ on BV/AG/TT — the Paid-partner-offers disclosure is live-verified in the Earn tab on both hosts (readback captured the full text: referral-fee funding, verified-completion-only crediting, caps, earn-only/no-cash-out).
+- ✅ **TT-INT-01** →✅ — Earn tab wired and live on both hosts (balance readback, consent gate, zero console errors).
+- 🔧 **governed-sql PR #19 (pending merge)**: Terms/Privacy links added to the component's FTC disclosure (U-TRU-01/02 TT).
+- Mid-deploy note: the first post-#433 live probe hit Vercel mid-propagation (transient 404 on /vendor/supabase.js); re-verified clean after propagation.
+
+**Headline after batch:** strict 19.0% / measured-only 35.1% — 139✅ / 228🟡 / 213🔴 / 797⚪ (v31; was 18.6% / 135✅). BV 34.5%, AG 40.3%, TT 20.1%.
+
+**Session cumulative (batches 12–17):** strict 17.3% → 19.0%, measured-only 32.9% → 35.1%, ✅ 121 → 139, with F-32 (CLS), F-02 (S0 balance), F-23 (LCP) closed and F-01's consent gate + policy work live.
