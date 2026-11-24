@@ -9,6 +9,52 @@
   "use strict";
   var URL_ = "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/neurons-claim";
   var ADSCEND_PUB_ID = "", ADSCEND_ADWALL_ID = ""; // set when Adscend approves the profile
+
+  /* ---- ad-network consent gate (F-01, v161) ----
+     The offer wall embeds a third-party ad network that can set its own cookies.
+     It never loads until the user explicitly accepts, with an equal-prominence
+     Reject. Choice persists in localStorage and can be changed anytime. */
+  var CONSENT_KEY = "ad_consent_v1";
+  function consentState() {
+    try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; }
+  }
+  function setConsent(v) {
+    try { localStorage.setItem(CONSENT_KEY, v); } catch (e) {}
+  }
+  function privacyLink() {
+    var isBV = /boundview/i.test(location.hostname);
+    return isBV ? "/privacy.boundview.html" : "/privacy.html";
+  }
+  function renderConsentRow(card, onDecide) {
+    var row = el("div", "oe-consent");
+    row.setAttribute("role", "group");
+    row.setAttribute("aria-label", "Partner-offer consent");
+    var p = el("p", null, "Partner offers embed a third-party ad network that may set its own cookies. The offer wall stays off unless you accept.");
+    var a = el("a", null, "How we use cookies");
+    a.href = privacyLink(); a.target = "_blank"; a.rel = "noopener";
+    p.appendChild(a);
+    row.appendChild(p);
+    var btns = el("div", "oe-consent-btns");
+    // Equal prominence: identical styling for Accept and Reject (F-01).
+    var acc = el("button", "oe-cbtn", "Accept partner offers");
+    var rej = el("button", "oe-cbtn", "Reject");
+    acc.type = "button"; rej.type = "button";
+    acc.addEventListener("click", function () { setConsent("granted"); row.remove(); onDecide(true); });
+    rej.addEventListener("click", function () { setConsent("denied"); row.remove(); renderDeniedRow(card, onDecide); });
+    btns.appendChild(acc); btns.appendChild(rej);
+    row.appendChild(btns);
+    card.insertBefore(row, card.firstChild);
+  }
+  function renderDeniedRow(card, onDecide) {
+    var row = el("div", "oe-consent");
+    var p = el("p", null, "Partner offers are off — the ad network never loads. You can change this anytime.");
+    var ch = el("button", "oe-cbtn", "Change choice");
+    ch.type = "button";
+    ch.addEventListener("click", function () { row.remove(); renderConsentRow(card, onDecide); });
+    p.appendChild(ch);
+    row.appendChild(p);
+    card.insertBefore(row, card.firstChild);
+  }
   var SB = (typeof supabase !== "undefined" && window.__SB_URL) || "https://bnxermyboeigvwonfrzx.supabase.co";
 
   var S = { user: null, token: null, lastBalance: null, alive: true, pollT: null, wallT: null };
@@ -83,6 +129,18 @@
   function mountWall(body) {
     var frame = body.querySelector(".oe-frame iframe");
     var ph = body.querySelector(".oe-ph");
+    // F-01 consent gate: the ad-network iframe never loads without explicit acceptance.
+    if (consentState() !== "granted") {
+      var card = body.querySelector(".oe-card");
+      if (card && !card.querySelector(".oe-consent")) {
+        if (consentState() === "denied") renderDeniedRow(card, function () { mountWall(body); });
+        else renderConsentRow(card, function () { mountWall(body); });
+      }
+      if (frame) frame.removeAttribute("src");
+      return false;
+    }
+    var stale = body.querySelector(".oe-card .oe-consent");
+    if (stale) stale.remove();
     if (!ADSCEND_PUB_ID || !ADSCEND_ADWALL_ID || !S.user) {
       ph.style.display = "flex";
       return false;
