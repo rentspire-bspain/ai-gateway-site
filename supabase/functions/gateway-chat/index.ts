@@ -1499,7 +1499,7 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
   }
   try {
     const callModelUrl = "https://dcyjmftriqayqaonitlx.supabase.co/functions/v1/call-model";
-    let { messages, purpose, model, max_tokens, stream, tool_loop, thread_id: threadIdRaw, deep_research, attachment, attachments, space_instructions, embed_context, personalization, model_council, sources_filter, time_range, incognito: incognitoRaw, max_completion_tokens, mode: modeRaw, deep_research_effort: drEffortRaw, deep_research_style: drStyleRaw } = (await req.json().catch(() => null)) ?? {};
+    let { messages, purpose, model, max_tokens, stream, tool_loop, thread_id: threadIdRaw, deep_research, attachment, attachments, space_instructions, embed_context, personalization, model_council, sources_filter, time_range, incognito: incognitoRaw, max_completion_tokens, mode: modeRaw, deep_research_effort: drEffortRaw, deep_research_style: drStyleRaw, lang: langRaw } = (await req.json().catch(() => null)) ?? {};
     // v262 ASYNC RESEARCH LANE: caller-selectable effort (default high) and style
     // ("report" = decision-grade report brief; "concise" = short-answer constraint-verified brief
     // for BrowseComp-class questions — the async lane's whole point is minutes-long persistent
@@ -2235,6 +2235,11 @@ Question: "${userQuery}"`;
     // sends 2,048 so chat behavior is UNCHANGED; only callers that ask for more get more.
     // v334: research-mode callers that send no max_tokens default to 4000 (frontend sends 2048 explicitly -> unchanged).
     const researchDefault = (deep_research === true || modeRaw === "research" || /research/i.test(String(purpose || ""))) ? 4000 : 2048;
+    // v343 ANSWER-LANGUAGE MATCHING (i18n final gap): when the client UI language is not
+    // English, the final answer is written in that language. Benchmarks and API callers
+    // send no lang -> default English, behavior unchanged.
+    const answerLang = String(langRaw || "en").toLowerCase().slice(0, 8) === "en" ? "" : String(langRaw || "").toLowerCase().slice(0, 8);
+    const answerLangRule = answerLang ? ` The user's interface language is ${answerLang === "es" ? "Spanish" : answerLang}. Write the FINAL ANSWER, all section headers, and the visible prose in ${answerLang === "es" ? "Spanish" : answerLang}. Work logs, search queries, source titles and quotations may remain in their original language.` : "";
     const tokenBudget = Math.min(Number(max_tokens) || researchDefault, (intent.complexity === "extreme" || longMultiPart || intent.complexity === "complex") ? 6000 : 4000);
     // v103 I8: one deterministic plan decision per request (plan-guidance.ts). Drives (a) whether the tool loop is even offered record_plan,
     // (b) the writer-side "Plan" block when no tool-loop plan exists.
@@ -3744,7 +3749,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     if (stream === true) {
       const streamMessages = intent.complexity === "simple"
         ? capped
-        : [...capped, { role: "system", content: "Keep the answer COMPLETE within the token budget — concise, no filler — lead with the direct answer, state the specific figures, dates and names from the research (not vague summaries), and finish with the Suggested Follow-ups section." + (perplexityFullText ? " The LIVE SEARCH ANSWER above is your primary source: preserve its figures, dates and [N] markers." : "") }];
+        : [...capped, { role: "system", content: "Keep the answer COMPLETE within the token budget — concise, no filler — lead with the direct answer, state the specific figures, dates and names from the research (not vague summaries), and finish with the Suggested Follow-ups section." + (perplexityFullText ? " The LIVE SEARCH ANSWER above is your primary source: preserve its figures, dates and [N] markers." : "") + answerLangRule }];
       const sres = await fetch(callModelUrl, {
         method: "POST",
         headers: CM_HEADERS,
