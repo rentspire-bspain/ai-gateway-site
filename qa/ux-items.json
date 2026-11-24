@@ -1,5 +1,5 @@
 {
- "version": 29,
+ "version": 30,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -127,7 +127,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Shell references 65 script tags + 16 stylesheets; modules/ dir is 3.4 MB raw across 77 files. TT is one 9.7 KB file with zero static deps",
+   "evidence": "2026-11-24 live (Playwright, first load, signed-out): 88 requests, 65 scripts, 408 KB br JS vs the \u226430-request/\u2264170 KB budget \u2014 still fails; root fix remains the true module code-split (F-23 follow-on). Post-#429 the module tail no longer gates UX (LCP 1.0s slow-4G).",
    "fix": "Bundle + defer non-critical modules (settings, fleet, media, voice) behind route/idle import; target \u226430 first-load requests"
   },
   {
@@ -2619,15 +2619,15 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "BV": "R",
+    "BV": "G",
     "TT": "U",
-    "AG": "U",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "LIVE: only strict-transport-security present. CSP and referrer set via <meta>, which cannot set frame-ancestors, so clickjacking protection is absent",
+   "evidence": "2026-11-24 live header audit (both hosts, curl): HSTS max-age=63072000, X-Content-Type-Options nosniff, X-Frame-Options DENY + CSP frame-ancestors 'none', Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy camera=()/geolocation=(), CSP \u2014 full required set present on ai.spaincos.com and boundview.com. Not yet present (optional hardening): Cross-Origin-Opener-Policy / Cross-Origin-Resource-Policy.",
    "fix": "Move to vercel.json headers (currently has no headers block)"
   },
   {
@@ -2707,7 +2707,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "PPLX-Sans/Serif variable fonts loaded from frontend-cdn.perplexity.ai (licensing and reliability risk; also leaks a third-party relationship) | worker AG 2026-11-22: Fetched https://ai.spaincos.com [[1](https://ai.spaincos.com/)]: the retrieved page describes the gateway's own app and content, and no third-party CDN hotlink (cdnjs, jsDelivr, unpkg, Google Fonts, or any other vendor asset host) was observed anywhere in the retrievable page result [[1](https://ai.",
+   "evidence": "2026-11-24: #416 self-hosted the fonts; PR #433 (pending merge) self-hosts supabase-js/marked/purify with SRI-verified byte-identical files and drops the jsdelivr preconnect + font-src entry \u2014 locally verified ZERO third-party asset origins on first load. Remaining hotlinks (post-merge): on-demand lazy loads only \u2014 pdfjs, jszip, KaTeX (documented; CSP keeps jsdelivr for them).",
    "fix": "Replace with licensed or open fonts self-hosted"
   },
   {
@@ -2819,7 +2819,7 @@
    "W": 6,
    "ircm": "2301",
    "status": {
-    "BV": "U",
+    "BV": "G",
     "TT": "U",
     "AG": "G",
     "GH": "R",
@@ -2827,7 +2827,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Not found | worker AG 2026-11-22: ai.spaincos.com serves its homepage (the Perplexity-history import page) [[1](https://ai.spaincos.com/)] and its repo rentspire-bspain/ai-gateway-site is indexed [[2](https://github.com/rentspire-bspain/ai-gateway-site)], but /.well-known/security.txt is not indexed or retrievable, no vulnerability | worker GH 2026-11-22: No /.well-known/security.txt could be observed for minutegig.com, and no monitored vulnerability-reporting inbox exists for that domain. The only disclosure contact surfaced anywhere was vulnreports@minut.com, published in the Bug Bounty Program Policy on minut.com [[1](https://www.minut.com/legal/b | 2026-11-22: .well-known/security.txt created (Contact, Expires 2027-11-22, coordinated-disclosure policy) \u2014 live on deploy of PR #342 | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): security.txt live 200 with Contact/Expires/Policy (curl verified)",
+   "evidence": "2026-11-24 live: /.well-known/security.txt returns 200 on both hosts \u2014 well-formed (Contact mailto x2, Expires 2027-11-22, Preferred-Languages, Canonical for both hosts, 72h acknowledgement policy, coordinated-disclosure request). Same artifact as AG's existing G.",
    "fix": "Add security.txt"
   },
   {
