@@ -4334,7 +4334,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
               let txt = extract(await tr.json());
               // v352b: the first pass can drop [[N](url)] citations; one retry with the
               // citation-preservation rule stated explicitly, else keep the original.
-              if (txt && txt.length > 40 && (txt.match(/\[\d+\]/g) || []).length !== nMark) {
+              if (txt && txt.length > 15 && (txt.match(/\[\d+\]/g) || []).length !== nMark) {
                 try {
                   const tr2 = await fetch("https://api.perplexity.ai/v1/agent", {
                     method: "POST",
@@ -4349,7 +4349,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
                   if (tr2.ok) txt = extract(await tr2.json());
                 } catch (_e2) { /* keep first-pass text */ }
               }
-              if (txt && txt.length > 40 && (txt.match(/\[\d+\]/g) || []).length === nMark) {
+              if (txt && txt.length > 15 && (txt.match(/\[\d+\]/g) || []).length === nMark) {
                 (finalResponse as any).choices[0].message.content = txt;
                 (finalResponse as any).x_language_gate = "es_translation_applied";
               }
