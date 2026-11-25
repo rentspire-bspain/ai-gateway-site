@@ -1899,3 +1899,22 @@ Merged: ai-gateway-site #498 (docs batches 31–40 + guardrails Part F), #499 (p
 - 🟡 **U-SEO-17 (BV/AG)** — funnel fully live (checkout_started + purchase in the first-party store); readback surface pending.
 
 **Headline after batch: strict 24.4% / measured-only 42.5% (v49)** — session arc since batch 24: 20.2% → 24.4%.
+
+### F5 — Full-estate data-layer monitoring inventory (v356, owner directive: strict + measured-only focus)
+
+What already exists server-side (verified in code, wired into the layers above):
+- **ops-health** (governed-sql, x-cron-key protected, 20+ checks per run): site home + five module 200s, both hosts' /api/health, locked-function posture (monitors/gateway-chat reject unauthenticated), call-model aliveness, browser-service health, DNS resolution for both hosts, 4 DB checks, storage, log API, cert transparency, and a live gateway canary ("pong") — the deepest existing estate check.
+- **gateway-status** (public): per-model live probes with 60s cache.
+- **retention** (Vercel cron daily), **harvest-cron**, **monitors** (DB-backed check registry, notifications_workflows.sql).
+- **qa-sweep** (hourly CI): full edge-function test suite — RPC contracts (credits reserve/settle/refund, neurons-claim), postback idempotency (143-request simulation), event-taxonomy sync, provider map, notification locks, esbuild bundle gate on every function.
+- **live-sweep** (5-min CI): the 11 production HTTP checks.
+- **heartbeat** (merged, deployment pending): continuous record layer with gap detection.
+
+Gaps to close, in strict-completion priority order (each gap = measurable register weight):
+1. **Schema snapshot diff in CI** — assert the live DB schema matches `_migrations/` (a schema-hash check per migration; fails on undeclared drift). Kills silent schema drift.
+2. **Ontology registry doctrine gate in the hourly sweep** — the spine.ontology_dataset_registry completeness check that already exists as a doctrine gate gets a schedule.
+3. **Analytics readback** — the funnel surface (checkout_started → purchase conversion) needs the service key or an authenticated ops endpoint; closes U-MEAS-01 and U-SEO-17.
+4. **Uptime history** — the heartbeat rows give pass/fail history; a monthly 99.9% computation closes U-REL-01 (BV/AG).
+5. **Heartbeat deployment** — owner deploy path or Supabase token; the 5-min sweep logs the KNOWN-GAP until then.
+
+Completion math under this focus: measured-only is 42.5% and strict is 24.4%; the difference is the 794 ⚪ unmeasured cells, concentrated in GH/ST/CT/DG (owner-gated access). Within BV/TT/AG — the apps we can measure — the remaining lever is converting 🟡→✅ via the gaps above (3 register items) and the owner decisions (pricing copy, N-valuation, passkey console, counsel E11-2).
