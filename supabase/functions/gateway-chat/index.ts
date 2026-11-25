@@ -3634,7 +3634,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
           callModelUrl, model: finalModel, purpose, baseMessages: capped,
           maxTokens: tokenBudget,
           reuseFinal: false,              // NEVER reuse the loop's own final: GLM tool-calls are flaky through call-model (mangled "ToolCall" prefixes, CJK confusion text). The loop gathers evidence; the writing path answers.
-          gatewayToken: GW_TOKEN,
+          gatewayToken: CM_TOKEN,
           ctx: toolCtx,
           onProgress: progress ? (e) => {   // v103 F12: truthful per-tool progress
             if ((e.phase === "start" || e.phase === "end") && (e.tool === "record_plan" || e.tool === "mark_step")) return;   // the plan row (setPlan) covers these
@@ -3914,7 +3914,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
                   const budget = Math.min(45_000, 115_000 - (Date.now() - reqStart));
                   if (trig && budget >= 5_000) {
                     const sc = await selfCheckPass({
-                      callModelUrl, model: PASS2_MODEL, gatewayToken: GW_TOKEN, draft: answer,
+                      callModelUrl, model: PASS2_MODEL, gatewayToken: CM_TOKEN, draft: answer,
                       findings: researchFindings, researchText: perplexityFullText,
                       evidence: (toolLoop?.evidence || "") + (autoAsset?.evidence || ""),
                       toolsUsed: [...(toolLoop?.used ? toolLoop.trace?.map((t: any) => t.tool) ?? [] : []), ...(autoAsset?.trace || []).filter((t) => t.ok).map((t) => t.tool)],
@@ -4480,7 +4480,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     if (finalResponse?.choices?.[0]?.message?.content && !imageUrl && !spaceInstructions && String(finalResponse.choices[0].message.content).length >= 80 && timeOk(105_000)) {
       try {
         const sc = await selfCheckPass({
-          callModelUrl, model: PASS2_MODEL, gatewayToken: GW_TOKEN,
+          callModelUrl, model: PASS2_MODEL, gatewayToken: CM_TOKEN,
           draft: String(finalResponse.choices[0].message.content),
           findings: researchFindings, researchText: perplexityFullText,
           evidence: (toolLoop?.evidence || "") + (autoAsset?.evidence || ""),
