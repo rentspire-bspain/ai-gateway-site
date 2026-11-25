@@ -3661,7 +3661,7 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         progress?.beginAgent("py-verify", "PYTHON · Verify", "Synthesizing the computation…", "reason");
         const res = await fetch(callModelUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json", ...(GW_TOKEN ? { Authorization: `Bearer ${GW_TOKEN}`, "x-gateway-token": GW_TOKEN } : {}) },
+          headers: { "Content-Type": "application/json", ...(CM_TOKEN ? { Authorization: `Bearer ${CM_TOKEN}`, "x-gateway-token": CM_TOKEN } : {}) }, // v349: outbound call-model token
           body: JSON.stringify({
             messages: [
               { role: "system", content: "You translate a computation request into ONE Python 3 script. Output ONLY a single fenced ```python code block and nothing else - no prose, no explanation before or after. The script must: put every input from the request as a clearly-named variable at the top, compute every number the request asks about, and print() every intermediate and final result with clear labels." },
