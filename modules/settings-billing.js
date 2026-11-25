@@ -135,6 +135,14 @@
     root.querySelector("#plans").addEventListener("click", async function (ev) {
       var b = ev.target.closest("button[data-plan]"); if (!b) return;
       if (b.dataset.plan === "team") { note.textContent = "Team seats launch with the Stripe wiring — email bspain@spaincos.com to be first in line."; return; }
+      // v353 (U-FORM-04, batch 37): double-submit prevention — the button stays
+      // disabled for the whole checkout request (re-enabled on failure), so a
+      // double click can never create two Stripe sessions. Server side is already
+      // idempotent (postback unique constraint; 143-request simulation, 0 doubles).
+      if (b.disabled) return;
+      b.disabled = true;
+      b.dataset.label = b.textContent;
+      b.textContent = "Starting checkout…";
       note.textContent = "Starting checkout…";
       try {
         var h = await authHeaders();
@@ -144,6 +152,8 @@
         if (d && d.not_configured) { note.textContent = "Checkout is one secret away: add STRIPE_SECRET_KEY in the project settings and this button goes live. Everything else (ledger, balance, plans) is already running."; return; }
         note.textContent = "Checkout unavailable: " + String((d && d.error) || ("HTTP " + res.status));
       } catch (e) { note.textContent = "Checkout error: " + String(e.message || e).slice(0, 120); }
+      b.disabled = false;
+      b.textContent = b.dataset.label;
     });
     return root;
   }
