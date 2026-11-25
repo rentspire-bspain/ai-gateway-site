@@ -59,3 +59,10 @@ jobs:
               labels: ["regression"],
               body: `The hourly live sweep failed. Run: ${runUrl}\n\nThe master-doc closure loop should pick this up, diagnose, and open a fix PR. Do not close until the sweep passes on the next run.`
             });
+      - name: Ping the estate heartbeat function (continuous record layer)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          code=$(curl -s -o /tmp/hb.json -w "%{http_code}" "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/heartbeat" || echo 000)
+          echo "heartbeat HTTP $code: $(head -c 400 /tmp/hb.json)"
+          test "$code" = "200"
+
