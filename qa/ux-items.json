@@ -1,5 +1,5 @@
 {
-  "version": 42,
+  "version": 43,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -2900,7 +2900,7 @@
       "W": 6,
       "ircm": "2103",
       "status": {
-        "BV": "R",
+        "BV": "G",
         "TT": "-",
         "AG": "Y",
         "GH": "U",
@@ -2909,7 +2909,10 @@
         "DG": "-"
       },
       "evidence": "LIVE: boundview.com and ai.spaincos.com both serve <title>BoundView</title> (identical bundle, 339,531 vs 339,560 bytes) | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item) | worker CT 2026-11-22: Observed the indexed Comptrove page title served at comptrove.com: \"Average Rent in Austin, TX — Rents by Bedroom, History & Comps - Comptrove\" (~73–74 characters).[[1](https://comptrove.com/m/austin/)] Brand (\"Comptrove\") and keyword (\"Average Rent in Austin, TX\") are present, and the wording is pa",
-      "fix": "Per-page titles via prerender; per-host brand"
+      "fix": "Per-page titles via prerender; per-host brand",
+      "notes": {
+        "BV": "2026-11-25 batch 30 (PR #491 merged; raw pre-JS HTML live-verified via curl): unique title 'BoundView — Where knowledge begins' (35 chars) in pre-JS response"
+      }
     },
     {
       "id": "U-SEO-02",
@@ -2920,7 +2923,7 @@
       "W": 6,
       "ircm": "2103",
       "status": {
-        "BV": "R",
+        "BV": "G",
         "TT": "-",
         "AG": "Y",
         "GH": "U",
@@ -2929,7 +2932,10 @@
         "DG": "-"
       },
       "evidence": "LIVE: no meta description on either host | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
-      "fix": "Add per route"
+      "fix": "Add per route",
+      "notes": {
+        "BV": "2026-11-25 batch 30 (PR #491 merged; raw pre-JS HTML live-verified via curl): static meta description, 118 chars, in pre-JS response (PR #491)"
+      }
     },
     {
       "id": "U-SEO-03",
@@ -2940,7 +2946,7 @@
       "W": 6,
       "ircm": "2103",
       "status": {
-        "BV": "R",
+        "BV": "G",
         "TT": "-",
         "AG": "Y",
         "GH": "U",
@@ -2949,7 +2955,10 @@
         "DG": "-"
       },
       "evidence": "LIVE: no og:* tags in head | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
-      "fix": "Add; test in Slack, iMessage, X, LinkedIn"
+      "fix": "Add; test in Slack, iMessage, X, LinkedIn",
+      "notes": {
+        "BV": "2026-11-25 batch 30 (PR #491 merged; raw pre-JS HTML live-verified via curl): og:title/og:description/og:image + twitter:card summary_large_image + twitter:image in raw HTML; social-card.png 200 image/png"
+      }
     },
     {
       "id": "U-SEO-04",
@@ -2960,7 +2969,7 @@
       "W": 6,
       "ircm": "2103",
       "status": {
-        "BV": "R",
+        "BV": "G",
         "TT": "-",
         "AG": "Y",
         "GH": "U",
@@ -2969,7 +2978,10 @@
         "DG": "-"
       },
       "evidence": "Two domains serve the same bundle with no canonical (local grep: canonical absent from head) | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
-      "fix": "Canonical on BV; noindex on ai.spaincos"
+      "fix": "Canonical on BV; noindex on ai.spaincos",
+      "notes": {
+        "BV": "2026-11-25 batch 30 (PR #491 merged; raw pre-JS HTML live-verified via curl): static rel=canonical https://boundview.com/ in pre-JS response (PR #491); runtime duplicate suppressed (single canonical)"
+      }
     },
     {
       "id": "U-SEO-05",
@@ -2980,7 +2992,7 @@
       "W": 6,
       "ircm": "2103",
       "status": {
-        "BV": "R",
+        "BV": "G",
         "TT": "-",
         "AG": "G",
         "GH": "U",
@@ -2989,7 +3001,10 @@
         "DG": "-"
       },
       "evidence": "LIVE: /sitemap.xml 404; robots.txt has no Sitemap line | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item) | 2026-11-21 live re-verification (post PR #264 merge): sitemap.xml live at ai.spaincos.com (200) and referenced in robots.txt",
-      "fix": "Generate in build.js"
+      "fix": "Generate in build.js",
+      "notes": {
+        "BV": "2026-11-25 batch 30 (PR #491 merged; raw pre-JS HTML live-verified via curl): robots.txt references https://boundview.com/sitemap.xml; sitemap.xml 200"
+      }
     },
     {
       "id": "U-SEO-06",
@@ -3011,7 +3026,7 @@
       "evidence": "robots.txt = \"User-agent: * Allow: /\" on both hosts, so the private ai.spaincos workspace is fully crawlable",
       "fix": "AG: noindex + auth interstitial; internal apps: noindex + X-Robots-Tag",
       "notes": {
-        "AG": "2026-11-25 batch 25: noindex,nofollow live-verified on ai.spaincos.com after dead-code fix (PR #462); robots.txt allows crawl but meta noindex governs; sitemap BV-only by design",
+        "AG": "2026-11-25 batch 30 (PR #491 merged; raw pre-JS HTML live-verified via curl) hardening: static noindex,nofollow now in the pre-JS response on ai.spaincos.com (on top of the runtime meta from PR #462)",
         "BV": "2026-11-25 batch 25: robots audit complete — robots.txt User-agent:* Allow:/ Disallow:/t/ + sitemap.xml; canonical https://boundview.com/ live; no noindex on public host (intended)"
       }
     },
@@ -3024,7 +3039,7 @@
       "W": 6,
       "ircm": "2103",
       "status": {
-        "BV": "R",
+        "BV": "G",
         "TT": "-",
         "AG": "Y",
         "GH": "R",
@@ -3033,7 +3048,10 @@
         "DG": "-"
       },
       "evidence": "Local grep: 0 ld+json blocks | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item) | worker GH 2026-11-22: Attempted to fetch https://minutegig.com and its obvious sub-pages to inspect the served markup for <script type=\"application/ld+json\"> blocks; the retrieval did not surface the site's markup or any relevant pages, so none of the five required types — Organization, WebSite+SearchAction, SoftwareAppl",
-      "fix": "Add and validate with Rich Results Test"
+      "fix": "Add and validate with Rich Results Test",
+      "notes": {
+        "BV": "2026-11-25 batch 30 (PR #491 merged; raw pre-JS HTML live-verified via curl): JSON-LD data block (Organization/WebSite/WebApplication/BreadcrumbList) in pre-JS response, data-bv attribute"
+      }
     },
     {
       "id": "U-SEO-08",
@@ -3144,7 +3162,7 @@
       "W": 6,
       "ircm": "2103",
       "status": {
-        "BV": "R",
+        "BV": "G",
         "TT": "-",
         "AG": "Y",
         "GH": "U",
@@ -3153,7 +3171,10 @@
         "DG": "-"
       },
       "evidence": "No og tags, so previews are bare URLs | 2026-11-21 live re-verification (post PR #264 merge): runtime SEO heads live on AG (brand.js seoHeads) + sitemap.xml live; still no static per-host heads (E11 item)",
-      "fix": "Share image set; test matrix"
+      "fix": "Share image set; test matrix",
+      "notes": {
+        "BV": "2026-11-25 batch 30 (PR #491 merged; raw pre-JS HTML live-verified via curl): unfurl inputs all in raw HTML: og:title/description/image + twitter card + 200 PNG social card"
+      }
     },
     {
       "id": "U-SEO-14",
