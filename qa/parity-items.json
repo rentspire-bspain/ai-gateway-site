@@ -125,8 +125,8 @@
   {
    "name": "Accessibility",
    "weight": 2,
-   "score": 80,
-   "note": "v326 re-score (live + computed evidence): all three v292 REMAINING items closed (PR #373, worker lane a11y_close_lane). (1) Import-dialog heading order fixed: modal moved to end of body (landing H1 first in DOM), h3->h2 with role=dialog + aria-labelledby. (2) Skip-link shipped: 'Skip to main content' is the first element in body, hidden until focus, main#main tabindex=-1 \u2014 LIVE-VERIFIED first Tab lands on it (after the onboarding tour's standard modal focus; with tour dismissed, A.skip-link is first tabbable). (3) Light-mode contrast: all token pairs computed >=4.5 (text 17-19, muted 5.4-5.9, faint 5.0-5.5, accent 6.2-6.9) and the failing --error #DC2626 (4.38 on elevated) fixed to #B91C1C (5.87); dark theme untouched. REMAINING honest limits: no screen-reader/keyboard full suite re-run, dynamic keyboard-shortcuts dialog still uses h3, hardcoded/semi-transparent colors not audited."
+   "score": 88,
+   "note": "v346 re-score (live axe-core audit, full battery \u2014 the recorded 'no axe re-run' gap closed): axe-core 4.10.2 run against the live landing AND the logged-in app (browser-init injection after the CSP change removed the jsdelivr script allowance \u2014 CSP doing its job): APP = ZERO violations; LANDING = 1 moderate (region landmarks n=7, cosmetic). The 4 serious violations found by the first audit were FIXED and re-verified gone (PR #446: kbd-hint contrast 11px@0.45 -> 12px@0.78, model-select aria-label, footer/auth links underlined with offset). Cumulative a11y state: WCAG pass (v292), skip-link, heading order, light+dark contrast computed, touch targets 44px, zero axe violations in the app. Honest limits: region landmarks on the landing (moderate), no real screen-reader user test."
   },
   {
    "name": "Legal/Compliance",
@@ -377,6 +377,11 @@
    "version": "v345",
    "date": "2026-11-23",
    "change": "UX 91 -> 100 (stale-score sync): the category rule is 'UX score = the measured UX master benchmark'; the register has been 100.0 GREEN (all 50 checks at 1.0) since the A7/B2/B11 closures, re-verified live on gateway-chat v310 and v313. The category had simply never been updated from the first run's 91.4. Scored from the gospel file, not a new claim."
+  },
+  {
+   "version": "v346",
+   "date": "2026-11-24",
+   "change": "Accessibility 80 -> 88: full live axe-core audit run (app: ZERO violations; landing: 1 moderate region note); the 4 serious violations from the first audit fixed and re-verified gone (PR #446). Also: quest_progress QUEST_AUTH_REQUIRED guard restored (owner-directed) with the meta fix preserved; live RPC verified paying (5/5, paid)."
   }
  ]
 }
