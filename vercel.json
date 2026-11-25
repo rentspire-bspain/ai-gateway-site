@@ -54,6 +54,10 @@
       "status": 307
     },
     {
+      "src": "/docs/api",
+      "dest": "/api/bv-render?page=docs-api"
+    },
+    {
       "src": "/docs",
       "dest": "/api/bv-render?page=docs"
     },
@@ -155,12 +159,6 @@
           "value": "camera=(), microphone=(self), geolocation=()"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/docs/api",
-      "dest": "/api/bv-render?page=docs-api"
     }
   ]
 }
