@@ -108,6 +108,10 @@ def backend():
         check("model lanes all pass", bool(res) and not fails, "failing: " + ", ".join(fails) if fails else f"{len(res)} lanes ok")
     except Exception as e:
         check("model lanes all pass", False, f"gateway-status unreadable: {str(e)[:80]}")
+    # v350 BRAND-LEAK GATE: zero Spain strings anywhere in the rendered BoundView UI.
+    import subprocess as _sp
+    r = _sp.run([sys.executable, __file__.replace("prelaunch.py", "bv-brand-leak.py")], capture_output=True, text=True, timeout=420)
+    check("boundview brand-leak gate", r.returncode == 0, (r.stdout + r.stderr).strip()[:160] or "leaks found")
     m = mint()
     tok = m and m.get("access_token")
     check("token mint", bool(tok))
