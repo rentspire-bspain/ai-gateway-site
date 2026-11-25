@@ -41,7 +41,22 @@
         isBoundView: false };
 
   // ---- BoundView scrub: the rendered UI must carry ZERO other-brand strings ----
-  if (!isBV) return;
+  // v333 (loop run 10, 2026-11-24) BUG FIX: this used to be a bare `if (!isBV) return;`
+  // which aborted the ENTIRE module on the private workspace host — including the
+  // seoHeads() noindex below (unreachable dead code). ai.spaincos.com was therefore
+  // fully indexable. On non-BV hosts we skip only the scrub machinery and still run
+  // the SEO head (noindex, nofollow) and the branded title.
+  if (!isBV) {
+    function bootAG() {
+      try {
+        document.title = window.BRAND.title;
+        seoHeads();
+      } catch (e) { /* never break the page over branding */ }
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootAG);
+    else bootAG();
+    return;
+  }
   var MAP = [
     [/ai\.spaincos\.com/gi, "BoundView"],
     [/ai-spaincos/gi, "BoundView"],
