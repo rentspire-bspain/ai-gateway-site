@@ -25,6 +25,11 @@ const FAST_CHECKS = [
   { name: "brand_bv_status", kind: "brand", url: "https://boundview.com/status" },
   { name: "brand_bv_help", kind: "brand", url: "https://boundview.com/help" },
   { name: "brand_bv_pricing", kind: "brand", url: "https://boundview.com/pricing" },
+  { name: "brand_bv_terms", kind: "brand", url: "https://boundview.com/terms" },
+  { name: "brand_bv_privacy", kind: "brand", url: "https://boundview.com/privacy" },
+  { name: "brand_bv_docs", kind: "brand", url: "https://boundview.com/docs" },
+  { name: "brand_bv_docs_api", kind: "brand", url: "https://boundview.com/docs/api" },
+  { name: "status_bv_docs_api", kind: "url_200", url: "https://boundview.com/docs/api" },
 ];
 const ESTATE_CHECKS: any[] = [
   // v355 FULL-ESTATE COVERAGE: the dcyj project (the estate's 329-function runtime:

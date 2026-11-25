@@ -160,7 +160,7 @@
   "rewrites": [
     {
       "source": "/docs/api",
-      "destination": "/api-docs.html"
+      "dest": "/api/bv-render?page=docs-api"
     }
   ]
 }
