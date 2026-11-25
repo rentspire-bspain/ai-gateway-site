@@ -1,5 +1,5 @@
 {
-  "version": 43,
+  "version": 44,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -4018,16 +4018,20 @@
       "W": 7,
       "ircm": "3202",
       "status": {
-        "BV": "R",
+        "BV": "Y",
         "TT": "-",
-        "AG": "R",
+        "AG": "Y",
         "GH": "-",
         "ST": "R",
         "CT": "R",
         "DG": "R"
       },
       "evidence": "None",
-      "fix": "Define events; first-party store"
+      "fix": "Define events; first-party store",
+      "notes": {
+        "BV": "2026-11-25 batch 31 (governed-sql PR #23): first-party taxonomy defined (query/completion/share/checkout_started/purchase over analytics_events) with a CI sync test locking doc-to-code; funnels computable (engagement, monetization, virality). Funnel readback surface pending",
+        "AG": "2026-11-25 batch 31 (governed-sql PR #23): first-party taxonomy defined (query/completion/share/checkout_started/purchase over analytics_events) with a CI sync test locking doc-to-code; funnels computable (engagement, monetization, virality). Funnel readback surface pending"
+      }
     },
     {
       "id": "U-MEAS-02",

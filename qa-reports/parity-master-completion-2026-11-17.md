@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 23.2%** (app-weighted; unmeasured counts as 0; v43 — batch 30: SEO sweep — static crawler-visible heads live on both hosts) · **measured-only: 40.8%** · 174✅ / 225🟡 / 184🔴 / 794⚪ across 386 line items. Per-app strict: BV 44.7% · TT 27.4% · AG 44.7% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 23.3%** (app-weighted; unmeasured counts as 0; v44 — batch 31: event taxonomy defined + sync test) · **measured-only: 40.9%** · 174✅ / 227🟡 / 182🔴 / 794⚪ across 386 line items. Per-app strict: BV 45.0% · TT 27.4% · AG 45.1% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1805,3 +1805,11 @@ PR #491 merged and live-readback-verified (raw pre-JS HTML, curl):
 **Headline after batch: strict 23.2% / measured-only 40.8% (v43)** — session arc since batch 24: 20.2% → 23.2%.
 
 Next queue: U-MEAS-01 event taxonomy readback surface, TT-WALL frame-health items (need Adscend approval), remaining BV/AG 🟡 sweeps. Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision, passkey enablement (Supabase console).
+
+### Batch 31 — event taxonomy defined and locked (2026-11-25, register v44)
+
+- 🔴→🟡 **U-MEAS-01 (BV/AG)** — governed-sql PR #23: the first-party event taxonomy is now defined (query, completion, share, checkout_started, purchase — all over the single `analytics_events` store) with a CI sync test (3/3 pass) that fails if a documented event disappears from code or an undocumented one appears. Three funnels are computable from the store: engagement (query→completion), monetization (checkout_started→purchase), virality (share). 🟡 pending a funnel readback surface.
+
+**Headline after batch: strict 23.3% / measured-only 40.9% (v44)** — session arc since batch 24: 20.2% → 23.3%.
+
+Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision, passkey enablement (Supabase console).
