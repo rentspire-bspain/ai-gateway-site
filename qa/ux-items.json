@@ -1,5 +1,5 @@
 {
-  "version": 40,
+  "version": 41,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -3228,16 +3228,20 @@
       "W": 8,
       "ircm": "3203",
       "status": {
-        "BV": "R",
+        "BV": "Y",
         "TT": "-",
-        "AG": "R",
+        "AG": "Y",
         "GH": "R",
         "ST": "U",
         "CT": "U",
         "DG": "U"
       },
       "evidence": "Policy says no analytics trackers; leaves marketing blind",
-      "fix": "First-party cookieless analytics + consent mode"
+      "fix": "First-party cookieless analytics + consent mode",
+      "notes": {
+        "BV": "2026-11-25 batch 28 (governed-sql PR #22): first-party checkout_started event implemented (checkout function -> analytics_events); purchase events already logged by stripe-webhook; funnel computable with zero trackers. Marketing-facing readback surface pending",
+        "AG": "2026-11-25 batch 28 (governed-sql PR #22): same shared backend funnel"
+      }
     },
     {
       "id": "U-SEO-18",
