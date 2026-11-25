@@ -4330,6 +4330,33 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
         let replacement2 = rText2;
         let reason2 = perplexityFullText ? "upstream_error_used_live_search_text" : "upstream_error_used_findings_digest";
         if (!replacement2) { replacement2 = await reliableModelAnswer(); reason2 = "upstream_error_used_reliable_model"; }
+        // v348 SESSION-RECALL FALLBACK: on session-recall turns the free writer has no
+        // Perplexity research fallback (web retrieval is intentionally off), so a free-lane
+        // outage used to surface as an error notice. Fall back to the Perplexity Agent API
+        // with NO web tools — it answers purely from the digest + conversation, which is
+        // exactly the contract of a session-recall turn. (Free-lane 401 incident 2026-11-24.)
+        if (!replacement2 && sessionRecall) {
+          const pKey = Deno.env.get("PERPLEXITY_API_KEY");
+          if (pKey) {
+            try {
+              const fb = await fetch("https://api.perplexity.ai/v1/agent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${pKey}` },
+                body: JSON.stringify({
+                  effort: "fast",
+                  input: `You are the assistant for this user. ${digestBlock.trim() ? digestBlock.trim() + "\n\n" : ""}The user asked the following question about their own session history, threads, or imported documents. Answer it from the digest above and the conversation context. If the specifics are not present, say what IS known from their history and suggest checking their imported history in Settings. NEVER claim you cannot access session history.\n\nUSER QUESTION: ${String(userQuery).slice(0, 600)}`,
+                  tools: []
+                }),
+                signal: AbortSignal.timeout(15_000)
+              });
+              if (fb.ok) {
+                const p = await fb.json();
+                const txt = (p?.output || []).filter((o: any) => o?.type === "message").map((o: any) => (o?.content || []).filter((c: any) => c?.type === "output_text").map((c: any) => c?.text || "").join("")).join("\n").trim();
+                if (txt) { replacement2 = txt; reason2 = "session_recall_perplexity_no_search"; }
+              }
+            } catch { /* fall through to honest notice */ }
+          }
+        }
         if (replacement2) {
           finalResponse = { id: "gw-upstream-fallback", object: "chat.completion", model: finalResponse?.model || finalModel,
             choices: [{ index: 0, message: { role: "assistant", content: replacement2 }, finish_reason: "stop" }],
