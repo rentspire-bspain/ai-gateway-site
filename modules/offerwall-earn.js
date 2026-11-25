@@ -193,7 +193,13 @@
       "We earn a referral fee when you complete offers below — that is how free accounts are funded. " +
       "Offers come from third-party networks and their terms govern each offer. Neurons credit automatically on verified " +
       "completion only; rewards are capped at 10 offers per day and 60 per month. Neurons are earn-only credits for AI " +
-      "usage and can never be cashed out. Caps reset at 4:00 PM Pacific (UTC midnight)."));
+      "usage and can never be cashed out. Caps reset at 4:00 PM Pacific (UTC midnight). Offers and rewards are governed by our "));
+    var termsLink = el("a", null, "Terms"); termsLink.href = "/terms.html"; termsLink.target = "_blank"; termsLink.rel = "noopener";
+    var privacyLink = el("a", null, "Privacy Policy"); privacyLink.href = "/privacy.html"; privacyLink.target = "_blank"; privacyLink.rel = "noopener";
+    span.appendChild(termsLink);
+    span.appendChild(document.createTextNode(" and "));
+    span.appendChild(privacyLink);
+    span.appendChild(document.createTextNode(", including how the partner ad network uses cookies."));
     ftc.appendChild(span);
     wrap.appendChild(ftc);
 

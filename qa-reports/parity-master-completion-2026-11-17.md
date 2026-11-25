@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 19.6%** (app-weighted; unmeasured counts as 0; v32 — zero third-party asset origins end-to-end, perf-budget CI gate live, state-rights copy live) · **measured-only: 35.7%** · 144✅ / 229🟡 / 209🔴 / 795⚪ across 386 line items. Per-app strict: BV 36.2% · TT 20.1% · AG 41.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 20.1%** (app-weighted; unmeasured counts as 0; v33 — TRU sweep 2: support route, AI disclosure, brand separation, deletion green on BV; code-split increment 1 in PR #451) · **measured-only: 36.5%** · 149✅ / 227🟡 / 207🔴 / 794⚪ across 386 line items. Per-app strict: BV 37.5% · TT 21.6% · AG 41.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1671,3 +1671,26 @@ Merged closeout record: https://github.com/rentspire-bspain/SHMT/issues/3500#iss
 - Corrected en route: the lazy-lib references live inside inline scripts, so their CSP hashes were recomputed after the swap (csp-hash-check PASS); a broken command chain briefly skipped edits and the perf-budget script itself caught the resulting 404s (13s LCP) before anything shipped.
 
 **Headline after batch:** strict 19.6% / measured-only 35.7% — 144✅ / 229🟡 / 209🔴 / 795⚪ (v32; was 19.0% / 139✅). BV 36.2%, AG 41.7%. **Session cumulative (batches 12–19): strict 17.3% → 19.6%, ✅ 121 → 144, 🔴 221 → 209, with F-32/F-02/F-23 closed, F-01 consent+policy+GPC live, and zero third-party asset origins end-to-end.**
+
+### Batch 19 ledger record
+
+Merged record: https://github.com/rentspire-bspain/SHMT/issues/3500#issuecomment-7150428589
+
+### Batch 20 — autonomous closure sweep + code-split increment 1 (2026-11-24, register v33)
+
+**Autonomous closures this batch (all live-verified or merged):**
+- ✅ U-TRU-14 (support route) →✅ BV — /help.html live with support contact; security.txt 72h SLA
+- ✅ U-TRU-08 (AI disclosure) →✅ BV — full AI disclosure in the public policy (live fetch)
+- ✅ U-TRU-11 (export/deletion) →✅ BV — in-app deletion + policy-stated account deletion + export module
+- ✅ U-TRU-12 (brand separation) →✅ BV — distinct titles, policy, favicon, social cards (live-verified)
+- ✅ U-TRU-02 (terms linked) →✅ TT — component (#19) + live Earn-tab FTC text now links Terms/Privacy
+- 🟡 U-TRU-01 →🟡 TT, U-TRU-16 →🟡 BV (provider categories + Adscend named; full list/DPA pending), U-PERF-09 stays 🟡 BV (PNG set unconverted)
+- 🔧 **Code-split increment 1 (PR #451)**: the 17-module Settings family (~250 KB) defers to first open behind a forwarding SettingsUI stub with idle prefetch; critical-path scripts 67 → 56; CSP rebuilt (csp-hash-check PASS, perf-budget PASS, settings verified opening with panes). Budget (≤30 req / ≤170 KB br) still fails — next increments: connectors/research/media/artifacts families, then bundling.
+
+**GH/CT/ST/DG status (why the remaining ⚪ can't close autonomously):**
+- 🔴 GH (minutegig.com): still 502 at the domain-parking edge (3.33.130.190/15.197.148.33 — not a Vercel target). Needs owner registrar action; code-level audit of the mockup is possible but register items require the deployed product.
+- 🔴 CT (comptrove.com): Vercel mitigation 403s datacenter IPs; needs a residential-IP probe (owner's local browser) or allowlisted path.
+- ⚪ ST (Spain Terminal): source not in this workspace; needs repo access.
+- ⚪ DG (DoorGraph): internal/synthetic staging; needs staging credentials and the CanonIntel formation decision.
+
+**Headline after batch:** strict 20.1% / measured-only 36.5% — 149✅ / 227🟡 / 207🔴 / 794⚪ (v33; was 19.6% / 144✅). **Session cumulative (batches 12–20): strict 17.3% → 20.1%, ✅ 121 → 149 (+28), 🔴 221 → 207.**
