@@ -51,7 +51,8 @@ html.pre-boot body::before{content:"";position:fixed;top:72px;left:50%;transform
 <link rel="stylesheet" href="/modules/onboarding.css">
 <link rel="preload" as="font" type="font/woff2" href="/fonts/PPLX-Sans-Beta-R6-VF.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/PPLX-Serif-Beta-R6-VF.woff2" crossorigin>
-<!-- v161 F-32: mobile-375.css used to load at the end of <body> as a non-blocking stylesheet; its
+<!-- v161 F-32: mobile-375.css used to load at the end of <body>
+<div class="app-titlebar-drag" aria-hidden="true"></div> as a non-blocking stylesheet; its
      font-size/touch-target overrides landed ~1.4s in on slow 4G and re-flowed the auth card by 42px
      (the residual 0.336 CLS). It is fully media-scoped, so it now loads render-blocking in <head>
      behind a union media attr covering every inner query (max-width 420/480/768, pointer:coarse,
@@ -214,6 +215,12 @@ a { color: inherit; text-decoration: none; }
 .sidebar.collapsed .sidebar-header { flex-direction: column; gap: 6px; padding: 10px 0 2px; align-items: center; }
 .sidebar.collapsed .logo { flex-direction: column; gap: 4px; }
 .sidebar.collapsed .logo span { display: none; }
+/* v352 WINDOW-CONTROLS-OVERLAY: when installed with WCO (Chromium desktop), the OS draws
+   window controls over the top-right; reserve the drag region and keep content clear. */
+@media (display-mode: window-controls-overlay) {
+  .app-titlebar-drag { position: fixed; inset: 0 env(titlebar-area-width-x, 100%) 0 0; height: env(titlebar-area-height, 32px); -webkit-app-region: drag; app-region: drag; z-index: 999; pointer-events: none; }
+  body { padding-top: env(titlebar-area-height, 0px); }
+}
 .sidebar.collapsed .logo img { height: 22px; width: 22px; margin: 0 auto; }
 .sidebar.collapsed .sidebar-actions { flex-direction: column; gap: 2px; }
 .sidebar.collapsed .new-thread-btn { width: 38px; padding: 9px 0; justify-content: center; font-size: 0; gap: 0; margin-left: 7px; margin-right: 7px; }
@@ -1885,7 +1892,7 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 </div>
 
 <!-- AUTH MODAL -->
-<div class="auth-overlay" id="authOverlay" style="display:none">
+<div class="auth-overlay" id="authOverlay" style="display:none" role="region" aria-label="Sign in">
   <div class="auth-modal">
     <div class="auth-logo">
       <img src="/spaincos-icon.svg?v=177" alt="Spain Companies" style="height:40px;width:auto;display:block" />

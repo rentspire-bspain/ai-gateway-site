@@ -1,7 +1,7 @@
 {
   "name": "BoundView",
   "short_name": "BoundView",
-  "description": "Private AI research — answers with sources.",
+  "description": "Private AI research \u2014 answers with sources.",
   "id": "/",
   "start_url": "/?source=pwa",
   "scope": "/",
@@ -68,5 +68,10 @@
       "form_factor": "wide",
       "label": "The full research workspace"
     }
+  ],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
   ]
 }
