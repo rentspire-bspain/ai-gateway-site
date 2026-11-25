@@ -60,7 +60,14 @@ function transformHtml(html) {
       '<link rel="manifest" href="/boundview-manifest.webmanifest">'
     )
     // crawler-visible structured data (data block, not executed — CSP-safe); brand.js skips its copy when present
-    .replace("</head>", '<script type="application/ld+json" data-bv="1">' + BV_LD + "</script></head>");
+    .replace("</head>", '<script type="application/ld+json" data-bv="1">' + BV_LD + "</script></head>")
+    // v351 (U-SEO-02/04, batch 29): crawler-visible STATIC head tags — meta description
+    // (118 chars, within the 70–160 window) and the canonical URL, both present in the
+    // pre-JS response so non-executing crawlers see them. brand.js skips its runtime
+    // duplicates: the canonical link would double up, so it is inserted only here.
+    .replace("</title>", "</title>\n" +
+      '<meta name="description" content="BoundView — see the whole picture. AI research with sources, and Neurons rewards for verified activity.">\n' +
+      '<link rel="canonical" href="https://boundview.com/">');
 }
 
 module.exports = async (req, res) => {
@@ -143,7 +150,12 @@ module.exports = async (req, res) => {
     // v290: transform ONLY for boundview hosts — every other host (ai.spaincos.com
     // included, which this same project serves) gets the RAW html. The transform is
     // the BoundView brand kit; applying it to ai.spaincos.com is a brand leak.
-    const out = isBoundViewHost ? transformHtml(html) : html;
+    // v351 (U-SEO-06 hardening): non-BoundView hosts get a STATIC crawler-visible
+    // noindex in the pre-JS response — the runtime brand.js noindex stays as the
+    // safety net, but crawlers that never execute JS now see it too.
+    const out = isBoundViewHost
+      ? transformHtml(html)
+      : html.replace("</title>", '</title>\n<meta name="robots" content="noindex, nofollow">');
     res.writeHead(200, headers);
     res.end(req.method === "HEAD" ? undefined : out);
   } catch (e) {

@@ -185,7 +185,11 @@
       meta("og:url", "https://boundview.com/");
       meta("og:site_name", "BoundView");
       meta("twitter:card", "summary");
-      var c = document.createElement("link"); c.setAttribute("rel", "canonical"); c.setAttribute("href", "https://boundview.com/"); head.appendChild(c);
+      // v351: bv-render now injects the canonical statically in the pre-JS HTML —
+      // only add the runtime copy if the static one is missing (no duplicates).
+      if (!document.querySelector('link[rel="canonical"]')) {
+        var c = document.createElement("link"); c.setAttribute("rel", "canonical"); c.setAttribute("href", "https://boundview.com/"); head.appendChild(c);
+      }
       var ld = document.createElement("script"); ld.setAttribute("type", "application/ld+json");
       if (!document.querySelector('script[type="application/ld+json"][data-bv]')) { // bv-render injects the same graph server-side
         ld.setAttribute("data-bv", "1");
