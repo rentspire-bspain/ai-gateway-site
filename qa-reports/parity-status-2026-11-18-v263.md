@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v353)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v354)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3366,3 +3366,44 @@ Every deploy must pass: lane-health canary + brand-leak gate + UX master (≥90)
 - Warden v2: authenticated probes (ES language gate, session recall, tool-loop sandbox execution) using a service-owned eval identity — the three checks that need a logged-in session.
 - Auto-rollback: pin the last-known-good gateway bundle digest in the ledger; on a persistent gateway-lane failure the warden can redeploy it via the deploy API (needs the deploy PAT moved into Supabase secrets — owner one-paste).
 - Score-drift alarms: headline + UX-master deltas over time, alerting on any drop >1 point between runs.
+
+---
+
+## Addendum 69 — v354 (2026-11-25): the infrastructure guardrails program — granular plan, executed
+
+### LAYER 0 — In-request failsafes (every single turn, ~0ms cadence)
+| Guard | Class prevented | Status |
+|---|---|---|
+| Upstream-error degradation chain (research text → reliable model → honest notice) | Raw error blobs reaching users | LIVE |
+| Session-recall Perplexity no-search fallback | Dead writer = dead feature | LIVE (v348) |
+| ES answer-language gate + citation verification | Nondeterministic model drift | LIVE (v326) |
+| Budget/meter fail-closed, empty-completion 4x retry, 546 backoff | Silent over-spend, empty answers | LIVE |
+| Per-IP + distributed identity rate limiters | Floods, quota abuse | LIVE (v351) |
+
+### LAYER 1 — Deploy gates (every push, blocks merge)
+| Guard | Class prevented | Status |
+|---|---|---|
+| Lane-health canary | Shipping on a half-dead platform | LIVE (PR #470) |
+| Brand-leak browser gate (8 surfaces) | Cross-brand leaks | LIVE (PR #475) |
+| UX master ≥90, eval-replay, CSP hash guard, benchmark gospel enforcer | UX/quality regressions | LIVE |
+| 38-check prelaunch battery (now GREEN on every merge) | Everything above, at deploy time | LIVE |
+
+### LAYER 2 — RUNTIME WARDEN v2 (LIVE — this batch, PR #508)
+**Near-constant cadence, two lanes:**
+- **FAST lane — EVERY 1 MINUTE** (cron job 16): model lanes, both /api/health endpoints, both status pages, sitemap, 4-page BoundView brand sweep. 10 checks/minute = 14,400 check executions/day.
+- **DEEP lane — EVERY 15 MINUTES** (cron job 17): everything in fast PLUS the estate/database/ontology layer — RLS audit (any public table losing row-level security), SCHEMA HASH drift (any column/type change without a migration), cron-job health, fleet_registry counts, ops-health analytics freshness — AND the authenticated probes: ES language gate, session recall, sandbox execution (via the warden service identity in gateway_config). 19 checks/15min.
+
+**Self-improvement:** every failure is matched against **warden_playbooks** — known failure signatures with remediations, seeded from the three real incidents (all-lanes-unauthorized, es-answers-english, status-page-brand-leak). Matches increment times_matched and carry the remediation in the alert. Unmatched persistent failures auto-file a deduplicated GitHub issue that explicitly instructs adding a playbook row after the fix — the library grows from every real incident.
+
+**Drift ledger:** every check result ever run is in warden_ledger (permanent history) — transitions in EITHER direction are recorded, so drift is visible as data, not guesswork.
+
+### Proof it works — findings from the FIRST runs:
+1. **Real security exposure found and fixed:** the RLS audit found 6 public tables readable by ANYONE with the anon key — model_costs, harvest_jobs, owner_owners, brand_guard_log, _ow_probe2, and **affiliate_networks, which contained a live webhook secret**. All locked down (RLS enabled; anon now receives empty sets). Verified live before/after.
+2. A false-alarm bug in my own freshness check (wrong time column) was caught and corrected within one run — the warden auditing the warden.
+
+### LAYER 3 — Scheduled (roadmap, needs one owner paste each)
+- **Auto-rollback:** warden redeploys the last-known-good gateway bundle on persistent lane failure — requires the deploy PAT in Supabase secrets.
+- **Auto-remediation expansion:** playbooks with executable remediations (e.g., token re-alignment via GATEWAY_TOKEN_B write) — same PAT prerequisite.
+- Score-drift alarms on headline and UX-master deltas.
+
+**Headline: 90.8% (11618/128).** All layers are now LIVE except the three owner-paste items in Layer 3.
