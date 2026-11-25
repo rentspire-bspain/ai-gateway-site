@@ -60,7 +60,7 @@ a{color:#14646B}
 (function () {
   fetch("/api/health", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject())
     .then(() => { document.getElementById("d-api").className = "dot ok"; })
-    .catch(() => { document.getElementById("d-api").className = "dot bad"; }); });
+    .catch(() => { document.getElementById("d-api").className = "dot bad"; });
   var gw = document.getElementById("d-gw");
   fetch("/api/health", { cache: "no-store" }).then(r => {
     if (r.ok) { gw.className = "dot ok"; gw.title = "Health endpoint reachable — the answer engine shares this serving layer; deep per-model status is in Settings."; }
