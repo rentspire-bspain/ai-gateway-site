@@ -93,6 +93,7 @@
     "education"
   ],
   "display_override": [
+    "window-controls-overlay",
     "standalone",
     "minimal-ui"
   ],
