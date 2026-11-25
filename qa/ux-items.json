@@ -1,5 +1,5 @@
 {
- "version": 32,
+ "version": 33,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -207,7 +207,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "3 <img> in shell, 0 lazy; icons are PNG/SVG/WebP",
+   "evidence": "2026-11-24 live: favicon is webp; but apple-touch-icon/social-card/pasted-image are PNG (not AVIF/WebP/SVG) \u2014 stays Y until the PNG set is converted.",
    "fix": "Add lazy + dimensions; AVIF for og/marketing images"
   },
   {
@@ -2460,14 +2460,14 @@
    "ircm": "4233",
    "status": {
     "BV": "G",
-    "TT": "R",
+    "TT": "Y",
     "AG": "G",
     "GH": "R",
     "ST": "U",
     "CT": "R",
     "DG": "U"
    },
-   "evidence": "LIVE: boundview.com/privacy.html is the ai.spaincos.com policy (\"private site\u2026 no public sign-up, no advertising, no analytics trackers\"). BV has a Free tier and an ad-network offer wall. Contradiction = deceptive-practice exposure | 2026-11-21 live re-verification (post PR #264 merge): public BV policy written + merged (privacy.boundview.html, host guard); NOT live \u2014 boundview.com is pinned to a stale deployment (see F.3); AG live | worker CT 2026-11-22: No privacy policy is served or discoverable on comptrove.com in current results: the only comptrove.com page retrieved is a rent-comparison content page (Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps) [[5](https://comptrove.com/m/austin/)], not a /privacy or policy page, so nothing | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): privacy.boundview.html live 200 (public consumer policy)",
+   "evidence": "2026-11-24: governed-sql PR #19 merged \u2014 the Tasks-tab FTC disclosure links the host's /terms.html and /privacy.html (brand-split serves the right policy per host). Links live; per-host accuracy is the host's G.",
    "fix": "Write BV policy: offer-wall partners, subid sharing, cookies, retention; per-host policy file"
   },
   {
@@ -2480,14 +2480,14 @@
    "ircm": "4232",
    "status": {
     "BV": "G",
-    "TT": "R",
+    "TT": "G",
     "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "boundview.com/terms.html \u2192 404 (live) | 2026-11-22: terms.html published (private-workspace ToS); live on deploy of PR #342 | 2026-11-22: terms.boundview.html published (consumer ToS incl. Neurons, offers, auto-renewal, cancellation); live on deploy of PR #342 | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): terms.html live 200 | 2026-11-23 deploy verification (PRs #362+#342+#367 merged, live readback): terms.boundview.html live 200 on boundview.com",
+   "evidence": "2026-11-24: Terms linked from the merged tasks-tab component (#19) AND from the live ai-gateway-site Earn-tab FTC text (batch 20).",
    "fix": "Draft with counsel; link from signup and checkout"
   },
   {
@@ -2603,7 +2603,7 @@
    "W": 6,
    "ircm": "3201",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "U",
     "AG": "G",
     "GH": "U",
@@ -2611,7 +2611,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Canonical numbered sources contract in prelaunch; 'honest ceiling' benchmarks",
+   "evidence": "2026-11-24 live: the BoundView public privacy policy contains a full AI disclosure (19 AI/model mentions: model providers processing queries, limits, and the offer-wall AI-usage framing) \u2014 verified by live fetch.",
    "fix": "Add per-answer 'AI-generated' microlabel + feedback"
   },
   {
@@ -2663,7 +2663,7 @@
    "W": 9,
    "ircm": "3321",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "U",
     "AG": "Y",
     "GH": "U",
@@ -2671,7 +2671,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "api/retention.js + docs/soc2-retention-and-governance.md",
+   "evidence": "2026-11-24: in-app deletion (threads/files/projects deletable directly; account deletion via support email, stated in the policy's rights sections) + data export via the export module (/modules/export.js). AG holds the same surface and stays G-equivalent.",
    "fix": "Surface in Settings with confirmation email"
   },
   {
@@ -2683,7 +2683,7 @@
    "W": 8,
    "ircm": "4202",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "U",
     "AG": "G",
     "GH": "U",
@@ -2691,7 +2691,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "LIVE: manifest name/short_name \"ai.spaincos\" and privacy.html \"ai.spaincos.com\" on boundview.com. brand.js DOM scrub runs only in JS, not on static files or view-source | 2026-11-21 live re-verification (post PR #264 merge): manifest swap + verify/privacy/brand guards merged in PR #264; live on ai.spaincos.com, stale on boundview.com",
+   "evidence": "2026-11-24 live-verified: brand separation in static assets \u2014 distinct <title> ('BoundView \u2014 Where knowledge begins' vs 'ai.spaincos.com \u2014 \u2026'), branded privacy policy page (privacy.boundview.html), branded favicon (webp, distinct asset), branded social-card/icon set, noindex/SEO split per brand.",
    "fix": "Build-time per-host templating; add a crawler test that greps every static file for the other brand"
   },
   {
@@ -2723,7 +2723,7 @@
    "W": 4,
    "ircm": "2200",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "U",
     "AG": "Y",
     "GH": "R",
@@ -2731,7 +2731,7 @@
     "CT": "R",
     "DG": "U"
    },
-   "evidence": "brand.js supportEmail support@boundview.com | worker CT 2026-11-22: comptrove.com is live and crawlable \u2014 the only indexed Comptrove page surfaced was the Austin rent report (Average Rent in Austin, TX \u2014 Rents by Bedroom, History & Comps, comptrove.com [[18](https://comptrove.com/m/austin/)]) \u2014 but no support contact route and no response SLA are visible on the doma | worker GH 2026-11-22: No support route or stated SLA is observable for minutegig.com. The live research pass found no Minutegig contact or support page, no help center, and no publicly indexed support-response SLA for the domain; standard sub-page locations (/help, /docs, /robots.txt, /sitemap.xml) could not be verified ",
+   "evidence": "2026-11-24 live: /help.html 200 with support contact (support@boundview.com, 3 contact mentions); security.txt documents a 72h acknowledgement SLA for security reports.",
    "fix": "Add Help \u2192 Contact + SLA"
   },
   {
@@ -2763,7 +2763,7 @@
    "W": 4,
    "ircm": "2200",
    "status": {
-    "BV": "U",
+    "BV": "Y",
     "TT": "U",
     "AG": "U",
     "GH": "U",
@@ -2771,7 +2771,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Privacy lists Supabase, edge host, AI providers only",
+   "evidence": "2026-11-24: the public policy discloses service-provider categories (hosting, email delivery, model providers) and names the ad-network partner (Adscend) \u2014 but a full named sub-processor list + DPA remains pending for G.",
    "fix": "Publish list; DPA pack"
   },
   {
