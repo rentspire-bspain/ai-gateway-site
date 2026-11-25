@@ -1,5 +1,5 @@
 {
- "version": 36,
+ "version": 37,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -127,7 +127,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "2026-11-25 code-split series (PRs #451/#455/#456/#457, all locally verified, pending merge): signed-out critical-path scripts 67 -> 38 (Settings family 17 mods; connectors/projects/plugins; Tasks overlay + skills; answer-rendering family gated to sign-in). Still above the \u226430-request/\u2264170KB br budget until merged + the remaining boot-critical set is bundled. Status stays R until merged and measured live.",
+   "evidence": "2026-11-25 LIVE post-#451/#455/#456/#457 (code-split series merged): at-load signed-out numbers 81 requests / 57 scripts / 344 KB br JS (baseline 90 requests / 67 scripts / ~410 KB). The Settings family (21 mods), Tasks overlay family, and the answer-rendering family are deferred behind stubs with idle prefetch, so the browser warms the full app shortly after load while the critical path shrinks. Still above the \u226430-request/\u2264170 KB budget \u2014 the remaining boot-critical set needs build-time bundling. Verdict stays R with the series recorded.",
    "fix": "Bundle + defer non-critical modules (settings, fleet, media, voice) behind route/idle import; target \u226430 first-load requests"
   },
   {
@@ -199,15 +199,15 @@
    "W": 2,
    "ircm": "1001",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "U",
-    "AG": "Y",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "2026-11-24 live: favicon is webp; but apple-touch-icon/social-card/pasted-image are PNG (not AVIF/WebP/SVG) \u2014 stays Y until the PNG set is converted.",
+   "evidence": "2026-11-25 LIVE post-#454: favicon and apple-touch-icon serve webp on both hosts (link hrefs verified in-page, image/webp); all manifest icons webp; og/twitter cards stay PNG deliberately for crawler compatibility. Icon assets verified loading with zero failures.",
    "fix": "Add lazy + dimensions; AVIF for og/marketing images"
   },
   {

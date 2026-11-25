@@ -1,31 +1,20 @@
 {
-<<<<<<< HEAD
- "ts": "2026-11-25T05:04:38+00:00",
- "version": 34,
-=======
- "ts": "2026-11-25T05:19:26+00:00",
- "version": 35,
->>>>>>> ffbaaef (docs: batch 22 — U-PERF-14 TT R->Y (offline-tolerant component), register v35)
- "portfolio_strict_pct": 20.1,
- "portfolio_measured_only_pct": 36.5,
-=======
- "ts": "2026-11-25T05:34:15+00:00",
- "version": 36,
+ "ts": "2026-11-25T05:47:04+00:00",
+ "version": 37,
  "portfolio_strict_pct": 20.2,
- "portfolio_measured_only_pct": 36.6,
->>>>>>> 281a49a (docs: batch 23 — U-TRU-05 GH Y->G (mockup FTC disclosure verified), register v36)
+ "portfolio_measured_only_pct": 36.7,
  "apps": {
   "BV": {
-   "strict": 37.5,
-   "measured_only": 49.9,
+   "strict": 37.6,
+   "measured_only": 50.0,
    "coverage": 75.7,
    "counts": {
-    "G": 55,
+    "G": 56,
     "U": 55,
     "R": 42,
-    "Y": 74
+    "Y": 73
    },
-   "weighted_num": 43550,
+   "weighted_num": 43650,
    "weighted_den": 1160
   },
   "TT": {
@@ -42,16 +31,16 @@
    "weighted_den": 992
   },
   "AG": {
-   "strict": 41.7,
-   "measured_only": 54.3,
+   "strict": 41.8,
+   "measured_only": 54.5,
    "coverage": 77.1,
    "counts": {
-    "G": 52,
+    "G": 53,
     "U": 46,
     "R": 29,
-    "Y": 74
+    "Y": 73
    },
-   "weighted_num": 41900,
+   "weighted_num": 42000,
    "weighted_den": 1004
   },
   "GH": {
