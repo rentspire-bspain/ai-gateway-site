@@ -9,3 +9,4 @@ Appended automatically on every full 10-query run of `qa/eval-replay.py` (machin
 | 2026-11-22T07:58:02+00:00 | `unspecified` | `v275` | **10/10** | research:3/3 / continuation:2/2 / status:2/2 / fact:2/2 / doc:1/1 | — | 308.3 | 0 |
 | 2026-11-23T17:30:23+00:00 | `9d70894` | `v275` | **10/10** | research:3/3 / continuation:2/2 / status:2/2 / fact:2/2 / doc:1/1 | — | 278.9 | 0 |
 | 2026-11-24T07:35:15+00:00 | `gw-v313` | `v275` | **10/10** | research:3/3 / continuation:2/2 / status:2/2 / fact:2/2 / doc:1/1 | — | 37.3 | 0 |
+| 2026-11-25T06:19:02+00:00 | `unspecified` | `v275` | **9/10** | research:3/3 / continuation:2/2 / status:1/2 / fact:2/2 / doc:1/1 | status-1 (status): bare completion claim(s) ['completed'] with no 'Claim check:' caveat and no tool evidence beyond research | 30.8 | 1 |

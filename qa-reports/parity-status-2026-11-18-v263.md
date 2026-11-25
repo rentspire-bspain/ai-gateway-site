@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-24, v346)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-24, v347)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3226,3 +3226,15 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - Quests system: migration applied 2026-11-24 (owner-authorized in-thread), hotfixed (peer), guard restored (owner-directed), live-verified paying.
 
 **HEADLINE: 89.9% (11513/128, 29 categories, generator-confirmed) — 🟡 YELLOW band (0.1 from GREEN).** UX MASTER 100.0 GREEN. Eval-replay 10/10. Remaining REDs (LAST per owner directive): Email 30 (OAuth), Legal 60 (counsel), NativeMobile 48 + store presence (store accounts), Stripe live checkout (live key — form open, parked per owner).
+
+---
+
+## Addendum 62 — v347 (2026-11-24): BoundView session-recall fixed + model-lane outage diagnosed
+
+**The owner-reported BoundView defect is fixed and live-verified** (screenshot: "can you pull up all of the session context regarding the patents we had discussed?" answered "I can't access other conversations").
+
+- **Root cause (two layers):** (1) the intent router classified the question as web research, so the answer came from the Perplexity lane — the v287 tool mandate for search_my_context never fired; (2) the CONTEXT DIGEST block was double-gated (env flag + per-request personalization flag), both off, so the writer genuinely had no view of stored history.
+- **Fix (gateway-chat, PRs #463/#465, live v319):** new SESSION_RECALL detector (8/8 on the failing query plus negative controls) routes history-flavored questions away from web research; the context digest now fires on session-recall turns regardless of the gates; the digest carries a NEVER-claim-unavailability mandate; and on free-writer outages the turn falls back to the Perplexity Agent API with no web tools, answering purely from the digest.
+- **Live verification (eval session):** "Can you pull up all of the session context regarding the patents we had discussed?" → 4.6s, lists actual thread titles and imported documents, points to Settings → imported history. "What did we talk about in our previous conversations?" → same quality. No "can't access" claim.
+- **NEW OWNER-GATED RED (P0 incident, live now):** ALL four self-write model lanes fail with provider "unauthorized" (gateway-status live probe) — OpenRouter key (GLM/DeepSeek/Flint) rejected by the provider, and GROQ_API_KEY is missing from project secrets entirely. Research answers are unaffected (Perplexity lane), but the tool loop, run_python, platform-state checks, and search_my_context execution are degraded. **Fix requires the owner to paste fresh OpenRouter + Groq keys into Supabase secrets** (deploy PAT cannot write secrets — codified). When restored, session-recall turns will additionally run search_my_context for full-text recall.
+- **eval-replay:** 9/10 — the single FAIL (runner-jobs status check: bare completion claim, no tool evidence) is caused by the same outage (fleet tool could not execute), not by the session-recall change.
