@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>/* brand-split guard: on a boundview host, serve the BoundView page instead */if(/boundview/i.test(location.hostname))location.replace('/api-docs.boundview.html'+location.search+location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API reference — BoundView</title>
+<meta name="robots" content="noindex, follow">
+<meta name="description" content="The BoundView public API: authenticated search and embeddings endpoints, request/response contracts, error codes, and Phase 1 limits.">
+<link rel="canonical" href="https://boundview.com/docs/api">
+<style>
+  :root { --bg: #0C0E14; --fg: #E8ECF4; --muted: #9AA4B8; --border: #232A3A; --surface: #141824; --accent: #5B8CFF; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.65; }
+  main { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 30px; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 40px 0 10px; color: var(--accent); }
+  pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-size: 13px; }
+  code { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 13px; }
+  .muted { color: var(--muted); font-size: 14px; }
+  a { color: var(--accent); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--surface); }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .note { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; margin: 16px 0; }
+  nav a { margin-right: 14px; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+<nav><a href="/docs">&larr; Docs</a><a href="/">App</a><a href="/help.html">Help</a></nav>
+<h1>Public API reference</h1>
+<p class="muted">Phase 1. Every contract below is generated from the live endpoints themselves — an unauthenticated GET on either route returns the same JSON contract shown here.</p>
+
+<h2>Authentication</h2>
+<p>Both POST routes require <code>Authorization: Bearer <credential></code>. Credentials are never accepted in query strings and never logged or returned.</p>
+<ul>
+<li><strong>API keys:</strong> <code>BoundView API keys</code> from <strong>Settings &rarr; API Keys</strong>. Keys are stored SHA-256 hashed (<code>api_keys.key_hash</code>); revoked or unknown keys return 401. Key holders must be on the same owner/QA allowlist as the web app.</li>
+<li><strong>User JWTs:</strong> the auth project validates the token remotely; locally-decoded JWTs are not trusted.</li>
+</ul>
+<div class="note"><strong>Phase 1 limits (honest):</strong> no usage ledger is written and no credits are charged yet; the distributed rate limiter is a documented hook, not yet enforced infrastructure. Do not build production traffic against this surface until those ship.</div>
+
+<h2>POST /api/search</h2>
+<p><code>query</code> is a non-empty string up to 300 characters. <code>mode</code> defaults to <code>search</code>; <code>quick</code>, <code>search</code>, and <code>deep</code> cap the response at 3, 6, and 12 results respectively — modes change breadth, not a multi-step research budget, and are not guarantees of result count.</p>
+<pre>curl https://boundview.com/api/search \
+  -H "Authorization: Bearer ${BOUNDVIEW_API_KEY}" \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"renewable energy storage","mode":"search"}'</pre>
+<pre>{
+  "object": "search.results",
+  "query": "renewable energy storage",
+  "mode": "search",
+  "results": [
+    {"rank": 1, "title": "Example", "url": "https://example.com/", "excerpt": "…"}
+  ],
+  "provider": "gateway-proxy | sonar | free-sources"
+}</pre>
+<p class="muted">Ranking is provider relevance order with deduplication; the provider field tells you which lane served the request.</p>
+
+<h2>POST /api/embeddings</h2>
+<p><code>input</code> is a non-empty string or an array of 1&ndash;32 non-empty strings, at most 32,000 total characters. <code>model</code> defaults to <code>text-embedding-3-small</code> (1536 dimensions). Responses are validated: sequential indices, the exact requested model, 1536 finite numeric dimensions, and safe token-usage integers; only public fields are relayed.</p>
+<div class="note">This route returns <code>503 embeddings_not_configured</code> until the dedicated embeddings upstream is configured. It deliberately never touches the gateway's <code>embed_context</code> path, which mutates stored personal documents.</div>
+
+<h2>Errors</h2>
+<table>
+<tr><th>HTTP</th><th>Meaning</th></tr>
+<tr><td>400</td><td>Invalid input</td></tr>
+<tr><td>401</td><td>Missing or invalid credentials</td></tr>
+<tr><td>403</td><td>Private-account restriction</td></tr>
+<tr><td>405 / 413 / 415</td><td>Wrong method / body over 128 KiB / non-JSON</td></tr>
+<tr><td>429</td><td>Upstream limit</td></tr>
+<tr><td>502 / 503 / 504</td><td>Bad upstream / unconfigured or unavailable / timeout</td></tr>
+</table>
+<p class="muted">Errors are JSON <code>{"error":{"message","type","code"}}</code>. Provider bodies and secrets are never included.</p>
+
+<h2>CORS and methods</h2>
+<p>Wildcard origins, no cookies or credentialed CORS; only GET (self-documentation), POST, and OPTIONS with <code>Authorization</code> and <code>Content-Type</code> headers. Auth is checked on every POST.</p>
+
+<p class="muted" style="margin-top:40px">Source of record: <code>api/search.js</code>, <code>api/embeddings.js</code>, <code>api/_lib/public-api.js</code>, and <code>docs/public-api-phase1.md</code> in the repository. If this page disagrees with the live endpoint, the endpoint wins.</p>
+</main>
+</body>
+</html>
