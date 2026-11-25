@@ -1,10 +1,10 @@
 {
- "ts": "2026-11-22T07:28:33+00:00",
+ "ts": "2026-11-25T07:12:13+00:00",
  "battery": "H1 liveness, H2 JS/CSP, H3 brand integrity (bytes+DOM), H4 serving freshness, H5 health endpoint",
  "scoring": "per applicable check 1.0/0.5/0.0; app score = mean; partials P=0.5 by contract; not_measured checks excluded from the denominator and recorded",
  "sources": [
   "S1 webapp_catalog: HTTP 200, 1 rows",
-  "S2 fleet_registry webapp/web_app kinds: HTTP 200, 0 rows"
+  "S2 fleet_registry webapp/web_app kinds: HTTP 200, 9 rows"
  ],
  "no_public_url_rows": [
   {
@@ -30,8 +30,8 @@
   "ai.spaincos.com": {
    "app": "ai.spaincos.com (AI gateway)",
    "host": "ai.spaincos.com",
-   "source": "estate_seed",
-   "evidence": "SHMT runner DOMAINS list; gateway WEBAPP_REGISTRY; repo root",
+   "source": "fleet_registry",
+   "evidence": "fleet_registry row webapp:ai.spaincos.com",
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
@@ -40,9 +40,9 @@
      "evidence": {
       "url": "https://ai.spaincos.com/",
       "status": 200,
-      "ttfb_ms": 113,
+      "ttfb_ms": 137,
       "server": "Vercel",
-      "x_vercel_id": "iad1::iad1::xc5br-1795332482707-2b197e15f1ff",
+      "x_vercel_id": "iad1::iad1::8tg2t-1795590705779-2ae70903ce85",
       "x_vercel_mitigated": ""
      }
     },
@@ -55,7 +55,7 @@
       "title": "ai.spaincos.com \u2014 Where knowledge begins",
       "js_errors": [],
       "csp_violations": [],
-      "dom_chars": 4990
+      "dom_chars": 2422
      }
     },
     {
@@ -65,7 +65,7 @@
      "evidence": {
       "title": "ai.spaincos.com \u2014 Where knowledge begins",
       "cross_serve": false,
-      "dom_snippet": "ai.spaincos\nNew Thread\nProjects\nLibrary\nArtifacts\nSkills\nDocs\nTasks\nHubs\nFleet\nWebapps\nPlugins\nDiscover\nRECENT\nYour research threads will appear here.\nSPACES\n/ "
+      "dom_snippet": "Skip to main content\nai.spaincos\nNew Thread\nProjects\nLibrary\nArtifacts\nSkills\nDocs\nTasks\nHubs\nFleet\nWebapps\nPlugins\nDiscover\nRECENT\nYour research threads will a"
      }
     },
     {
@@ -73,9 +73,9 @@
      "verdict": "PASS",
      "score": 1.0,
      "evidence": {
-      "bytes": 348581,
+      "bytes": 359400,
       "forbidden_brand": "boundview",
-      "wanted_brand": "spaincos",
+      "wanted_brand": "ai.spaincos.com",
       "cross_serve": false,
       "brand_present": true
      }
@@ -86,7 +86,7 @@
      "score": 1.0,
      "evidence": {
       "server": "Vercel",
-      "x_vercel_id": "iad1::iad1::xc5br-179533",
+      "x_vercel_id": "iad1::iad1::8tg2t-179559",
       "cache_control": "no-store",
       "etag": "",
       "age": "0",
@@ -105,12 +105,12 @@
      "evidence": {
       "url": "https://ai.spaincos.com/api/health",
       "status": 200,
-      "ttfb_ms": 90,
+      "ttfb_ms": 104,
       "body": {
        "ok": true,
        "service": "ai-gateway-site",
        "check": "health",
-       "ts": "2026-11-22T07:28:10.749Z"
+       "ts": "2026-11-25T07:11:52.564Z"
       }
      }
     }
@@ -121,8 +121,8 @@
   "boundview.com": {
    "app": "BoundView (public host, ai-gateway project)",
    "host": "boundview.com",
-   "source": "estate_seed",
-   "evidence": "SHMT runner DOMAINS list; v290/v291 public-host fix record",
+   "source": "fleet_registry",
+   "evidence": "fleet_registry row webapp:boundview.com",
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
@@ -131,9 +131,9 @@
      "evidence": {
       "url": "https://boundview.com/",
       "status": 200,
-      "ttfb_ms": 120,
+      "ttfb_ms": 259,
       "server": "Vercel",
-      "x_vercel_id": "iad1::iad1::c8z6g-1795332491817-8e6926150969",
+      "x_vercel_id": "iad1::iad1::r89vc-1795590713662-9db0441b7a5a",
       "x_vercel_mitigated": ""
      }
     },
@@ -146,7 +146,7 @@
       "title": "BoundView \u2014 Where knowledge begins",
       "js_errors": [],
       "csp_violations": [],
-      "dom_chars": 4986
+      "dom_chars": 2418
      }
     },
     {
@@ -156,7 +156,7 @@
      "evidence": {
       "title": "BoundView \u2014 Where knowledge begins",
       "cross_serve": false,
-      "dom_snippet": "BoundView\nNew Thread\nProjects\nLibrary\nArtifacts\nSkills\nDocs\nTasks\nHubs\nFleet\nWebapps\nPlugins\nDiscover\nRECENT\nYour research threads will appear here.\nSPACES\n/ co"
+      "dom_snippet": "Skip to main content\nBoundView\nNew Thread\nProjects\nLibrary\nArtifacts\nSkills\nDocs\nTasks\nHubs\nFleet\nWebapps\nPlugins\nDiscover\nRECENT\nYour research threads will app"
      }
     },
     {
@@ -164,7 +164,7 @@
      "verdict": "PASS",
      "score": 1.0,
      "evidence": {
-      "bytes": 349592,
+      "bytes": 360411,
       "forbidden_brand": "spaincos",
       "wanted_brand": "boundview",
       "cross_serve": false,
@@ -177,7 +177,7 @@
      "score": 1.0,
      "evidence": {
       "server": "Vercel",
-      "x_vercel_id": "iad1::iad1::c8z6g-179533",
+      "x_vercel_id": "iad1::iad1::r89vc-179559",
       "cache_control": "no-store",
       "etag": "",
       "age": "0",
@@ -191,12 +191,12 @@
      "evidence": {
       "url": "https://boundview.com/api/health",
       "status": 200,
-      "ttfb_ms": 122,
+      "ttfb_ms": 98,
       "body": {
        "ok": true,
        "service": "ai-gateway-site",
        "check": "health",
-       "ts": "2026-11-22T07:28:17.788Z"
+       "ts": "2026-11-25T07:11:59.038Z"
       }
      }
     }
@@ -207,8 +207,8 @@
   "condoscores.com": {
    "app": "CondoScores",
    "host": "condoscores.com",
-   "source": "estate_seed",
-   "evidence": "SHMT runner DOMAINS list",
+   "source": "fleet_registry",
+   "evidence": "fleet_registry row webapp:condoscores.com",
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
@@ -217,9 +217,9 @@
      "evidence": {
       "url": "https://condoscores.com/",
       "status": 429,
-      "ttfb_ms": 116,
+      "ttfb_ms": 144,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795332498-w7CQZjZKQprPs8V7JeiEHfClqyRZqrYx",
+      "x_vercel_id": "iad1::1795590720-wrScZOqKqFYrotORoRFYUIJpvQbNfwtl",
       "x_vercel_mitigated": "challenge",
       "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
@@ -232,8 +232,8 @@
   "comptrove.com": {
    "app": "Comptrove (rent comps public site)",
    "host": "comptrove.com",
-   "source": "estate_seed",
-   "evidence": "SHMT runner DOMAINS list; gateway WEBAPP_REGISTRY; webapp_catalog",
+   "source": "fleet_registry",
+   "evidence": "fleet_registry row webapp:comptrove.com",
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
@@ -242,9 +242,9 @@
      "evidence": {
       "url": "https://comptrove.com/",
       "status": 429,
-      "ttfb_ms": 134,
+      "ttfb_ms": 143,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795332500-7v93DnWj06fctJutOiHMQlrjJimSrbnj",
+      "x_vercel_id": "iad1::1795590721-WG9Eskn1jUgQT4wNGjQDEIrpK3kIcIck",
       "x_vercel_mitigated": "challenge",
       "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
@@ -257,8 +257,8 @@
   "spaincos.com": {
    "app": "SpainCos marketing site",
    "host": "spaincos.com",
-   "source": "estate_seed",
-   "evidence": "SHMT runner DOMAINS list",
+   "source": "fleet_registry",
+   "evidence": "fleet_registry row webapp:spaincos.com",
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
@@ -267,7 +267,7 @@
      "evidence": {
       "url": "https://spaincos.com/",
       "status": 200,
-      "ttfb_ms": 662,
+      "ttfb_ms": 611,
       "server": "Squarespace",
       "x_vercel_id": "",
       "x_vercel_mitigated": ""
@@ -300,7 +300,7 @@
      "verdict": "PASS",
      "score": 1.0,
      "evidence": {
-      "bytes": 1484394,
+      "bytes": 278570,
       "forbidden_brand": "boundview",
       "wanted_brand": "spaincos",
       "cross_serve": false,
@@ -315,10 +315,9 @@
       "server": "Squarespace",
       "x_vercel_id": "",
       "cache_control": "",
-      "etag": "W/\"8917fc74fd34291e1ae8573a37ba7dbc--gzip\"",
+      "etag": "W/\"d5f48301b020d2767a3e64a20d7b706c--gzip\"",
       "age": "0",
-      "serving_layer": "Squarespace with etag revalidation",
-      "etag_304_revalidation": true
+      "serving_layer": "Squarespace with etag revalidation"
      }
     },
     {
@@ -328,7 +327,7 @@
      "evidence": {
       "url": "https://spaincos.com/api/health",
       "status": 404,
-      "ttfb_ms": 484,
+      "ttfb_ms": 359,
       "note": "no health endpoint on this app \u2014 not applicable (not a failure)"
      }
     }
@@ -339,8 +338,8 @@
   "terminal.spaincos.com": {
    "app": "Spain Terminal (internal operating shell)",
    "host": "terminal.spaincos.com",
-   "source": "estate_seed",
-   "evidence": "SHMT runner DOMAINS list; gateway WEBAPP_REGISTRY",
+   "source": "fleet_registry",
+   "evidence": "fleet_registry row webapp:terminal.spaincos.com",
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
@@ -349,9 +348,9 @@
      "evidence": {
       "url": "https://terminal.spaincos.com/",
       "status": 429,
-      "ttfb_ms": 209,
+      "ttfb_ms": 224,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795332508-ghX0cFXHimhDBKba8L3VCeM8BfFayMHu",
+      "x_vercel_id": "iad1::1795590729-JRaoO2TdrqFHGMh0z5FLPoUXteNhfIsK",
       "x_vercel_mitigated": "challenge",
       "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
@@ -364,8 +363,8 @@
   "allowancehealth.com": {
    "app": "Allowance (ICHRA plan finder)",
    "host": "allowancehealth.com",
-   "source": "estate_seed",
-   "evidence": "fleet_registry guardian name 'Allowance (allowancehealth.com)'",
+   "source": "fleet_registry",
+   "evidence": "fleet_registry row webapp:allowancehealth.com",
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
@@ -374,9 +373,9 @@
      "evidence": {
       "url": "https://allowancehealth.com/",
       "status": 429,
-      "ttfb_ms": 190,
+      "ttfb_ms": 123,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795332509-UNVhSBrAPzYqLa8MA6rvyga77FH6J092",
+      "x_vercel_id": "iad1::1795590730-GchydYHtuN2xVKtnfsq1skP6PHAUy311",
       "x_vercel_mitigated": "challenge",
       "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
@@ -389,8 +388,8 @@
   "nodegrade.com": {
    "app": "NodeGrade (agentready scorecard)",
    "host": "nodegrade.com",
-   "source": "estate_seed",
-   "evidence": "fleet_registry guardian name 'NodeGrade (agentready scorecard)' + Vercel-attached challenge response",
+   "source": "fleet_registry",
+   "evidence": "fleet_registry row webapp:nodegrade.com",
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
@@ -399,9 +398,9 @@
      "evidence": {
       "url": "https://nodegrade.com/",
       "status": 429,
-      "ttfb_ms": 115,
+      "ttfb_ms": 181,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795332510-qXJPzbqnqueho1NgdaHF81oSdwJkeXac",
+      "x_vercel_id": "iad1::1795590731-CaeS9osOKFXvsIR1YCYhnsURbUesUAD7",
       "x_vercel_mitigated": "challenge",
       "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
@@ -414,8 +413,8 @@
   "perilmark.com": {
    "app": "PERILMARK",
    "host": "perilmark.com",
-   "source": "estate_seed",
-   "evidence": "fleet_registry guardian name 'PERILMARK' + repo rentspire-bspain/perilmark + Vercel-attached challenge response",
+   "source": "fleet_registry",
+   "evidence": "fleet_registry row webapp:perilmark.com",
    "checks": [
     {
      "check": "H1 liveness (HTTPS status + TTFB)",
@@ -424,9 +423,9 @@
      "evidence": {
       "url": "https://perilmark.com/",
       "status": 429,
-      "ttfb_ms": 191,
+      "ttfb_ms": 151,
       "server": "Vercel",
-      "x_vercel_id": "iad1::1795332512-SG6DJ3SX1jFcUjGcpe9paDmV7P0NPU5p",
+      "x_vercel_id": "iad1::1795590732-1Dn7xESpetGtBoAk7Dep84YQxaRkIsMd",
       "x_vercel_mitigated": "challenge",
       "note": "Vercel bot-mitigation answered (deployed + TLS-healthy per the domain_uptime rail precedent); the battery is not runnable from this runner \u2014 NOT_MEASURED, excluded from the denominator, never a pass"
      }
