@@ -38,7 +38,7 @@
 <li><strong>API keys:</strong> <code>BoundView API keys</code> from <strong>Settings &rarr; API Keys</strong>. Keys are stored SHA-256 hashed (<code>api_keys.key_hash</code>); revoked or unknown keys return 401. Key holders must be on the same owner/QA allowlist as the web app.</li>
 <li><strong>User JWTs:</strong> the auth project validates the token remotely; locally-decoded JWTs are not trusted.</li>
 </ul>
-<div class="note"><strong>Phase 1 limits (honest):</strong> no usage ledger is written and no credits are charged yet; the distributed rate limiter is a documented hook, not yet enforced infrastructure. Do not build production traffic against this surface until those ship.</div>
+<div class="note"><strong>Phase 1 limits (honest):</strong> no usage ledger is written and no credits are charged yet; the distributed rate limiter is LIVE (a Postgres fixed-window counter keyed to your API key or user, 60 requests/minute by default, Retry-After on 429). Do not build production traffic against this surface until those ship.</div>
 
 <h2>POST /api/search</h2>
 <p><code>query</code> is a non-empty string up to 300 characters. <code>mode</code> defaults to <code>search</code>; <code>quick</code>, <code>search</code>, and <code>deep</code> cap the response at 3, 6, and 12 results respectively — modes change breadth, not a multi-step research budget, and are not guarantees of result count.</p>
