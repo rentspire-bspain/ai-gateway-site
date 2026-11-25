@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Us4LR0UnHp7hxCsYpQovuAXUxIcogJppFzVqwTThEfs=' 'sha256-B4irQKwK/6jlr/uKwkD/4kbMIceD8jmngLqhNUr9tPs=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Us4LR0UnHp7hxCsYpQovuAXUxIcogJppFzVqwTThEfs=' 'sha256-JkP+AmScOGvaGq6YGr3VPd2esWlailc7Ih41wUShoh4=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
@@ -6076,18 +6076,14 @@ function wireCodeCopy(scope) {
 <div id="moduleRoot"></div>
 <script src="/modules/connectors.config.js"></script>
 <script src="/modules/connectors.js"></script>
-<script src="/modules/skills.js"></script>
 <script src="/modules/artifacts.js"></script>
 <script src="/modules/cards.js"></script>
-<script src="/modules/tasks.js"></script>
 <script src="/modules/offerwall-earn.js"></script>
-<script src="/modules/monitors.js"></script>
 <script src="/modules/research.js"></script>
 <script src="/modules/projects.js"></script>
 <script src="/modules/safe-url.js"></script>
 <script src="/modules/siteassets.js"></script>
 <script src="/modules/composerx.js"></script>
-<script src="/modules/skills-actions.js"></script>
 <script src="/modules/plugins.js"></script>
 <script src="/modules/quests-pane.js"></script>
 <script src="/modules/shortcuts.js"></script>
@@ -6100,7 +6096,8 @@ function wireCodeCopy(scope) {
   var FAM = ["settings", "settings-security", "settings-billing", "settings-neurons", "settings-mcp",
              "settings-troubleshooting", "settings-account", "settings-premium", "settings-models",
              "settings-org", "teammates", "usage", "api-docs", "repo-pr", "eval-replay", "automations", "enterprise-admin",
-             "connectors.config", "connectors", "projects", "plugins"];
+             "connectors.config", "connectors", "projects", "plugins",
+             "skills", "skills-actions", "monitors", "tasks"];
   var p = null;
   window.__loadSettingsFamily = function () {
     if (p) return p;
@@ -6127,6 +6124,13 @@ function wireCodeCopy(scope) {
   };
   if (!window.ProjectsUI) window.ProjectsUI = navStub("ProjectsUI");
   if (!window.PluginsUI) window.PluginsUI = navStub("PluginsUI");
+  var taskStub = {
+    open: function () { var a = arguments; window.__loadSettingsFamily().then(function () { window.TasksUI && window.TasksUI.open.apply(window.TasksUI, a); }).catch(console.error); },
+    openInbox: function () { var a = arguments; window.__loadSettingsFamily().then(function () { window.TasksUI && window.TasksUI.openInbox.apply(window.TasksUI, a); }).catch(console.error); },
+    close: function () {}
+  };
+  if (!window.TasksUI) window.TasksUI = taskStub;
+  if (!window.SkillsUI) window.SkillsUI = navStub("SkillsUI");
   (window.requestIdleCallback || function (f) { setTimeout(f, 2500); })(function () {
     window.__loadSettingsFamily().catch(function () {});
   });
