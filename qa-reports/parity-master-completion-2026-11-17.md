@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 22.1%** (app-weighted; unmeasured counts as 0; v41 — batch 28: first-party conversion funnel; status page fully green live) · **measured-only: 39.3%** · 165✅ / 226🟡 / 192🔴 / 794⚪ across 386 line items. Per-app strict: BV 39.9% · TT 27.4% · AG 43.7% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 22.3%** (app-weighted; unmeasured counts as 0; v42 — batch 29: billing disclosure live-verified on both hosts; brand-leak gate 0 leaks) · **measured-only: 39.6%** · 167✅ / 225🟡 / 191🔴 / 794⚪ across 386 line items. Per-app strict: BV 41.0% · TT 27.4% · AG 43.7% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1779,3 +1779,12 @@ Merged under owner authorization: #479 (status-page JS fix) and #481 (batch-27 d
 **Headline after batch: strict 22.1% / measured-only 39.3% (v41)** — session arc since batch 24: 20.2% → 22.1%.
 
 Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision, billing-pane live readback (local/AG sign-in rate-limited this window).
+
+### Batch 29 — billing disclosure live readback + brand-leak gate (2026-11-25, register v42)
+
+- 🟡→✅ **U-TRU-06 (BV)** — the auto-renewal/negative-option disclosure is LIVE-verified at the point of sale on boundview.com (signed in, Settings → Billing): price, monthly term, 30-day trial conversion, and cancel method render above the fold alongside all three plan cards; the same pane verified on ai.spaincos.com (same build). The earlier "sign-in failing" was a test-selector artifact — the boundview.com placeholder is brand-swapped to you@boundview.com; network logs confirmed auth was succeeding.
+- 🔴→✅ **BV-12** — brand separation at serve time: api/bv-render.js applies the brand MAP server-side before the browser sees the HTML, and the v350 brand-leak gate run live now reports **0 leaks across 8 surfaces** (/, /status, /help, /terms, /privacy, /pricing, /docs — logged-out AND logged-in): no /spain/i match in any rendered text, attribute, image src, href, head link, or title.
+
+**Headline after batch: strict 22.3% / measured-only 39.6% (v42)** — session arc since batch 24: 20.2% → 22.3%.
+
+Next queue: passkey e2e (U-ONB-03) via Playwright virtual authenticator, remaining BV/AG 🟡 sweeps. Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision.

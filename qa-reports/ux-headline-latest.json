@@ -1,20 +1,20 @@
 {
- "ts": "2026-11-25T08:01:58+00:00",
- "version": 41,
- "portfolio_strict_pct": 22.1,
- "portfolio_measured_only_pct": 39.3,
+ "ts": "2026-11-25T08:19:36+00:00",
+ "version": 42,
+ "portfolio_strict_pct": 22.3,
+ "portfolio_measured_only_pct": 39.6,
  "apps": {
   "BV": {
-   "strict": 40.0,
-   "measured_only": 53.2,
+   "strict": 41.0,
+   "measured_only": 54.5,
    "coverage": 75.7,
    "counts": {
-    "G": 59,
+    "G": 61,
     "U": 55,
-    "R": 38,
-    "Y": 74
+    "R": 37,
+    "Y": 73
    },
-   "weighted_num": 46400,
+   "weighted_num": 47600,
    "weighted_den": 1160
   },
   "TT": {
