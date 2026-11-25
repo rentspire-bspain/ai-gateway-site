@@ -5,9 +5,14 @@ const CACHE = { at: 0, results: null as any[] | null };
 async function testModel(purpose: string, name: string, provider: string, model: string, use: string) {
   const started = Date.now();
   try {
-    const res = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/call-model`, {
+    // v349: production call-model runs cross-project (dcyj) — probe the REAL fleet, and
+    // authenticate with the outbound gateway token (GATEWAY_TOKEN_B || GATEWAY_TOKEN), not
+    // the service-role key (the service key was only accepted while it happened to equal the
+    // primary token; the 11-23 rotation broke that equality and every lane showed "unauthorized").
+    const cmTok = Deno.env.get("GATEWAY_TOKEN_B") || Deno.env.get("GATEWAY_TOKEN") || "";
+    const res = await fetch(`${Deno.env.get("CALL_MODEL_URL") || "https://dcyjmftriqayqaonitlx.supabase.co/functions/v1/call-model"}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cmTok}`,
       body: JSON.stringify({ purpose, messages: [{ role: "user", content: "Reply with exactly: OK" }], max_tokens: 512 }),
       signal: AbortSignal.timeout(25_000),
     });
