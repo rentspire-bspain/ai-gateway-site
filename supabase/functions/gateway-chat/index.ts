@@ -334,8 +334,12 @@ function buildMemberProfile(p: any): string {
 
 // v89 (audit P0-1): call-model is locked behind a shared gateway token. Env GATEWAY_TOKEN wins; the literal is the deployed fallback.
 const GW_TOKEN: string = Deno.env.get("GATEWAY_TOKEN") || ""; // env only — no compiled-in fallback (rotated 2026-11-10)
+// v349: outbound token for the cross-project call-model (dcyj). GATEWAY_TOKEN_B re-aligns us
+// after dcyj rotated its primary on 11-23 without telling cross-project callers.
+const CM_TOKEN: string = Deno.env.get("GATEWAY_TOKEN_B") || GW_TOKEN;
 const rateMem = new MemoryLimiter();
-const GW_HEADERS: Record<string, string> = { "Content-Type": "application/json", "x-gateway-token": GW_TOKEN };
+const GW_HEADERS: Record<string, string> = { "Content-Type": "application/json", "x-gateway-token": GW_TOKEN }; // inbound gateway-chat auth
+const CM_OUT_HEADERS: Record<string, string> = { "Content-Type": "application/json", "x-gateway-token": CM_TOKEN }; // outbound to call-model (v349)
 
 // ============================================================
 // I6 DEAD-END DETECTOR + I7 SELF-CHECK (inlined from response_quality specs; v95)
@@ -1403,7 +1407,7 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
   const userId = authUser?.id ?? "";
   // v234 PER-USER ATTRIBUTION: every call-model fetch in this handler carries the
   // authenticated user id so the ops ledger + meter attribute cost to the user.
-  const CM_HEADERS: Record<string, string> = { ...GW_HEADERS, ...(userId ? { "x-user-id": userId } : {}) };
+  const CM_HEADERS: Record<string, string> = { ...CM_OUT_HEADERS, ...(userId ? { "x-user-id": userId } : {}) }; // v349: outbound call-model token
 
   // v72: private-site lock — only the owner's account (plus the QA test account)
   // may call this gateway. Everyone else gets a clean 403.

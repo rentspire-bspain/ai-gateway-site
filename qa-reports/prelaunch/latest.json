@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-22T02:22:08+00:00",
+ "ts": "2026-11-25T06:20:01+00:00",
  "base": "https://ai.spaincos.com",
  "passed": 36,
  "failed": 0,
@@ -37,7 +37,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "16.2s"
+   "detail": "2.3s"
   },
   {
    "name": "current-events answered",
@@ -52,7 +52,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "15.4s"
+   "detail": "2.7s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -157,7 +157,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 36/36 checks \u00b7 11/22/2026, 1:12:"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 36/36 checks \u00b7 11/22/2026, 2:22:"
   },
   {
    "name": "Fleet Automations tab renders",
@@ -177,7 +177,7 @@
   {
    "name": "Follow-up chip submits full command",
    "ok": true,
-   "detail": "q=2 msg='FRED release for the updated 10-year constant maturity yield' payload='FRED release for the updated 10-year constant maturity yield'"
+   "detail": "q=2 msg='Build a step-by-step action plan with owners and dates' payload='Build a step-by-step action plan with owners and dates'"
   },
   {
    "name": "zero JS/CSP errors",

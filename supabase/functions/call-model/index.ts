@@ -10,10 +10,16 @@ Deno.serve(async (req) => {
     // v2 auth: env GATEWAY_TOKEN preferred; a compiled-in shared token is the fallback so the
     // endpoint is NEVER open when the env secret is unset (audit P0-1, 2026-11-09).
     const gt = Deno.env.get("GATEWAY_TOKEN") || "";
-    if (gt.length < 32) return new Response(JSON.stringify({ error: "gateway not configured" }), { status: 503, headers: { "Content-Type": "application/json" } }); // fail closed, no compiled-in fallback
+    // v349 SECONDARY TOKEN (incident 2026-11-24: dcyj GATEWAY_TOKEN was rotated 11-23 19:27
+    // without updating cross-project callers — bnx gateway-chat/gateway-status 401'd, killing
+    // the tool loop platform-wide). GATEWAY_TOKEN_B is a SECOND accepted token so a caller
+    // on another project can be re-aligned without touching the primary or any peer's rotation.
+    const gt2 = Deno.env.get("GATEWAY_TOKEN_B") || "";
+    if (gt.length < 32 && gt2.length < 32) return new Response(JSON.stringify({ error: "gateway not configured" }), { status: 503, headers: { "Content-Type": "application/json" } }); // fail closed, no compiled-in fallback
     const auth = req.headers.get("authorization") || "";
     const presented = auth.startsWith("Bearer ") ? auth.slice(7) : req.headers.get("x-gateway-token") || "";
-    if (!safeEqual(presented, gt)) return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
+    const okTok = (gt.length >= 32 && safeEqual(presented, gt)) || (gt2.length >= 32 && safeEqual(presented, gt2));
+    if (!okTok) return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
     const { prompt, model, messages, purpose, max_tokens, stream, reasoning_effort , tools, tool_choice, parallel_tool_calls } = await req.json();
     // THE FREE HOSTED MODELS (no hardware, no cost):
     //   - OpenRouter's free Flint (recursive/flint-v1.0:free) — the coding/agent model
