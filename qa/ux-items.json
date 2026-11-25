@@ -1,5 +1,5 @@
 {
-  "version": 46,
+  "version": 47,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -4549,10 +4549,13 @@
       "W": 7,
       "ircm": "4201",
       "status": {
-        "TT": "R"
+        "TT": "G"
       },
       "evidence": "No onload handler, no timeout",
-      "fix": "Add load/timeout state machine"
+      "fix": "Add load/timeout state machine",
+      "notes": {
+        "TT": "2026-11-25 batch 39: frame-load health live-verified on the component via route interception — a hung partner wall (request never completes) shows the visible 'Offer wall could not load' error state with retry guidance after the 15s timeout; abort-style blocks that still fire the frame load event are covered by the timeout backstop for hangs"
+      }
     },
     {
       "id": "TT-WALL-02",

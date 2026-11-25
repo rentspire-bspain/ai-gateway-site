@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 23.4%** (app-weighted; unmeasured counts as 0; v46 — batch 33: bot-protection probes green; BV landing value prop in PR #500) · **measured-only: 41.1%** · 176✅ / 225🟡 / 182🔴 / 794⚪ across 386 line items. Per-app strict: BV 45.3% · TT 27.4% · AG 45.4% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 23.5%** (app-weighted; unmeasured counts as 0; v47 — batch 39: TT frame-load health verified) · **measured-only: 41.3%** · 177✅ / 225🟡 / 181🔴 / 794⚪ across 386 line items. Per-app strict: BV 45.3% · TT 28.1% · AG 45.4% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1830,3 +1830,11 @@ Blockers unchanged plus two new owner decisions: pricing-page copy reconciliatio
 **Headline after batch: strict 23.4% / measured-only 41.1% (v46)** — session arc since batch 24: 20.2% → 23.4%.
 
 Blockers unchanged (plus pricing-copy reconciliation and analytics service key from batch 32). Pending merge authorization: PRs #498, #499, #500, #501 (SPA 404 state, U-STATE-07), #502 (U-FORM-04 double-submit prevention, verified locally), governed-sql #23 (event taxonomy), #24 (TT error state, U-STATE-03), #25 (TT-BAL-11/TT-PEN-01), and #26 (TT-WALL-07 provider parameter contract: one PROVIDERS map + lock test, wall URL verified identical with a fake config).
+
+### Batch 39 — TT frame-load health verified (2026-11-25, register v47)
+
+- 🔴→✅ **TT-WALL-01 (TT)** — frame-load health live-verified on the component via route interception: a partner wall that never completes loading shows the visible "Offer wall could not load" error state with retry guidance after the 15s timeout (v262 F-03 behavior, now evidenced). Abort-style blocks that still fire the frame's load event are covered by the timeout backstop for hangs.
+
+**Headline after batch: strict 23.5% / measured-only 41.3% (v47)** — session arc since batch 24: 20.2% → 23.5%.
+
+Nine PRs remain queued for merge authorization (ai-gateway-site #498–#502; governed-sql #23–#26). All blockers unchanged.
