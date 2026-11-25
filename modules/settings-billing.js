@@ -39,6 +39,12 @@
       '<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative"><div style="font-weight:700">Max</div><div class="muted">$50 / month</div><div style="margin-top:8px">250,000 pts/day</div><div style="margin-top:8px">Deep Research included</div><button class="sk-btn primary" data-plan="max" style="margin-top:10px;width:100%">Subscribe</button></div>' +
       '<div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:14px"><div style="font-weight:700">Team</div><div class="muted">$20 / seat / month</div><div style="margin-top:8px">Shared spaces + roles</div><button class="sk-btn" data-plan="team" style="margin-top:10px;width:100%">Contact</button></div>' +
       '</div>' +
+      // v334 (U-TRU-06, batch 26): negative-option / auto-renewal disclosure BEFORE purchase —
+      // price, term, and cancel method must be visible at the point of sale (IRCM 4301).
+      '<div id="renewNote" class="muted" style="margin-top:12px;max-width:60ch;border:1px solid var(--border);border-radius:8px;padding:10px 12px">' +
+      '<strong>Auto-renewal terms:</strong> Subscriptions start with a 30-day free trial, then bill the price shown above per month and <strong>auto-renew monthly until you cancel</strong>. ' +
+      'Cancel anytime — in Settings → Billing before your renewal date, or from the link in your receipt email — and you keep access through the paid period. ' +
+      'No cancellation fee. Trials convert automatically unless cancelled before the trial ends.</div>' +
       '<h3 style="margin-top:22px">Invite friends — free credits for both of you</h3>' +
       '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px">' +
       '<div class="muted">Your code:</div><code id="refCode" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:15px">…</code>' +
