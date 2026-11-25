@@ -1,5 +1,5 @@
 {
-  "version": 41,
+  "version": 42,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -2570,7 +2570,7 @@
       "W": 8,
       "ircm": "4301",
       "status": {
-        "BV": "Y",
+        "BV": "G",
         "TT": "-",
         "AG": "-",
         "GH": "-",
@@ -2581,7 +2581,7 @@
       "evidence": "Not evidenced | worker BV 2026-11-22: No negative-option/auto-renew disclosure could be observed for https://boundview.com itself. The retrievable pages resolve only to a similarly named but different service — BondView at join.bondview.com — whose pricing page lists $69/month or $759/year (Investors and Advisors) and $120/month or $1,3 | worker CT 2026-11-22: Fetched comptrove.com plus probes of /terms, /privacy, /help, /sitemap.xml and /robots.txt. The served content is a free rent-comparison data surface only (average rent by bedroom, rent history, comps — e.g. the Austin, TX rent page [[11](https://comptrove.com/m/austin/)]); no pricing page, no check",
       "fix": "Add to checkout; screenshot evidence per state template",
       "notes": {
-        "BV": "2026-11-25 batch 26 (PRs #478 / governed-sql #21): auto-renewal disclosure implemented at point of sale in Settings→Billing (PR #478, code-verified); live pane readback pending"
+        "BV": "2026-11-25 batch 29: auto-renewal disclosure LIVE-verified at the point of sale on boundview.com (Settings→Billing, signed in as eval-bot): price/monthly term/trial conversion/cancel method render above the fold with all three plan cards; also verified on ai.spaincos.com (same build)"
       }
     },
     {
@@ -5422,10 +5422,13 @@
       "W": 8,
       "ircm": "4202",
       "status": {
-        "BV": "R"
+        "BV": "G"
       },
       "evidence": "brand.js scrubs strings at runtime; static files leak",
-      "fix": "See U-TRU-12"
+      "fix": "See U-TRU-12",
+      "notes": {
+        "BV": "2026-11-25 batch 29: brand separation at serve time — api/bv-render.js applies the brand MAP server-side before the browser sees the HTML, and the v350 brand-leak gate (qa/bv-brand-leak.py, run live now) reports 0 leaks across 8 surfaces (/,/status,/help,/terms,/privacy,/pricing,/docs; logged-out AND logged-in): no /spain/i in any rendered text, attribute, src, href, head link, or title"
+      }
     },
     {
       "id": "BV-13",
