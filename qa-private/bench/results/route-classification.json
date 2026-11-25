@@ -1,0 +1,134 @@
+{
+ "https://ai.spaincos.com": {
+  "robots": [
+   200,
+   "User-agent: *\nAllow: /\nDisallow: /t/\nSitemap: https://boundview.com/sitemap.xml\n"
+  ],
+  "unknown_public": {
+   "status": 404,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 404,
+   "title": "ai.spaincos.com \u2014 Where knowledge begins",
+   "canonical": [],
+   "robots_meta": [],
+   "body_sample": "ai.spaincos New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / ",
+   "recovery": true
+  },
+  "unknown_nested": {
+   "status": 404,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 404,
+   "title": "ai.spaincos.com \u2014 Where knowledge begins",
+   "canonical": [],
+   "robots_meta": [],
+   "body_sample": "ai.spaincos New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / ",
+   "recovery": true
+  },
+  "spa_thread": {
+   "status": 200,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 200,
+   "title": "ai.spaincos.com \u2014 Where knowledge begins",
+   "canonical": [],
+   "robots_meta": [],
+   "body_sample": "ai.spaincos New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / ",
+   "recovery": true
+  },
+  "private_qa": {
+   "status": 404,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 404,
+   "title": "ai.spaincos.com \u2014 Where knowledge begins",
+   "canonical": [],
+   "robots_meta": [],
+   "body_sample": "ai.spaincos New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / ",
+   "recovery": true
+  },
+  "private_sql": {
+   "status": 404,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 404,
+   "title": "ai.spaincos.com \u2014 Where knowledge begins",
+   "canonical": [],
+   "robots_meta": [],
+   "body_sample": "ai.spaincos New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / ",
+   "recovery": true
+  }
+ },
+ "https://boundview.com": {
+  "robots": [
+   200,
+   "User-agent: *\nAllow: /\nDisallow: /t/\nSitemap: https://boundview.com/sitemap.xml\n"
+  ],
+  "unknown_public": {
+   "status": 404,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 404,
+   "title": "BoundView",
+   "canonical": [
+    "https://boundview.com/"
+   ],
+   "robots_meta": [],
+   "body_sample": "BoundView New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / co",
+   "recovery": true
+  },
+  "unknown_nested": {
+   "status": 404,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 404,
+   "title": "BoundView",
+   "canonical": [
+    "https://boundview.com/"
+   ],
+   "robots_meta": [],
+   "body_sample": "BoundView New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / co",
+   "recovery": true
+  },
+  "spa_thread": {
+   "status": 200,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 200,
+   "title": "BoundView",
+   "canonical": [
+    "https://boundview.com/"
+   ],
+   "robots_meta": [],
+   "body_sample": "BoundView New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / co",
+   "recovery": true
+  },
+  "private_qa": {
+   "status": 404,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 404,
+   "title": "BoundView",
+   "canonical": [
+    "https://boundview.com/"
+   ],
+   "robots_meta": [],
+   "body_sample": "BoundView New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / co",
+   "recovery": true
+  },
+  "private_sql": {
+   "status": 404,
+   "x_robots": null,
+   "content_type": "text/html; charset=utf-8",
+   "browser_status": 404,
+   "title": "BoundView",
+   "canonical": [
+    "https://boundview.com/"
+   ],
+   "robots_meta": [],
+   "body_sample": "BoundView New Thread Projects Library Artifacts Skills Docs Tasks Hubs Fleet Webapps Plugins Discover RECENT Your research threads will appear here. SPACES / co",
+   "recovery": true
+  }
+ }
+}
