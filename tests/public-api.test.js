@@ -1,5 +1,6 @@
 // Run: node --test tests/public-api.test.js (no credentials or network required).
 process.env.PUBLIC_API_RATE_LIMIT = process.env.PUBLIC_API_RATE_LIMIT ?? '0'; // limiter has its own test below
+process.env.PUBLIC_API_DISTRIBUTED_LIMIT = process.env.PUBLIC_API_DISTRIBUTED_LIMIT ?? '0'; // v351 distributed limiter: unit-tested via its own mock below
 const { test, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const { Readable } = require('node:stream');
@@ -240,4 +241,27 @@ test('per-IP limiter returns 429 with Retry-After after the limit, then recovers
     assert.ok(rateLimit(req) > 0);
     assert.equal(rateLimit({ headers: { 'x-forwarded-for': '203.0.113.10' }, socket: {} }), 0);
   } finally { process.env.PUBLIC_API_RATE_LIMIT = '0'; }
+});
+
+// v351: distributed limiter — RPC allow/deny, fail-open on DB error.
+test('distributed limiter denies when the RPC says no, with Retry-After', async () => {
+  const calls = [];
+  const fakeFetch = async (url, init) => {
+    calls.push(url);
+    return { ok: true, status: 200, json: async () => ({ allowed: false, retry_after: 42 }) };
+  };
+  const mod = require('../api/_lib/public-api.js');
+  process.env.PUBLIC_API_DISTRIBUTED_LIMIT = '10';
+  const wait = await mod.__distributedRateLimitForTest('id-1', fakeFetch);
+  process.env.PUBLIC_API_DISTRIBUTED_LIMIT = '0';
+  if (wait !== 42) throw new Error('expected 42, got ' + wait);
+  if (!calls[0].includes('rpc/api_rate_limit_take')) throw new Error('wrong endpoint: ' + calls[0]);
+});
+test('distributed limiter fails OPEN on DB error', async () => {
+  const fakeFetch = async () => { throw new Error('db down'); };
+  const mod = require('../api/_lib/public-api.js');
+  process.env.PUBLIC_API_DISTRIBUTED_LIMIT = '10';
+  const wait = await mod.__distributedRateLimitForTest('id-2', fakeFetch);
+  process.env.PUBLIC_API_DISTRIBUTED_LIMIT = '0';
+  if (wait !== 0) throw new Error('expected fail-open 0, got ' + wait);
 });
