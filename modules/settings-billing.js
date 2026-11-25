@@ -61,6 +61,30 @@
       '<div id="billNote" class="muted" style="margin-top:10px;max-width:60ch"></div>';
     var balVal = root.querySelector("#balVal"), ledger = root.querySelector("#ledger"), note = root.querySelector("#billNote");
 
+    // v352 (U-PAY-01, batch 32): render plan cards from the canonical /pricing.json
+    // (single source). The embedded constants above stay as the offline fallback and
+    // are kept in sync by qa/pricing-consistency.py.
+    fetch("/pricing.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d || !d.plans) return;
+      var cards = {};
+      root.querySelectorAll("#plans button[data-plan]").forEach(function (b) {
+        var card = b.closest("div");
+        while (card && card.parentElement && card.parentElement.id !== "plans") card = card.parentElement;
+        if (card) cards[b.dataset.plan] = card;
+      });
+      d.plans.forEach(function (p) {
+        var card = cards[p.id];
+        if (!card) return;
+        var price = card.querySelector(".muted");
+        if (price && p.price_monthly) price.textContent = "$" + p.price_monthly + " / month";
+        if (price && p.price_monthly_per_seat) price.textContent = "$" + p.price_monthly_per_seat + " / seat / month";
+        if (p.allowance) {
+          var lines = card.querySelectorAll("div");
+          if (lines[1] && !p.contact) lines[1].textContent = p.allowance;
+        }
+      });
+    }).catch(function () { /* offline-tolerant: fallback constants already rendered */ });
+
     function fmt(n) { return (n >= 0 ? "" : "−") + Math.abs(n).toLocaleString(window.I18N ? window.I18N.locale() : undefined); }
     credits("balance").then(function (d) {
       balVal.textContent = fmt(Number(d.balance || 0) * 10) + " pts";
