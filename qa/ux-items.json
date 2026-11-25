@@ -1,5 +1,5 @@
 {
-  "version": 38,
+  "version": 39,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -2565,7 +2565,7 @@
       "W": 8,
       "ircm": "4301",
       "status": {
-        "BV": "R",
+        "BV": "Y",
         "TT": "-",
         "AG": "-",
         "GH": "-",
@@ -2574,7 +2574,10 @@
         "DG": "U"
       },
       "evidence": "Not evidenced | worker BV 2026-11-22: No negative-option/auto-renew disclosure could be observed for https://boundview.com itself. The retrievable pages resolve only to a similarly named but different service — BondView at join.bondview.com — whose pricing page lists $69/month or $759/year (Investors and Advisors) and $120/month or $1,3 | worker CT 2026-11-22: Fetched comptrove.com plus probes of /terms, /privacy, /help, /sitemap.xml and /robots.txt. The served content is a free rent-comparison data surface only (average rent by bedroom, rent history, comps — e.g. the Austin, TX rent page [[11](https://comptrove.com/m/austin/)]); no pricing page, no check",
-      "fix": "Add to checkout; screenshot evidence per state template"
+      "fix": "Add to checkout; screenshot evidence per state template",
+      "notes": {
+        "BV": "2026-11-25 batch 26 (PRs #478 / governed-sql #21): auto-renewal disclosure implemented at point of sale in Settings→Billing (PR #478, code-verified); live pane readback pending"
+      }
     },
     {
       "id": "U-TRU-07",
@@ -2585,8 +2588,8 @@
       "W": 8,
       "ircm": "4202",
       "status": {
-        "BV": "R",
-        "TT": "R",
+        "BV": "G",
+        "TT": "G",
         "AG": "U",
         "GH": "U",
         "ST": "U",
@@ -2594,7 +2597,11 @@
         "DG": "U"
       },
       "evidence": "No age screen in TT or signup evidence",
-      "fix": "Add DOB or attestation before wall mount"
+      "fix": "Add DOB or attestation before wall mount",
+      "notes": {
+        "BV": "2026-11-25 batch 26 (PRs #478 / governed-sql #21): 18+ attestation gate live-verified locally ahead of consent; wall never mounts before it",
+        "TT": "2026-11-25 batch 26 (PRs #478 / governed-sql #21): age gate verified on the tasks-tab component (localhost:8905): confirm disabled until checked, consent only after"
+      }
     },
     {
       "id": "U-TRU-08",
@@ -3289,16 +3296,21 @@
       "W": 8,
       "ircm": "4301",
       "status": {
-        "BV": "R",
-        "TT": "R",
-        "AG": "R",
+        "BV": "Y",
+        "TT": "Y",
+        "AG": "Y",
         "GH": "R",
         "ST": "U",
         "CT": "R",
         "DG": "U"
       },
       "evidence": "Three values in docs: TT says 1 N ≈ $0.004; pricing doc catalog (500 N = 1,000 credits; 2,500 credits = $1) gives ≈ $0.0008; D5 (2,500 N ≈ $0.25) gives ≈ $0.0001 | worker CT 2026-11-22: Fetched comptrove.com and its implied sub-page surfaces (help/docs/terms). What is served right now identifies Comptrove as a rent-comps product; the only pricing signal observed is a Pro price of $179/month during a launch offer [[1](https://comptrove.com/m/austin/)]. No served page defines 'neuron",
-      "fix": "Decide one constant in earn_actions/model_costs; render from API; legal reviews any $ claim"
+      "fix": "Decide one constant in earn_actions/model_costs; render from API; legal reviews any $ claim",
+      "notes": {
+        "TT": "2026-11-25 batch 26 (PRs #478 / governed-sql #21): single NEURON_USD_EQUIV constant now the only stated dollar equivalent on the component; cross-doc valuation decision pending owner",
+        "BV": "2026-11-25 batch 26 (PRs #478 / governed-sql #21): product copy carries no conflicting $/N claim (earn-only, no cash value); doc reconciliation pending owner decision",
+        "AG": "2026-11-25 batch 26 (PRs #478 / governed-sql #21): same as BV — shared copy surface, no conflicting $/N claim"
+      }
     },
     {
       "id": "U-COPY-04",
@@ -5223,10 +5235,13 @@
       "W": 8,
       "ircm": "3302",
       "status": {
-        "TT": "R"
+        "TT": "G"
       },
       "evidence": "None",
-      "fix": "Per-network eligibility note"
+      "fix": "Per-network eligibility note",
+      "notes": {
+        "TT": "2026-11-25 batch 26 (PRs #478 / governed-sql #21): per-network/state eligibility note rendered and verified on the component"
+      }
     },
     {
       "id": "BV-01",

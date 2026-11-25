@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 21.0%** (app-weighted; unmeasured counts as 0; v38 — batch 25: AG noindex dead-code fix live, robots-policy audit closed, TT consent/GPC/report/dispute port merged) · **measured-only: 37.8%** · 158✅ / 224🟡 / 201🔴 / 794⚪ across 386 line items. Per-app strict: BV 38.0% · TT 25.4% · AG 42.6% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 21.7%** (app-weighted; unmeasured counts as 0; v39 — batch 26: age gates, TT eligibility note, auto-renew disclosure, canonical N valuation constant) · **measured-only: 38.8%** · 161✅ / 228🟡 / 194🔴 / 794⚪ across 386 line items. Per-app strict: BV 39.4% · TT 27.4% · AG 43.0% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1741,3 +1741,17 @@ Owner authorized merging all three queued PRs; merged ai-gateway-site #462 + #46
 **Headline after batch: strict 21.0% / measured-only 37.8% (v38)** — up from 20.2% / 36.7% (v37).
 
 Next autonomous queue: U-COPY-03 currency vocabulary sweep, TT-NW-03 state eligibility copy, U-TRU-06 BV auto-renew copy, U-TRU-07 BV/TT age gate. Blocked: comptrove probes + minutegig DNS (Comet offline / GoDaddy), ST/DG access, E11-2 counsel review.
+
+### Batch 26 — trust gates: 18+ age attestation, auto-renewal disclosure, TT eligibility, N valuation constant (2026-11-25, register v39)
+
+Code PRs: ai-gateway-site #478, governed-sql #21 (awaiting merge authorization alongside docs PR #464).
+
+- 🔴→✅ **U-TRU-07 (BV)** — 18+ attestation gate ahead of the F-01 consent gate in the Tasks/Earn offer wall. Live-verified locally: confirm button disabled until the checkbox is checked; consent row appears only after attestation; ad-network iframe stays unloaded.
+- 🔴→✅ **U-TRU-07 (TT)** — same gate on the tasks-tab component (localhost:8905), verified end-to-end.
+- 🔴→✅ **TT-NW-03 (TT)** — per-network/state eligibility note rendered on the offer surface and verified.
+- 🔴→🟡 **U-TRU-06 (BV)** — auto-renewal/negative-option disclosure implemented at the point of sale (Settings → Billing): price, monthly term, trial conversion, cancel method, no cancellation fee. Code-verified (node --check, module loads clean); live pane readback queued — local eval-bot sign-in currently failing, so the pane was not re-rendered live this batch.
+- 🔴→🟡 **U-COPY-03 (TT/BV/AG)** — the component now states the dollar equivalent in exactly ONE named constant (NEURON_USD_EQUIV) and renders from it; BV/AG product copy carries no conflicting $/N claim (earn-only, no cash value). 🟡 because the cross-doc valuation decision (0.004 vs 0.0008 vs 0.0001) is an owner/legal call, not autonomously decidable.
+
+**Headline after batch: strict 21.7% / measured-only 38.8% (v39)** — up from 21.0% / 37.8% (v38). Session arc since batch 24: 20.2% → 21.7%.
+
+Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend publisher approval. Next autonomous queue: live readback of the Billing pane disclosure once sign-in works, remaining measurable BV/AG/TT sweeps.
