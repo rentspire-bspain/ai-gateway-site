@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-25T06:19:02+00:00",
+ "ts": "2026-11-25T06:48:22+00:00",
  "deploy_id": null,
  "live_build": "v275",
  "passed": 9,
@@ -14,12 +14,12 @@
  },
  "failures": [
   {
-   "id": "status-1",
+   "id": "status-2",
    "kind": "status",
-   "failed": "bare completion claim(s) ['completed'] with no 'Claim check:' caveat and no tool evidence beyond research"
+   "failed": "bare completion claim(s) ['merged', 'shipped', 'went live'] with no 'Claim check:' caveat and no tool evidence beyond research"
   }
  ],
- "secs": 30.8,
+ "secs": 126.6,
  "exit": 1,
  "checks": [
   {
@@ -27,7 +27,7 @@
    "kind": "research",
    "q": "What is the current 30-year fixed mortgage rate in the US?",
    "http": 200,
-   "secs": 4.1,
+   "secs": 19.5,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -41,7 +41,7 @@
    "kind": "research",
    "q": "What is the latest US CPI inflation rate reported by the BLS?",
    "http": 200,
-   "secs": 2.7,
+   "secs": 9.2,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -55,7 +55,7 @@
    "kind": "research",
    "q": "What is the current price of Bitcoin in USD?",
    "http": 200,
-   "secs": 2.4,
+   "secs": 4.4,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -69,12 +69,12 @@
    "kind": "continuation",
    "q": "What is the current US 10-year Treasury yield?",
    "http": "200/200",
-   "secs": 3.6,
+   "secs": 12.4,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
    "commands": [
-    "retrieval decision \u2014 skipped (analyst_no_search)"
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 4 sources"
    ],
    "claim_checks": 0
   },
@@ -83,7 +83,7 @@
    "kind": "continuation",
    "q": "What are this week's top headlines about the Federal Reserve?",
    "http": "200/200",
-   "secs": 3.7,
+   "secs": 17.0,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -97,9 +97,23 @@
    "kind": "status",
    "q": "Confirm the runner jobs are deployed.",
    "http": 200,
-   "secs": 2.4,
+   "secs": 18.8,
+   "ok": true,
+   "failed": "",
+   "worklog_n": 1,
+   "commands": [
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources"
+   ],
+   "claim_checks": 1
+  },
+  {
+   "id": "status-2",
+   "kind": "status",
+   "q": "Confirm PR #96 is merged and deployed to production.",
+   "http": 200,
+   "secs": 20.5,
    "ok": false,
-   "failed": "bare completion claim(s) ['completed'] with no 'Claim check:' caveat and no tool evidence beyond research",
+   "failed": "bare completion claim(s) ['merged', 'shipped', 'went live'] with no 'Claim check:' caveat and no tool evidence beyond research",
    "worklog_n": 1,
    "commands": [
     "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources"
@@ -107,30 +121,16 @@
    "claim_checks": 0
   },
   {
-   "id": "status-2",
-   "kind": "status",
-   "q": "Confirm PR #96 is merged and deployed to production.",
-   "http": 200,
-   "secs": 3.4,
-   "ok": true,
-   "failed": "",
-   "worklog_n": 1,
-   "commands": [
-    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources"
-   ],
-   "claim_checks": 2
-  },
-  {
    "id": "fact-1",
    "kind": "fact",
    "q": "What is the capital of France? One sentence.",
    "http": 200,
-   "secs": 2.1,
+   "secs": 5.4,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
    "commands": [
-    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources"
+    "retrieval decision \u2014 skipped (analyst_no_search)"
    ],
    "claim_checks": 0
   },
@@ -139,12 +139,12 @@
    "kind": "fact",
    "q": "What is the chemical symbol for gold and its atomic number? One sentence.",
    "http": 200,
-   "secs": 2.4,
+   "secs": 2.6,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
    "commands": [
-    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources"
+    "retrieval decision \u2014 skipped (analyst_no_search)"
    ],
    "claim_checks": 0
   },
@@ -153,7 +153,7 @@
    "kind": "doc",
    "q": "Create a markdown document named eval-replay-checklist.md with a 3-step release readiness checklist (Gate A, Gate B, Gate C) using create_file and attach it.",
    "http": 200,
-   "secs": 4.0,
+   "secs": 16.8,
    "assets": [
     "eval-replay-checklist.md"
    ],
@@ -161,7 +161,7 @@
    "failed": "",
    "worklog_n": 2,
    "commands": [
-    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources",
+    "retrieval decision \u2014 skipped (analyst_no_search)",
     "attach files \u2014 1 file(s)"
    ],
    "claim_checks": 1
