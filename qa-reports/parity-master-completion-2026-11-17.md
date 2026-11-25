@@ -1713,3 +1713,7 @@ All four PRs await owner authorization (merge order 454 → 455 → 456 → 457)
 
 - 🟡 U-PERF-14 (TT) 🔴→🟡 — code inspection of the merged tasks-tab component: polling and wall-load failures are offline-tolerant (errors keep last-known values; auth loss shows a visible sign-in state); the component inherits the host's offline shell when embedded (host U-PERF-14 ✅ on BV/AG).
 - ✅ Stack health: all five pending PRs (#454–#458) verified MERGEABLE against current master — no drift from the parallel session; merge order 454 → 455 → 456 → 457 → 458.
+### Batch 23 — GH mockup FTC disclosure verified (2026-11-25, register v36)
+
+- ✅ U-TRU-05 (GH) 🟡→✅ — code inspection of the deployed mockup's source (gig-hub-mockup/index.html): conspicuous FTC material-connection disclosure present ("FTC-disclosed partner offers" label + referral-fee/earn-only/no-cash-out/caps copy).
+- Stack health: all six pending PRs (#454–#459) still MERGEABLE against current master.
