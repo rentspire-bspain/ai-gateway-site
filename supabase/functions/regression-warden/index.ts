@@ -26,6 +26,14 @@ const FAST_CHECKS = [
   { name: "brand_bv_help", kind: "brand", url: "https://boundview.com/help" },
   { name: "brand_bv_pricing", kind: "brand", url: "https://boundview.com/pricing" },
 ];
+const ESTATE_CHECKS: any[] = [
+  // v355 FULL-ESTATE COVERAGE: the dcyj project (the estate's 329-function runtime:
+  // harvest runners, monitors, fleet dispatch). These were invisible to every gate.
+  { name: "estate_fleet_status", kind: "url_200", url: "https://dcyjmftriqayqaonitlx.supabase.co/functions/v1/fleet-status" },
+  { name: "estate_launch_health", kind: "estate_launch" },
+  { name: "storage_public_buckets", kind: "db_buckets" },
+  { name: "gateway_latency_anomaly", kind: "latency" },
+];
 const DEEP_CHECKS: any[] = [
   { name: "db_warden_ledger_writable", kind: "db_write" },
   { name: "db_rls_public_tables", kind: "db_rls" },
@@ -120,6 +128,27 @@ async function runCheck(c: any, ctx: any): Promise<{ ok: boolean; detail: string
       const failing = (d || []).filter((j: any) => j.last_status && j.last_status !== "succeeded");
       return { ok: failing.length === 0, detail: failing.length ? `cron jobs failing: ${failing.map((j: any) => j.jobname).join(",")}` : `${(d || []).length} cron jobs healthy` };
     }
+    if (c.kind === "estate_launch") {
+      const r = await fetch("https://dcyjmftriqayqaonitlx.supabase.co/functions/v1/launch-health", { signal: AbortSignal.timeout(30_000) });
+      const d = await r.json().catch(() => null);
+      const ok = r.ok && d?.ok === true;
+      return { ok, detail: ok ? "estate launch-health ok" : `estate launch-health failures: ${(d?.failures || ["unreadable"]).slice(0, 5).join(", ")}` };
+    }
+    if (c.kind === "db_buckets") {
+      const r = await fetch(`${SB}/rest/v1/rpc/warden_bucket_audit`, { method: "POST", headers: ctx.h, body: "{}", signal: AbortSignal.timeout(15_000) });
+      if (!r.ok) return { ok: false, detail: `bucket audit HTTP ${r.status}` };
+      const n = Number(await r.text());
+      return { ok: n === 0, detail: n === 0 ? "no unexpectedly-public storage buckets" : `${n} public buckets (check exposure intent)` };
+    }
+    if (c.kind === "latency") {
+      // v355 LATENCY ANOMALY: gateway-status lane latencies recorded in the ledger; a lane
+      // p50 above 8s or a jump >2.5x versus the previous run is drift (the 546 class showed
+      // exactly this signature: +12s under worker overlap).
+      const r = await fetch(`${SB}/functions/v1/gateway-status`, { signal: AbortSignal.timeout(60_000) });
+      const d = await r.json();
+      const maxLat = Math.max(...(d.results || []).map((x: any) => x.latency_ms || 0));
+      return { ok: maxLat < 8000, detail: `slowest lane ${maxLat}ms (guard 8s)` };
+    }
     if (c.kind === "db_count") {
       const r = await fetch(`${SB}/rest/v1/${c.table}?${c.filter}&select=id`, { headers: ctx.h, signal: AbortSignal.timeout(15_000) });
       const rows = r.ok ? await r.json() : [];
@@ -186,7 +215,7 @@ Deno.serve(async (req) => {
     if (id) ctx.tok = await mintToken(anon, id.email, id.password);
   }
   const runAt = new Date().toISOString();
-  const checks = deep ? [...FAST_CHECKS, ...DEEP_CHECKS] : FAST_CHECKS;
+  const checks = deep ? [...FAST_CHECKS, ...DEEP_CHECKS, ...ESTATE_CHECKS] : FAST_CHECKS;
   const results: any[] = [];
   const transitions: any[] = [];
   for (const c of checks) {
