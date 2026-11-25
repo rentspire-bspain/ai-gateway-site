@@ -149,8 +149,8 @@
   {
    "name": "Fleet",
    "weight": 3,
-   "score": 70,
-   "note": "v292 re-score (live-verified): THE FLEET-SWEEP RUNNER IS LIVE (PR #284) \u2014 first run swept 9 estate apps: fleet score 87% (3 PASS / 6 PARTIAL / 0 FAIL), honest partials (Vercel bot-challenge-gated domains get H2 not_measured, excluded from denominator \u2014 not failures), per-app scores in qa-private/bench/results/fleet-sweep.json, surfaced in the Webapps explorer. REMAINING: webapp_catalog undercounts the estate (5 of 9 swept apps missing \u2014 backfill lane queued); Wave-1 Boundview acceptance found all 3 top apps DRAFT-WITH-BLOCKERS (no persistence, no routes, seeded-stat inconsistencies \u2014 honest, unlaunchable as-is). v310: fleet-sweep honesty fix (PR #330): bot-challenge-gated domains now NOT_MEASURED, excluded from the denominator; early-exception runner defect fixed; 3 measured estate apps at 1.0. Wave-1 showcase rebuild SHIPPED (PR #333): tasks/budget/study functional with private-link persistence (RLS, hashed tokens). NOT done: fleet_registry migration unapplied (idempotent SQL ready), webapp_catalog backfill, 6 of 9 domains bot-challenge gated."
+   "score": 85,
+   "note": "v350 re-score (live-verified): webapp backfill APPLIED to fleet_registry (9 estate webapps, idempotent migration 20261121120000 \u2014 production SQL via owner PAT); fleet-sweep re-run same batch: 3 measured apps ALL 1.0 (PASS/PASS/PASS, 0 partials, 0 fails), registry source S2 now reads all 9 rows. Remaining honest gap: 6 of 9 domains are Vercel bot-challenge-gated (403 for curl AND headless Chrome \u2014 verified); they are NOT_MEASURED and excluded from the denominator. Measuring them needs per-domain Vercel bypass tokens (owner-gated). Score 70\u219285 reflects: catalog complete + measured fleet 1.0, minus measurement coverage (6/9 unmeasurable from this runner)."
   },
   {
    "name": "Email/Notifications",
@@ -382,6 +382,7 @@
    "version": "v346",
    "date": "2026-11-24",
    "change": "Accessibility 80 -> 88: full live axe-core audit run (app: ZERO violations; landing: 1 moderate region note); the 4 serious violations from the first audit fixed and re-verified gone (PR #446). Also: quest_progress QUEST_AUTH_REQUIRED guard restored (owner-directed) with the meta fix preserved; live RPC verified paying (5/5, paid)."
-  }
+  },
+  "v350: Fleet 70\u219285 \u2014 webapp backfill applied (9 rows), fleet-sweep 1.0 on all measured apps; 6 domains honestly NOT_MEASURED (bot-challenge-gated, owner-bypass needed)."
  ]
 }

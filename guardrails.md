@@ -65,3 +65,9 @@ The `shmt_ontology_control` tracker receipt (ops.ontology_tracker_receipt) must 
 | DDL out-of-path audit | 🟡 1,825 events/24h — mostly recurring Supavisor ALTER churn on operational tables; the audit view is the guard, volume is the watch metric |
 
 <sub>Created with [Perplexity](https://www.perplexity.ai/computer/tasks/3fe340fb-38e8-40e8-9a42-b96efa46136c)</sub>
+
+## v350 — Cross-project token discipline + brand separation (incident-driven, 2026-11-25)
+
+1. **NEVER rotate a Supabase GATEWAY_TOKEN on a project whose call-model is called cross-project** (call-model lives on dcyj; bnx callers present the token). The 11-23 rotation caused a 34h silent all-lane 401 outage. Re-alignment path: set `GATEWAY_TOKEN_B` on BOTH projects (secondary accepted token, call-model v57+); the bnx deploy bundles carry a compiled-in fallback until the env secret is set.
+2. **Every shared JSON rendered on boundview.com must be brand-audited.** The estate fleet-sweep JSON leaked internal app names on the public BoundView status page. The prelaunch brand-leak gate (Playwright, 8 surfaces) now enforces zero cross-brand strings in the rendered UI.
+3. **Every gate must assert lane health, not just answer quality.** The prelaunch lane-health canary (gateway-status all-pass) exists because a dead tool loop hid behind green Perplexity-lane benchmarks for 34 hours.
