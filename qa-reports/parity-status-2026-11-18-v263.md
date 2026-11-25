@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v355)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v355b)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3437,3 +3437,13 @@ warden_playbooks: known failure signatures with remediations (seeded: all-lanes-
 1. Deploy PAT → Supabase secrets: unlocks warden auto-rollback (redeploy last-known-good gateway bundle on persistent lane failure).
 2. GATEWAY_TOKEN_B as env secret on both projects: replaces the deploy-bundle token fallback with clean env auth.
 3. PUBLIC_API_AUTH_SERVICE_ROLE_KEY → Vercel: activates API-key auth + the distributed rate limiter in production.
+
+---
+
+## Addendum 71 — v355b (2026-11-25): guardrails tightened again — and the proof repeated
+
+- **Deep lane cadence: every 15 minutes → EVERY 5 MINUTES** (cron job 18). Fast lane stays at every minute. Total autonomous check executions: ~360 fast runs/day × 15 checks + ~288 deep runs/day × 23 checks.
+- **Brand sweep widened 4 → 8 BoundView pages** (terms, privacy, docs, docs/api added) plus a status check on /docs/api.
+- **The proof repeated itself within minutes of widening the sweep:** the new /docs/api check caught a live brand leak — boundview.com/docs/api was serving the ai.spaincos variant to every non-JS client (the vercel rewrite bypassed the host-aware middleware; first fix used the wrong routing key, caught by re-checking, corrected to the legacy routes array). Fixed and verified clean on both domains: bv /docs/api 0 spain-mentions, ai /docs/api intact.
+- **Fast lane: 15/15, deep lane: 23 checks** — the only persistent failure anywhere is the dcyj estate harvest feed (issue #510, auto-filed, being worked).
+- Standing proof points of the warden to date: 6 anon-readable tables locked down, the estate harvest drift surfaced and filed, the /docs/api brand leak caught and fixed, one warden self-bug caught and corrected. All within one day of the warden going live.
