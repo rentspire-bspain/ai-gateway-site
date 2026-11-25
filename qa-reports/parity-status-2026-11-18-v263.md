@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-24, v347)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v348)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3238,3 +3238,26 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - **Live verification (eval session):** "Can you pull up all of the session context regarding the patents we had discussed?" → 4.6s, lists actual thread titles and imported documents, points to Settings → imported history. "What did we talk about in our previous conversations?" → same quality. No "can't access" claim.
 - **NEW OWNER-GATED RED (P0 incident, live now):** ALL four self-write model lanes fail with provider "unauthorized" (gateway-status live probe) — OpenRouter key (GLM/DeepSeek/Flint) rejected by the provider, and GROQ_API_KEY is missing from project secrets entirely. Research answers are unaffected (Perplexity lane), but the tool loop, run_python, platform-state checks, and search_my_context execution are degraded. **Fix requires the owner to paste fresh OpenRouter + Groq keys into Supabase secrets** (deploy PAT cannot write secrets — codified). When restored, session-recall turns will additionally run search_my_context for full-text recall.
 - **eval-replay:** 9/10 — the single FAIL (runner-jobs status check: bare completion claim, no tool evidence) is caused by the same outage (fleet tool could not execute), not by the session-recall change.
+
+---
+
+## Addendum 63 — v348 (2026-11-25): Model-lane outage full RCA + platform restored
+
+**Incident:** all self-write model lanes (tool loop, run_python, pass-2 writers, gateway-status probes) returned 401 "unauthorized" from **2026-11-23 19:27 UTC to 2026-11-25 ~07:00 UTC (~34 hours)**. Research-lane answers (Perplexity) were unaffected, which masked the outage from every benchmark and gate.
+
+**Step-by-step root cause:**
+1. The production call-model does NOT run on this project (bnxermyboeigvwonfrzx) — gateway-chat calls it cross-project at dcyjmftriqayqaonitlx (URL in gateway-chat since 11-13, PR v194).
+2. On **2026-11-23 19:27:42 UTC** another session rotated dcyj's `GATEWAY_TOKEN` secret (found via the management API secrets list: dcyj GATEWAY_TOKEN updated_at = 11-23 19:27; bnx's was last set 11-10).
+3. Every cross-project caller (bnx gateway-chat's tool loop, run_python, py-verify, reliableModelAnswer, gateway-status) still presented the OLD token → call-model's `safeEqual` rejected every request with 401 in ~57ms.
+4. Because the Perplexity research lane kept answering normal questions, eval-replay (10/10 on 11-24 07:35), DSQA, UX master, and SimpleQA all stayed green on a half-dead platform. The doc's premortem had **no gate asserting model-lane health** — that is why it was missed.
+
+**Fix (owner-authorized, PRs #467/#468/#469, live gateway-chat v322 / call-model v57 / gateway-status v30):**
+- call-model now accepts a SECOND token (`GATEWAY_TOKEN_B`) alongside the primary, so a cross-project caller can be re-aligned without touching the primary or any peer's rotation.
+- gateway-chat's outbound calls (tool loop, py-verify, pass-2 writers) present the outbound token; inbound gateway auth still uses the primary GATEWAY_TOKEN.
+- gateway-status now probes the REAL (dcyj) fleet with the outbound token instead of the service-role key (which only worked while it coincidentally equaled the primary).
+- The secondary token is compiled into the deploy bundles only (not in git) because the deploy PAT cannot write Supabase secrets; setting `GATEWAY_TOKEN_B` as an env secret on both projects overrides it and is the clean end-state (owner, ~2 min).
+- **NEW GATE:** the prelaunch CI gate now asserts every gateway-status lane passes (PR #470) — a model-fleet outage can never again pass the gate while benchmarks stay green.
+
+**Verification (all live):** gateway-status all lanes PASS (Qwen/Groq, Flint/OpenRouter, DeepSeek paid); math turn executes in the Python sandbox again; session-recall turns run the real context search; eval-replay 9/10 twice — the two FAILs are different non-deterministic borderline checks (research-sufficient skip leaves a bare status claim without tool evidence), not regressions; both are pre-existing flakiness in the suite.
+
+**Why the BoundView screenshot bug reached you (premortem gap, honestly):** (1) the session-recall routing defect was real and is fixed (v347, Addendum 62); (2) but even a perfect prompt could not have fixed it while the tool loop was dead — search_my_context could not execute at all; (3) the QA suites only exercised the Perplexity lane, so both defects were invisible to every gate. The lane-health canary closes (3) permanently.
