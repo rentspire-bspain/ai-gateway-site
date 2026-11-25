@@ -8,7 +8,10 @@ on:
   push:
     branches: [master]
   schedule:
-    - cron: "7 * * * *"
+    # v355 owner directive: near-constant monitoring — the fast pure-HTTP sweep
+    # runs every 5 minutes (GitHub Actions floor); deep Playwright checks stay
+    # on their own hourly schedules (perf-budget.yml, brand-leak).
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:

@@ -1847,3 +1847,43 @@ Nine PRs remain queued for merge authorization (ai-gateway-site #498–#502; gov
 **Headline after batch: strict 23.6% / measured-only 41.3% (v48)** — session arc since batch 24: 20.2% → 23.6%.
 
 Ten PRs now queued for merge authorization (ai-gateway-site #498–#502; governed-sql #23–#27). Blockers unchanged.
+
+## PART F — INFRASTRUCTURE GUARDRAILS PROGRAM (v355, owner directive 2026-11-25)
+
+**Owner directive:** near-constant monitoring across the full estate — web apps, database, ontology, schema, health, analytics. No drift/error/bug may wait a day to be seen. Self-improvement required: every incident must end in a new codified gate.
+
+### F0 — Layered monitoring architecture
+
+| Layer | Cadence | Scope | Mechanism | On failure |
+|---|---|---|---|---|
+| L0 CI gates | every PR + push (seconds) | CSP hashes, pricing single-source, register/doc drift, module syntax, perf budget | `.github/workflows/qa-gates.yml` + `perf-budget.yml` (merge-blocking) | merge blocked |
+| L1 fast monitor | **every 5 minutes** | health endpoint, both hosts 200, static SEO heads (title/description/canonical/JSON-LD), AG static noindex, brand-leak in raw HTML, robots.txt + sitemap, pricing.json when shipped | `qa/live-sweep.py` via `qa-gates.yml` schedule (pure HTTP, no browser) | auto-filed `regression` issue → closure loop picks it up within one 15-min run |
+| L2 deep monitor | hourly | full Playwright prelaunch suite, brand-leak gate (logged-out + logged-in, 8 surfaces), CLS/LCP budgets, request-count budget, status-page live checks | `perf-budget.yml` + `bv-brand-leak.py` on schedule | auto-filed `regression` issue |
+| L3 data/schema layer | hourly, moving to continuous | DB schema snapshot diff vs migrations, ontology registry doctrine gate, RPC contract tests (credits reserve/settle/refund, neurons-claim, postback idempotency), ledger integrity verify, analytics event-taxonomy sync | governed-sql `_tests/` + `monitors/` + `ops-health/` + `gateway-status` (already server-side) | regression issue + loop |
+| L4 self-healing | every 15 minutes | the master-doc closure automation consumes the `regression` issue queue, diagnoses, opens a fix PR for known deterministic failure classes (CSP drift, copy drift, module 404, SEO-head regressions, gate failures) | automation `9e3dc488` + deterministic fix patterns | fix PR + postmortem |
+| L5 integrity invariants | always | headline computed never hand-summed (`register-drift-check.py`), doc (vNN) == register version, idempotent ledgers, fire-and-forgage analytics never block user paths, no silent catches without visible state | CI-enforced | merge blocked |
+
+### F1 — Silent-failure elimination rules (codified)
+
+1. Every `catch` in edge functions must either (a) log, (b) degrade visibly in the UI, or (c) be annotated with why silence is correct (e.g. never-fail-over-analytics).
+2. Every poll loop must have a visible failure state (the TT connection-issue pattern — 2 consecutive failures → visible state + retry).
+3. Every scheduled job must heartbeat: the fast monitor writes a pass/fail trail; a missed heartbeat is itself a failure signal.
+4. Every gate must be CI-enforced — a gate that only runs when remembered is not a gate (owner rule, F0/L0).
+
+### F2 — Self-improvement loop (the incident → gate pipeline)
+
+Every `regression` issue closure requires one of: a new CI gate, a new lock test, a new live-sweep check, or a written justification of why the existing gate suffices. Incidents feed the gate library, so the same bug class can never recur silently. Current gate library: csp-hash-check, pricing-consistency, register-drift-check, event-taxonomy sync, provider-map lock, postback-notifications lock, perf-budget, brand-leak, prelaunch, contract_neurons_claim, offerwall idempotency (143-request simulation), purchase analytics.
+
+### F3 — Escalation ladder
+
+5 min: fast monitor catches → 15 min: closure loop diagnoses + fix PR → 60 min: deep monitor confirms fix + regression issue closed with a new gate if a new failure class → 24 h: no regression may remain open without an owner-note explaining why.
+
+### F4 — Execution status (2026-11-25)
+
+- ✅ L0 CI gates shipped (qa-gates.yml, PR #498): CSP, pricing, drift, syntax — run on every PR
+- ✅ L1 fast monitor shipped at 5-minute cadence (qa-gates.yml schedule, live-sweep.py: 10 PASS against production now)
+- ✅ L5 drift guard shipped (register-drift-check.py: doc/register version + computed headline integrity)
+- 🟡 L2 hourly deep: components exist (perf-budget, brand-leak, prelaunch) — schedule wiring rides on the qa-gates merge
+- 🟡 L3 data/schema hourly sweep: governed-sql test suite + monitors exist; a single scheduled runner wrapping them is the next increment
+- 🟡 L4: closure loop live (15-min floor); regression-issue consumption is this loop's standing rule from this batch forward
+- 🔴 Continuous (sub-5-min) in-process monitoring needs an always-on runner (Vercel cron floor is 1 min; GitHub Actions floor ~5 min) — a dedicated edge heartbeat function is the escalation path when owner approves
