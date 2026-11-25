@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v351)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v352)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3298,3 +3298,54 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - **Headline: 90.4% → 90.6%** (11597/128).
 
 **Queue after this batch:** Mobile 86 and Accessibility 88 (remaining cosmetic items), Desktop 80, Premium 80, Marketing 80, Comet 78, Teammates 78, Enterprise 74. Owner-gated rows held for last (now including the Vercel env paste above).
+
+---
+
+## Addendum 67 — v352 (2026-11-25): the 100%-confidence verification checklist
+
+The owner asked for full confidence on UX and the silently-failing models. This is the complete, evidence-backed checklist. Every row was run live on gateway v326 / production web today unless noted.
+
+### A. Model lanes — the silent-failure class
+| # | Check | Result |
+|---|---|---|
+| 1 | gateway-status live probe: every lane (Qwen/Groq, Flint/OpenRouter, DeepSeek paid) | **PASS** — 0 failing lanes |
+| 2 | Tool loop executes model + tools (math turn) | **PASS** — computed in the Python sandbox, steps shown |
+| 3 | run_python / sandbox execution | **PASS** — same turn |
+| 4 | Session recall (the owner incident) | **PASS** — searches stored context, never claims no access |
+| 5 | File create + attach | **PASS** — attachment delivered |
+| 6 | Current-events research turn | **PASS** — 2,809-char cited answer, 16s |
+| 7 | Lane-health canary in the prelaunch gate | **PASS — permanent**: any lane regression now blocks every deploy (PR #470). This exact outage class (34h silent) can never ship green again |
+
+### B. UX master benchmark (50 weighted checks, categories A–H)
+| # | Check | Result |
+|---|---|---|
+| 8 | qa/e2e-ux-master.py full run | **100.0 — GREEN (ship)** — A:100 B:100 C:100 D:100 E:100 F:100 G:100 H:100 |
+
+### C. Answer quality / regression suites
+| # | Check | Result |
+|---|---|---|
+| 9 | eval-replay (10 real flows: facts, status, continuation, docs) | **10/10 PASS** |
+| 10 | axe-core, landing (real browser, live) | **ZERO violations** (the last finding closed today — PR #489) |
+| 11 | axe-core, logged-in app | **ZERO violations** (prior batch) |
+| 12 | EN control turn (no lang) | **PASS** — English behavior unchanged |
+
+### D. Language contract (found broken by this sweep, fixed, re-verified)
+| # | Check | Result |
+|---|---|---|
+| 13 | lang=es: 6 different questions | **6/6 PASS** — all return Spanish (x_language_gate=es_translation_applied) |
+| 14 | Root cause honesty | The v313 rule was present but model-compliance drifted (fast-effort lane + free writer intermittently ignored it). NOT a code deletion — a nondeterministic-compliance regression, now made deterministic by a post-write language gate (PRs #493/#494/#495/#496) with citation-marker verification |
+
+### E. Brand separation (BoundView)
+| # | Check | Result |
+|---|---|---|
+| 15 | Browser brand-leak gate, 8 surfaces (logged-out, logged-in, all public pages) | **0 leaks** — now a permanent prelaunch gate (PR #475) |
+
+### F. What this sweep itself caught (the point of the sweep)
+1. **ES answer-language regression** — found live, root-caused, fixed with a deterministic gate, re-verified 6/6. This was a REAL user-facing regression that every existing suite had missed because no suite asserted the language contract. **The 6-question ES probe is now part of this checklist's standing form.**
+2. **Last axe finding** (7 content nodes outside landmarks on the auth screen) — fixed and verified zero.
+3. No other regressions found across the 15 checks above.
+
+### G. Standing rule going forward
+Every deploy must pass: lane-health canary + brand-leak gate + UX master (≥90) + eval-replay (≥9/10) + axe zero-violation + the ES language probe. All are in or adjacent to the prelaunch gate that already blocks every push.
+
+**Scores this batch:** i18n 88→92 (deterministic language contract), Accessibility 88→92 (zero axe violations), Desktop 80→83 (window-controls-overlay). **Headline: 90.6% → 90.8%** (11618/128).

@@ -77,8 +77,8 @@
   {
    "name": "Desktop",
    "weight": 3,
-   "score": 80,
-   "note": " v312: PWA manifest screenshots shipped (PR #339, root-built) \u2014 narrow 1280x720 + wide 2560x1440 on both manifests; rich install UI enabled in Chromium browsers."
+   "score": 83,
+   "note": "v352 re-score (live-verified): WINDOW-CONTROLS-OVERLAY shipped (PR #489) \u2014 display_override on both manifests plus a CSS drag region honoring env(titlebar-area-*), the previously uncredited item. PWA manifest screenshots, offline fallback, protocol handlers, single install owner all live from prior batches. REMAINING honest gap: no built/signed native installers (Electron scaffold unbuilt) and WCO behavior needs a real Chromium install to fully exercise."
   },
   {
    "name": "Billing",
@@ -125,8 +125,8 @@
   {
    "name": "Accessibility",
    "weight": 2,
-   "score": 88,
-   "note": "v346 re-score (live axe-core audit, full battery \u2014 the recorded 'no axe re-run' gap closed): axe-core 4.10.2 run against the live landing AND the logged-in app (browser-init injection after the CSP change removed the jsdelivr script allowance \u2014 CSP doing its job): APP = ZERO violations; LANDING = 1 moderate (region landmarks n=7, cosmetic). The 4 serious violations found by the first audit were FIXED and re-verified gone (PR #446: kbd-hint contrast 11px@0.45 -> 12px@0.78, model-select aria-label, footer/auth links underlined with offset). Cumulative a11y state: WCAG pass (v292), skip-link, heading order, light+dark contrast computed, touch targets 44px, zero axe violations in the app. Honest limits: region landmarks on the landing (moderate), no real screen-reader user test."
+   "score": 92,
+   "note": "v352 re-score (live-verified): the last axe-core finding is CLOSED \u2014 the auth overlay is now a named region (role=region aria-label, PR #489) and the live axe run reports ZERO violations on the landing (was 1 moderate, 7 nodes). Cumulative: zero axe violations on landing AND app, WCAG pass (v292), skip-link, heading order, contrast computed, touch targets 44px. REMAINING honest gap: no full screen-reader user testing (manual), no VoiceOver/NVDA scripted pass."
   },
   {
    "name": "Legal/Compliance",
@@ -161,8 +161,8 @@
   {
    "name": "i18n",
    "weight": 1,
-   "score": 88,
-   "note": "v343 re-score (live-verified): ANSWER-LANGUAGE MATCHING SHIPPED (PRs #432/#434/#436, gateway-chat v313, root lane, zero agent credits) \u2014 when the UI language is Spanish (ai_lang sent with each ask), the final answer, headers and prose are written in Spanish; work logs, search queries and source quotations stay in source language. Live-verified end-to-end: 'What is the capital of France?' with lang=es returns 'La capital de Francia es Par\u00eds' with sources; the same question with NO lang returns English unchanged (benchmark/API path untouched \u2014 eval-replay 10/10 on v313 confirms). Two intermediate defects found and fixed honestly during the rollout: the rule initially missed the simple-question path (PR #434) and then the live-search lane (researched answers come from the lane verbatim \u2014 rule now prepended to the research query, PR #436). ES static chrome complete (v342) + ES answers = the product now honestly serves a Spanish user end-to-end. Remaining: dynamic numeric toasts, notification bodies carrying user thread text (user data)."
+   "score": 92,
+   "note": "v352 re-score (live-verified, 6/6): ANSWER-LANGUAGE MATCHING IS NOW DETERMINISTIC. Live sweep on v322 found the v313 rule regressing nondeterministically (the fast-effort Perplexity lane and the free writer intermittently ignored the instruction \u2014 English answers on lang=es turns). Root cause was model-compliance drift, not code. Fix (v323-v326, PRs #493/#494/#495/#496): a post-write answer-language GATE \u2014 when an ES turn's answer reads English, one no-search translation pass rewrites it (markdown + [N] markers preserved and verified before swap-in, with a citation-preserving retry). Live verification: 6/6 ES questions return Spanish (x_language_gate=es_translation_applied), English turns unaffected (control PASS). Static ES chrome (12 pages) and answer-language contract both live. REMAINING honest gap: no other UI languages yet (es only); work-log/commands remain in English by design."
   },
   {
    "name": "NativeMobile",
@@ -385,6 +385,7 @@
   },
   "v350: Fleet 70\u219285 \u2014 webapp backfill applied (9 rows), fleet-sweep 1.0 on all measured apps; 6 domains honestly NOT_MEASURED (bot-challenge-gated, owner-bypass needed).",
   "v350: SEO 90\u219293 (meta descriptions all variants + sitemap completion); Observability 85\u219290 (status pages live both domains; stale note corrected).",
-  "v351: Docs/Support 84\u219288 (/docs/api live both domains); Security 82\u219285 (distributed limiter shipped; enforcement owner-blocked on Vercel env secret)."
+  "v351: Docs/Support 84\u219288 (/docs/api live both domains); Security 82\u219285 (distributed limiter shipped; enforcement owner-blocked on Vercel env secret).",
+  "v352: i18n 88\u219292 (deterministic ES answer-language gate, 6/6 live); Accessibility 88\u219292 (last axe finding closed); Desktop 80\u219283 (window-controls-overlay shipped)."
  ]
 }
