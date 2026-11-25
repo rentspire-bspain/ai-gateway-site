@@ -119,8 +119,8 @@
   {
    "name": "Security",
    "weight": 4,
-   "score": 82,
-   "note": "v291b re-score: the four security headers now LIVE on function-routed paths too (bv-render carries them; vercel.json headers alone do not reach function routes \u2014 found and fixed). CSP+hashes, HSTS, invite-only, RLS present. REMAINING GAPS: no pen test, no distributed rate limit. v310 (PR #328, curl-verified live on ai.spaincos.com and boundview.com): nosniff/XFO/Referrer/Permissions plus frame-ancestors, object-src, base-uri headers now on static assets, sw.js, manifest and /api/*; internal source dirs (/qa, /browser-service, etc.) return 404; per-IP limiter on public POST API returns 429 with Retry-After (best-effort, per instance). Secret scan of tracked deployable files found only public Supabase publishable keys. NOT verified: browser behavior, distributed rate limiting, pen test. privacy/terms/docs/verify/offline have no page CSP; HSTS preload, includeSubDomains and external scanning are owner-gated; style-src unsafe-inline remains."
+   "score": 85,
+   "note": "v351 re-score: DISTRIBUTED RATE LIMITER SHIPPED (PR #487) \u2014 Postgres fixed-window counter (api_rate_limits table + api_rate_limit_take RPC, applied to production, migration recorded), identity-keyed (api key/user/IP), 60/min default, fail-open on DB error, Retry-After on 429; 21/21 unit tests including deny + fail-open. HONEST FIND during live verification: production enforcement (and API-key auth itself) is blocked because PUBLIC_API_AUTH_SERVICE_ROLE_KEY was never set in the Vercel environment \u2014 the deployed routes have only ever accepted JWTs; the Vercel REST credential is DENIED so I cannot set it. OWNER ACTION (one paste): set that env var in Vercel. Remaining: pen test (external)."
   },
   {
    "name": "Accessibility",
@@ -137,8 +137,8 @@
   {
    "name": "Docs/Support",
    "weight": 2,
-   "score": 84,
-   "note": "v325 re-score (live-verified both domains): /help expanded with five new sections grounded in repo sources (keyboard shortcuts from modules/shortcuts.js + command-palette.js: / j k Cmd+K, typing-guard; data retention 12-month policy from api/retention.js; voice three-state bar + interrupt + Exit from modules/voice-convo.js; offline bar behavior; plan tiers Starter 2500 / Pro 10000 / Unlimited 25000 + priority from supabase/functions/checkout with honest 'paid checkout is not live yet'). Live 200 both domains with all 3 anchor sections present (curl-verified post-deploy). REMAINING: no ticketing/helpdesk or inbound email triage (email-only), docs still one page, FAQ not tested with real user questions."
+   "score": 88,
+   "note": "v351 re-score (live-verified): SECOND DOCS PAGE SHIPPED \u2014 /docs/api (PR #485, api-docs.html + BoundView variant + /docs/api rewrite), the full public API reference grounded in the live self-documenting endpoints: auth (hashed sk-spaincos keys + JWT), search contract with quick/search/deep modes (3/6/12), embeddings contract, error table, CORS, and honest Phase 1 limits. Live 200 on BOTH domains, cross-linked from both docs pages, in the sitemap. Help page already carries FAQ + troubleshooting + transient-error guidance (v325). REMAINING honest gap: no ticketing/helpdesk (email-only), FAQ not tested with a real new user."
   },
   {
    "name": "Observability",
@@ -384,6 +384,7 @@
    "change": "Accessibility 80 -> 88: full live axe-core audit run (app: ZERO violations; landing: 1 moderate region note); the 4 serious violations from the first audit fixed and re-verified gone (PR #446). Also: quest_progress QUEST_AUTH_REQUIRED guard restored (owner-directed) with the meta fix preserved; live RPC verified paying (5/5, paid)."
   },
   "v350: Fleet 70\u219285 \u2014 webapp backfill applied (9 rows), fleet-sweep 1.0 on all measured apps; 6 domains honestly NOT_MEASURED (bot-challenge-gated, owner-bypass needed).",
-  "v350: SEO 90\u219293 (meta descriptions all variants + sitemap completion); Observability 85\u219290 (status pages live both domains; stale note corrected)."
+  "v350: SEO 90\u219293 (meta descriptions all variants + sitemap completion); Observability 85\u219290 (status pages live both domains; stale note corrected).",
+  "v351: Docs/Support 84\u219288 (/docs/api live both domains); Security 82\u219285 (distributed limiter shipped; enforcement owner-blocked on Vercel env secret)."
  ]
 }
