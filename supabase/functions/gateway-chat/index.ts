@@ -4328,10 +4328,28 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
               }),
               signal: AbortSignal.timeout(15_000)
             });
+            const extract = (tp: any) => (tp?.output || []).filter((o: any) => o?.type === "message").map((o: any) => (o?.content || []).filter((c: any) => c?.type === "output_text").map((c: any) => c?.text || "").join("")).join("\n").trim();
+            const nMark = (c0.match(/\[\d+\]/g) || []).length;
             if (tr.ok) {
-              const tp = await tr.json();
-              const txt = (tp?.output || []).filter((o: any) => o?.type === "message").map((o: any) => (o?.content || []).filter((c: any) => c?.type === "output_text").map((c: any) => c?.text || "").join("")).join("\n").trim();
-              if (txt && txt.length > 40 && (c0.match(/\[\d+\]/g) || []).length === (txt.match(/\[\d+\]/g) || []).length) {
+              let txt = extract(await tr.json());
+              // v352b: the first pass can drop [[N](url)] citations; one retry with the
+              // citation-preservation rule stated explicitly, else keep the original.
+              if (txt && txt.length > 40 && (txt.match(/\[\d+\]/g) || []).length !== nMark) {
+                try {
+                  const tr2 = await fetch("https://api.perplexity.ai/v1/agent", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${pKey}` },
+                    body: JSON.stringify({
+                      effort: "fast",
+                      input: "Translate the following answer into Spanish. IMPORTANT: keep every citation marker such as [[1](https://example.com)] EXACTLY as written — copy them character-for-character, do not remove or renumber them. Preserve all markdown and code blocks. Return ONLY the translated answer.\n\n" + c0.slice(0, 8000),
+                      tools: []
+                    }),
+                    signal: AbortSignal.timeout(15_000)
+                  });
+                  if (tr2.ok) txt = extract(await tr2.json());
+                } catch (_e2) { /* keep first-pass text */ }
+              }
+              if (txt && txt.length > 40 && (txt.match(/\[\d+\]/g) || []).length === nMark) {
                 (finalResponse as any).choices[0].message.content = txt;
                 (finalResponse as any).x_language_gate = "es_translation_applied";
               }
