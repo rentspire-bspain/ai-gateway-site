@@ -50,6 +50,38 @@
     row.appendChild(btns);
     card.insertBefore(row, card.firstChild);
   }
+  /* ---- age / eligibility attestation (U-TRU-07, batch 26) ----
+     Partner networks require 18+ participants (COPPA floor is 13+, but ad-network
+     offer walls are 18+). The wall and consent flow stay behind a one-time 18+
+     attestation; the checkbox is unchecked by default and the confirm button
+     stays disabled until it is checked. */
+  var AGE_KEY = "age_attest_18_v1";
+  function ageAttested() {
+    try { return localStorage.getItem(AGE_KEY) === "yes"; } catch (e) { return false; }
+  }
+  function renderAgeRow(card, onDone) {
+    var row = el("div", "oe-consent");
+    row.setAttribute("role", "group");
+    row.setAttribute("aria-label", "Age eligibility check");
+    var p = el("p", null, "Partner offers require an age check: you must be 18 or older to use the offer wall.");
+    row.appendChild(p);
+    var lbl = el("label", "oe-age-label");
+    lbl.style.cssText = "display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px";
+    var cb = document.createElement("input");
+    cb.type = "checkbox"; cb.id = "oeAge18";
+    var ok = el("button", "oe-cbtn", "I am 18 or older — continue");
+    ok.type = "button"; ok.disabled = true;
+    cb.addEventListener("change", function () { ok.disabled = !cb.checked; });
+    ok.addEventListener("click", function () {
+      try { localStorage.setItem(AGE_KEY, "yes"); } catch (e) {}
+      row.remove(); onDone();
+    });
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(" I confirm I am 18 years of age or older."));
+    row.appendChild(lbl);
+    row.appendChild(ok);
+    card.insertBefore(row, card.firstChild);
+  }
   function renderDeniedRow(card, onDecide) {
     var row = el("div", "oe-consent");
     var p = el("p", null, "Partner offers are off — the ad network never loads. You can change this anytime.");
@@ -134,6 +166,15 @@
   function mountWall(body) {
     var frame = body.querySelector(".oe-frame iframe");
     var ph = body.querySelector(".oe-ph");
+    // U-TRU-07 age gate: the consent flow and the wall both stay behind an 18+ attestation.
+    if (!ageAttested()) {
+      var ageCard = body.querySelector(".oe-card");
+      if (ageCard && !ageCard.querySelector(".oe-age-label")) {
+        renderAgeRow(ageCard, function () { mountWall(body); });
+      }
+      if (frame) frame.removeAttribute("src");
+      return false;
+    }
     // F-01 consent gate: the ad-network iframe never loads without explicit acceptance.
     if (consentState() !== "granted") {
       var card = body.querySelector(".oe-card");
