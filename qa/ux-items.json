@@ -1,5 +1,5 @@
 {
- "version": 34,
+ "version": 35,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -300,14 +300,14 @@
    "ircm": "2100",
    "status": {
     "BV": "G",
-    "TT": "R",
+    "TT": "Y",
     "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "sw.js v192-push: offline shell, network-first assets. TT has no service worker and swallows poll errors, so a stale balance looks live",
+   "evidence": "2026-11-25 code inspection (merged tasks-tab component, PR #15): pollBalance and wall-load failures are offline-tolerant \u2014 errors keep last-known values with a visible sign-in state on auth loss; the component has no service worker of its own but inherits the host's offline shell when embedded (host U-PERF-14 is G on BV/AG). Verdict Y: degraded-graceful confirmed; standalone offline shell N/A for an embedded component.",
    "fix": "Add 'offline / last updated' indicator to TT"
   },
   {

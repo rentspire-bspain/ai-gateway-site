@@ -1709,3 +1709,7 @@ The 15-minute continuous closure loop (automation `9e3dc488`) is running; runs 1
 **U-PERF-05 evidence updated:** the full series + budgets documented; stays 🔴 until the PRs merge and the live numbers are re-measured.
 
 All four PRs await owner authorization (merge order 454 → 455 → 456 → 457). Blockers unchanged: Comet offline (comptrove + GoDaddy DNS), ST/DG access, E11-2 counsel review.
+### Batch 22 — TT offline tolerance + PR-stack health check (2026-11-25, register v35)
+
+- 🟡 U-PERF-14 (TT) 🔴→🟡 — code inspection of the merged tasks-tab component: polling and wall-load failures are offline-tolerant (errors keep last-known values; auth loss shows a visible sign-in state); the component inherits the host's offline shell when embedded (host U-PERF-14 ✅ on BV/AG).
+- ✅ Stack health: all five pending PRs (#454–#458) verified MERGEABLE against current master — no drift from the parallel session; merge order 454 → 455 → 456 → 457 → 458.
