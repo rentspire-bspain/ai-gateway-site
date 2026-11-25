@@ -41,8 +41,9 @@ a{color:#14646B}
 </div>
 
 <div class="card">
-  <strong>Estate status</strong> <span class="muted">(latest fleet sweep)</span>
-  <div id="fleet" class="muted">Loading…</div>
+  <!-- v350: estate fleet section removed — the shared fleet-sweep JSON lists every
+       internal estate app (ai.spaincos.com, SpainCos marketing, Spain Terminal) and
+       was rendered publicly on boundview.com (owner report 2026-11-24). -->
 </div>
 
 <div class="card">
@@ -59,15 +60,7 @@ a{color:#14646B}
 (function () {
   fetch("/api/health", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject())
     .then(() => { document.getElementById("d-api").className = "dot ok"; })
-    .catch(() => { document.getElementById("d-api").className = "dot bad"; });
-  fetch("/qa-reports/fleet-sweep/latest.json", { cache: "no-store" }).then(r => r.json()).then(d => {
-    var el = document.getElementById("fleet");
-    var rows = (d.apps || []).map(function (a) {
-      var cls = a.verdict === "PASS" ? "ok" : (a.verdict === "FAIL" || a.verdict === "UNREACHABLE") ? "bad" : "na";
-      return '<div class="row"><span>' + a.app + '</span><span class="dot ' + cls + '" title="' + a.verdict + '"></span></div>';
-    }).join("");
-    el.innerHTML = rows + '<p class="muted" style="margin:8px 0 0">Sweeped ' + (d.ts || "recently") + ". Domains behind a bot challenge are shown gray (not measured), never scored as failures.</p>";
-  }).catch(() => { document.getElementById("fleet").textContent = "Fleet data unavailable right now."; });
+    .catch(() => { document.getElementById("d-api").className = "dot bad"; }); });
   var gw = document.getElementById("d-gw");
   fetch("/api/health", { cache: "no-store" }).then(r => {
     if (r.ok) { gw.className = "dot ok"; gw.title = "Health endpoint reachable — the answer engine shares this serving layer; deep per-model status is in Settings."; }
