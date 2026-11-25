@@ -129,6 +129,19 @@ module.exports = async (req, res) => {
         res.end(req.method === "HEAD" ? undefined : htmlEs);
         return;
       }
+      // v355b: /docs/api (the public API reference) served HOST-AWARE like the other
+      // pages — the vercel.json rewrite bypassed this middleware and handed boundview.com
+      // the ai.spaincos variant to every non-JS client (warden catch: spain-mentions=6).
+      if (page === "docs-api") {
+        const baseApi = isBoundViewHost ? "api-docs.boundview.html" : "api-docs.html";
+        const candsApi = [path.join(__dirname, baseApi), path.join(__dirname, "../" + baseApi), path.join(process.cwd(), baseApi), path.join(process.cwd(), "../" + baseApi)];
+        const fApi = candsApi.find((c) => { try { return fs.existsSync(c); } catch (e) { return false; } });
+        if (!fApi) { res.writeHead(404, headers); res.end("page not bundled"); return; }
+        const htmlApi = fs.readFileSync(fApi, "utf8");
+        res.writeHead(200, { ...headers, "Content-Type": "text/html; charset=utf-8" });
+        res.end(req.method === "HEAD" ? undefined : htmlApi);
+        return;
+      }
       const allowed = { terms: 1, privacy: 1, docs: 1, help: 1, status: 1 };
       if (page === "pricing" && !isBoundViewHost) { res.writeHead(404, headers); res.end("not found"); return; }
       if (page === "pricing") allowed.pricing = 1;
