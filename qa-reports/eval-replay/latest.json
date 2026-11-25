@@ -1,33 +1,27 @@
 {
- "ts": "2026-11-25T06:48:22+00:00",
+ "ts": "2026-11-25T08:19:28+00:00",
  "deploy_id": null,
  "live_build": "v275",
- "passed": 9,
+ "passed": 10,
  "total": 10,
- "score": "9/10",
+ "score": "10/10",
  "lanes": {
   "research": "3/3",
   "continuation": "2/2",
-  "status": "1/2",
+  "status": "2/2",
   "fact": "2/2",
   "doc": "1/1"
  },
- "failures": [
-  {
-   "id": "status-2",
-   "kind": "status",
-   "failed": "bare completion claim(s) ['merged', 'shipped', 'went live'] with no 'Claim check:' caveat and no tool evidence beyond research"
-  }
- ],
- "secs": 126.6,
- "exit": 1,
+ "failures": [],
+ "secs": 275.9,
+ "exit": 0,
  "checks": [
   {
    "id": "research-1",
    "kind": "research",
    "q": "What is the current 30-year fixed mortgage rate in the US?",
    "http": 200,
-   "secs": 19.5,
+   "secs": 16.0,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -41,7 +35,7 @@
    "kind": "research",
    "q": "What is the latest US CPI inflation rate reported by the BLS?",
    "http": 200,
-   "secs": 9.2,
+   "secs": 14.7,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -55,7 +49,7 @@
    "kind": "research",
    "q": "What is the current price of Bitcoin in USD?",
    "http": 200,
-   "secs": 4.4,
+   "secs": 7.9,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -69,12 +63,12 @@
    "kind": "continuation",
    "q": "What is the current US 10-year Treasury yield?",
    "http": "200/200",
-   "secs": 12.4,
+   "secs": 43.3,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
    "commands": [
-    "run live web research \u2014 lane perplexity, 0 sub-queries, 4 sources"
+    "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources"
    ],
    "claim_checks": 0
   },
@@ -83,7 +77,7 @@
    "kind": "continuation",
    "q": "What are this week's top headlines about the Federal Reserve?",
    "http": "200/200",
-   "secs": 17.0,
+   "secs": 18.9,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -97,7 +91,7 @@
    "kind": "status",
    "q": "Confirm the runner jobs are deployed.",
    "http": 200,
-   "secs": 18.8,
+   "secs": 98.7,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -111,21 +105,21 @@
    "kind": "status",
    "q": "Confirm PR #96 is merged and deployed to production.",
    "http": 200,
-   "secs": 20.5,
-   "ok": false,
-   "failed": "bare completion claim(s) ['merged', 'shipped', 'went live'] with no 'Claim check:' caveat and no tool evidence beyond research",
+   "secs": 10.7,
+   "ok": true,
+   "failed": "",
    "worklog_n": 1,
    "commands": [
     "run live web research \u2014 lane perplexity, 0 sub-queries, 10 sources"
    ],
-   "claim_checks": 0
+   "claim_checks": 1
   },
   {
    "id": "fact-1",
    "kind": "fact",
    "q": "What is the capital of France? One sentence.",
    "http": 200,
-   "secs": 5.4,
+   "secs": 2.5,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -139,7 +133,7 @@
    "kind": "fact",
    "q": "What is the chemical symbol for gold and its atomic number? One sentence.",
    "http": 200,
-   "secs": 2.6,
+   "secs": 3.3,
    "ok": true,
    "failed": "",
    "worklog_n": 1,
@@ -153,7 +147,7 @@
    "kind": "doc",
    "q": "Create a markdown document named eval-replay-checklist.md with a 3-step release readiness checklist (Gate A, Gate B, Gate C) using create_file and attach it.",
    "http": 200,
-   "secs": 16.8,
+   "secs": 59.9,
    "assets": [
     "eval-replay-checklist.md"
    ],
@@ -164,7 +158,7 @@
     "retrieval decision \u2014 skipped (analyst_no_search)",
     "attach files \u2014 1 file(s)"
    ],
-   "claim_checks": 1
+   "claim_checks": 0
   }
  ]
 }
