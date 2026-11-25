@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Us4LR0UnHp7hxCsYpQovuAXUxIcogJppFzVqwTThEfs=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Us4LR0UnHp7hxCsYpQovuAXUxIcogJppFzVqwTThEfs=' 'sha256-pPibSSpT+HegkyTRgYr5hjIXb2wbbGcQF1/qlXz0wBg=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
@@ -6074,7 +6074,6 @@ function wireCodeCopy(scope) {
 })();
 </script>
 <div id="moduleRoot"></div>
-<script src="/modules/settings.js"></script>
 <script src="/modules/connectors.config.js"></script>
 <script src="/modules/connectors.js"></script>
 <script src="/modules/skills.js"></script>
@@ -6090,43 +6089,62 @@ function wireCodeCopy(scope) {
 <script src="/modules/composerx.js"></script>
 <script src="/modules/skills-actions.js"></script>
 <script src="/modules/plugins.js"></script>
-<script src="/modules/settings-mcp.js"></script>
-<script src="/modules/settings-billing.js"></script>
-<script src="/modules/settings-neurons.js"></script>
 <script src="/modules/quests-pane.js"></script>
-<script src="/modules/automations.js"></script>
-<script src="/modules/eval-replay.js"></script>
-<script src="/modules/api-docs.js"></script>
 <script src="/modules/shortcuts.js"></script>
+<script>
+/* F-23 code-split increment 1 (U-PERF-05): the Settings family — 17 modules, ~250 KB —
+   is only reachable through the Settings overlay. It now loads on first open (in the
+   original module order; settings.js first so panes can register), prefetched at idle
+   so the click is instant. window.SettingsUI is stubbed until the real module lands. */
+(function () {
+  var FAM = ["settings", "settings-security", "settings-billing", "settings-neurons", "settings-mcp",
+             "settings-troubleshooting", "settings-account", "settings-premium", "settings-models",
+             "settings-org", "teammates", "usage", "api-docs", "repo-pr", "eval-replay", "automations", "enterprise-admin"];
+  var p = null;
+  window.__loadSettingsFamily = function () {
+    if (p) return p;
+    p = new Promise(function (resolve, reject) {
+      var i = 0;
+      (function next() {
+        if (i >= FAM.length) { resolve(window.SettingsUI); return; }
+        var sc = document.createElement("script");
+        sc.src = "/modules/" + FAM[i++] + ".js";
+        sc.onload = next;
+        sc.onerror = function () { reject(new Error("settings module failed: " + sc.src)); };
+        document.head.appendChild(sc);
+      })();
+    });
+    return p;
+  };
+  var stub = {
+    open: function () { var a = arguments; window.__loadSettingsFamily().then(function (ui) { ui.open.apply(ui, a); }).catch(console.error); },
+    close: function () {}
+  };
+  if (!window.SettingsUI) window.SettingsUI = stub;
+  (window.requestIdleCallback || function (f) { setTimeout(f, 2500); })(function () {
+    window.__loadSettingsFamily().catch(function () {});
+  });
+})();
+</script>
 <script src="/modules/student-verify.js"></script>
 <script src="/modules/favicon-live.js"></script>
 <script src="/modules/notify-bell.js"></script>
-<script src="/modules/settings-security.js"></script>
-<script src="/modules/settings-account.js"></script>
-<script src="/modules/settings-premium.js"></script>
-<script src="/modules/settings-models.js"></script>
 <script src="/modules/local-files.js"></script>
-<script src="/modules/settings-org.js"></script>
 <script src="/modules/voice-convo.js"></script>
 <script src="/modules/artifacts-files.js"></script>
 <script src="/modules/artifacts-gallery.js"></script>
 <script src="/modules/docs-panel.js"></script>
 <script src="/modules/artifact-library.js"></script>
 <script src="/modules/webapps.js"></script>
-<script src="/modules/repo-pr.js"></script>
 <script src="/modules/sources.js"></script>
 <script src="/modules/media.js"></script>
 <script src="/modules/export.js"></script>
 <script src="/modules/tabstatus.js"></script>
 <script src="/modules/tool-chips.js"></script>
 <script src="/modules/onboarding.js"></script>
-<script src="/modules/usage.js"></script>
-<script src="/modules/teammates.js"></script>
-<script src="/modules/enterprise-admin.js"></script>
 <script src="/modules/mobile-375.js"></script>
 <script src="/modules/mobile-focus-trap.js"></script>
 <script src="/modules/desktop-notifications.js"></script>
-<script src="/modules/settings-troubleshooting.js"></script>
 <script src="/modules/voice-readaloud.js"></script>
 <link rel="stylesheet" href="/css/readaloud.css">
 <script src="/modules/response-diff.js"></script>
