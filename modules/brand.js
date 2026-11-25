@@ -135,7 +135,7 @@
         var href = l.getAttribute("href") || "";
         if (/icon|apple-touch|manifest/.test(rel)) {
           if (/(spaincos|favicon\.png|favicon\.webp|apple-touch-icon\.png|icons\/icon-|manifest\.webmanifest)/i.test(href)) {
-            if (/apple-touch/.test(rel)) l.setAttribute("href", "/icons/boundview-apple-touch-icon.png");
+            if (/apple-touch/.test(rel)) l.setAttribute("href", "/icons/boundview-apple-touch-icon.webp");
             else if (/manifest/.test(rel)) l.setAttribute("href", "/boundview-manifest.webmanifest");
             else if (/\.png/i.test(href)) l.setAttribute("href", "/icons/boundview-favicon-48.png");
             else l.setAttribute("href", "/boundview-icon.svg");

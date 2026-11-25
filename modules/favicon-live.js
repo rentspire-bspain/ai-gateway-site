@@ -11,7 +11,7 @@
 (function () {
   "use strict";
   if (window.FaviconLive && window.FaviconLive._loaded) return;
-  var SIZE = 64, ICON = "/favicon.png";
+  var SIZE = 64, ICON = "/favicon.webp";
   var canvas = document.createElement("canvas");
   canvas.width = SIZE; canvas.height = SIZE;
   var ctx = canvas.getContext("2d");

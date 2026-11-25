@@ -75,7 +75,7 @@ function renderHtmlPage({ statusTitle, eyebrow, headline, subtext, provider, pro
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escHtml(statusTitle)} — ai.spaincos.com</title>
-<link rel="icon" type="image/png" href="/favicon.png?v=177">
+<link rel="icon" type="image/webp" href="/favicon.webp?v=177">
 <style>
   :root{--bg:#15171B;--bg-elevated:#1C1E23;--border:#2a2d33;--text:#eceef2;--text-muted:#9aa3ae;--accent:#3D9595;--accent-bg:rgba(61,149,149,.14);--warn:#e6b450;--warn-bg:rgba(230,180,80,.14);--radius:14px;--radius-sm:10px}
   *{box-sizing:border-box}
