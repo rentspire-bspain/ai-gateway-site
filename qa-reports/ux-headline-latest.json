@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
  "ts": "2026-11-25T05:04:38+00:00",
  "version": 34,
+=======
+ "ts": "2026-11-25T05:19:26+00:00",
+ "version": 35,
+>>>>>>> ffbaaef (docs: batch 22 — U-PERF-14 TT R->Y (offline-tolerant component), register v35)
  "portfolio_strict_pct": 20.1,
  "portfolio_measured_only_pct": 36.5,
  "apps": {
@@ -18,16 +23,16 @@
    "weighted_den": 1160
   },
   "TT": {
-   "strict": 21.6,
-   "measured_only": 34.0,
+   "strict": 21.8,
+   "measured_only": 34.3,
    "coverage": 60.1,
    "counts": {
     "U": 73,
     "G": 22,
-    "Y": 29,
-    "R": 59
+    "Y": 30,
+    "R": 58
    },
-   "weighted_num": 21450,
+   "weighted_num": 21600,
    "weighted_den": 992
   },
   "AG": {
