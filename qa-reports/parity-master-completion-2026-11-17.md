@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 23.6%** (app-weighted; unmeasured counts as 0; v48 — batch 40: cap states verified; postback notifications) · **measured-only: 41.3%** · 178✅ / 224🟡 / 181🔴 / 794⚪ across 386 line items. Per-app strict: BV 45.3% · TT 28.5% · AG 45.4% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 24.4%** (app-weighted; unmeasured counts as 0; v49 — batch 41: all 12 queued PRs merged, readbacks green, guardrails live) · **measured-only: 42.5%** · 187✅ / 220🟡 / 176🔴 / 794⚪ across 386 line items. Per-app strict: BV 46.4% · TT 31.6% · AG 45.8% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1887,3 +1887,15 @@ Every `regression` issue closure requires one of: a new CI gate, a new lock test
 - 🟡 L3 data/schema hourly sweep: governed-sql test suite + monitors exist; a single scheduled runner wrapping them is the next increment
 - 🟡 L4: closure loop live (15-min floor); regression-issue consumption is this loop's standing rule from this batch forward
 - 🔴 Continuous (sub-5-min) in-process monitoring needs an always-on runner (Vercel cron floor is 1 min; GitHub Actions floor ~5 min) — a dedicated edge heartbeat function is the escalation path when owner approves
+
+### Batch 41 — all 12 PRs merged under owner authorization; live readbacks green (2026-11-25, register v49)
+
+Merged: ai-gateway-site #498 (docs batches 31–40 + guardrails Part F), #499 (pricing single-source), #500 (BV value prop), #501 (SPA 404), #502 (double-submit); governed-sql #23 (event taxonomy), #24 (TT error state), #25 (TT expiry/pending), #26 (provider map), #27 (postback notifications), #28 (L3 qa-sweep).
+
+**Live readbacks (all green):** live-sweep 11 PASS including pricing.json 200 with the canonical plan set; BV hero value proposition live; SPA 404 card live at /no-such-xyz (HTTP 404); pricing-consistency and register-drift gates PASS.
+
+- 🔴→✅ **U-STATE-03 (TT)**, **U-STATE-07 (BV)**, **TT-BAL-11**, **TT-PEN-01**, **TT-WALL-07 (🟡→✅)**, **U-FORM-04 (BV/AG)**, **U-ONB-01 (BV)**, **U-TRU-15 (TT)** — all merged and evidenced.
+- 🔴→🟡 **U-NOT-07 (TT)** — postback notifications merged (lock test 3/3); live postback readback needs Adscend traffic.
+- 🟡 **U-SEO-17 (BV/AG)** — funnel fully live (checkout_started + purchase in the first-party store); readback surface pending.
+
+**Headline after batch: strict 24.4% / measured-only 42.5% (v49)** — session arc since batch 24: 20.2% → 24.4%.

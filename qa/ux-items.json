@@ -1,5 +1,5 @@
 {
-  "version": 48,
+  "version": 49,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -939,7 +939,7 @@
       "W": 7,
       "ircm": "4111",
       "status": {
-        "BV": "Y",
+        "BV": "G",
         "TT": "-",
         "AG": "Y",
         "GH": "Y",
@@ -948,7 +948,10 @@
         "DG": "U"
       },
       "evidence": "Landing h1 \"Where knowledge begins\" (generic) while brand.js tagline is \"BoundView — see the whole picture\"",
-      "fix": "Align headline + tagline; 5-second test with 5 users"
+      "fix": "Align headline + tagline; 5-second test with 5 users",
+      "notes": {
+        "BV": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #500 merged — hero value proposition LIVE on boundview.com ('Ask anything — see the whole picture. AI research with sources…')"
+      }
     },
     {
       "id": "U-ONB-02",
@@ -1403,16 +1406,20 @@
       "W": 7,
       "ircm": "4210",
       "status": {
-        "BV": "Y",
+        "BV": "G",
         "TT": "U",
-        "AG": "Y",
+        "AG": "G",
         "GH": "U",
         "ST": "U",
         "CT": "U",
         "DG": "U"
       },
       "evidence": "Server side: postback idempotent, 0 double-credits in 143-request simulation",
-      "fix": "Client: disable on submit and send idempotency key on checkout"
+      "fix": "Client: disable on submit and send idempotency key on checkout",
+      "notes": {
+        "BV": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #502 merged — checkout button disables for the whole request (verified locally: second rapid click ignored; restored on failure)",
+        "AG": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): same shared billing module"
+      }
     },
     {
       "id": "U-FORM-05",
@@ -1584,7 +1591,7 @@
       "ircm": "4110",
       "status": {
         "BV": "Y",
-        "TT": "R",
+        "TT": "G",
         "AG": "Y",
         "GH": "U",
         "ST": "U",
@@ -1592,7 +1599,10 @@
         "DG": "U"
       },
       "evidence": "TT poll: !res.ok → return, and catch → ignored; user never sees failure",
-      "fix": "Show 'Couldn't refresh · Retry · last updated hh:mm'"
+      "fix": "Show 'Couldn't refresh · Retry · last updated hh:mm'",
+      "notes": {
+        "TT": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #24 merged — visible connection-issue state verified via route interception (2 failures → state; recovery restores balance/pill)"
+      }
     },
     {
       "id": "U-STATE-04",
@@ -1663,7 +1673,7 @@
       "W": 6,
       "ircm": "3102",
       "status": {
-        "BV": "R",
+        "BV": "G",
         "TT": "U",
         "AG": "U",
         "GH": "U",
@@ -1672,7 +1682,10 @@
         "DG": "U"
       },
       "evidence": "404.html is a 108-byte \"Redirecting…\" stub running spa-redirect.js; live unknown path returns HTTP 404 with that stub",
-      "fix": "Real 404 page with nav; keep redirect only for known legacy slugs"
+      "fix": "Real 404 page with nav; keep redirect only for known legacy slugs",
+      "notes": {
+        "BV": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #501 merged — branded SPA 404 card LIVE-verified on boundview.com/no-such-xyz (HTTP 404 + visible card)"
+      }
     },
     {
       "id": "U-STATE-08",
@@ -2411,7 +2424,7 @@
       "ircm": "4210",
       "status": {
         "BV": "Y",
-        "TT": "R",
+        "TT": "Y",
         "AG": "U",
         "GH": "-",
         "ST": "U",
@@ -2419,7 +2432,10 @@
         "DG": "U"
       },
       "evidence": "TT notifies only on in-tab delta",
-      "fix": "Event → notification matrix with tests"
+      "fix": "Event → notification matrix with tests",
+      "notes": {
+        "TT": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #27 merged — postback now inserts offerwall_credit/offerwall_capped inbox notifications (fire-and-forget, lock test 3/3); Y until a live postback readback (needs Adscend traffic)"
+      }
     },
     {
       "id": "U-NOT-08",
@@ -2768,7 +2784,7 @@
       "ircm": "3301",
       "status": {
         "BV": "G",
-        "TT": "Y",
+        "TT": "G",
         "AG": "U",
         "GH": "G",
         "ST": "U",
@@ -2776,7 +2792,10 @@
         "DG": "U"
       },
       "evidence": "GH guardrails ban guarantees; TT says \"may earn\" not amounts but pending says \"usually minutes\"",
-      "fix": "Source every number; add disclaimers"
+      "fix": "Source every number; add disclaimers",
+      "notes": {
+        "TT": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): honest timing copy merged and served (no fixed promises; per-offer variance disclosed; dispute route)"
+      }
     },
     {
       "id": "U-TRU-16",
@@ -3267,8 +3286,8 @@
       "evidence": "Policy says no analytics trackers; leaves marketing blind",
       "fix": "First-party cookieless analytics + consent mode",
       "notes": {
-        "BV": "2026-11-25 batch 28 (governed-sql PR #22): first-party checkout_started event implemented (checkout function -> analytics_events); purchase events already logged by stripe-webhook; funnel computable with zero trackers. Marketing-facing readback surface pending",
-        "AG": "2026-11-25 batch 28 (governed-sql PR #22): same shared backend funnel"
+        "BV": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): funnel live (checkout_started + purchase both in first-party analytics_events, PRs #22/#28 merged); Y pending a readback surface",
+        "AG": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): same shared backend funnel"
       }
     },
     {
@@ -4636,10 +4655,13 @@
       "W": 7,
       "ircm": "4201",
       "status": {
-        "TT": "Y"
+        "TT": "G"
       },
       "evidence": "subid1 for Adscend; A6 text says subId; ayeT/OfferToro use different names",
-      "fix": "Provider config map + contract test"
+      "fix": "Provider config map + contract test",
+      "notes": {
+        "TT": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #26 merged — PROVIDERS map is the single parameter contract, lock test 4/4, wall URL byte-identical with fake config"
+      }
     },
     {
       "id": "TT-WALL-08",
@@ -4877,10 +4899,13 @@
       "W": 7,
       "ircm": "3301",
       "status": {
-        "TT": "R"
+        "TT": "G"
       },
       "evidence": "Only in README",
-      "fix": "Show in header/tooltip"
+      "fix": "Show in header/tooltip",
+      "notes": {
+        "TT": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #25 merged — 1-year expiry disclosed in the balance header with tooltip, verified served"
+      }
     },
     {
       "id": "TT-BAL-12",
@@ -5048,10 +5073,13 @@
       "W": 7,
       "ircm": "3301",
       "status": {
-        "TT": "R"
+        "TT": "G"
       },
       "evidence": "Static 'usually minutes'",
-      "fix": "Use per-offer ETA from network"
+      "fix": "Use per-offer ETA from network",
+      "notes": {
+        "TT": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #25 merged — honest 'minutes–24h, varies by offer' pending copy with dispute tooltip, verified served"
+      }
     },
     {
       "id": "TT-PEN-02",
