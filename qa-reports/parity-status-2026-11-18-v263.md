@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v352)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v353)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3349,3 +3349,20 @@ The owner asked for full confidence on UX and the silently-failing models. This 
 Every deploy must pass: lane-health canary + brand-leak gate + UX master (≥90) + eval-replay (≥9/10) + axe zero-violation + the ES language probe. All are in or adjacent to the prelaunch gate that already blocks every push.
 
 **Scores this batch:** i18n 88→92 (deterministic language contract), Accessibility 88→92 (zero axe violations), Desktop 80→83 (window-controls-overlay). **Headline: 90.6% → 90.8%** (11618/128).
+
+---
+
+## Addendum 68 — v353 (2026-11-25): the autonomous self-protection stack
+
+**NEW, LIVE NOW: the regression warden** ([PR #503](https://github.com/rentspire-bspain/ai-gateway-site/pull/503)) — an edge function on a 15-minute pg_cron job (cron job 15) that runs the ten critical checks covering every class that has actually failed silently: model lanes, both /api/health endpoints, both status pages, the sitemap, and a brand-leak sweep of four public BoundView pages. Every result is written to a **warden_ledger** (permanent history — this is the drift detector: any check that was passing and now fails is a TRANSITION). Transitions are escalated two ways, autonomously: a **deduplicated GitHub issue is auto-filed with evidence and a runbook pointer** (via the already-vaulted GITHUB_PR_TOKEN), and a warden_alerts row records regression/recovery. Recoveries are recorded too, so the ledger shows full health history. Live-verified: first two runs 10/10, dedupe logic confirmed.
+
+**The complete self-protection stack, end to end:**
+1. **Deploy-time gates** (prelaunch, blocks every push): lane-health canary, brand-leak browser gate, UX master ≥90, benchmark gospel enforcer, CSP hash guard, plus the full e2e battery.
+2. **Runtime warden** (every 15 min): the ten critical checks with transition-only escalation and auto-filed issues — covers BETWEEN-deploy drift, which the deploy gates cannot see (that is exactly how the 34h lane outage and the ES regression hid).
+3. **In-request failsafes** (already live): upstream-error degradation chain, session-recall Perplexity no-search fallback, ES language gate with citation verification, budget/meter fail-closed, per-IP + distributed rate limiters.
+4. **Codified law** (guardrails.md v350): cross-project token discipline, brand-audit rule for any shared JSON, every-gate-asserts-lane-health.
+
+**What this enables next (v354 candidates, in priority order):**
+- Warden v2: authenticated probes (ES language gate, session recall, tool-loop sandbox execution) using a service-owned eval identity — the three checks that need a logged-in session.
+- Auto-rollback: pin the last-known-good gateway bundle digest in the ledger; on a persistent gateway-lane failure the warden can redeploy it via the deploy API (needs the deploy PAT moved into Supabase secrets — owner one-paste).
+- Score-drift alarms: headline + UX-master deltas over time, alerting on any drop >1 point between runs.
