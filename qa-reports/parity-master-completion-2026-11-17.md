@@ -1829,4 +1829,4 @@ Blockers unchanged plus two new owner decisions: pricing-page copy reconciliatio
 
 **Headline after batch: strict 23.4% / measured-only 41.1% (v46)** — session arc since batch 24: 20.2% → 23.4%.
 
-Blockers unchanged (plus pricing-copy reconciliation and analytics service key from batch 32). Pending merge authorization: PRs #498, #499, #500, #501 (SPA 404 state, U-STATE-07: branded 'Page not found' card on ?p= fallback paths, verified locally), governed-sql #23 (event taxonomy) and #24 (TT error state, U-STATE-03).
+Blockers unchanged (plus pricing-copy reconciliation and analytics service key from batch 32). Pending merge authorization: PRs #498, #499, #500, #501 (SPA 404 state, U-STATE-07), governed-sql #23 (event taxonomy), #24 (TT error state, U-STATE-03), and #25 (TT-BAL-11 expiry disclosed + TT-PEN-01 honest pending expectation, both verified live on the component).
