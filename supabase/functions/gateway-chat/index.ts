@@ -4302,6 +4302,45 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       }
     }
 
+    // v352 ANSWER-LANGUAGE GATE (regression 2026-11-25: the ES rule is present on both the
+    // research input and the writer prompt, but the fast-effort Perplexity lane and the free
+    // writer both intermittently ignore it — live probe: "What is the capital of France?"
+    // with lang=es returned English on v322 while the same code passed on v313). This gate
+    // makes the contract deterministic: if the UI language is es and the final answer reads
+    // English, one no-search translation pass (Perplexity Agent API, tools:[]) rewrites it,
+    // preserving markdown, [N] markers, and code blocks. Failures keep the original answer.
+    if (answerLang === "es" && !apiKeyMode) {
+      try {
+        const c0 = String((finalResponse as any)?.choices?.[0]?.message?.content || "");
+        const answerBody = c0.slice(Math.max(0, c0.indexOf("---"))); // skip the work-log header
+        const looksEnglish = /\b(the|is|are|and|of|with|was|for)\b/i.test(answerBody);
+        const looksSpanish = /\b(el|la|los|las|de|que|es|en|una|para|con|por)\b/i.test(answerBody);
+        if (c0.trim() && looksEnglish && !looksSpanish) {
+          const pKey = Deno.env.get("PERPLEXITY_API_KEY");
+          if (pKey) {
+            const tr = await fetch("https://api.perplexity.ai/v1/agent", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": `Bearer ${pKey}` },
+              body: JSON.stringify({
+                effort: "fast",
+                input: "Translate the following answer into Spanish. Preserve ALL markdown formatting, [N] citation markers, URLs, code blocks, and numbers EXACTLY as they are — translate only the prose. Return ONLY the translated answer, nothing else.\n\n" + c0.slice(0, 8000),
+                tools: []
+              }),
+              signal: AbortSignal.timeout(15_000)
+            });
+            if (tr.ok) {
+              const tp = await tr.json();
+              const txt = (tp?.output || []).filter((o: any) => o?.type === "message").map((o: any) => (o?.content || []).filter((c: any) => c?.type === "output_text").map((c: any) => c?.text || "").join("")).join("\n").trim();
+              if (txt && txt.length > 40 && (c0.match(/\[\d+\]/g) || []).length === (txt.match(/\[\d+\]/g) || []).length) {
+                (finalResponse as any).choices[0].message.content = txt;
+                (finalResponse as any).x_language_gate = "es_translation_applied";
+              }
+            }
+          }
+        }
+      } catch (_e) { /* keep the original answer */ }
+    }
+
     // v247 FAKE-DONE GUARD (non-stream path — see fakeDoneBannerFor for the full incident note):
     // cross-check data-operation completion claims against the turn's executed tool trace.
     {
