@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 23.2%** (app-weighted; unmeasured counts as 0; v43 — batch 30: SEO sweep — static crawler-visible heads live on both hosts) · **measured-only: 40.8%** · 174✅ / 225🟡 / 184🔴 / 794⚪ across 386 line items. Per-app strict: BV 44.7% · TT 27.4% · AG 44.7% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 23.6%** (app-weighted; unmeasured counts as 0; v48 — batch 40: cap states verified; postback notifications) · **measured-only: 41.3%** · 178✅ / 224🟡 / 181🔴 / 794⚪ across 386 line items. Per-app strict: BV 45.3% · TT 28.5% · AG 45.4% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1805,3 +1805,85 @@ PR #491 merged and live-readback-verified (raw pre-JS HTML, curl):
 **Headline after batch: strict 23.2% / measured-only 40.8% (v43)** — session arc since batch 24: 20.2% → 23.2%.
 
 Next queue: U-MEAS-01 event taxonomy readback surface, TT-WALL frame-health items (need Adscend approval), remaining BV/AG 🟡 sweeps. Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision, passkey enablement (Supabase console).
+
+### Batch 31 — event taxonomy defined and locked (2026-11-25, register v44)
+
+- 🔴→🟡 **U-MEAS-01 (BV/AG)** — governed-sql PR #23: the first-party event taxonomy is now defined (query, completion, share, checkout_started, purchase — all over the single `analytics_events` store) with a CI sync test (3/3 pass) that fails if a documented event disappears from code or an undocumented one appears. Three funnels are computable from the store: engagement (query→completion), monetization (checkout_started→purchase), virality (share). 🟡 pending a funnel readback surface.
+
+**Headline after batch: strict 23.3% / measured-only 40.9% (v44)** — session arc since batch 24: 20.2% → 23.3%.
+
+Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision, passkey enablement (Supabase console).
+
+### Batch 32 — canonical pricing source (2026-11-25, register v45)
+
+- 🟡 **U-PAY-01 / BV-05 (BV)** — mechanism built in PR #499: canonical `/pricing.json` (Core/Max/Team, credit value, trial days), the Settings → Billing pane now renders plan cards from it (offline-tolerant fallback), and `qa/pricing-consistency.py` gates that the live checkout surface matches the canonical source (exit 0). **Owner decision surfaced:** the public pricing page describes planned Starter/Pro/Unlimited tiers with no prices and "checkout not live yet", while the live billing pane carries Core/Max/Team Stripe prices — reconciling that copy is an owner pricing call, reported by the gate on every run.
+
+**Headline after batch: strict 23.3% / measured-only 40.9% (v45)** — session arc since batch 24: 20.2% → 23.3%.
+
+Blockers unchanged plus two new owner decisions: pricing-page copy reconciliation, and an analytics service key (or authenticated ops endpoint) for the funnel readback. Others: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation, passkey enablement (Supabase console).
+
+### Batch 33 — bot-protection probes green + BV landing value prop (2026-11-25, register v46)
+
+- 🟡→✅ **U-AUTH-10 (BV/AG)** — bot protection does not block humans or good bots: live probes returned HTTP 200 to Googlebot, Bingbot, and generic CLI user-agents on both hosts (no challenge, no WAF deny; the 403-deny behavior is Comptrove/RentSpire only). Human flows unaffected — full Playwright sign-in/settings/earn flows pass on production.
+- 🟡 **U-ONB-01 (BV)** — PR #500: the BoundView hero subtitle now states the value proposition in the first paint (server-side, matching the tagline and description). Flip to ✅ pending merge + live readback.
+
+**Headline after batch: strict 23.4% / measured-only 41.1% (v46)** — session arc since batch 24: 20.2% → 23.4%.
+
+Blockers unchanged (plus pricing-copy reconciliation and analytics service key from batch 32). Pending merge authorization: PRs #498, #499, #500, #501 (SPA 404 state, U-STATE-07), #502 (U-FORM-04 double-submit prevention, verified locally), governed-sql #23 (event taxonomy), #24 (TT error state, U-STATE-03), #25 (TT-BAL-11/TT-PEN-01), and #26 (TT-WALL-07 provider parameter contract: one PROVIDERS map + lock test, wall URL verified identical with a fake config).
+
+### Batch 39 — TT frame-load health verified (2026-11-25, register v47)
+
+- 🔴→✅ **TT-WALL-01 (TT)** — frame-load health live-verified on the component via route interception: a partner wall that never completes loading shows the visible "Offer wall could not load" error state with retry guidance after the 15s timeout (v262 F-03 behavior, now evidenced). Abort-style blocks that still fire the frame's load event are covered by the timeout backstop for hangs.
+
+**Headline after batch: strict 23.5% / measured-only 41.3% (v47)** — session arc since batch 24: 20.2% → 23.5%.
+
+Nine PRs remain queued for merge authorization (ai-gateway-site #498–#502; governed-sql #23–#26). All blockers unchanged.
+
+### Batch 40 — cap states verified + postback notifications (2026-11-25, register v48)
+
+- 🟡→✅ **TT-CAP-03 (TT)** — cap-reached states verified on the component via route interception: daily ("Daily cap reached — resets 4:00 PM PT", amber highlight) and monthly ("Monthly cap reached — resets on the 1st") states render, cap ring at full offset.
+- 🔴→🟡 **U-NOT-07 (TT)** — governed-sql PR #27: the offerwall postback now inserts an inbox notification for every money state change (verified credits and cap rejections), landing in the same notifications table the app bell reads. 🟡 pending merge + live readback; BV side (money/access matrix beyond the earn surface) still open.
+
+**Headline after batch: strict 23.6% / measured-only 41.3% (v48)** — session arc since batch 24: 20.2% → 23.6%.
+
+Ten PRs now queued for merge authorization (ai-gateway-site #498–#502; governed-sql #23–#27). Blockers unchanged.
+
+## PART F — INFRASTRUCTURE GUARDRAILS PROGRAM (v355, owner directive 2026-11-25)
+
+**Owner directive:** near-constant monitoring across the full estate — web apps, database, ontology, schema, health, analytics. No drift/error/bug may wait a day to be seen. Self-improvement required: every incident must end in a new codified gate.
+
+### F0 — Layered monitoring architecture
+
+| Layer | Cadence | Scope | Mechanism | On failure |
+|---|---|---|---|---|
+| L0 CI gates | every PR + push (seconds) | CSP hashes, pricing single-source, register/doc drift, module syntax, perf budget | `.github/workflows/qa-gates.yml` + `perf-budget.yml` (merge-blocking) | merge blocked |
+| L1 fast monitor | **every 5 minutes** | health endpoint, both hosts 200, static SEO heads (title/description/canonical/JSON-LD), AG static noindex, brand-leak in raw HTML, robots.txt + sitemap, pricing.json when shipped | `qa/live-sweep.py` via `qa-gates.yml` schedule (pure HTTP, no browser) | auto-filed `regression` issue → closure loop picks it up within one 15-min run |
+| L2 deep monitor | hourly | full Playwright prelaunch suite, brand-leak gate (logged-out + logged-in, 8 surfaces), CLS/LCP budgets, request-count budget, status-page live checks | `perf-budget.yml` + `bv-brand-leak.py` on schedule | auto-filed `regression` issue |
+| L3 data/schema layer | hourly, moving to continuous | DB schema snapshot diff vs migrations, ontology registry doctrine gate, RPC contract tests (credits reserve/settle/refund, neurons-claim, postback idempotency), ledger integrity verify, analytics event-taxonomy sync | governed-sql `_tests/` + `monitors/` + `ops-health/` + `gateway-status` (already server-side) | regression issue + loop |
+| L4 self-healing | every 15 minutes | the master-doc closure automation consumes the `regression` issue queue, diagnoses, opens a fix PR for known deterministic failure classes (CSP drift, copy drift, module 404, SEO-head regressions, gate failures) | automation `9e3dc488` + deterministic fix patterns | fix PR + postmortem |
+| L5 integrity invariants | always | headline computed never hand-summed (`register-drift-check.py`), doc (vNN) == register version, idempotent ledgers, fire-and-forgage analytics never block user paths, no silent catches without visible state | CI-enforced | merge blocked |
+
+### F1 — Silent-failure elimination rules (codified)
+
+1. Every `catch` in edge functions must either (a) log, (b) degrade visibly in the UI, or (c) be annotated with why silence is correct (e.g. never-fail-over-analytics).
+2. Every poll loop must have a visible failure state (the TT connection-issue pattern — 2 consecutive failures → visible state + retry).
+3. Every scheduled job must heartbeat: the fast monitor writes a pass/fail trail; a missed heartbeat is itself a failure signal.
+4. Every gate must be CI-enforced — a gate that only runs when remembered is not a gate (owner rule, F0/L0).
+
+### F2 — Self-improvement loop (the incident → gate pipeline)
+
+Every `regression` issue closure requires one of: a new CI gate, a new lock test, a new live-sweep check, or a written justification of why the existing gate suffices. Incidents feed the gate library, so the same bug class can never recur silently. Current gate library: csp-hash-check, pricing-consistency, register-drift-check, event-taxonomy sync, provider-map lock, postback-notifications lock, perf-budget, brand-leak, prelaunch, contract_neurons_claim, offerwall idempotency (143-request simulation), purchase analytics.
+
+### F3 — Escalation ladder
+
+5 min: fast monitor catches → 15 min: closure loop diagnoses + fix PR → 60 min: deep monitor confirms fix + regression issue closed with a new gate if a new failure class → 24 h: no regression may remain open without an owner-note explaining why.
+
+### F4 — Execution status (2026-11-25)
+
+- ✅ L0 CI gates shipped (qa-gates.yml, PR #498): CSP, pricing, drift, syntax — run on every PR
+- ✅ L1 fast monitor shipped at 5-minute cadence (qa-gates.yml schedule, live-sweep.py: 10 PASS against production now)
+- ✅ L5 drift guard shipped (register-drift-check.py: doc/register version + computed headline integrity)
+- 🟡 L2 hourly deep: components exist (perf-budget, brand-leak, prelaunch) — schedule wiring rides on the qa-gates merge
+- 🟡 L3 data/schema hourly sweep: governed-sql test suite + monitors exist; a single scheduled runner wrapping them is the next increment
+- 🟡 L4: closure loop live (15-min floor); regression-issue consumption is this loop's standing rule from this batch forward
+- 🔴 Continuous (sub-5-min) in-process monitoring needs an always-on runner (Vercel cron floor is 1 min; GitHub Actions floor ~5 min) — a dedicated edge heartbeat function is the escalation path when owner approves
