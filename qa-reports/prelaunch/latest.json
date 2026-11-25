@@ -1,7 +1,7 @@
 {
- "ts": "2026-11-25T06:20:01+00:00",
+ "ts": "2026-11-25T06:49:55+00:00",
  "base": "https://ai.spaincos.com",
- "passed": 36,
+ "passed": 37,
  "failed": 0,
  "checks": [
   {
@@ -25,6 +25,11 @@
    "detail": "HTTP 200"
   },
   {
+   "name": "model lanes all pass",
+   "ok": true,
+   "detail": "3 lanes ok"
+  },
+  {
    "name": "token mint",
    "ok": true,
    "detail": ""
@@ -37,7 +42,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "2.3s"
+   "detail": "2.9s"
   },
   {
    "name": "current-events answered",
@@ -52,7 +57,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "2.7s"
+   "detail": "6.2s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -157,7 +162,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 36/36 checks \u00b7 11/22/2026, 2:22:"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 36/36 checks \u00b7 11/25/2026, 6:20:"
   },
   {
    "name": "Fleet Automations tab renders",
@@ -177,7 +182,7 @@
   {
    "name": "Follow-up chip submits full command",
    "ok": true,
-   "detail": "q=2 msg='Build a step-by-step action plan with owners and dates' payload='Build a step-by-step action plan with owners and dates'"
+   "detail": "q=2 msg='ch multifamily (4.2%\u20134.8% cap rates vs. the risk-free rate).' payload='ch multifamily (4.2%\u20134.8% cap rates vs. the risk-free rate).'"
   },
   {
    "name": "zero JS/CSP errors",
