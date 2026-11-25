@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "updated": "2026-11-25",
+  "currency": "usd",
+  "credit_value_usd": 0.01,
+  "points_display_multiplier": 10,
+  "trial_days": 30,
+  "plans": [
+    {
+      "id": "core",
+      "name": "Core",
+      "price_monthly": 8,
+      "allowance": "25,000 pts/day refresh"
+    },
+    {
+      "id": "max",
+      "name": "Max",
+      "price_monthly": 50,
+      "allowance": "250,000 pts/day",
+      "includes": ["Deep Research"]
+    },
+    {
+      "id": "team",
+      "name": "Team",
+      "price_monthly_per_seat": 20,
+      "allowance": "Shared spaces + roles",
+      "contact": true
+    }
+  ]
+}
