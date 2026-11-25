@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 21.9%** (app-weighted; unmeasured counts as 0; v40 — batch 27: crawler access verified, AG consent/export equivalence, status-page JS fix) · **measured-only: 39.1%** · 164✅ / 226🟡 / 194🔴 / 794⚪ across 386 line items. Per-app strict: BV 39.7% · TT 27.4% · AG 43.5% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 22.1%** (app-weighted; unmeasured counts as 0; v41 — batch 28: first-party conversion funnel; status page fully green live) · **measured-only: 39.3%** · 165✅ / 226🟡 / 192🔴 / 794⚪ across 386 line items. Per-app strict: BV 39.9% · TT 27.4% · AG 43.7% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1768,3 +1768,14 @@ Live readback of batch 26 first: all three PRs (#478, #464, governed-sql #21) me
 **Headline after batch: strict 21.9% / measured-only 39.1% (v40)** — session arc since batch 24: 20.2% → 21.9%.
 
 Next autonomous queue: U-SEO-17 privacy-safe conversion measurement (first-party, no third parties), remaining BV/AG 🟡 sweeps. Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision.
+
+### Batch 28 — first-party conversion funnel + live readbacks (2026-11-25, register v41)
+
+Merged under owner authorization: #479 (status-page JS fix) and #481 (batch-27 docs).
+
+- ✅ **Live readback (U-REL-01 evidence surface)**: boundview.com/status now shows all three checks green — Web app: ok, Health endpoint: ok, Answer engine: ok (the syntax-error fix verified on production).
+- 🔴→🟡 **U-SEO-17 (BV/AG)** — privacy-safe conversion measurement implemented (governed-sql PR #22, awaiting merge): server-side `checkout_started` event + existing `purchase` event, both in the first-party `analytics_events` table. Zero third-party pixels, zero cookies, zero cross-site identifiers. 🟡 pending merge + a marketing-facing readback surface.
+
+**Headline after batch: strict 22.1% / measured-only 39.3% (v41)** — session arc since batch 24: 20.2% → 22.1%.
+
+Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision, billing-pane live readback (local/AG sign-in rate-limited this window).
