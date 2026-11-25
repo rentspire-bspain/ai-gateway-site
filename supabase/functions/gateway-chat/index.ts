@@ -4313,8 +4313,12 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       try {
         const c0 = String((finalResponse as any)?.choices?.[0]?.message?.content || "");
         const answerBody = c0.slice(Math.max(0, c0.indexOf("---"))); // skip the work-log header
-        const looksEnglish = /\b(the|is|are|and|of|with|was|for)\b/i.test(answerBody);
-        const looksSpanish = /\b(el|la|los|las|de|que|es|en|una|para|con|por)\b/i.test(answerBody);
+        // v352c: count distinct function words — 'de' is excluded from the Spanish set
+        // (names like "Miguel de Cervantes" false-positived the gate); accents are decisive.
+        const engHits = (answerBody.match(/\b(the|is|are|was|were|and|of|with|for|by|from|that|this|in|on)\b/gi) || []).length;
+        const spaHits = (answerBody.match(/\b(el|la|los|las|que|son|una|para|por|con)\b/gi) || []).length + ((answerBody.match(/[áéíóúñ¿¡]/g) || []).length > 2 ? 5 : 0);
+        const looksEnglish = engHits >= 2 && spaHits === 0;
+        const looksSpanish = spaHits > 0;
         if (c0.trim() && looksEnglish && !looksSpanish) {
           const pKey = Deno.env.get("PERPLEXITY_API_KEY");
           if (pKey) {
