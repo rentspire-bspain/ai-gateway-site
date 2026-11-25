@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 23.5%** (app-weighted; unmeasured counts as 0; v47 — batch 39: TT frame-load health verified) · **measured-only: 41.3%** · 177✅ / 225🟡 / 181🔴 / 794⚪ across 386 line items. Per-app strict: BV 45.3% · TT 28.1% · AG 45.4% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 23.6%** (app-weighted; unmeasured counts as 0; v48 — batch 40: cap states verified; postback notifications) · **measured-only: 41.3%** · 178✅ / 224🟡 / 181🔴 / 794⚪ across 386 line items. Per-app strict: BV 45.3% · TT 28.5% · AG 45.4% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1838,3 +1838,12 @@ Blockers unchanged (plus pricing-copy reconciliation and analytics service key f
 **Headline after batch: strict 23.5% / measured-only 41.3% (v47)** — session arc since batch 24: 20.2% → 23.5%.
 
 Nine PRs remain queued for merge authorization (ai-gateway-site #498–#502; governed-sql #23–#26). All blockers unchanged.
+
+### Batch 40 — cap states verified + postback notifications (2026-11-25, register v48)
+
+- 🟡→✅ **TT-CAP-03 (TT)** — cap-reached states verified on the component via route interception: daily ("Daily cap reached — resets 4:00 PM PT", amber highlight) and monthly ("Monthly cap reached — resets on the 1st") states render, cap ring at full offset.
+- 🔴→🟡 **U-NOT-07 (TT)** — governed-sql PR #27: the offerwall postback now inserts an inbox notification for every money state change (verified credits and cap rejections), landing in the same notifications table the app bell reads. 🟡 pending merge + live readback; BV side (money/access matrix beyond the earn surface) still open.
+
+**Headline after batch: strict 23.6% / measured-only 41.3% (v48)** — session arc since batch 24: 20.2% → 23.6%.
+
+Ten PRs now queued for merge authorization (ai-gateway-site #498–#502; governed-sql #23–#27). Blockers unchanged.

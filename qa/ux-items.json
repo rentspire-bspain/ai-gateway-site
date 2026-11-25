@@ -1,5 +1,5 @@
 {
-  "version": 47,
+  "version": 48,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -4961,10 +4961,13 @@
       "W": 7,
       "ircm": "4300",
       "status": {
-        "TT": "Y"
+        "TT": "G"
       },
       "evidence": "Wall stays open at cap; simulation shows 27 cap-rejected completions | 2026-11-21 live re-verification (post PR #264 merge): cap-reached states shipped on PR #15 branch 7258921 (pending merge)",
-      "fix": "Overlay at cap"
+      "fix": "Overlay at cap",
+      "notes": {
+        "TT": "2026-11-25 batch 40: cap-reached states verified on the component via route interception — daily ('Daily cap reached — resets 4:00 PM PT', amber) and monthly ('Monthly cap reached — resets on the 1st') states render with the cap ring at full offset"
+      }
     },
     {
       "id": "TT-CAP-04",
