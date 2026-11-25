@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 23.3%** (app-weighted; unmeasured counts as 0; v44 — batch 31: event taxonomy defined + sync test) · **measured-only: 40.9%** · 174✅ / 227🟡 / 182🔴 / 794⚪ across 386 line items. Per-app strict: BV 45.0% · TT 27.4% · AG 45.1% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 23.3%** (app-weighted; unmeasured counts as 0; v45 — batch 32: canonical pricing source + gate) · **measured-only: 40.9%** · 174✅ / 227🟡 / 182🔴 / 794⚪ across 386 line items. Per-app strict: BV 45.0% · TT 27.4% · AG 45.1% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1813,3 +1813,11 @@ Next queue: U-MEAS-01 event taxonomy readback surface, TT-WALL frame-health item
 **Headline after batch: strict 23.3% / measured-only 40.9% (v44)** — session arc since batch 24: 20.2% → 23.3%.
 
 Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision, passkey enablement (Supabase console).
+
+### Batch 32 — canonical pricing source (2026-11-25, register v45)
+
+- 🟡 **U-PAY-01 / BV-05 (BV)** — mechanism built in PR #499: canonical `/pricing.json` (Core/Max/Team, credit value, trial days), the Settings → Billing pane now renders plan cards from it (offline-tolerant fallback), and `qa/pricing-consistency.py` gates that the live checkout surface matches the canonical source (exit 0). **Owner decision surfaced:** the public pricing page describes planned Starter/Pro/Unlimited tiers with no prices and "checkout not live yet", while the live billing pane carries Core/Max/Team Stripe prices — reconciling that copy is an owner pricing call, reported by the gate on every run.
+
+**Headline after batch: strict 23.3% / measured-only 40.9% (v45)** — session arc since batch 24: 20.2% → 23.3%.
+
+Blockers unchanged plus two new owner decisions: pricing-page copy reconciliation, and an analytics service key (or authenticated ops endpoint) for the funnel readback. Others: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation, passkey enablement (Supabase console).

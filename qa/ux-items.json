@@ -1,5 +1,5 @@
 {
-  "version": 44,
+  "version": 45,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -2052,7 +2052,10 @@
         "DG": "U"
       },
       "evidence": "A3 locks tiers; no automated cross-surface price diff",
-      "fix": "Single pricing.json consumed by every surface + CI diff"
+      "fix": "Single pricing.json consumed by every surface + CI diff",
+      "notes": {
+        "BV": "2026-11-25 batch 32 (PR #499): canonical /pricing.json + billing-pane consumption + qa/pricing-consistency.py gate (exit 0). FOUND OWNER DECISION: public pricing page shows planned Starter/Pro/Unlimited tiers with no prices while the live billing pane carries Core/Max/Team Stripe prices — reconciliation is an owner pricing call"
+      }
     },
     {
       "id": "U-PAY-02",
@@ -5352,7 +5355,10 @@
         "BV": "Y"
       },
       "evidence": "A3 parity statement",
-      "fix": "pricing.json diff test"
+      "fix": "pricing.json diff test",
+      "notes": {
+        "BV": "2026-11-25 batch 32 (PR #499): canonical /pricing.json + billing-pane consumption + qa/pricing-consistency.py gate (exit 0). FOUND OWNER DECISION: public pricing page shows planned Starter/Pro/Unlimited tiers with no prices while the live billing pane carries Core/Max/Team Stripe prices — reconciliation is an owner pricing call"
+      }
     },
     {
       "id": "BV-06",
