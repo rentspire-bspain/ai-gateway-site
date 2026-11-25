@@ -1,5 +1,5 @@
 {
- "version": 33,
+ "version": 34,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -127,7 +127,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "2026-11-24 live (Playwright, first load, signed-out): 88 requests, 65 scripts, 408 KB br JS vs the \u226430-request/\u2264170 KB budget \u2014 still fails; root fix remains the true module code-split (F-23 follow-on). Post-#429 the module tail no longer gates UX (LCP 1.0s slow-4G).",
+   "evidence": "2026-11-25 code-split series (PRs #451/#455/#456/#457, all locally verified, pending merge): signed-out critical-path scripts 67 -> 38 (Settings family 17 mods; connectors/projects/plugins; Tasks overlay + skills; answer-rendering family gated to sign-in). Still above the \u226430-request/\u2264170KB br budget until merged + the remaining boot-critical set is bundled. Status stays R until merged and measured live.",
    "fix": "Bundle + defer non-critical modules (settings, fleet, media, voice) behind route/idle import; target \u226430 first-load requests"
   },
   {
@@ -287,7 +287,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "prelaunch only gates simple query <30 s and current-events <35 s, which is far looser than a UX budget",
+   "evidence": "2026-11-25 lab (eval-bot fixture, gateway-chat, 5 samples): simple-answer total latency median 2.49s / p75 ~2.67s \u2014 passes the \u22648s simple-answer budget. First token 2.4\u20133.5s on the free 'flint' lane, above the \u22642s p75 target; the production 'auto' lane first-token p75 needs a measured sample set to close. Verdict Y: total-answer latency green, first-token pending production-lane measurement.",
    "fix": "Tighten gates to 8 s / 20 s; chart p50/p95 on Fleet QA tab"
   },
   {

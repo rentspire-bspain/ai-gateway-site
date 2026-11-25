@@ -1694,3 +1694,18 @@ Merged record: https://github.com/rentspire-bspain/SHMT/issues/3500#issuecomment
 - ⚪ DG (DoorGraph): internal/synthetic staging; needs staging credentials and the CanonIntel formation decision.
 
 **Headline after batch:** strict 20.1% / measured-only 36.5% — 149✅ / 227🟡 / 207🔴 / 794⚪ (v33; was 19.6% / 144✅). **Session cumulative (batches 12–20): strict 17.3% → 20.1%, ✅ 121 → 149 (+28), 🔴 221 → 207.**
+
+### Batch 21 — loop runs 1–4 consolidation + gateway latency measurement (2026-11-24/25, register v34)
+
+The 15-minute continuous closure loop (automation `9e3dc488`) is running; runs 1–4 produced the four-PR code-split series, all locally verified and stacked:
+
+- 🔧 **#454** — webp icon set (U-PERF-09; og/twitter cards stay PNG for crawler compat; production favicon.webp restored after catching an overwrite)
+- 🔧 **#455** — code-split 2: connectors (~85KB, all refs guarded) + projects + plugins → deferred family of 21
+- 🔧 **#456** — code-split 3: Tasks overlay (all five tabs verified through the TasksUI stub) + skills
+- 🔧 **#457** — code-split 4: answer-rendering family (8 modules) gated to sign-in/share/first-submit — signed-out scripts **67 → 38**
+
+**U-PERF-13 measured (first real p75 samples):** simple-answer total latency median 2.49s / p75 ~2.67s (5 samples, eval-bot, gateway-chat) — passes the ≤8s budget; first token 2.4–3.5s on the free flint lane exceeds the ≤2s target — production-lane first-token measurement pending. Verdict stays 🟡 with recorded evidence.
+
+**U-PERF-05 evidence updated:** the full series + budgets documented; stays 🔴 until the PRs merge and the live numbers are re-measured.
+
+All four PRs await owner authorization (merge order 454 → 455 → 456 → 457). Blockers unchanged: Comet offline (comptrove + GoDaddy DNS), ST/DG access, E11-2 counsel review.
