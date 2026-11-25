@@ -1,7 +1,7 @@
 {
- "ts": "2026-11-25T07:10:35+00:00",
+ "ts": "2026-11-25T19:21:55+00:00",
  "base": "https://ai.spaincos.com",
- "passed": 37,
+ "passed": 38,
  "failed": 0,
  "checks": [
   {
@@ -30,6 +30,11 @@
    "detail": "3 lanes ok"
   },
   {
+   "name": "boundview brand-leak gate",
+   "ok": true,
+   "detail": "bv-brand-leak: 0 leaks across 8 surfaces"
+  },
+  {
    "name": "token mint",
    "ok": true,
    "detail": ""
@@ -42,7 +47,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "4.4s"
+   "detail": "14.1s"
   },
   {
    "name": "current-events answered",
@@ -57,7 +62,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "11.0s"
+   "detail": "11.2s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -162,7 +167,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 36/36 checks \u00b7 11/25/2026, 6:20:"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 37/37 checks \u00b7 11/25/2026, 7:10:"
   },
   {
    "name": "Fleet Automations tab renders",
@@ -182,7 +187,7 @@
   {
    "name": "Follow-up chip submits full command",
    "ok": true,
-   "detail": "q=2 msg='0-year yield against the 2-year for the current curve spread' payload='0-year yield against the 2-year for the current curve spread'"
+   "detail": "q=2 msg='ar fixed mortgage rate and its spread over the 10-year yield' payload='ar fixed mortgage rate and its spread over the 10-year yield'"
   },
   {
    "name": "zero JS/CSP errors",
