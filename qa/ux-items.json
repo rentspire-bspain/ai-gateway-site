@@ -1,5 +1,5 @@
 {
-  "version": 39,
+  "version": 40,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -1808,7 +1808,11 @@
         "DG": "U"
       },
       "evidence": "gateway-status endpoint + Fleet page; no public status page | worker CT 2026-11-22: comptrove.com resolves and serves Comptrove content right now (a rendered Austin, TX rent-comparison page was fetched from comptrove.com), but the benchmark requires ≥99.9% monthly availability AND a public status page — neither is verifiable: no public Comptrove status page was found on comptrove.c",
-      "fix": "Publish status.<domain>"
+      "fix": "Publish status.<domain>",
+      "notes": {
+        "BV": "2026-11-25 batch 27: public status page exists and serves (boundview.com/status 200); its live-check JS was dead code from a syntax error — fix in PR #479; monthly 99.9% availability measurement still pending",
+        "AG": "2026-11-25 batch 27: ai.spaincos.com/status serves and its checks run (no syntax error there); monthly availability measurement pending"
+      }
     },
     {
       "id": "U-REL-02",
@@ -2501,7 +2505,7 @@
       "status": {
         "BV": "G",
         "TT": "G",
-        "AG": "Y",
+        "AG": "G",
         "GH": "U",
         "ST": "U",
         "CT": "U",
@@ -2510,7 +2514,8 @@
       "evidence": "2026-11-24: consent gate live with equal-prominence reject (#430) + GPC honored as default denial (#445, verified) + state-rights policy cross-references (#448). Ad-network iframe never loads without explicit acceptance.",
       "fix": "Add CMP gating the wall; honor GPC",
       "notes": {
-        "TT": "2026-11-25 batch 25: consent gate ported via governed-sql PR #20 (merged); served at localhost:8905"
+        "TT": "2026-11-25 batch 25: consent gate ported via governed-sql PR #20 (merged); served at localhost:8905",
+        "AG": "2026-11-25 batch 27: identical build as BV (same Vercel project) — consent gate with GPC live-verified on boundview.com; /modules/offerwall-earn.js served on AG (200, contains globalPrivacyControl + ad_consent_v1); AG-host live sign-in was unavailable during the window (same auth backend)"
       }
     },
     {
@@ -2674,14 +2679,17 @@
       "status": {
         "BV": "G",
         "TT": "U",
-        "AG": "Y",
+        "AG": "G",
         "GH": "U",
         "ST": "U",
         "CT": "U",
         "DG": "U"
       },
       "evidence": "2026-11-24: in-app deletion (threads/files/projects deletable directly; account deletion via support email, stated in the policy's rights sections) + data export via the export module (/modules/export.js). AG holds the same surface and stays G-equivalent.",
-      "fix": "Surface in Settings with confirmation email"
+      "fix": "Surface in Settings with confirmation email",
+      "notes": {
+        "AG": "2026-11-25 batch 27: /modules/export.js served on AG (200); deletion surface identical to BV (shared codebase, BV verified G)"
+      }
     },
     {
       "id": "U-TRU-12",
@@ -3156,16 +3164,20 @@
       "W": 7,
       "ircm": "3103",
       "status": {
-        "BV": "Y",
+        "BV": "G",
         "TT": "-",
-        "AG": "Y",
+        "AG": "G",
         "GH": "U",
         "ST": "-",
         "CT": "Y",
         "DG": "-"
       },
       "evidence": "comptrove.com and rentspire.com return 403 'deny' to a generic UA (WAF rule)",
-      "fix": "Verify with Search Console URL inspection; allowlist verified bots"
+      "fix": "Verify with Search Console URL inspection; allowlist verified bots",
+      "notes": {
+        "BV": "2026-11-25 batch 27: live probes — HTTP 200 to Googlebot/Bingbot and generic CLI user-agents on boundview.com and ai.spaincos.com; robots.txt 200; no WAF deny (the 403-deny issue is CT/rentspire only)",
+        "AG": "2026-11-25 batch 27: same probes on ai.spaincos.com — 200 to all bot user-agents"
+      }
     },
     {
       "id": "U-SEO-15",
