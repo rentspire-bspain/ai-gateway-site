@@ -156,5 +156,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/docs/api",
+      "destination": "/api-docs.html"
+    }
   ]
 }

@@ -12,4 +12,5 @@
   <url><loc>https://boundview.com/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://boundview.com/status</loc><changefreq>hourly</changefreq><priority>0.3</priority></url>
   <url><loc>https://boundview.com/verify</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://boundview.com/docs/api</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>
