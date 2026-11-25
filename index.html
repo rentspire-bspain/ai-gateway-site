@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Us4LR0UnHp7hxCsYpQovuAXUxIcogJppFzVqwTThEfs=' 'sha256-JkP+AmScOGvaGq6YGr3VPd2esWlailc7Ih41wUShoh4=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Us4LR0UnHp7hxCsYpQovuAXUxIcogJppFzVqwTThEfs=' 'sha256-JkP+AmScOGvaGq6YGr3VPd2esWlailc7Ih41wUShoh4=' 'sha256-awrUxp/8yF09zIqg9R+DBua/ET+82mE1Zco/XFw0Y+M=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
@@ -6076,8 +6076,6 @@ function wireCodeCopy(scope) {
 <div id="moduleRoot"></div>
 <script src="/modules/connectors.config.js"></script>
 <script src="/modules/connectors.js"></script>
-<script src="/modules/artifacts.js"></script>
-<script src="/modules/cards.js"></script>
 <script src="/modules/offerwall-earn.js"></script>
 <script src="/modules/research.js"></script>
 <script src="/modules/projects.js"></script>
@@ -6141,23 +6139,64 @@ function wireCodeCopy(scope) {
 <script src="/modules/notify-bell.js"></script>
 <script src="/modules/local-files.js"></script>
 <script src="/modules/voice-convo.js"></script>
-<script src="/modules/artifacts-files.js"></script>
 <script src="/modules/artifacts-gallery.js"></script>
 <script src="/modules/docs-panel.js"></script>
 <script src="/modules/artifact-library.js"></script>
 <script src="/modules/webapps.js"></script>
-<script src="/modules/sources.js"></script>
-<script src="/modules/media.js"></script>
-<script src="/modules/export.js"></script>
 <script src="/modules/tabstatus.js"></script>
-<script src="/modules/tool-chips.js"></script>
 <script src="/modules/onboarding.js"></script>
+<script>
+/* F-23 code-split increment 4 (U-PERF-05): the answer-rendering family — 8 modules
+   (~180 KB: artifacts, cards, artifacts-files, sources, media, export, tool-chips,
+   response-diff) — is only needed once answers can render. It loads when the auth
+   gate lifts (sign-in), on /t/ share pages at boot, or on the first composer submit
+   as a fallback — before the first answer arrives, since the gateway round-trip
+   outlasts the module fetch. Signed-out landing visitors never download it.
+   All external references (ToolChips, EntityCards, ArtifactsFiles) are guarded. */
+(function () {
+  var FAM = ["tool-chips", "cards", "response-diff", "artifacts", "artifacts-files", "sources", "media", "export"];
+  var p = null;
+  function loadAnswerFam() {
+    if (p) return p;
+    p = new Promise(function (resolve, reject) {
+      var i = 0;
+      (function next() {
+        if (i >= FAM.length) { resolve(true); return; }
+        var sc = document.createElement("script");
+        sc.src = "/modules/" + FAM[i++] + ".js";
+        sc.onload = next;
+        sc.onerror = function () { reject(new Error("answer module failed: " + sc.src)); };
+        document.head.appendChild(sc);
+      })();
+    });
+    return p;
+  }
+  window.__loadAnswerFam = loadAnswerFam;
+  function gateLifted() {
+    var auth = document.getElementById("authOverlay");
+    return !auth || !auth.style || !auth.style.display || auth.style.display === "none";
+  }
+  if (/^\/t\//.test(location.pathname)) { loadAnswerFam().catch(console.error); }
+  else if (typeof MutationObserver !== "undefined") {
+    var gate = document.getElementById("authOverlay");
+    if (gate && !gateLifted()) {
+      var mo = new MutationObserver(function () {
+        if (gateLifted()) { mo.disconnect(); loadAnswerFam().catch(console.error); }
+      });
+      mo.observe(gate, { attributes: true, attributeFilter: ["style", "class"] });
+    } else if (gateLifted()) { loadAnswerFam().catch(console.error); }
+  }
+  document.addEventListener("submit", function once(e) {
+    document.removeEventListener("submit", once, true);
+    loadAnswerFam().catch(console.error);
+  }, true);
+})();
+</script>
 <script src="/modules/mobile-375.js"></script>
 <script src="/modules/mobile-focus-trap.js"></script>
 <script src="/modules/desktop-notifications.js"></script>
 <script src="/modules/voice-readaloud.js"></script>
 <link rel="stylesheet" href="/css/readaloud.css">
-<script src="/modules/response-diff.js"></script>
 <script src="/modules/command-palette.js"></script>
 <script>
 // perf: on-demand modules + non-blocking stylesheets. These five overlays are only reachable through a click, so
