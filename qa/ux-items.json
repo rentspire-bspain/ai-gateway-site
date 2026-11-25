@@ -1,5 +1,5 @@
 {
-  "version": 45,
+  "version": 46,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -1319,16 +1319,20 @@
       "W": 7,
       "ircm": "3112",
       "status": {
-        "BV": "Y",
+        "BV": "G",
         "TT": "-",
-        "AG": "Y",
+        "AG": "G",
         "GH": "-",
         "ST": "Y",
         "CT": "U",
         "DG": "U"
       },
       "evidence": "prelaunch notes transient x-vercel-mitigated challenge on QA traffic. comptrove.com and rentspire.com return 403 x-vercel-mitigated: deny to a generic UA",
-      "fix": "Document WAF rules; allowlist verified search + unfurl bots; test with real browser UA nightly"
+      "fix": "Document WAF rules; allowlist verified search + unfurl bots; test with real browser UA nightly",
+      "notes": {
+        "BV": "2026-11-25 batch 33: live probes — HTTP 200 to Googlebot/Bingbot and generic CLI user-agents on boundview.com (no challenge, no WAF deny); humans unaffected (full prelaunch + Playwright flows pass)",
+        "AG": "2026-11-25 batch 33: same probes on ai.spaincos.com — 200 to all bot user-agents"
+      }
     },
     {
       "id": "U-FORM-01",
