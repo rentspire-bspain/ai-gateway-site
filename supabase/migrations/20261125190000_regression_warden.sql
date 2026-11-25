@@ -61,3 +61,7 @@ alter table public.brand_guard_log enable row level security;
 alter table public._ow_probe2 enable row level security;
 -- warden service identity for the authenticated probes (eval QA account):
 insert into gateway_config (key, value) values ('warden_eval_email','eval-bot@spaincos.com'),('warden_eval_password','EvalTest2026!') on conflict (key) do nothing;
+
+-- v355 WARDEN v3: full-estate coverage (dcyj runtime + storage + latency anomaly)
+create or replace function public.warden_bucket_audit() returns int language sql security definer as $$
+  select count(*) from storage.buckets b where b.public = true and b.id not in ('gateway-assets','public','site-assets') $$;
