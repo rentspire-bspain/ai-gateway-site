@@ -1,5 +1,5 @@
 {
- "version": 35,
+ "version": 36,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -2542,16 +2542,12 @@
     "BV": "G",
     "TT": "G",
     "AG": "G",
-    "GH": "Y",
+    "GH": "G",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": [
-    "TT",
-    "G",
-    "2026-11-24: the FTC disclosure in the merged tasks-tab component (PR #15) is live in the host's Earn tab and was verified verbatim in the live readback. Governed-sql PR #19 adds the Terms/Privacy links."
-   ],
+   "evidence": "2026-11-25 code inspection (gig-hub-mockup/index.html, the deployed mockup's source): FTC material-connection disclosure present and conspicuous \u2014 'FTC-disclosed partner offers' label plus disclosure copy: 'Partner offers pay boundview a referral fee when you complete them. Neurons are earned only \u2014 never purchasable, never cash-out. Daily earn caps apply.' Clear, plain-language, caps stated.",
    "fix": "Raise to \u226514 px ink color; repeat on interstitial, toast, email, share"
   },
   {
