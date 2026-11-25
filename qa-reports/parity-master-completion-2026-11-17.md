@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 20.1%** (app-weighted; unmeasured counts as 0; v33 — TRU sweep 2: support route, AI disclosure, brand separation, deletion green on BV; code-split increment 1 in PR #451) · **measured-only: 36.5%** · 149✅ / 227🟡 / 207🔴 / 794⚪ across 386 line items. Per-app strict: BV 37.5% · TT 21.6% · AG 41.7% · GH 10.7% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 21.0%** (app-weighted; unmeasured counts as 0; v38 — batch 25: AG noindex dead-code fix live, robots-policy audit closed, TT consent/GPC/report/dispute port merged) · **measured-only: 37.8%** · 158✅ / 224🟡 / 201🔴 / 794⚪ across 386 line items. Per-app strict: BV 38.0% · TT 25.4% · AG 42.6% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1728,3 +1728,16 @@ Owner authorized the full stack; merged in order #454 → #460 (the two docs PRs
 - U-PERF-05 stays 🔴 (budget ≤30 req / ≤170 KB) — remaining boot-critical set needs build-time bundling; series recorded
 
 **Headline after batch:** strict 20.2% / measured-only 36.7% (v37).
+
+### Batch 25 — AG noindex dead-code fix live + robots audit closed + TT consent port merged (2026-11-25, register v38)
+
+Owner authorized merging all three queued PRs; merged ai-gateway-site #462 + #461 and governed-sql #20.
+
+**AG noindex bug found and fixed (U-SEO-06):**
+- 🔴→✅ **U-SEO-06 (AG)** — the run-9 audit found the private host served NO noindex meta. Root cause: `modules/brand.js`'s `if (!isBV) return;` aborted the module on non-BoundView hosts before `seoHeads()` was reachable — the noindex branch was dead code, leaving ai.spaincos.com indexable with og tags. Fix in PR #462: non-BV hosts boot a minimal path (branded title + `noindex, nofollow`). **Live-verified post-deploy**: `{robots: "noindex, nofollow", canonical: null}` on ai.spaincos.com.
+- 🟡→✅ **U-SEO-06 (BV)** — robots-policy audit closed: robots.txt (`User-agent: * / Allow: / / Disallow: /t/` + sitemap.xml) serves both hosts; canonical `https://boundview.com/` live; no noindex on the public host (intended); AG robots.txt pointing its sitemap at boundview.com is by-design brand separation (private workspace noindexed).
+- 🔴→✅ **U-TRU-03/04, TT-WALL-12, TT-PEN-03 (TT)** — governed-sql PR #20 merged (consent gate with GPC honoring, state-rights copy, report-an-offer path, dispute explanation); verified served on the tasks-tab component at localhost:8905.
+
+**Headline after batch: strict 21.0% / measured-only 37.8% (v38)** — up from 20.2% / 36.7% (v37).
+
+Next autonomous queue: U-COPY-03 currency vocabulary sweep, TT-NW-03 state eligibility copy, U-TRU-06 BV auto-renew copy, U-TRU-07 BV/TT age gate. Blocked: comptrove probes + minutegig DNS (Comet offline / GoDaddy), ST/DG access, E11-2 counsel review.
