@@ -1717,3 +1717,14 @@ All four PRs await owner authorization (merge order 454 → 455 → 456 → 457)
 
 - ✅ U-TRU-05 (GH) 🟡→✅ — code inspection of the deployed mockup's source (gig-hub-mockup/index.html): conspicuous FTC material-connection disclosure present ("FTC-disclosed partner offers" label + referral-fee/earn-only/no-cash-out/caps copy).
 - Stack health: all six pending PRs (#454–#459) still MERGEABLE against current master.
+
+### Batch 24 — all seven queued PRs merged + live readback (2026-11-25, register v37)
+
+Owner authorized the full stack; merged in order #454 → #460 (the two docs PRs required conflict rebases as the parallel session moved master mid-stack — both resolved keeping all batch sections and the highest register version).
+
+**Live readback post-merge:**
+- ✅ U-PERF-09 →✅ BV+AG — webp icons live on both hosts (link hrefs verified, image/webp, zero failures; og cards stay PNG by design)
+- 📊 Code-split series live: signed-out at-load **81 requests / 57 scripts / 344 KB br** (baseline 90 / 67 / ~410 KB); families deferred behind stubs with idle prefetch; settings verified opening live; LCP 552ms, CLS 0.000, zero console errors
+- U-PERF-05 stays 🔴 (budget ≤30 req / ≤170 KB) — remaining boot-critical set needs build-time bundling; series recorded
+
+**Headline after batch:** strict 20.2% / measured-only 36.7% (v37).
