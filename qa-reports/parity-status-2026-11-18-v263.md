@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v354)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v355)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3407,3 +3407,33 @@ Every deploy must pass: lane-health canary + brand-leak gate + UX master (≥90)
 - Score-drift alarms on headline and UX-master deltas.
 
 **Headline: 90.8% (11618/128).** All layers are now LIVE except the three owner-paste items in Layer 3.
+
+---
+
+## Addendum 70 — v355 (2026-11-25): guardrails program EXECUTED at full-estate scope
+
+The granular plan from Addendum 69 is now fully live, extended beyond the original scope, and **proven**: the warden autonomously detected the dcyj harvest-pipeline drift (feed_has_rows, counter_fresh, pipeline_alive failing) on its first estate run and **auto-filed [issue #510](https://github.com/rentspire-bspain/ai-gateway-site/issues/510) with evidence — no human in the loop**.
+
+### THE COMPLETE MONITORING MATRIX (what runs, how often, what it catches)
+| Cadence | Layer | Checks | What it catches |
+|---|---|---|---|
+| **Every turn (~0s)** | In-request failsafes | degradation chains, language gate, citation verification, budget fail-closed, retry/backoff | user-visible errors of every known class |
+| **Every push** | Deploy gates | 38-check prelaunch (lane canary, brand browser gate, UX master, eval-replay, CSP, gospel) | regressions shipping |
+| **EVERY 1 MINUTE** | Warden fast lane | model lanes, both /api/health, both /status, sitemap, 4-page brand sweep (10 checks; ~14,400 runs/day) | outages, lane deaths, brand leaks |
+| **EVERY 15 MINUTES** | Warden deep lane | all of fast PLUS: RLS audit, schema-hash drift, cron health, fleet registry, ops-health analytics freshness, storage public-exposure audit, gateway latency anomaly (8s guard), dcyj estate fleet-status + launch-health, and the authenticated probes (ES language, session recall, sandbox math) — 23 checks | database drift, schema drift, silent pipeline stalls, estate decay, security exposure, latency regressions |
+| **On any transition** | Escalation | playbook match (remediation carried forward, times_matched incremented) → deduped GitHub issue auto-filed with evidence → warden_alerts row (regression AND recovery) | everything above, made visible and durable |
+| **Continuous** | Drift ledger | every check result ever, permanent (warden_ledger) | historical drift analysis |
+
+### Proven in production, in order:
+1. RLS audit run 1 → **6 anon-readable tables found and locked down** (one carrying a live webhook secret).
+2. Estate launch-health run 1 → **harvest pipeline drift surfaced for the first time** → issue #510 auto-filed.
+3. False-alarm in my own freshness check → caught and corrected within one run (the warden auditing the warden).
+4. Recovery tracking → the ops-health false alarm is recorded as recovered in warden_alerts.
+
+### Self-improvement loop (live)
+warden_playbooks: known failure signatures with remediations (seeded: all-lanes-unauthorized, es-answers-english, status-page-brand-leak). Every failure matches a playbook or files an issue instructing a new one — the library grows from every incident. times_matched tracks recurrence.
+
+### Remaining to full autonomous FIX (owner pastes, Layer 3):
+1. Deploy PAT → Supabase secrets: unlocks warden auto-rollback (redeploy last-known-good gateway bundle on persistent lane failure).
+2. GATEWAY_TOKEN_B as env secret on both projects: replaces the deploy-bundle token fallback with clean env auth.
+3. PUBLIC_API_AUTH_SERVICE_ROLE_KEY → Vercel: activates API-key auth + the distributed rate limiter in production.
