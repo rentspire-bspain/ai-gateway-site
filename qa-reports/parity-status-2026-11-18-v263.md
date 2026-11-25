@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v350)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-25, v351)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3287,3 +3287,14 @@ Also live this batch: the response-diff evolution (PR #283 — "v2 of 7" badges 
 - **Headline: 90.3% → 90.4%** (11577/128) — from qa/generate-parity-headline.py, the honest generator, never hand-summed.
 
 **Next autonomous lanes queued (in order):** Docs/Support 84 (second docs page + FAQ), Security 82 (DB-backed distributed rate limiter), Mobile 86 / Accessibility 88 (remaining cosmetic items), Desktop 80, Premium 80, Marketing 80, Comet 78, Teammates 78 (admin-path check owner-token-gated), Enterprise 74 (SSO/SCIM owner-gated portions documented). Owner-gated rows (Email, NativeMobile, Legal, Stripe checkout, Fleet bypass tokens) held for absolute last per directive.
+
+---
+
+## Addendum 66 — v351 (2026-11-25): Docs/Support 88, Security 85; API-key auth owner item surfaced
+
+- **Docs/Support 84 → 88 (PR #485, live both domains):** second docs page shipped — /docs/api, the full public API reference (auth, search modes, embeddings, errors, CORS, honest Phase 1 limits) grounded in the live self-documenting endpoints; cross-linked from both docs pages, in the sitemap, 200 live on both domains.
+- **Security 82 → 85 (PR #487):** distributed rate limiter shipped — Postgres fixed-window counter (api_rate_limits + api_rate_limit_take RPC, applied to production, migration recorded), identity-keyed at 60/min default, fail-open on DB error, Retry-After on 429, 21/21 unit tests (deny + fail-open paths).
+- **Honest finding surfaced by live verification (NEW OWNER ACTION, one paste):** PUBLIC_API_AUTH_SERVICE_ROLE_KEY was never set in the Vercel environment — the deployed /api routes have only ever accepted JWTs; API-key auth AND the new limiter's enforcement are inert in production until that env var is set (the Vercel REST credential is DENIED, so I cannot set it). The /docs/api page and route code are correct; the env paste completes the surface. Temporary live-test keys were created for verification and deleted.
+- **Headline: 90.4% → 90.6%** (11597/128).
+
+**Queue after this batch:** Mobile 86 and Accessibility 88 (remaining cosmetic items), Desktop 80, Premium 80, Marketing 80, Comet 78, Teammates 78, Enterprise 74. Owner-gated rows held for last (now including the Vercel env paste above).
