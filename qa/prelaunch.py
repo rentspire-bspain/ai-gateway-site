@@ -95,6 +95,19 @@ def backend():
     print("BACKEND")
     st, body, dt = http(f"{SB}/functions/v1/gateway-status", 20)
     check("gateway-status 200", st == 200, f"HTTP {st}")
+    # v348 LANE-HEALTH CANARY (incident 2026-11-23..25): the 11-23 dcyj GATEWAY_TOKEN
+    # rotation killed all four self-write model lanes for ~34h while Perplexity-lane
+    # answers masked it — no gate asserted lane health, so the doc kept reporting green
+    # benchmarks on a half-dead platform. This canary fails the prelaunch gate whenever
+    # any lane regresses, so that class of silent outage can never hide again.
+    try:
+        lanes = json.loads(http(f"{SB}/functions/v1/gateway-status?force=1", 60, None, {}, 2)[1]) if False else json.loads(urllib.request.urlopen(
+            urllib.request.Request(f"{SB}/functions/v1/gateway-status", headers={"content-type": "application/json"}), timeout=60).read())
+        res = lanes.get("results") or []
+        fails = [r.get("name") for r in res if r.get("status") != "pass"]
+        check("model lanes all pass", bool(res) and not fails, "failing: " + ", ".join(fails) if fails else f"{len(res)} lanes ok")
+    except Exception as e:
+        check("model lanes all pass", False, f"gateway-status unreadable: {str(e)[:80]}")
     m = mint()
     tok = m and m.get("access_token")
     check("token mint", bool(tok))
