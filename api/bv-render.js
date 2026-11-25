@@ -61,6 +61,11 @@ function transformHtml(html) {
     )
     // crawler-visible structured data (data block, not executed — CSP-safe); brand.js skips its copy when present
     .replace("</head>", '<script type="application/ld+json" data-bv="1">' + BV_LD + "</script></head>")
+    // v352 (U-ONB-01, batch 33): brand-specific landing value proposition — the shared
+    // hero subtitle becomes the BoundView value prop (matches the tagline + description),
+    // so the ≤5s first impression states what the product is.
+    .replace('<p class="landing-subtitle">Ask anything. Powered by open-weight models.</p>',
+      '<p class="landing-subtitle">Ask anything — see the whole picture. AI research with sources, powered by open-weight models.</p>')
     // v351 (U-SEO-02/04, batch 29): crawler-visible STATIC head tags — meta description
     // (118 chars, within the 70–160 window) and the canonical URL, both present in the
     // pre-JS response so non-executing crawlers see them. brand.js skips its runtime
