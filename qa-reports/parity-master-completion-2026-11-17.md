@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 21.7%** (app-weighted; unmeasured counts as 0; v39 — batch 26: age gates, TT eligibility note, auto-renew disclosure, canonical N valuation constant) · **measured-only: 38.8%** · 161✅ / 228🟡 / 194🔴 / 794⚪ across 386 line items. Per-app strict: BV 39.4% · TT 27.4% · AG 43.0% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 21.9%** (app-weighted; unmeasured counts as 0; v40 — batch 27: crawler access verified, AG consent/export equivalence, status-page JS fix) · **measured-only: 39.1%** · 164✅ / 226🟡 / 194🔴 / 794⚪ across 386 line items. Per-app strict: BV 39.7% · TT 27.4% · AG 43.5% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1755,3 +1755,16 @@ Code PRs: ai-gateway-site #478, governed-sql #21 (awaiting merge authorization a
 **Headline after batch: strict 21.7% / measured-only 38.8% (v39)** — up from 21.0% / 37.8% (v38). Session arc since batch 24: 20.2% → 21.7%.
 
 Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend publisher approval. Next autonomous queue: live readback of the Billing pane disclosure once sign-in works, remaining measurable BV/AG/TT sweeps.
+
+### Batch 27 — crawler access, AG trust equivalence, status-page fix (2026-11-25, register v40)
+
+Live readback of batch 26 first: all three PRs (#478, #464, governed-sql #21) merged; the 18+ age gate is LIVE on boundview.com (verified signed-in: age row present, wall stays unloaded).
+
+- 🟡→✅ **U-SEO-14 (BV/AG)** — crawler access live-probed: HTTP 200 to Googlebot, Bingbot, and generic CLI user-agents on both hosts; robots.txt 200. The 403-deny WAF behavior is Comptrove/RentSpire only.
+- 🟡→✅ **U-TRU-03 (AG)** — consent + GPC: same Vercel project/build as BV (live-verified on boundview.com); /modules/offerwall-earn.js served on AG (200, contains the GPC default-denial and consent-gate logic).
+- 🟡→✅ **U-TRU-11 (AG)** — data export/deletion: /modules/export.js served on AG (200); surface identical to BV (verified G on BV).
+- 🐛→PR #479 **U-REL-01 (BV)** — found the BoundView public status page's live-check JS was dead code (stray `});` syntax error; health dot stuck at "na". Fix in PR #479 (awaiting merge auth with this batch's docs). Monthly 99.9% availability measurement still pending → stays 🟡.
+
+**Headline after batch: strict 21.9% / measured-only 39.1% (v40)** — session arc since batch 24: 20.2% → 21.9%.
+
+Next autonomous queue: U-SEO-17 privacy-safe conversion measurement (first-party, no third parties), remaining BV/AG 🟡 sweeps. Blockers unchanged: Comet offline (comptrove + GoDaddy/minutegig DNS), ST/DG access, E11-2 counsel review, Adscend approval, N-valuation owner decision.
