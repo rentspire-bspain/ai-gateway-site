@@ -28,3 +28,36 @@ select cron.schedule('regression-warden-15min','*/15 * * * *', $$
     url := 'https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/regression-warden',
     headers := jsonb_build_object('Content-Type','application/json'))
 $$);
+
+-- v354 WARDEN v2 additions (all applied to production on 2026-11-25):
+create table if not exists public.warden_playbooks (
+  id bigint generated always as identity primary key,
+  signature text unique not null,
+  check_name text not null,
+  severity text not null default 'P1',
+  remediation text,
+  auto_remediation text,
+  learned_at timestamptz default now(),
+  times_matched int default 0
+);
+alter table public.warden_playbooks enable row level security;
+create or replace function public.warden_rls_audit() returns int language sql security definer as $$
+  select count(*) from pg_class c where c.relnamespace='public'::regnamespace and c.relkind='r' and not c.relrowsecurity $$;
+create or replace function public.warden_schema_hash() returns text language sql security definer as $$
+  select md5(string_agg(c.relname || ':' || coalesce((select string_agg(a.attname || ':' || format_type(a.atttypid, a.atttypmod), ',' order by a.attnum) from pg_attribute a where a.attrelid=c.oid and a.attnum>0 and not a.attisdropped), ''), '|' order by c.relname)) from pg_class c where c.relnamespace='public'::regnamespace and c.relkind='r' $$;
+create or replace function public.warden_cron_status() returns jsonb language sql security definer as $$
+  select coalesce(jsonb_agg(jsonb_build_object('jobname',j.jobname,'active',j.active)), '[]'::jsonb) from cron.job j where j.jobname like 'regression-warden%' $$;
+-- near-constant cadence (owner directive: "I cannot go a full day"):
+select cron.schedule('regression-warden-fast','* * * * *', $$ select net.http_post(url:='https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/regression-warden', headers:=jsonb_build_object('Content-Type','application/json')) $$);
+select cron.schedule('regression-warden-deep','*/15 * * * *', $$ select net.http_post(url:='https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/regression-warden?deep=1', headers:=jsonb_build_object('Content-Type','application/json')) $$);
+select cron.unschedule('regression-warden-15min'); -- replaced by fast+deep
+-- RLS lockdown found by the warden's first RLS audit (six tables were anon-readable,
+-- including affiliate_networks carrying a webhook secret):
+alter table public.model_costs enable row level security;
+alter table public.harvest_jobs enable row level security;
+alter table public.owner_owners enable row level security;
+alter table public.affiliate_networks enable row level security;
+alter table public.brand_guard_log enable row level security;
+alter table public._ow_probe2 enable row level security;
+-- warden service identity for the authenticated probes (eval QA account):
+insert into gateway_config (key, value) values ('warden_eval_email','eval-bot@spaincos.com'),('warden_eval_password','EvalTest2026!') on conflict (key) do nothing;
