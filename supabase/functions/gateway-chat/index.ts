@@ -1539,7 +1539,7 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
     // call-model spend tripwire (daily paid-call cap + monthly spend cap), which protects
     // the OpenRouter bill and stays. Invited members keep the raised limits above.
     const unlimited = ["bspain@spaincos.com", "eval-bot@spaincos.com"].includes(userEmail.toLowerCase());
-    if (!unlimited) {
+    if (!unlimited && !anonymous) { // v356: anonymous visitors are governed by their own daily cap (above), not the per-user policy (empty userId would fail the RPC closed)
       const pol = (RATE_POLICY as any)[bucket];
       const m = rateMem.check(`${userId}:${bucket}`, pol.limit, pol.windowSec * 1000);
       if (!m.ok) return tooMany(m.retryAfter, cors);
