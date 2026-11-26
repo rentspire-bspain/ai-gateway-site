@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-25T19:21:55+00:00",
+ "ts": "2026-11-26T04:46:06+00:00",
  "base": "https://ai.spaincos.com",
  "passed": 38,
  "failed": 0,
@@ -47,7 +47,7 @@
   {
    "name": "simple query < 30s",
    "ok": true,
-   "detail": "14.1s"
+   "detail": "5.9s"
   },
   {
    "name": "current-events answered",
@@ -62,7 +62,7 @@
   {
    "name": "current-events < 35s",
    "ok": true,
-   "detail": "11.2s"
+   "detail": "21.4s"
   },
   {
    "name": "guardian-runner lists guardians",
@@ -167,7 +167,7 @@
   {
    "name": "Fleet QA tab shows fleet report",
    "ok": true,
-   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 37/37 checks \u00b7 11/25/2026, 7:10:"
+   "detail": "Overview\nAutomations\nGuardians\nQA\nBuild\nPRE-LAUNCH REGRESSION FLEET Refresh\nALL GREEN\n\u00b7 38/38 checks \u00b7 11/25/2026, 7:21:"
   },
   {
    "name": "Fleet Automations tab renders",
@@ -187,7 +187,7 @@
   {
    "name": "Follow-up chip submits full command",
    "ok": true,
-   "detail": "q=2 msg='ar fixed mortgage rate and its spread over the 10-year yield' payload='ar fixed mortgage rate and its spread over the 10-year yield'"
+   "detail": "q=2 msg='e 30-year mortgage rate implied by the current 10-year yield' payload='e 30-year mortgage rate implied by the current 10-year yield'"
   },
   {
    "name": "zero JS/CSP errors",
