@@ -1,5 +1,5 @@
 {
- "version": 51,
+ "version": 52,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -3088,7 +3088,7 @@
    "W": 7,
    "ircm": "3103",
    "status": {
-    "BV": "R",
+    "BV": "G",
     "TT": "-",
     "AG": "R",
     "GH": "U",
@@ -3096,7 +3096,7 @@
     "CT": "Y",
     "DG": "-"
    },
-   "evidence": "Single SPA shell; unknown paths JS-redirect (spa-redirect.js) | worker CT 2026-11-22: One representative public content page — a Comptrove rent-comps market page (Austin, TX average-rent) — served substantial readable body copy, data tables, and internal links in the raw crawlable HTML, confirming content is visible without JavaScript on that page [[2](https://comptrove.com/m/austin/",
+   "evidence": "[batch 44, 2026-11-26] Live: BV landing serves a crawler-visible noscript marketing block (value prop + links to pricing/features/compare/changelog/docs/help/status/refund) and pricing, features, compare, changelog, docs, help, status, refund all serve full static HTML with no-JS visible content (pricing 2.3k, features 3.2k, compare 3.6k, docs 8.1k visible chars). Verified by live-sweep 'bv landing noscript prerender' + per-page 200 checks. PR #610; deploy ec2cece.",
    "fix": "Prerender landing, pricing, features, docs, compare pages as static HTML"
   },
   {
@@ -3108,7 +3108,7 @@
    "W": 7,
    "ircm": "3103",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "-",
     "AG": "R",
     "GH": "U",
@@ -3116,7 +3116,7 @@
     "CT": "R",
     "DG": "-"
    },
-   "evidence": "[batch 43, 2026-11-26] Live: https://boundview.com/features serves a crawlable static features page (branded 200; answers-with-sources, open-weight models, Neurons, research tooling) alongside existing /pricing, /docs, /status. Compare/changelog pages still missing (partial → Y). PRs #594/#596; deploy 218ddd8b.",
+   "evidence": "[batch 44, 2026-11-26] Live: dedicated BV pages for pricing (/pricing), features (/features), compare (/compare — vs ChatGPT/Claude/Perplexity), docs (/docs), and changelog (/changelog), each with unique intent and static HTML. Verified 200 + branded on all five by live-sweep. PRs #594/#596/#610 + batch-44 changelog; deploy ec2cece.",
    "fix": "Create content plan (pricing ladder vs ChatGPT/Claude/Perplexity per A3)"
   },
   {
@@ -5623,9 +5623,9 @@
    "W": 9,
    "ircm": "3303",
    "status": {
-    "AG": "R"
+    "AG": "G"
    },
-   "evidence": "Fully crawlable and titled 'BoundView'",
+   "evidence": "[batch 44, 2026-11-26] Live: ai.spaincos.com workspace root serves a static auth interstitial (noindex + X-Robots-Tag; no workspace shell bytes in the gate response — 'ag auth interstitial' sweep check). JS-capable visitors set the ws cookie and reach the sign-in shell ('ag ws bypass reaches shell'), which retains the static noindex. PR #610; deploy ec2cece; live-sweep ALL GREEN.",
    "fix": "noindex + auth interstitial"
   },
   {

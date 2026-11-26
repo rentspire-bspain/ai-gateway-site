@@ -64,13 +64,12 @@ jobs:
         run: |
           code=$(curl -s -o /tmp/hb.json -w "%{http_code}" "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/heartbeat" || echo 000)
           echo "heartbeat HTTP $code: $(head -c 400 /tmp/hb.json)"
-          # KNOWN-GAP (tracked): the heartbeat function is merged (governed-sql #29) but
-          # NOT yet deployed — no deploy pipeline/credentials in the repo. A 404 means
-          # still-pending deployment, which must not spam regression issues every 5 min.
-          # Any other non-200 (or a 404 once deployment exists) fails the sweep.
-          if grep -q '"code":"NOT_FOUND"' /tmp/hb.json 2>/dev/null; then
-            echo "KNOWN-GAP: heartbeat not deployed yet — skipping (remove this branch once deployed)"
-            exit 0
-          fi
+          # v355 DEPLOYED 2026-11-26 (batch 44): the heartbeat function is live on
+          # bnxermyboeigvwonfrzx and runs every minute via pg_cron (heartbeat-cron).
+          # Non-200 now FAILS the sweep — the minute-scale record layer must never
+          # silently disappear. A heartbeat_gap analytics_events row is also written
+          # by the DB-side gap detector (cron job 'heartbeat-gap-detector', every 2 min)
+          # when the newest heartbeat is older than 3 minutes.
           test "$code" = "200"
+          grep -q '"ok":true' /tmp/hb.json
 

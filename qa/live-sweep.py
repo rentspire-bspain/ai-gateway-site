@@ -53,7 +53,7 @@ def main():
     st, body = get(BV + "/sitemap.xml")
     fails += not check("sitemap 200", st == 200)
 
-    for pg in ("features", "refund", "compare"):
+    for pg in ("features", "refund", "compare", "changelog"):
         st, body = get(BV + "/" + pg)
         fails += not check(f"bv /{pg} page 200 + branded", st == 200 and b"BoundView" in body)
 
