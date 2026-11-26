@@ -142,7 +142,7 @@ module.exports = async (req, res) => {
         res.end(req.method === "HEAD" ? undefined : htmlApi);
         return;
       }
-      const allowed = { terms: 1, privacy: 1, docs: 1, help: 1, status: 1, refund: 1, features: 1 };
+      const allowed = { terms: 1, privacy: 1, docs: 1, help: 1, status: 1, refund: 1, features: 1, compare: 1 };
       if (page === "pricing" && !isBoundViewHost) { res.writeHead(404, headers); res.end("not found"); return; }
       if (page === "pricing") allowed.pricing = 1;
       if (!allowed[page]) { res.writeHead(404, headers); res.end("not found"); return; }
@@ -180,9 +180,45 @@ module.exports = async (req, res) => {
       .replace(/href="\/favicon\.png"/g, 'href="/icons/boundview-favicon-48.png"')
       .replace(/href="\/icons\/apple-touch-icon\.webp"/g, 'href="/icons/boundview-apple-touch-icon.webp"')
       .replace(/href="\/icons\/apple-touch-icon\.png"/g, 'href="/icons/boundview-apple-touch-icon.png"');
-    const out = isBoundViewHost
-      ? faviconFix(transformHtml(html))
-      : html.replace("</title>", '</title>\n<meta name="robots" content="noindex, nofollow">');
+    // v358 (AG-01): non-BoundView hosts get a STATIC auth interstitial before the
+    // workspace shell — a crawler-visible auth wall, not just a noindex meta. JS-capable
+    // visitors set the ws cookie and land on the sign-in card; JS-less crawlers see
+    // only the gate. boundview.com is the public surface and is never gated.
+    const cookie = String(req.headers.cookie || "");
+    const wsOk = /(?:^|;\s*)ws=1/.test(cookie) || /[?&]ws=1/.test(String(req.url || ""));
+    let out;
+    if (isBoundViewHost) {
+      // v359 (U-SEO-08): crawler-visible prerendered marketing copy on the landing —
+      // the SPA shell paints via JS; non-JS clients (and plain crawlers) still get the
+      // value prop and the static page set from the raw HTML.
+      const seoBlock = `<noscript><div id="seo-prerender"><h2>BoundView — AI research with sources, powered by open-weight models</h2>
+<p>Every answer carries its citations. Daily verified activity earns Neurons — earn-only credits that power bonus AI usage (never purchasable, never cash-out).</p>
+<ul>
+<li><a href="/pricing">Pricing — Core $8/mo, Max $50/mo, Team $20/seat</a></li>
+<li><a href="/features">Features — answers with sources, open-weight routing, Neurons, research tooling</a></li>
+<li><a href="/compare">Compare BoundView vs ChatGPT, Claude and Perplexity</a></li>
+<li><a href="/docs.boundview.html">Documentation</a> · <a href="/help.boundview.html">Help center</a> · <a href="/status">Status</a></li>
+<li><a href="/refund">Refund, reversal and dispute policy</a> · <a href="/terms.boundview.html">Terms</a> · <a href="/privacy.boundview.html">Privacy</a></li>
+</ul>
+<p>Enable JavaScript for the interactive workspace.</p></div></noscript>`;
+      out = faviconFix(transformHtml(html)).replace("</body>", seoBlock + "\n</body>");
+    } else if (!wsOk) {
+      const cands = [
+        path.join(__dirname, "auth-interstitial.html"),
+        path.join(__dirname, "../auth-interstitial.html"),
+        path.join(process.cwd(), "auth-interstitial.html"),
+        path.join(process.cwd(), "../auth-interstitial.html"),
+      ];
+      const fInt = cands.find((c) => { try { return fs.existsSync(c); } catch { return false; } });
+      if (fInt) {
+        res.writeHead(200, { ...headers, "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" });
+        res.end(req.method === "HEAD" ? undefined : fs.readFileSync(fInt, "utf8"));
+        return;
+      }
+      out = html.replace("</title>", '</title>\n<meta name="robots" content="noindex, nofollow">');
+    } else {
+      out = html.replace("</title>", '</title>\n<meta name="robots" content="noindex, nofollow">');
+    }
     res.writeHead(200, headers);
     res.end(req.method === "HEAD" ? undefined : out);
   } catch (e) {
