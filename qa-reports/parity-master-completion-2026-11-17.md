@@ -1918,3 +1918,11 @@ Gaps to close, in strict-completion priority order (each gap = measurable regist
 5. **Heartbeat deployment** — owner deploy path or Supabase token; the 5-min sweep logs the KNOWN-GAP until then.
 
 Completion math under this focus: measured-only is 42.5% and strict is 24.4%; the difference is the 794 ⚪ unmeasured cells, concentrated in GH/ST/CT/DG (owner-gated access). Within BV/TT/AG — the apps we can measure — the remaining lever is converting 🟡→✅ via the gaps above (3 register items) and the owner decisions (pricing copy, N-valuation, passkey console, counsel E11-2).
+
+### Batch 42 — A6 per-offer disclosure (2026-11-26, register v50)
+
+- 🔴→✅ **TT-FTC-04 (TT)** — A6 per-offer disclosure live on BOTH earn surfaces (governed-sql #32 + ai-gateway-site #590, owner-authorized): a one-time interstitial before the first offer-wall open (referral fee, per-network terms, verification timing, no obligation — the wall stays unloaded behind it) plus a permanent sticky disclosure label above the frame. Verified on the component and the Earn tab before merge.
+
+**Headline after batch: strict 24.5% / measured-only 42.8% (v50)** — session arc since batch 24: 20.2% → 24.5%.
+
+**Completion math (owner answer to "why not more %"):** the hard ceiling with all BV+TT+AG items green is 38.3% strict; +GH measured = 40.4%; all 7 apps = 47.0% — the remaining mass sits in 794 ⚪ unmeasured cells concentrated in GH/ST/CT/DG (owner access) and in owner decisions. The autonomous grind continues down the weight-sorted list (next: U-PAY-05 refund page, U-SEO-09/08 static marketing pages).

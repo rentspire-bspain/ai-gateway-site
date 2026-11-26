@@ -1,5 +1,5 @@
 {
-  "version": 49,
+  "version": 50,
   "date": "2026-11-20",
   "statuses": {
     "G": 100,
@@ -4470,10 +4470,13 @@
       "W": 9,
       "ircm": "4131",
       "status": {
-        "TT": "R"
+        "TT": "G"
       },
       "evidence": "A6 says per-offer; code has one global banner, offers render inside a third-party iframe",
-      "fix": "Interstitial before first wall open + sticky label above frame; confirm with network on in-frame labeling"
+      "fix": "Interstitial before first wall open + sticky label above frame; confirm with network on in-frame labeling",
+      "notes": {
+        "TT": "2026-11-26 batch 42 (PRs #32/#590 merged): A6 per-offer disclosure live — one-time interstitial before the first wall open (verified: wall stays unloaded behind it) + permanent sticky disclosure label above the frame; verified on both the component and the Earn tab"
+      }
     },
     {
       "id": "TT-FTC-05",
