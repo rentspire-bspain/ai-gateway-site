@@ -49,6 +49,8 @@ const DEEP_CHECKS: any[] = [
   { name: "es_language_probe", kind: "es_probe" },
   { name: "session_recall_probe", kind: "recall_probe" },
   { name: "sandbox_math_probe", kind: "math_probe" },
+  { name: "bv_favicon_kit", kind: "bv_favicon" },          // v359: favicon incident
+  { name: "bv_context_probe", kind: "bv_context_probe" },  // v359: owner phrasings, brand-bleed-in-answer
 ];
 
 function sbHeaders(key: string) { return { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" }; }
@@ -74,9 +76,9 @@ async function mintToken(anon: string, email: string, password: string): Promise
   return d?.access_token || null;
 }
 
-async function gatewayAsk(tok: string, q: string, extra: any = {}): Promise<{ ok: boolean; content: string; skipped: string | null }> {
+async function gatewayAsk(tok: string, q: string, extra: any = {}, origin?: string): Promise<{ ok: boolean; content: string; skipped: string | null }> {
   const r = await fetch(`${SB}/functions/v1/gateway-chat`, {
-    method: "POST", headers: { authorization: `Bearer ${tok}`, "Content-Type": "application/json" },
+    method: "POST", headers: { authorization: `Bearer ${tok}`, "Content-Type": "application/json", ...(origin ? { origin } : {}) },
     body: JSON.stringify({ messages: [{ role: "user", content: q }], mode: "concise", thread_id: `warden-${Date.now()}`, ...extra }),
     signal: AbortSignal.timeout(120_000),
   }).catch(() => null);
@@ -177,6 +179,25 @@ async function runCheck(c: any, ctx: any): Promise<{ ok: boolean; detail: string
       const res = await gatewayAsk(ctx.tok, "What did we talk about in our previous conversations?");
       const bad = /can'?t access|cannot access other/i.test(res.content);
       return { ok: !bad && res.content.length > 50, detail: bad ? "recall regressed: claims no access" : "recall answers from stored context" };
+    }
+    if (c.kind === "bv_favicon") {
+      // v359 free check: boundview.com must serve the BoundView favicon kit server-side
+      // (browsers pin the tab favicon from the first HTML response — incident 2026-11-25).
+      const r = await fetch("https://boundview.com/", { signal: AbortSignal.timeout(20_000) });
+      const t = await r.text();
+      const okFav = /boundview-favicon/.test(t);
+      const spain = (t.match(/spain/gi) || []).length;
+      return { ok: r.ok && okFav && spain === 0, detail: `favicon=${okFav}, spain-mentions=${spain}, HTTP ${r.status}` };
+    }
+    if (c.kind === "bv_context_probe" && ctx.tok) {
+      // v359: the EXACT owner phrasings from the 2026-11-25 incident, replayed on the
+      // boundview.com origin every deep run — session recall must route, no raw export
+      // filenames, no estate internals, and no brand bleed inside the ANSWER text.
+      const res = await gatewayAsk(ctx.tok, "Do you have full and complete history and context and API connections with Perplexity?", { origin_host: "boundview.com" }, "https://boundview.com");
+      const c1 = res.content;
+      const leak = /conversations-\d{8}|\.json\b|spaincos|Spain Companies|476,270/i.test(c1);
+      const routed = res.skipped === "session_recall";
+      return { ok: res.ok && !leak && routed && c1.length > 50, detail: `routed=${routed}, leak=${leak}, len=${c1.length}` };
     }
     if (c.kind === "math_probe" && ctx.tok) {
       const res = await gatewayAsk(ctx.tok, "Calculate 17 * 23.");
