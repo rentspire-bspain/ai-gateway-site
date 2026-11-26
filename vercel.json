@@ -70,6 +70,14 @@
       "dest": "/api/bv-render?page=pricing"
     },
     {
+      "src": "/refund/?",
+      "dest": "/api/bv-render?page=refund"
+    },
+    {
+      "src": "/features/?",
+      "dest": "/api/bv-render?page=features"
+    },
+    {
       "src": "/help",
       "dest": "/api/bv-render?page=help"
     },
