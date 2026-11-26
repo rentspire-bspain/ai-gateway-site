@@ -3041,7 +3041,14 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
     // the service key scoped by user_id; never logs content; skipped entirely for
     // incognito and api-key traffic; best-effort (any failure = no block, chat unbroken).
     let digestBlock = "";
-    if (!apiKeyMode && !incognito && userId && ((Deno.env.get("CONTEXT_DIGEST") === "on" && (personalization as any)?.context_digest === true) || sessionRecall)) {
+    // v358 CONTEXT ON BY DEFAULT (owner directive 2026-11-26: "how does BoundView still
+// have no actual context"): the digest was double-gated (env flag + per-request flag,
+// both off) so ordinary logged-in turns got ZERO personal context — only session-recall
+// turns saw it. Now every authenticated, non-incognito turn gets the digest. The user's
+// privacy controls still work: incognito threads and personalization.context_digest === false
+// suppress it. (sessionRecall keeps its stronger mandate from v347.)
+const digestOn = sessionRecall || (personalization as any)?.context_digest !== false;
+if (!apiKeyMode && !incognito && userId && digestOn) {
       try {
         const svcKey0 = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
         const dHeaders = { apikey: svcKey0, Authorization: `Bearer ${svcKey0}`, "Content-Type": "application/json" };
