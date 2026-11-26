@@ -1419,9 +1419,10 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
     anonymous = true;
     mark("anon_auth");
   }
-  const token = authHeader.slice(7).trim();
+  // v356: the anonymous lane skips credential parsing entirely (authorized above).
+  const token = anonymous ? "" : authHeader.slice(7).trim();
   // v96 G4: API-key path (OpenAI-compatible clients send Authorization: Bearer sk-spaincos-...).
-  const apiKeyMode = token.startsWith(API_KEY_PREFIX);
+  const apiKeyMode = !anonymous && token.startsWith(API_KEY_PREFIX);
   let svcAuth: { key: string; uid: string } | undefined;
   let authUser: any;
   if (apiKeyMode) {
@@ -1433,6 +1434,8 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
     if (rk.status === "unavailable") return new Response(JSON.stringify(oaiError("API key verification is temporarily unavailable.", "api_error", "auth_unavailable")), { status: 503, headers: jsonHdr });
     svcAuth = { key: rk.svc!, uid: rk.userId! };
     authUser = { id: rk.userId, email: rk.email };
+  } else if (anonymous) {
+    mark("anon_skip_auth"); // v356: anonymous lane — no credential to verify (cap already enforced above)
   } else {
     const authCheck = await fetch(`${Deno.env.get("SUPABASE_URL") ?? "https://bnxermyboeigvwonfrzx.supabase.co"}/auth/v1/user`, {
       headers: { "Authorization": `Bearer ${token}`, "apikey": Deno.env.get("SUPABASE_ANON_KEY") ?? "" },
