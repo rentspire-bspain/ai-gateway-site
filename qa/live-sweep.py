@@ -53,9 +53,23 @@ def main():
     st, body = get(BV + "/sitemap.xml")
     fails += not check("sitemap 200", st == 200)
 
-    for pg in ("features", "refund"):
+    for pg in ("features", "refund", "compare"):
         st, body = get(BV + "/" + pg)
         fails += not check(f"bv /{pg} page 200 + branded", st == 200 and b"BoundView" in body)
+
+    # v359 (U-SEO-08): crawler-visible marketing copy on the BV landing without JS.
+    st, body = get(BV + "/")
+    b = body.decode("utf-8", "replace")
+    fails += not check("bv landing noscript prerender", 'id="seo-prerender"' in b)
+
+    # v358 (AG-01): the AG workspace root is a static auth interstitial (noindex,
+    # no workspace shell); ?ws=1 still reaches the workspace shell.
+    st, body = get(AG + "/")
+    a = body.decode("utf-8", "replace")
+    fails += not check("ag auth interstitial", st == 200 and "Private workspace" in a and "spa-restore" not in a)
+    st, body = get(AG + "/?ws=1")
+    a = body.decode("utf-8", "replace")
+    fails += not check("ag ws bypass reaches shell", st == 200 and "spa-restore" in a)
 
     # pricing.json is only checked when the repo itself ships it (the canonical-source
     # feature lands via its own PR; the sweep must not file regressions for pending work).
