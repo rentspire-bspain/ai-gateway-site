@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 24.4%** (app-weighted; unmeasured counts as 0; v49 — batch 41: all 12 queued PRs merged, readbacks green, guardrails live) · **measured-only: 42.5%** · 187✅ / 220🟡 / 176🔴 / 794⚪ across 386 line items. Per-app strict: BV 46.4% · TT 31.6% · AG 45.8% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 24.7%** (app-weighted; unmeasured counts as 0; v51 — batch 43: /refund and /features live on boundview.com, deploy path restored) · **measured-only: 43.0%** · 189✅ / 220🟡 / 174🔴 / 794⚪ across 386 line items. Per-app strict: BV 47.0% · TT 32.5% · AG 45.8% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1926,3 +1926,13 @@ Completion math under this focus: measured-only is 42.5% and strict is 24.4%; th
 **Headline after batch: strict 24.5% / measured-only 42.8% (v50)** — session arc since batch 24: 20.2% → 24.5%.
 
 **Completion math (owner answer to "why not more %"):** the hard ceiling with all BV+TT+AG items green is 38.3% strict; +GH measured = 40.4%; all 7 apps = 47.0% — the remaining mass sits in 794 ⚪ unmeasured cells concentrated in GH/ST/CT/DG (owner access) and in owner decisions. The autonomous grind continues down the weight-sorted list (next: U-PAY-05 refund page, U-SEO-09/08 static marketing pages).
+
+
+### Batch 43 — static refund/features pages live + deploy-path repair (2026-11-26, register v51)
+
+- 🟡→✅ **U-PAY-05 (BV)** — https://boundview.com/refund live: refund, reversal, chargeback and dispute-first policy page (branded 200, linked from /pricing; AG host correctly 404s). PRs #594 + #596.
+- 🔴→🟡 **U-SEO-09 (BV)** — https://boundview.com/features live: crawlable static features page next to /pricing, /docs, /status (compare/changelog still missing → Y). PRs #594 + #596.
+- **Deploy-path repair:** Vercel git auto-deploy had silently stopped (live index stale vs master; verify-live red 20/20). Root causes fixed: (a) the local Vercel CLI token was dead — production deploys now triggered via the Vercel REST API using the vault token; (b) PR #594 missed the vercel.json routes for the two clean URLs — #596 added them; (c) the verify-live md5 guard compared raw index.html, which bv-render brand-transforms per host — it can never match and has been red since the host-branding landed. Guard now compares modules/brand.js (served verbatim, changes with app code), so silent non-deploys are caught without permanent false alarms.
+- **Production deploy:** 218ddd8b via Vercel API (gitSource master). Live readbacks: /refund 200 branded, /features 200 branded, AG 404/404, home 200, live-sweep ALL GREEN.
+
+**Headline after batch: strict 24.7% / measured-only 43.0% (v51)** — session arc since batch 24: 20.2% → 24.7%. Next in the weight-sorted grind: U-SEO-08 (prerendered marketing/docs HTML), AG-01 auth interstitial, U-TRU-21 AG trust center, U-NOT-07 BV matrix.

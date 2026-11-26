@@ -16,14 +16,16 @@ jobs:
       - name: Compare live site to repo (retry up to ~10 min for Vercel build)
         if: github.event_name != 'pull_request'
         run: |
-          want=$(md5sum index.html | cut -d' ' -f1)
+          # index.html is host-branded by bv-render, so raw md5 never matches. Compare
+          # verbatim-served app assets instead (modules/brand.js changes with app code).
+          want=$(md5sum modules/brand.js | cut -d' ' -f1)
           for i in $(seq 1 20); do
-            got=$(curl -fsS -H 'Cache-Control: no-cache' "https://ai.spaincos.com/?cb=$(date +%s)" | md5sum | cut -d' ' -f1 || true)
+            got=$(curl -fsS -H 'Cache-Control: no-cache' "https://boundview.com/modules/brand.js?cb=$(date +%s)" | md5sum | cut -d' ' -f1 || true)
             echo "attempt $i: repo=$want live=$got"
             [ "$got" = "$want" ] && { echo "live matches repo"; exit 0; }
             sleep 30
           done
-          echo "::error::ai.spaincos.com does not match repo index.html - deploy did not reach production"
+          echo "::error::boundview.com does not match repo modules/brand.js - deploy did not reach production"
           exit 1
       - name: "CSP inline-script hash self-check (v241 guard - a stale hash makes the whole app JS-dead)"
         run: python3 qa/csp-hash-check.py
