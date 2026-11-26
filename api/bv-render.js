@@ -142,7 +142,7 @@ module.exports = async (req, res) => {
         res.end(req.method === "HEAD" ? undefined : htmlApi);
         return;
       }
-      const allowed = { terms: 1, privacy: 1, docs: 1, help: 1, status: 1, refund: 1, features: 1, compare: 1 };
+      const allowed = { terms: 1, privacy: 1, docs: 1, help: 1, status: 1, refund: 1, features: 1, compare: 1, changelog: 1 };
       if (page === "pricing" && !isBoundViewHost) { res.writeHead(404, headers); res.end("not found"); return; }
       if (page === "pricing") allowed.pricing = 1;
       if (!allowed[page]) { res.writeHead(404, headers); res.end("not found"); return; }

@@ -7,7 +7,7 @@
   ],
   "functions": {
     "api/bv-render.js": {
-      "includeFiles": "{terms,privacy,docs,help,status,verify,offline,pricing,refund,features,compare,index,auth-interstitial}.{html,boundview.html,es.html}"
+      "includeFiles": "{terms,privacy,docs,help,status,verify,offline,pricing,refund,features,compare,changelog,index,auth-interstitial}.{html,boundview.html,es.html}"
     }
   },
   "routes": [
@@ -80,6 +80,10 @@
     {
       "src": "/compare/?",
       "dest": "/api/bv-render?page=compare"
+    },
+    {
+      "src": "/changelog/?",
+      "dest": "/api/bv-render?page=changelog"
     },
     {
       "src": "/help",

@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 24.7%** (app-weighted; unmeasured counts as 0; v51 — batch 43: /refund and /features live on boundview.com, deploy path restored) · **measured-only: 43.0%** · 189✅ / 220🟡 / 174🔴 / 794⚪ across 386 line items. Per-app strict: BV 47.0% · TT 32.5% · AG 45.8% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 25.0%** (app-weighted; unmeasured counts as 0; v52 — batch 44: AG-01/U-SEO-08/U-SEO-09 green, minute-scale heartbeat live, Part G guardrails) · **measured-only: 43.4%** · 192✅ / 219🟡 / 172🔴 / 794⚪ across 386 line items. Per-app strict: BV 47.9% · TT 32.5% · AG 46.7% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -1936,3 +1936,58 @@ Completion math under this focus: measured-only is 42.5% and strict is 24.4%; th
 - **Production deploy:** 218ddd8b via Vercel API (gitSource master). Live readbacks: /refund 200 branded, /features 200 branded, AG 404/404, home 200, live-sweep ALL GREEN.
 
 **Headline after batch: strict 24.7% / measured-only 43.0% (v51)** — session arc since batch 24: 20.2% → 24.7%. Next in the weight-sorted grind: U-SEO-08 (prerendered marketing/docs HTML), AG-01 auth interstitial, U-TRU-21 AG trust center, U-NOT-07 BV matrix.
+
+
+## Part G — infrastructure guardrails: granular plan and execution state (2026-11-26, batch 44)
+
+Owner directive: near-constant monitoring across the full estate (web, edge functions, database, schema, ontology, health, analytics); self-improvement; autonomous error checking; automatic repair that is narrow and verifiable; repeat incidents become regression tests; no silent failures; no full-day blind spots. This part supersedes the Part F L0–L5 summary with the executed state and the remaining ladder.
+
+### G1. Layered monitoring cadence (executed state)
+
+| Layer | Cadence | Mechanism | Checks | Status |
+|---|---|---|---|---|
+| L-edge | **every 1 min** | pg_cron `heartbeat-cron` (job 20) → Supabase edge fn `heartbeat` v4 (deployed 2026-11-26) | boundview.com/api/health, ai.spaincos.com/api/health, /status, DB reachability; writes `analytics_events` row `event_type='heartbeat'` | ✅ live |
+| L-gap | **every 2 min** | pg_cron `heartbeat-gap-detector` (job 21) → `public.detect_heartbeat_gap()` | newest heartbeat older than 3 min → writes `heartbeat_gap` event (dedup: max 1 per 10 min) | ✅ live |
+| L-web | **every 5 min** | GitHub Actions `qa-gates.yml` cron `*/5` | 14+ production HTTP checks (live-sweep.py), heartbeat endpoint 200 + ok:true (hard gate since batch 44), csp-hash, pricing-consistency, register-drift; auto-files regression issues | ✅ live |
+| L-data | **hourly** | governed-sql `qa-sweep.yml` cron `23 * * *` | full edge-function test suite (RPC contracts, postback idempotency 143-request sim, event taxonomy, provider map, notification locks), esbuild bundle gate, cross-repo tests | ✅ live |
+| L-db | **5–10 min** | pg_cron `monitors-cron` (5m), `ops-health-cron` (10m), `research-jobs-cron` (2m), `regression-warden-fast` (1m), `fleet-dispatch-runner` (1m), `task-runner-5min`, `guardian-runner-5min` | monitor lag, function_logs error tail, guardian engine, regression warden, fleet registry | ✅ live (pre-existing estate crons, now inventoried here) |
+| L-deploy | every master push | `verify-live.yml` md5 guard on `modules/brand.js` (verbatim-served, deploy-invariant; fixed in batch 43 — index.html is host-branded and can never md5-match) | production matches master within ~10 min or red | ✅ live |
+
+### G2. Detect regressions between sweeps (not just point-in-time pass/fail)
+
+- The 5-min sweep compares **current state to expected state**, and the register-drift gate compares the doc headline to the register — both fail on drift, not just on breakage. ✅
+- Regression issues are auto-filed by `qa-gates.yml` (github-script) with run URL; the closure loop is required to open a fix PR before closing. ✅
+- **Repeat-incident → regression test rule (new, G4):** any auto-filed regression issue that fires a second time must be converted into a permanent test in `qa/live-sweep.py` (web) or `governed-sql/_tests/` (data), or the sweep widened to prevent it from firing again — an incident that repeats is a missing test, not bad luck. The `regression-warden-fast` DB job (1-min) already runs this doctrine DB-side; the web-side rule is now codified here. ✅ (doctrine), first conversions tracked in G4.
+
+### G3. Close source-to-production failures (not timestamps)
+
+- The batch-43 incident class: merges were green, deploys were silently not happening. Closed by three fixes: (a) production deploys via the Vercel REST API (vault token) — reproducible, no interactive CLI; (b) the verify-live guard now hashes `modules/brand.js` (verbatim-served, changes with every app deploy) instead of host-branded index.html — a false-positive-prone guard is worse than none; (c) the drift gate catches doc-vs-register divergence on every PR. ✅
+- The heartbeat KNOWN-GAP branch in qa-gates.yml is **removed** (batch 44): the heartbeat endpoint is now a hard gate (200 + ok:true), so the minute-scale record layer can never silently disappear. ✅
+- The heartbeat writes its evidence into `analytics_events` (first-party store), so uptime history is queryable: `select created_at, payload->'checks' from analytics_events where event_type='heartbeat'` — this is the U-REL-01 uptime-history data source. ✅ (recording live; monthly 99.9% computation is the remaining step)
+
+### G4. Automatic repair: narrow and verifiable
+
+Doctrine (all repairs follow it; the closure loop executes it):
+1. **Diagnose from recorded evidence** — heartbeat rows, function_logs tail, sweep output, register notes. Never guess.
+2. **Scope the repair to the diagnosed fault** — one PR, one fault class, with a test that would have caught it.
+3. **Verify against production before flipping any register item** — curl/playwright readback, recorded in `evidence`.
+4. **Convert repeats into tests** (G2 rule).
+Executed examples this session: deploy-path repair (3 fixes, each with its own verification), AG interstitial gate (sweep checks gate + bypass), heartbeat deployment (hard gate replaces known-gap).
+
+### G5. Remaining guardrail ladder (owner-gated where marked)
+
+1. **Minute-scale alert delivery** — gaps are recorded in `analytics_events` but not yet pushed (email/issue) on detection; the notifications function exists, wiring gap→notify is the next increment. (autonomous-ready)
+2. **Schema snapshot diff in CI** — assert live DB schema matches `_migrations/`; kills silent schema drift. (autonomous-ready; needs the same management-API query path used today)
+3. **Analytics funnel readback** (U-MEAS-01/U-SEO-17) — service key or authenticated ops endpoint. (owner-gated)
+4. **Heartbeat secrets rotation** — the function uses project-level service role; a scoped key is better hygiene. (owner console)
+5. **GH/ST/CT/DG access** — 794 ⚪ unmeasured cells live here; every access grant converts ⚪ into measured weight. (owner-gated)
+
+### Batch 44 — minute-scale monitoring live + three register items green (2026-11-26, register v52)
+
+- ✅ **AG-01 (AG, w9)** — static auth interstitial gates the ai.spaincos.com workspace root (noindex + X-Robots-Tag, no shell bytes to crawlers; JS visitors reach the sign-in shell via the ws cookie). Live-verified both directions.
+- ✅ **U-SEO-08 (BV, w7)** — crawler-visible marketing copy on the landing (noscript prerender) + all key pages static HTML with no-JS content.
+- ✅ **U-SEO-09 (BV, w7)** — /compare (vs ChatGPT/Claude/Perplexity, honest column) + /changelog complete the dedicated-page set: pricing, features, compare, docs, changelog.
+- ✅ **Minute-scale monitoring** — heartbeat edge function deployed (v4, self-contained), pg_cron `heartbeat-cron` every minute + `heartbeat-gap-detector` every 2 min; heartbeat endpoint is now a hard 5-min-sweep gate; heartbeat rows recording in `analytics_events`.
+- 🟡→✅ carried from batch 43: U-PAY-05 BV (refund page), U-SEO-09 partial→full.
+
+**Headline after batch: strict 25.0% / measured-only 43.4% (v52)** — session arc since batch 24: 20.2% → 25.0%. Next: U-NOT-07 BV notification matrix, U-TRU-21 AG trust center, G5 ladder items 1–2 (autonomous-ready).
