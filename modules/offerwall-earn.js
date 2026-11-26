@@ -50,6 +50,33 @@
     row.appendChild(btns);
     card.insertBefore(row, card.firstChild);
   }
+  /* ---- TT-FTC-04 (batch 42): A6 per-offer disclosure — interstitial before the
+     FIRST wall open (per browser) + a sticky label that stays above the frame. ---- */
+  function renderStickyOfferLabel(body) {
+    var frameBox = body.querySelector(".oe-frame");
+    if (!frameBox || body.querySelector(".oe-a6sticky")) return;
+    var bar = el("div", "oe-a6sticky");
+    bar.style.cssText = "display:flex;gap:8px;align-items:center;margin:0 0 8px 0;padding:8px 12px;border:1px solid #b98a2e;border-radius:8px;background:rgba(185,138,46,0.08);font-size:12.5px;color:var(--muted,#9aa4b8)";
+    bar.textContent = "Paid partner offers — we earn a referral fee when you complete them; each offer's terms come from its network.";
+    frameBox.parentNode.insertBefore(bar, frameBox);
+  }
+  function renderA6Row(card, onAccept) {
+    if (card.querySelector(".oe-a6")) return;
+    var row = el("div", "oe-consent oe-a6");
+    row.setAttribute("role", "dialog");
+    row.setAttribute("aria-label", "How partner offers work");
+    var p = el("p", null, "Before you open the offer wall: every offer below comes from a third-party partner network. We earn a referral fee when you complete one — that is how free accounts are funded. Each offer has its own terms, timing, and eligibility from its network; Neurons credit only after the network verifies completion. You are never obligated to complete anything.");
+    var ok = el("button", "oe-cbtn", "Got it — show offers");
+    ok.type = "button";
+    ok.addEventListener("click", function () {
+      try { localStorage.setItem("a6_disclosure_seen", "yes"); } catch (e) {}
+      row.remove();
+      renderStickyOfferLabel(card);
+      onAccept();
+    });
+    row.appendChild(p); row.appendChild(ok);
+    card.insertBefore(row, card.firstChild);
+  }
   /* ---- age / eligibility attestation (U-TRU-07, batch 26) ----
      Partner networks require 18+ participants (COPPA floor is 13+, but ad-network
      offer walls are 18+). The wall and consent flow stay behind a one-time 18+
@@ -185,8 +212,18 @@
       if (frame) frame.removeAttribute("src");
       return false;
     }
-    var stale = body.querySelector(".oe-card .oe-consent");
+    var stale = body.querySelector(".oe-card .oe-consent:not(.oe-a6)");
     if (stale) stale.remove();
+    // TT-FTC-04: one-time A6 per-offer disclosure before the first wall open.
+    var a6seen = false;
+    try { a6seen = localStorage.getItem("a6_disclosure_seen") === "yes"; } catch (e) {}
+    if (!a6seen) {
+      var a6card = body.querySelector(".oe-card");
+      if (a6card && !a6card.querySelector(".oe-a6")) renderA6Row(a6card, function () { mountWall(body); });
+      if (frame) frame.removeAttribute("src");
+      return false;
+    }
+    renderStickyOfferLabel(body);
     if (!ADSCEND_PUB_ID || !ADSCEND_ADWALL_ID || !S.user) {
       ph.style.display = "flex";
       return false;
