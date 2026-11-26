@@ -16,8 +16,11 @@ AG = "https://ai.spaincos.com"
 
 def get(url, timeout=20):
     req = urllib.request.Request(url, headers={"User-Agent": "qa-live-sweep/1.0"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.status, r.read()
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.status, r.read()
+    except urllib.error.HTTPError as e:
+        return e.code, b""
 
 def check(name, ok, detail=""):
     print(("PASS " if ok else "SWEEP-FAIL ") + name + (" — " + detail if detail else ""))
@@ -49,6 +52,10 @@ def main():
 
     st, body = get(BV + "/sitemap.xml")
     fails += not check("sitemap 200", st == 200)
+
+    for pg in ("features", "refund"):
+        st, body = get(BV + "/" + pg)
+        fails += not check(f"bv /{pg} page 200 + branded", st == 200 and b"BoundView" in body)
 
     # pricing.json is only checked when the repo itself ships it (the canonical-source
     # feature lands via its own PR; the sweep must not file regressions for pending work).

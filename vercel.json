@@ -7,7 +7,7 @@
   ],
   "functions": {
     "api/bv-render.js": {
-      "includeFiles": "{terms,privacy,docs,help,status,verify,offline,pricing,index}.{html,boundview.html,es.html}"
+      "includeFiles": "{terms,privacy,docs,help,status,verify,offline,pricing,refund,features,index}.{html,boundview.html,es.html}"
     }
   },
   "routes": [
