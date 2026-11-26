@@ -14,7 +14,7 @@ mode smoke, guardian-runner).
 
 Exit code 0 = all green (launch). Non-zero = red (fix first).
 """
-import argparse, json, os, re, sys, time, urllib.request, urllib.error
+import argparse, datetime, json, os, re, sys, time, urllib.request, urllib.error
 from pathlib import Path
 
 BASE = "https://ai.spaincos.com"
@@ -535,6 +535,24 @@ def gospel():
     b = p / "ruthless-bench.py"
     check("benchmark harness gospel-bound", b.exists() and "BENCHMARK_GOSPEL" in b.read_text()[:2500], "ruthless-bench.py docstring lost the gospel reference")
 
+def parity_replay(base=""):
+    """v359 RESPONSE-PARITY REPLAY GATE (owner directive 2026-11-26: 'add the parity
+    replay to the scheduled run so it runs on every deploy'): before any deploy,
+    5 prompts sampled from the imported Perplexity history are replayed through
+    gateway-chat on the boundview.com origin and scored against the originals.
+    Gate threshold: >=85% WTD (full runs use n=25; the per-deploy sample is the
+    tripwire, the warden's bv_context/bv_favicon probes carry the 1-5 min cadence)."""
+    import subprocess
+    seed = int(datetime.datetime.now().strftime("%Y%m%d%H"))  # rotates hourly; stable within a deploy
+    r = subprocess.run([sys.executable, str(Path(__file__).resolve().parent / "bv-parity-replay.py"),
+                        "--n", "5", "--seed", str(seed)],
+                       capture_output=True, text=True, timeout=1200)
+    out = (r.stdout or "") + (r.stderr or "")
+    m = re.search(r"WTD pass-rate: ([0-9.]+)%", out)
+    wtd = float(m.group(1)) if m else 0.0
+    check("response-parity replay (5 prompts, BV origin)", wtd >= 85.0,
+          f"{wtd}% (threshold 85) — {'see qa-reports/parity-replay-*.md' if wtd < 85 else 'replay corpus: imported Perplexity history'}")
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default=BASE)
@@ -542,6 +560,7 @@ if __name__ == "__main__":
     print(f"PRE-LAUNCH REGRESSION FLEET -> {a.base}")
     _safe(gospel)
     _safe(backend)
+    _safe(parity_replay)
     if os.environ.get("PRELAUNCH_SKIP_INTEGRITY") != "1": _safe(integrity, a.base)
     _safe(frontend, a.base)
     fails = [r for r in RESULTS if not r[1]]

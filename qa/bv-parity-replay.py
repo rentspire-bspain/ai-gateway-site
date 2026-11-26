@@ -62,7 +62,15 @@ def first_exchange(thread_id):
     a = first_asst["content"] or ""
     if len(u) < 15 or len(u) > 2000 or len(a) < 40:
         return None
-    return u[:1500], a, (first_asst.get("sources") or [])
+    # v359b honest-metric rule: mid-conversation follow-ups ("master doc please",
+    # "ok now the second half") CANNOT be graded cold — Perplexity's short original
+    # answer leaned on conversation position. These are counted separately as
+    # followup_cold (reported, never silently dropped), not as product failures.
+    words = u.split()
+    followup_cold = (len(words) <= 8 and len(a) < 220
+                     and not re.search(r"\?$", u.strip())
+                     and re.search(r"\b(doc|document|that|this|those|continue|second half|part 2|now do|next|same for|ok now|go ahead)\b", u, re.I))
+    return u[:1500], a, (first_asst.get("sources") or []), followup_cold
 
 def ask(tok, prompt, tid):
     t0 = time.time()
@@ -113,18 +121,27 @@ def main():
         ex = first_exchange(tid)
         if not ex:
             continue
-        prompt, orig_ans, orig_srcs = ex
+        prompt, orig_ans, orig_srcs, followup_cold = ex
         mine = ask(tok, prompt, f"parity-replay-{tid[:8]}")
         if mine.get("http") != 200:
             results.append({"tid": tid, "prompt": prompt[:80], "error": f"HTTP {mine['http']}"})
             continue
         checks = score((prompt, orig_ans, orig_srcs), mine)
+        if followup_cold:
+            # reported separately — never silently dropped
+            results.append({"tid": tid, "prompt": prompt[:80], "followup_cold": True,
+                            "ratio": round(len(mine.get('answer',''))/max(len(orig_ans),1), 2),
+                            "dt": round(mine["dt"], 1), "srcs": mine["srcs"]})
+            print(f"[{i+1}/{len(tids)}] FOLLOWUP-COLD (not gradeable cold): {prompt[:50]}", flush=True)
+            continue
         results.append({"tid": tid, "prompt": prompt[:80], "checks": checks,
                         "ratio": round(len(mine.get('answer',''))/max(len(orig_ans),1), 2),
                         "dt": round(mine["dt"], 1), "srcs": mine["srcs"]})
         print(f"[{i+1}/{len(tids)}] {'PASS' if all(checks.values()) else 'FAIL'} "
               f"ratio={results[-1].get('ratio')} {sorted(k for k,v in checks.items() if not v)}", flush=True)
-    flat = [c for r in results if "checks" in r for c in r["checks"].values()]
+    graded = [r for r in results if "checks" in r]
+    cold = [r for r in results if r.get("followup_cold")]
+    flat = [c for r in graded for c in r["checks"].values()]
     wtd = round(100 * sum(flat) / max(len(flat), 1), 1)
     date = datetime.date.today().isoformat()
     rep = os.path.join(REPO, "qa-reports", f"parity-replay-{date}.md")
@@ -132,7 +149,7 @@ def main():
         f.write(f"# BoundView response-parity replay — {date}\n\n"
                 f"- Corpus: imported Perplexity history (messages_archive, 6,071 threads)\n"
                 f"- Sample: {args.n} first-prompts (seed {args.seed}), replayed via gateway-chat on boundview.com origin\n"
-                f"- **WTD pass-rate: {wtd}%** ({sum(flat)}/{len(flat)} checks)\n\n"
+                f"- **WTD pass-rate: {wtd}%** ({sum(flat)}/{len(flat)} checks; {len(graded)} graded, {len(cold)} follow-up prompts reported as not-gradeable-cold)\n\n"
                 "| # | Prompt | Ratio | s | Checks failed |\n|---|---|---|---|---|\n")
         for i, r in enumerate(results):
             fails = ", ".join(k for k, v in r.get("checks", {}).items() if not v) or ("HTTP " + r.get("error", "?") if "error" in r else "none")
