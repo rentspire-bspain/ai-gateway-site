@@ -2376,7 +2376,7 @@ Question: "${userQuery}"`;
     // are CONTEXT REFERENCES: merge prior user turns like isStatusCheck and skip the web search entirely.
     // v347: session-recall phrasings — questions about what WE discussed / the user's own
     // session, thread, chat, or imported history. Must fire before the retrieval decision.
-    const SESSION_RECALL_RE = /\ball of the session context\b|\bmy (session|chat|thread|conversation) (context|history)\b|\bwhat did we (talk about|discuss|cover|say)\b|\b(we|I)\b[^?]{0,50}\b(discussed|talked about|went over|covered|mentioned)\b|\b(pull up|show me|find|recall|retrieve|look up|bring up)\b[^?]{0,60}\b(we|I)\b[^?]{0,40}\b(discussed|said|asked|mentioned|talked)\b|\b(session|conversation|thread|chat) (context|history)\b|\b(imported|perplexity) (history|threads?|memories)\b/i;
+    const SESSION_RECALL_RE = /\ball of the session context\b|\bmy (session|chat|thread|conversation) (context|history)\b|\bwhat did we (talk about|discuss|cover|say)\b|\b(we|I)\b[^?]{0,50}\b(discussed|talked about|went over|covered|mentioned)\b|\b(pull up|show me|find|recall|retrieve|look up|bring up)\b[^?]{0,60}\b(we|I)\b[^?]{0,40}\b(discussed|said|asked|mentioned|talked)\b|\b(session|conversation|thread|chat) (context|history)\b|\b(imported|perplexity) (history|threads?|memories)\b|\b(full|complete|any|my)?\s*(and|or)?\s*(full|complete)?\s*history\b[^?]{0,60}\b(context|connections?|perplexity)\b|\bcontext (and|&) (api )?connections?\b|\bdo you have .{0,40}(history|context|connections?)\b/i; // v357: also meta-questions like 'do you have full history and context and api connections with perplexity'
     const CONTEXT_REFERENCE = /\b(these|those|all of these|all these|the remaining|remaining)\s+(items?|tasks?|issues?|points?|gaps?)\b|\b(the|that|this)\s+(list|doc|document|checklist)\b|\b(keep|continue|finish)\s+(closing|going|fixing)\b|\bclose\s+the\s+remaining\b|\ball of these\b/i.test(String(userQuery));
     const priorUserCtx = priorUserMsgs.slice(-3, -1).map((mm: any) => String(mm?.content || "").slice(0, 160)).join(" ");
     const isBareFollowUp = userQuery.length < 70 || isStatusCheck || CONTEXT_REFERENCE || /^(what|how) about|and (what|why|how)|why (is|did|do)|so (what|why)|more on/i.test(userQuery.trim());
@@ -3064,6 +3064,10 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
           if (memories.length) lines.push("MEMORIES/PREFERENCES:", ...memories.map((m: string) => "- " + m.slice(0, 200)));
           if (threadTitles.length) lines.push("", "RECENT THREADS (titles only - recall anchors):", ...threadTitles.map((t: string) => "- " + t.slice(0, 120)));
           if (docTitles.length) lines.push("", "IMPORTED DOCUMENTS (titles only):", ...docTitles.map((t: string) => "- " + t.slice(0, 120)));
+          // v357 RESPONSE HYGIENE: never show raw export filenames in an answer (owner incident:
+          // 'conversations-20261109_103038-3340b43f.json' surfaced verbatim). Describe imports by
+          // what they are; models must render counts, never filenames.
+          lines.push("Never quote raw filenames (anything like conversations-*.json or *.md hashes) in the answer — describe the imported history by count and content instead.");
           digestBlock = "\n\n" + lines.join("\n");
         }
       } catch (_e) { /* digest is best-effort - never break chat */ }

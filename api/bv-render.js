@@ -171,8 +171,17 @@ module.exports = async (req, res) => {
     // v351 (U-SEO-06 hardening): non-BoundView hosts get a STATIC crawler-visible
     // noindex in the pre-JS response — the runtime brand.js noindex stays as the
     // safety net, but crawlers that never execute JS now see it too.
+    // v357 SERVER-SIDE FAVICON: browsers pin the tab favicon from the FIRST response and
+    // cache it aggressively — the runtime swap in brand.js never reaches the tab. The BV
+    // host must get the BoundView favicon kit in the served HTML itself (owner incident
+    // 2026-11-26: the Spaincos ribbon showed in the boundview.com tab).
+    const faviconFix = (h) => h
+      .replace(/href="\/favicon\.webp\?v=[0-9]+"/g, 'href="/icons/boundview-favicon-48.webp"')
+      .replace(/href="\/favicon\.png"/g, 'href="/icons/boundview-favicon-48.png"')
+      .replace(/href="\/icons\/apple-touch-icon\.webp"/g, 'href="/icons/boundview-apple-touch-icon.webp"')
+      .replace(/href="\/icons\/apple-touch-icon\.png"/g, 'href="/icons/boundview-apple-touch-icon.png"');
     const out = isBoundViewHost
-      ? transformHtml(html)
+      ? faviconFix(transformHtml(html))
       : html.replace("</title>", '</title>\n<meta name="robots" content="noindex, nofollow">');
     res.writeHead(200, headers);
     res.end(req.method === "HEAD" ? undefined : out);
