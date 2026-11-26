@@ -4799,7 +4799,11 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
         if (toolCtx.assets && toolCtx.assets.length) wl.push("**Command: attach files** \u2014 " + String(toolCtx.assets.length) + " file(s)");
         if (wl.length) {
           const c0 = finalResponse && finalResponse.choices && finalResponse.choices[0] && finalResponse.choices[0].message ? finalResponse.choices[0].message.content : "";
-          if (typeof c0 === "string" && c0.indexOf("Commands executed this turn") === -1) {
+          if (typeof c0 === "string" && c0.indexOf("Commands executed this turn") === -1 && !verbatimMode) {
+            // v360 IFEVAL: verbatim-mode answers are the user's format constraints — a
+            // prepended work log breaks "wrap entire response", "all lowercase", <<title>>,
+            // N-paragraph and end-phrase constraints. r4/r5 teardown: this preamble was
+            // prepended on every format-constrained row. Never prepend it in verbatim mode.
             // v206 (2026-11-14, self-improvement cycle 13-run finding): the model sometimes
             // echoes its own command narration as the FIRST line of the answer
             // ("**Command: synthesize the C&W October 2026 ranking with the sub-research on
@@ -4812,6 +4816,18 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
           }
         }
       } catch (_wl) { /* best effort */ }
+
+      // v360 IFEVAL VERBATIM SANITIZER: teardown of r5 showed the writer emits artifacts
+      // that break literal formats: a bare language-tag line ("json") before the object,
+      // fenced output when the prompt forbade fences, and a `<<title>>` that lost its
+      // opening brackets. Restore the literal format deterministically (shape-based only).
+      if (verbatimMode && finalResponse?.choices?.[0]?.message?.content) {
+        let vt = String(finalResponse.choices[0].message.content);
+        vt = vt.replace(/^```[a-zA-Z0-9]*\s*\n?/, "").replace(/\n?```\s*$/, "");            // stray fences
+        vt = vt.replace(/^(json|xml|html|yaml|csv)\s*\n(?=\s*[{<])/i, "");                    // bare language tag before object
+        vt = vt.replace(/^(.*?)(?=>>)/m, (full) => (/</.test(full) ? full : "<<" + full.replace(/^\s*/, "")); // <<title>> restore
+        finalResponse.choices[0].message.content = vt;
+      }
 
       // v199 CLAIM GUARD (parity doc 34f, owner complaint 2026-11-13: the assistant
       // "hallucinates and says it's completing items and then doesn't do them"):
