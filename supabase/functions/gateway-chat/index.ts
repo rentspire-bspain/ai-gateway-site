@@ -3780,6 +3780,16 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
     else if (planDec.plan && !toolCtx.plan?.length) capped.push({ role: "system", content: PLAN_WRITER_GUIDANCE });
     // worse-elimination (2026-11-10): depth + continuation guidance for the writer (pairs with the 4,000-token ceiling above).
     if (clarifierContinuation) capped.push({ role: "system", content: CLARIFIER_CONTINUATION_RULE });
+    // v359 RESPONSE-PARITY (owner directive 2026-11-25: "why are responses nothing like Perplexity"):
+    // the replay harness qa/bv-parity-replay.py (replays the owner's imported Perplexity history through
+    // the gateway) scored 83.7% on its first run with two systematic failures: (a) BoundView answers
+    // echoed "ai.spaincos.com"/"Spain Companies" out of the user's own imported context — brand bleed on
+    // the consumer product; (b) short factual questions got answers 20-30x longer than the Perplexity
+    // originals. Both are fixed here in the writer contract.
+    const bvWriterOrigin = String(req.headers.get("origin") || req.headers.get("referer") || "").toLowerCase();
+    const bvWriter = /(^|\.)boundview\.com/.test(bvWriterOrigin.replace(/^https?:\/\//, "").split("/")[0]);
+    if (bvWriter) capped.push({ role: "system", content: "BRAND SEPARATION (consumer product, binding): you are BoundView. Never write the strings \"ai.spaincos.com\", \"spaincos\", \"Spain Companies\", or any sister-brand, internal-estate or infrastructure name in the answer — even when the user's own imported history, memories, or thread context contain them. Refer to the user's prior assistant as \"your previous research assistant\". Never reveal internal lane names, estate counts, or file names." });
+    if (intent.complexity === "simple") capped.push({ role: "system", content: "LENGTH REGISTER (response parity with Perplexity): a short factual or conversational question gets a short answer — 1-3 sentences for simple lookups, then stop. Do not add headings, tables, or multi-section structure for simple asks, and keep Suggested Follow-ups to at most 2. Depth belongs to complex questions, not every question." });
     if (isImageGenAsk(String(userQuery))) capped.push({ role: "system", content: IMAGE_ASK_RULE });
     if (longMultiPart || intent.complexity === "extreme") capped.push({ role: "system", content: COMPLEX_DEPTH_RULE });
     if (isDocumentAsk(String(userQuery))) capped.push({ role: "system", content: DOCUMENT_RULE });   // v145: .md/docs render as artifacts, not fenced text
