@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Us4LR0UnHp7hxCsYpQovuAXUxIcogJppFzVqwTThEfs=' 'sha256-JkP+AmScOGvaGq6YGr3VPd2esWlailc7Ih41wUShoh4=' 'sha256-awrUxp/8yF09zIqg9R+DBua/ET+82mE1Zco/XFw0Y+M=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6ZwqRizEQA3YYsaC+xG3lXe8XDIIrZgUaAgwdS2Vd+g=' 'sha256-JkP+AmScOGvaGq6YGr3VPd2esWlailc7Ih41wUShoh4=' 'sha256-awrUxp/8yF09zIqg9R+DBua/ET+82mE1Zco/XFw0Y+M=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k=' ; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
@@ -1931,6 +1931,7 @@ body { font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
     </div>
     <div class="auth-error" id="authError"></div>
     <p class="auth-note">Invite-only access &mdash; we'll email a 6-digit code to authorized accounts.</p>
+    <button class="auth-btn-secondary" id="guestBtn" style="display:none;margin-top:14px">Try BoundView without an account</button>
     <div class="auth-conn-pitch" aria-label="Connected context overview">
       <p class="auth-conn-lead"><strong>Connected context:</strong> search live web sources alongside your own messages, files, and inbox &mdash; cited in every answer, user-owned under row-level security, deletable anytime.</p>
       <ul class="auth-conn-list">
@@ -3748,6 +3749,31 @@ const accountMenu = (function () {
   row.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
 })();
 // ---- PASSWORD SIGN-IN ----
+// v356 GUEST MODE (anonymous trial lane, BV only): 5 questions/day per visitor, no account.
+// The gateway enforces the cap (api_rate_limits, per-IP daily window); the UI just
+// enables the entry point, tracks the remaining count from response headers, and
+// shows the signup prompt when the lane runs out.
+window.__guest = false;
+window.__guestRemaining = null;
+(function initGuest() {
+  const btn = document.getElementById("guestBtn");
+  try { if (btn && window.BRAND && window.BRAND.isBoundView) btn.style.display = "block"; } catch (e) {}
+  if (btn) btn.onclick = () => {
+    window.__guest = true;
+    const ov = document.getElementById("authOverlay");
+    if (ov) ov.style.display = "none";
+    try {
+      const bar = document.createElement("div");
+      bar.id = "guestBar";
+      bar.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(91,140,255,0.14);border-bottom:1px solid rgba(91,140,255,0.4);color:var(--fg,#E8ECF4);font-size:13px;padding:6px 14px;text-align:center";
+      bar.innerHTML = 'Guest mode — up to <b>5 questions a day</b>. <a href="#" id="guestSignup" style="text-decoration:underline">Create an account</a> to keep your threads and get more.';
+      document.body.appendChild(bar);
+      const su = bar.querySelector("#guestSignup");
+      if (su) su.onclick = (ev) => { ev.preventDefault(); window.__guest = false; const o2 = document.getElementById("authOverlay"); if (o2) o2.style.display = "flex"; };
+    } catch (e) {}
+    try { const c = document.querySelector(".composer textarea"); if (c) c.focus(); } catch (e) {}
+  };
+})();
 document.getElementById("authPasswordBtn").onclick = async () => {
   const err = document.getElementById("authError");
   err.textContent = "";
@@ -5382,7 +5408,10 @@ async function performSearchInner(query) {
   let liveTimer = null;    // trailing live-render timer (cleared in finally so it can never leak into the next search)
   try {
     const { data: s } = await sb.auth.getSession();
-    if (!s || !s.session || !s.session.access_token) throw AuthGuard.makeError(); // session vanished between checkAuth and send
+    // v356: guest mode (BV anonymous trial) — no session required; the gateway authorizes
+    // the BV-origin request and enforces the daily cap. Signed-in flow is unchanged.
+    const isGuest = window.__guest === true && !(s && s.session && s.session.access_token);
+    if (!isGuest && (!s || !s.session || !s.session.access_token)) throw AuthGuard.makeError(); // session vanished between checkAuth and send
 
     // Final render (shared by streaming, deep research, and fallback paths).
     // v65: prior turns are already in the DOM — only the loading state is
@@ -5542,7 +5571,7 @@ async function performSearchInner(query) {
       const res = await fetchRetry(GATEWAY + "/gateway-chat", {
         method: "POST",
         signal: searchAbort ? searchAbort.signal : undefined,   // v181: STOP button
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.session.access_token },
+        headers: { "Content-Type": "application/json", ...(isGuest ? {} : { "Authorization": "Bearer " + s.session.access_token }) },
         body: JSON.stringify({ messages: history, purpose, max_tokens: 2048, stream: true, lang: (localStorage.getItem("ai_lang") || "en"), ...(currentThreadId ? { thread_id: currentThreadId } : {}), ...v83Body, personalization: persona(), ...getSourcesFilter(), ...(modelOverride ? { model: modelOverride } : {}), ...(attachmentBody ? { attachment: attachmentBody, attachments: attachmentsBody } : {}), ...(spaceInstr ? { space_instructions: spaceInstr } : {}) }),
       });
       if (res.authExpired) { AuthGuard.expire(); throw AuthGuard.makeError(); }

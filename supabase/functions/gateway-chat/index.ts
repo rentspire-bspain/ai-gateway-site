@@ -1375,8 +1375,49 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
   // --- AUTH ---
   const authHeader = req.headers.get("Authorization") ?? "";
   const jsonHdr = { ...cors, "Content-Type": "application/json" };
+  // v356 ANONYMOUS TRIAL LANE (owner-approved 2026-11-25, Perplexity-style): on the
+  // PUBLIC BoundView host, visitors may ask up to 5 questions per day WITHOUT an account.
+  // Identity = client IP (x-forwarded-for), enforced by the same distributed Postgres
+  // fixed-window counter as the public API (api_rate_limits). Restrictions: concise mode
+  // only, no deep research, no attachments, no embed_context, no thread persistence,
+  // no incognito flag effects. The private ai.spaincos.com host stays fully locked.
+  let anonymous = false;
+  let anonRemaining = -1;
   if (!authHeader.startsWith("Bearer ")) {
-    return new Response(JSON.stringify({ error: "Not authenticated — sign in again." }), { status: 401, headers: jsonHdr });
+    const origin = String(req.headers.get("origin") || req.headers.get("referer") || "").toLowerCase();
+    const isBvOrigin = /(^|\.)boundview\.com/.test(origin.replace(/^https?:\/\//, "").split("/")[0]);
+    if (!isBvOrigin) {
+      return new Response(JSON.stringify({ error: "Not authenticated — sign in again." }), { status: 401, headers: jsonHdr });
+    }
+    const fwd = String(req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+    const svc = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    if (!svc) return new Response(JSON.stringify({ error: "gateway not configured" }), { status: 503, headers: jsonHdr });
+    try {
+      const rr = await fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/rpc/api_rate_limit_take`, {
+        method: "POST", headers: { apikey: svc, Authorization: `Bearer ${svc}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ p_identity: `anon:${fwd.slice(0, 64)}`, p_limit: 5, p_window_s: 86_400 }),
+        signal: AbortSignal.timeout(5_000),
+      });
+      if (rr.ok) {
+        const d = await rr.json();
+        if (d && d.allowed === false) {
+          return new Response(JSON.stringify({ error: "Daily anonymous limit reached. Create a free account to keep going.", code: "anon_limit" }), { status: 429, headers: { ...jsonHdr, "Retry-After": String(Math.max(1, Number(d.retry_after) || 3600)) } });
+        }
+        anonRemaining = 5 - (typeof d === "object" ? 0 : 1); // RPC does not return the count; recomputed below
+      } else {
+        return new Response(JSON.stringify({ error: "gateway busy — try again" }), { status: 503, headers: jsonHdr });
+      }
+      // recompute remaining for the response header (window counter)
+      try {
+        const cr = await fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/api_rate_limits?identity=eq.anon:${fwd.slice(0, 64)}&select=hits,window_start&order=window_start.desc&limit=1`, {
+          headers: { apikey: svc, Authorization: `Bearer ${svc}` }, signal: AbortSignal.timeout(3_000) });
+        if (cr.ok) { const rows = await cr.json(); if (rows[0]) anonRemaining = Math.max(0, 5 - Number(rows[0].hits)); }
+      } catch (_ce) { /* header only */ }
+    } catch (_e) {
+      return new Response(JSON.stringify({ error: "gateway busy — try again" }), { status: 503, headers: jsonHdr });
+    }
+    anonymous = true;
+    mark("anon_auth");
   }
   const token = authHeader.slice(7).trim();
   // v96 G4: API-key path (OpenAI-compatible clients send Authorization: Bearer sk-spaincos-...).
@@ -1405,6 +1446,8 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
   }
   const userEmail = authUser?.email ?? "";
   const userId = authUser?.id ?? "";
+  // v356: anonymous lane identity (after the standard auth block so authUser exists)
+  const anonEmail = anonymous ? "anonymous@boundview" : "";
   // v234 PER-USER ATTRIBUTION: every call-model fetch in this handler carries the
   // authenticated user id so the ops ledger + meter attribute cost to the user.
   const CM_HEADERS: Record<string, string> = { ...CM_OUT_HEADERS, ...(userId ? { "x-user-id": userId } : {}) }; // v349: outbound call-model token
@@ -1414,7 +1457,7 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
   const ALLOWED_EMAILS = ["bspain@spaincos.com", "eval-bot@spaincos.com"];
   // require a confirmed address (open signup is enabled on the auth project until the migration/dashboard change lands)
   const emailConfirmed = apiKeyMode || !!(authUser?.email_confirmed_at || authUser?.confirmed_at);
-  if (!emailConfirmed || !ALLOWED_EMAILS.includes(userEmail.toLowerCase())) {
+  if (!anonymous && (!emailConfirmed || !ALLOWED_EMAILS.includes((anonEmail || userEmail).toLowerCase()))) {
     return new Response(JSON.stringify({ error: "This site is private." }), { status: 403, headers: { ...cors, "Content-Type": "application/json" } });
   }
 
@@ -1504,6 +1547,9 @@ async function chatHandler(req: Request, progress?: ProgressSink): Promise<Respo
   try {
     const callModelUrl = "https://dcyjmftriqayqaonitlx.supabase.co/functions/v1/call-model";
     let { messages, purpose, model, max_tokens, stream, tool_loop, thread_id: threadIdRaw, deep_research, attachment, attachments, space_instructions, embed_context, personalization, model_council, sources_filter, time_range, incognito: incognitoRaw, max_completion_tokens, mode: modeRaw, deep_research_effort: drEffortRaw, deep_research_style: drStyleRaw, lang: langRaw } = (await req.json().catch(() => null)) ?? {};
+    // v356 anonymous restrictions: concise mode only, no deep research, no attachments,
+    // no embed_context, no personalization, no model council — the trial lane.
+    if (anonymous) { deep_research = undefined; attachment = undefined; attachments = undefined; embed_context = undefined; personalization = undefined; model_council = undefined; modeRaw = "concise"; drEffortRaw = undefined; drStyleRaw = undefined; }
     // v262 ASYNC RESEARCH LANE: caller-selectable effort (default high) and style
     // ("report" = decision-grade report brief; "concise" = short-answer constraint-verified brief
     // for BrowseComp-class questions — the async lane's whole point is minutes-long persistent
@@ -4966,7 +5012,9 @@ When the user says "this UX," "the terminal," "my connections," "Comptrove," "th
       }
     } catch (e) { /* formatting must never break the response */ }
 
-    return new Response(JSON.stringify(finalResponse), { status: outStatus, headers: { ...cors, "Content-Type": "application/json" } });
+    const outHdrs: Record<string, string> = { ...cors, "Content-Type": "application/json" };
+    if (anonymous && anonRemaining >= 0) outHdrs["x-anonymous-remaining"] = String(anonRemaining);
+    return new Response(JSON.stringify(finalResponse), { status: outStatus, headers: outHdrs });
   } catch (e) {
     // hardening: never leak raw engine error class/message to clients; log details server-side only
     console.error("gateway-chat unhandled error:", e instanceof Error ? (e.stack || `${e.name}: ${e.message}`) : String(e));
