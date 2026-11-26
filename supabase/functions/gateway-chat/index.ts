@@ -4825,7 +4825,7 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
         let vt = String(finalResponse.choices[0].message.content);
         vt = vt.replace(/^```[a-zA-Z0-9]*\s*\n?/, "").replace(/\n?```\s*$/, "");            // stray fences
         vt = vt.replace(/^(json|xml|html|yaml|csv)\s*\n(?=\s*[{<])/i, "");                    // bare language tag before object
-        vt = vt.replace(/^(.*?)(?=>>)/m, (full) => (/</.test(full) ? full : "<<" + full.replace(/^\s*/, "")); // <<title>> restore
+        vt = vt.replace(/^(.*?)(?=>>)/m, (full) => (/</.test(full) ? full : "<<" + full.replace(/^\s*/, ""))); // <<title>> restore
         finalResponse.choices[0].message.content = vt;
       }
 
