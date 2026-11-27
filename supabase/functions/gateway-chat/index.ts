@@ -3801,8 +3801,42 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
     // when the classifier says "simple" (replay: "Examples where Freddie Mac has granted
     // exceptions..." was cut to ratio 0.1). Research-grade short questions answered with a
     // list are legitimately longer.
+    // v362 LENGTH REGISTER CLASSIFIER (owner directive 2026-11-27: "build the length
+    // register classifier from my imported Perplexity thread pairs"). Trained offline on
+    // 5,855 (prompt -> Perplexity answer length) pairs from messages_archive. KEY HONEST
+    // FINDING: the owner's Perplexity answers cluster tightly — quartiles 970 / 1797 /
+    // 2598 chars — prompt shape barely predicts length (58% train accuracy). Parity is a
+    // TARGET BAND, not "1-3 sentences": class short -> aim 600-1,200 chars; medium ->
+    // 1,000-2,600; long -> 1,800-4,000. The regex gates (v360/v361b) remain as the
+    // short-class fallback when the model is not confident.
+    const LEN_MODEL = { keys: ["attach","caps","chars","clause","deep","enum","masterdoc","qmarks","simple","short","w"], W: ' + json.dumps(json.load(open("qa/length-register-model.json"))["W"]) + ', B: ' + json.dumps(json.load(open("qa/length-register-model.json"))["B"]) + ' };
+    const lenFeatures = (q: string) => {
+      const words = q.split(/\s+/).filter(Boolean);
+      const f: Record<string, number> = {
+        w: Math.min(words.length / 300, 2), chars: Math.min(q.length / 300, 2),
+        qmarks: (q.match(/\?/g) || []).length,
+        clause: Math.min((q.split(/[.?!;]/) || []).length / 5, 2),
+        enum: /\b(all|every|list|enumerate|compare|examples? of|types of|cases of|which|who are)\b/i.test(q) ? 1 : 0,
+        deep: /\b(analy[sz]e|explain|in depth|deep dive|comprehensive|thorough|detailed|breakdown|strategy|plan)\b/i.test(q) ? 1 : 0,
+        caps: words.filter((w: string) => w.length > 2 && w === w.toUpperCase()).length / Math.max(words.length, 1),
+        simple: /\b(what is|who is|when (did|was)|capital of|best price|highest rated|cheapest|name of)\b/i.test(q) ? 1 : 0,
+        short: words.length <= 6 ? 1 : 0,
+        attach: /\b(attached|attachment|spreadsheet|csv|file|data)\b/i.test(q) ? 1 : 0,
+        masterdoc: /\b(master doc|continue|second half|part 2|next part)\b/i.test(q) ? 1 : 0,
+      };
+      return LEN_MODEL.keys.map((k: string) => f[k] ?? 0);
+    };
+    const lenPredict = (q: string): { cls: number; p: number[] } => {
+      const x = lenFeatures(q);
+      const z = LEN_MODEL.W.map((row: number[], c: number) => row.reduce((acc: number, w: number, j: number) => acc + w * x[j], 0) + LEN_MODEL.B[c]);
+      const m = Math.max(...z); const e = z.map((v: number) => Math.exp(v - m)); const s = e.reduce((a: number, b: number) => a + b, 0);
+      const p = e.map((v: number) => v / s);
+      return { cls: p.indexOf(Math.max(...p)), p };
+    };
     const lenReg = (intent.complexity === "simple" && !(qEnumeration && (intent as any).needs_search)) || (qShort && !qMultiPart && !qEnumeration && !(intent as any).needs_search && intent.complexity !== "complex" && intent.complexity !== "extreme");
-    if (lenReg) capped.push({ role: "system", content: "LENGTH REGISTER (response parity with Perplexity): a short factual or conversational question gets a short answer — 1-3 sentences for simple lookups, then stop. Do not add headings, tables, or multi-section structure for simple asks, and keep Suggested Follow-ups to at most 2. Depth belongs to complex questions, not every question." });
+    const lp = lenPredict(String(userQuery));
+    const BANDS = ["600 and 1,200 characters", "1,000 and 2,600 characters", "1,800 and 4,000 characters"];
+    capped.push({ role: "system", content: "LENGTH REGISTER (trained on the user's own Perplexity history, " + BANDS.length + " classes): aim for a TOTAL answer length between " + BANDS[lp.cls] + " — the user's prior assistant consistently produced answers in this band for questions like this one. Do not pad beyond the band; do not cut substance to go under it. " + (lenReg ? "For this simple lookup, lead with the direct answer in the first sentence." : "") });
     // v360 IFEVAL LITERAL-FORMAT PASSTHROUGH (gap-plan step 1): when the user's prompt
     // explicitly demands a literal format, produce it VERBATIM and suppress house style.
     // Shape-based detection only (Benchmark Gospel rule 4 — levers fire on question shape,

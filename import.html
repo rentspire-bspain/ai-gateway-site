@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Import your AI history</title>
+<style>
+:root { --bg:#fcfcf9; --panel:#fff; --line:#e5e7eb; --txt:#1f2937; --mut:#6b7280; --acc:#0e7490; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--txt); font:16px/1.6 -apple-system,"Segoe UI",Georgia,serif; }
+main { max-width:720px; margin:0 auto; padding:40px 20px 80px; }
+h1 { font-family:Georgia,serif; font-size:28px; margin:0 0 6px; }
+h2 { font-family:Georgia,serif; font-size:20px; margin:32px 0 8px; }
+p.lead { color:var(--mut); margin:0 0 24px; }
+ol li { margin:10px 0; }
+.kbd { background:#f3f4f6; border:1px solid var(--line); border-radius:5px; padding:1px 7px; font:13px ui-monospace,monospace; }
+.drop { border:2px dashed #cbd5e1; border-radius:12px; padding:28px; text-align:center; margin:16px 0; background:var(--panel); }
+.drop.on { border-color:var(--acc); background:#ecfeff; }
+button { padding:10px 20px; border-radius:8px; border:1px solid var(--acc); background:var(--acc); color:#fff; font-size:15px; cursor:pointer; }
+.out { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:14px; white-space:pre-wrap; font:13px ui-monospace,monospace; }
+.mut { color:var(--mut); font-size:14px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Import your AI history</h1>
+<p class="lead">Bring your conversations from Perplexity, Claude, or ChatGPT. Imported threads appear in your sidebar and give the assistant full context in every new conversation.</p>
+
+<h2>Perplexity</h2>
+<ol>
+  <li>Go to <b>Settings → Data</b> (perplexity.ai/settings/data).</li>
+  <li>Click <b>Export data</b> and confirm.</li>
+  <li>You'll receive an email with a download link — download the ZIP and open it.</li>
+  <li>Inside, find <span class="kbd">conversations.json</span> — that's the file to upload below.</li>
+</ol>
+
+<h2>Claude</h2>
+<ol>
+  <li>Go to <b>Settings → Privacy</b> (claude.ai/settings/privacy).</li>
+  <li>Under "Export data", request your data export.</li>
+  <li>Download the ZIP when the email arrives and open it.</li>
+  <li>Upload <span class="kbd">conversations.json</span> below.</li>
+</ol>
+
+<h2>ChatGPT / OpenAI</h2>
+<ol>
+  <li>Go to <b>Settings → Data controls → Export data</b> (chatgpt.com/#settings).</li>
+  <li>Click <b>Export</b> — you'll get an email with a download link.</li>
+  <li>Download and unzip it.</li>
+  <li>Upload <span class="kbd">conversations.json</span> below.</li>
+</ol>
+
+<h2>Upload</h2>
+<div class="drop" id="drop">
+  <p style="margin:0 0 10px">Drop your <b>conversations.json</b> here</p>
+  <input type="file" id="file" accept=".json">
+  <p class="mut">Your history is imported into your account only. Already-imported threads are skipped, so re-uploading is safe.</p>
+</div>
+<button id="go" disabled>Import</button>
+<div class="out" id="out" hidden></div>
+<p class="mut" id="signin" hidden>You need to be signed in first — open the main app, sign in, then come back to this page.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
+const sb = window.supabase.createClient(SB_URL, "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb", { auth: { persistSession: true } });
+let PAYLOAD = null;
+const $ = (s) => document.querySelector(s);
+document.addEventListener("DOMContentLoaded", async () => {
+  const s = (await sb.auth.getSession()).data.session;
+  if (!s) { $("#signin").hidden = false; $("#drop").style.opacity = .5; return; }
+  const read = (f) => { const r = new FileReader(); r.onload = () => { try { PAYLOAD = JSON.parse(r.result); $("#go").disabled = false; $("#out").hidden = false; $("#out").textContent = "Loaded " + (PAYLOAD.length || Object.keys(PAYLOAD).length) + " conversations. Click Import."; } catch (e) { $("#out").hidden = false; $("#out").textContent = "Not valid JSON: " + e.message; } }; r.readAsText(f); };
+  $("#file").onchange = (e) => e.target.files[0] && read(e.target.files[0]);
+  $("#drop").ondragover = (e) => { e.preventDefault(); $("#drop").classList.add("on"); };
+  $("#drop").ondragleave = () => $("#drop").classList.remove("on");
+  $("#drop").ondrop = (e) => { e.preventDefault(); $("#drop").classList.remove("on"); e.dataTransfer.files[0] && read(e.dataTransfer.files[0]); };
+  $("#go").onclick = async () => {
+    const tok = (await sb.auth.getSession()).data.session?.access_token;
+    $("#out").hidden = false; $("#out").textContent = "Importing…";
+    const r = await fetch(SB_URL + "/functions/v1/import-history", { method: "POST", headers: { authorization: "Bearer " + tok, "content-type": "application/json" }, body: JSON.stringify({ payload: PAYLOAD, provider: "auto" }) });
+    $("#out").textContent = JSON.stringify(await r.json(), null, 2);
+  };
+});
+</script>
+</body>
+</html>

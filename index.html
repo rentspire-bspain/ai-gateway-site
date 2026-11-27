@@ -1049,9 +1049,9 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
 .answer-content {
   overflow-wrap: anywhere;
   min-width: 0;
-  font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.7;
+  font-family: var(--font-serif);   /* v362 UX parity (owner Perplexity screenshots 2026-11-27): serif body, 15.5px/1.6 */
+  font-size: 15.5px;
+  line-height: 1.6;
   color: var(--text);
 }
 .answer-content p { margin-bottom: 14px; }
@@ -1182,24 +1182,27 @@ button.council-badge:hover, button.council-badge:focus-visible { border-color:va
   color: var(--text-muted);
   margin-bottom: 12px;
 }
-.related-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.related-list { display: flex; flex-direction: column; flex-wrap: nowrap; gap: 0; }   /* v362: Perplexity-style vertical ↳ list */
 .related-item {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   text-align: left;
   max-width: 100%;
-  line-height: 1.4;
-  gap: 8px;
-  padding: 7px 14px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 999px;
+  line-height: 1.5;
+  gap: 10px;
+  padding: 7px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  transition: border-color 0.15s ease, background 0.15s ease;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary, #374151);
+  transition: color 0.15s ease;
 }
+.related-item::before { content: "\21B3"; color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
+.related-item:hover { color: var(--accent); background: transparent; border-color: transparent; }
 .related-item { max-width: min(100%, 560px); }
 .related-item span {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
