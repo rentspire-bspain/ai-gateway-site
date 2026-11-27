@@ -3797,7 +3797,11 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
     const qShort = String(userQuery).trim().length <= 160;
     const qMultiPart = (String(userQuery).match(/\?/g) || []).length >= 2 || /\band also\b|\badditionally\b|;/.test(String(userQuery).slice(0, 160));
     const qEnumeration = /\b(all|every|list|enumerate|compare|comparison|breakdown|analyze|analysis|cases of|examples of|types of)\b/i.test(String(userQuery));
-    const lenReg = intent.complexity === "simple" || (qShort && !qMultiPart && !qEnumeration && !(intent as any).needs_search && intent.complexity !== "complex" && intent.complexity !== "extreme");
+    // v361b guard: an enumeration-shaped question that needs research keeps full depth even
+    // when the classifier says "simple" (replay: "Examples where Freddie Mac has granted
+    // exceptions..." was cut to ratio 0.1). Research-grade short questions answered with a
+    // list are legitimately longer.
+    const lenReg = (intent.complexity === "simple" && !(qEnumeration && (intent as any).needs_search)) || (qShort && !qMultiPart && !qEnumeration && !(intent as any).needs_search && intent.complexity !== "complex" && intent.complexity !== "extreme");
     if (lenReg) capped.push({ role: "system", content: "LENGTH REGISTER (response parity with Perplexity): a short factual or conversational question gets a short answer — 1-3 sentences for simple lookups, then stop. Do not add headings, tables, or multi-section structure for simple asks, and keep Suggested Follow-ups to at most 2. Depth belongs to complex questions, not every question." });
     // v360 IFEVAL LITERAL-FORMAT PASSTHROUGH (gap-plan step 1): when the user's prompt
     // explicitly demands a literal format, produce it VERBATIM and suppress house style.
