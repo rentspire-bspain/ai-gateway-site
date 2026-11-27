@@ -44,6 +44,7 @@ def sample_threads(n, seed):
         having count(*) filter (where role='user') >= 2
            and count(*) filter (where role='assistant') >= 2
            and count(*) <= 80
+        order by thread_id
     """)
     rng = random.Random(seed)
     rng.shuffle(rows)
