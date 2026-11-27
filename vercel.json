@@ -12,6 +12,10 @@
   },
   "routes": [
     {
+      "src": "/import",
+      "dest": "/import.html"
+    },
+    {
       "src": "/admin",
       "dest": "/admin.html"
     },
