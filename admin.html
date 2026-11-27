@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin Console</title>
+<style>
+:root { --bg:#0d1117; --panel:#161b22; --line:#30363d; --txt:#e6edf3; --mut:#8b949e; --acc:#3fb950; --red:#f85149; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+header { padding:14px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:var(--bg); z-index:5; }
+h1 { font-size:16px; margin:0; }
+main { max-width:1200px; margin:0 auto; padding:20px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-bottom:20px; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px; }
+.card h3 { margin:0 0 8px; font-size:12px; color:var(--mut); text-transform:uppercase; letter-spacing:.05em; }
+.big { font-size:28px; font-weight:600; }
+table { width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+th, td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); font-size:13px; }
+th { color:var(--mut); font-weight:600; position:sticky; top:0; background:var(--panel); }
+tr:last-child td { border-bottom:none; }
+.search { padding:8px 12px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--txt); width:280px; }
+button { padding:8px 14px; border-radius:6px; border:1px solid var(--line); background:var(--panel); color:var(--txt); cursor:pointer; }
+button:hover { border-color:var(--acc); }
+.err { color:var(--red); }
+.mut { color:var(--mut); }
+.tabs { display:flex; gap:8px; margin-bottom:16px; }
+.tab { padding:6px 14px; border-radius:20px; border:1px solid var(--line); cursor:pointer; }
+.tab.on { background:var(--acc); color:#04170a; border-color:var(--acc); font-weight:600; }
+#login { max-width:360px; margin:80px auto; text-align:center; }
+#login input { width:100%; margin:6px 0; padding:10px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--txt); }
+</style>
+</head>
+<body>
+<header><h1>Superadmin Console</h1><div><span class="mut" id="who"></span> <button id="refresh">Refresh</button> <button id="logout">Sign out</button></div></header>
+<div id="login">
+  <h2>Admin sign-in</h2>
+  <input id="email" type="email" placeholder="Email">
+  <input id="pass" type="password" placeholder="Password">
+  <button id="signin">Sign in</button>
+  <p class="err" id="loginerr"></p>
+</div>
+<main id="main" hidden>
+  <div class="grid">
+    <div class="card"><h3>Signups (30d)</h3><div class="big" id="k-signups">–</div></div>
+    <div class="card"><h3>Active threads (30d)</h3><div class="big" id="k-threads">–</div></div>
+    <div class="card"><h3>Messages (30d)</h3><div class="big" id="k-msgs">–</div></div>
+    <div class="card"><h3>Total users</h3><div class="big" id="k-users">–</div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab on" data-t="users">Users</div>
+    <div class="tab" data-t="searches">Recent searches</div>
+    <div class="tab" data-t="activity">Activity by day</div>
+  </div>
+  <input class="search" id="q" placeholder="Filter…">
+  <div id="pane"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
+const sb = window.supabase.createClient(SB_URL, "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb", { auth: { persistSession: true } });
+let DATA = null;
+const $ = (s) => document.querySelector(s);
+
+async function load() {
+  $("#login").hidden = true; $("#main").hidden = false;
+  const tok = (await sb.auth.getSession()).data.session?.access_token;
+  const r = await fetch(SB_URL + "/functions/v1/admin-console", { method: "POST", headers: { authorization: "Bearer " + tok, "content-type": "application/json" }, body: "{}" });
+  if (!r.ok) { $("#pane").innerHTML = '<p class="err">' + r.status + " — " + (await r.text()).slice(0, 200) + "</p>"; return; }
+  DATA = await r.json();
+  const s = DATA.signups_30d || [], a = DATA.activity_30d || [], u = DATA.users || [];
+  $("#k-signups").textContent = s.reduce((n, x) => n + Number(x.n || 0), 0);
+  $("#k-threads").textContent = a.reduce((n, x) => n + Number(x.threads || 0), 0);
+  $("#k-msgs").textContent = a.reduce((n, x) => n + Number(x.messages || 0), 0);
+  $("#k-users").textContent = u.length;
+  render($(".tab.on").dataset.t);
+}
+function render(t) {
+  const q = ($("#q").value || "").toLowerCase();
+  let html = "";
+  if (t === "users") {
+    html = "<table><tr><th>Email</th><th>Threads</th><th>Messages</th><th>Last active</th></tr>" +
+      (DATA.users || []).filter(u => (u.email || "").toLowerCase().includes(q)).map(u =>
+        `<tr><td>${u.email || ""}</td><td>${u.threads || 0}</td><td>${u.messages || 0}</td><td class="mut">${u.last_active ? new Date(u.last_active).toLocaleString() : "—"}</td></tr>`).join("") + "</table>";
+  } else if (t === "searches") {
+    html = "<table><tr><th>When</th><th>User</th><th>Thread</th><th>Query</th></tr>" +
+      (DATA.recent_searches || []).filter(s => (String(s.query) + String(s.email)).toLowerCase().includes(q)).map(s =>
+        `<tr><td class="mut">${new Date(s.created_at).toLocaleString()}</td><td>${s.email || ""}</td><td>${(s.thread_title || "").slice(0, 60)}</td><td>${String(s.query || "").slice(0, 300)}</td></tr>`).join("") + "</table>";
+  } else {
+    html = "<table><tr><th>Day</th><th>Signups</th><th>Threads</th><th>Messages</th></tr>" +
+      merge().map(d => `<tr><td>${d.day}</td><td>${d.signup || 0}</td><td>${d.threads || 0}</td><td>${d.messages || 0}</td></tr>`).join("") + "</table>";
+  }
+  $("#pane").innerHTML = html;
+}
+function merge() {
+  const m = {};
+  for (const s of DATA.signups_30d || []) m[s.day] = { day: s.day, signup: Number(s.n || 0) };
+  for (const a of DATA.activity_30d || []) m[a.day] = Object.assign(m[a.day] || { day: a.day }, { threads: Number(a.threads || 0), messages: Number(a.messages || 0) });
+  return Object.values(m).sort((x, y) => y.day.localeCompare(x.day));
+}
+document.addEventListener("DOMContentLoaded", async () => {
+  const sess = (await sb.auth.getSession()).data.session;
+  if (sess) { $("#who").textContent = sess.user.email; load(); }
+  else $("#login").hidden = false;
+  $("#signin").onclick = async () => {
+    const { error } = await sb.auth.signInWithPassword({ email: $("#email").value, password: $("#pass").value });
+    if (error) $("#loginerr").textContent = error.message; else { $("#who").textContent = $("#email").value; load(); }
+  };
+  $("#logout").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+  $("#refresh").onclick = load;
+  $("#q").oninput = () => render($(".tab.on").dataset.t);
+  document.querySelectorAll(".tab").forEach(t => t.onclick = () => { document.querySelectorAll(".tab").forEach(x => x.classList.remove("on")); t.classList.add("on"); render(t.dataset.t); });
+});
+</script>
+</body>
+</html>
