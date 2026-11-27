@@ -4868,6 +4868,39 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
         finalResponse.choices[0].message.content = vt;
       }
 
+      // v363 DETERMINISTIC LENGTH ENFORCEMENT (owner directive 2026-11-27): three rounds of
+      // prompt-only tuning plateaued (replay 88-89% stable) — the writer ignores soft band
+      // instructions on deep-research rows (31x, 26x the band). When the final answer
+      // exceeds 2.8x its trained band max, ONE condensing rewrite pass fires: mechanical,
+      // measurable, never touches Sources/citations, and only replaces the body if the
+      // condensed version is genuinely shorter (guards against a model no-op).
+      if (!verbatimMode && finalResponse?.choices?.[0]?.message?.content) {
+        const BAND_MAX = [1200, 2600, 4000][lp.cls] || 2600;
+        const full363 = String(finalResponse.choices[0].message.content);
+        const body363 = full363.replace(/\n## Sources[\s\S]*$/i, "");
+        if (body363.length > 2.8 * BAND_MAX && body363.length > 1500) {
+          try {
+            const r363 = await fetch(callModelUrl, {
+              method: "POST", headers: CM_HEADERS,
+              body: JSON.stringify({
+                messages: [
+                  { role: "system", content: "You condense research answers to a target length without losing substance." },
+                  { role: "user", content: "Condense the ANSWER below to roughly " + BAND_MAX + " characters. PRESERVE: every figure, date, and name; every [N] citation marker with its sentence; the answer's core conclusions. CUT: repetition, padding, throat-clearing, redundant examples, and over-long background. Keep 2-4 headings maximum. Output ONLY the condensed answer.\n\nANSWER:\n" + body363.slice(0, 24000) }
+                ], purpose: "general", model: finalModel, reasoning_effort: "low", max_tokens: 2500
+              }),
+              signal: AbortSignal.timeout(45_000)
+            });
+            if (r363.ok) {
+              const d363 = await r363.json();
+              const c363 = String(d363?.choices?.[0]?.message?.content || "").trim();
+              if (c363.length > 300 && c363.length < body363.length * 0.75) {
+                finalResponse.choices[0].message.content = c363 + full363.slice(body363.length);
+              }
+            }
+          } catch (_e363) { /* keep original */ }
+        }
+      }
+
       // v199 CLAIM GUARD (parity doc 34f, owner complaint 2026-11-13: the assistant
       // "hallucinates and says it's completing items and then doesn't do them"):
       // server-side post-response check on the assembled answer. Completion claims
