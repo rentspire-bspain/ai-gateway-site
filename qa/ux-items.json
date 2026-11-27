@@ -1,5 +1,5 @@
 {
- "version": 52,
+ "version": 53,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -2434,7 +2434,8 @@
    "evidence": "TT notifies only on in-tab delta",
    "fix": "Event → notification matrix with tests",
    "notes": {
-    "TT": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #27 merged — postback now inserts offerwall_credit/offerwall_capped inbox notifications (fire-and-forget, lock test 3/3); Y until a live postback readback (needs Adscend traffic)"
+    "TT": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #27 merged — postback now inserts offerwall_credit/offerwall_capped inbox notifications (fire-and-forget, lock test 3/3); Y until a live postback readback (needs Adscend traffic)",
+    "BV": "[batch 45] Full matrix shipped: offerwall_credit/capped (live batch 40/41), neuron_expiry (daily DB job notify_neuron_expiry, deployed, runs clean), payment_failed + reversal (stripe-webhook v13, deployed, boots, matrix test in governed-sql _tests/notification-matrix.test.mjs). STAYS Y: the STRIPE_WEBHOOK_SECRET env var is not configured on the function and zero purchase events have ever been recorded — payment/reversal lanes cannot be live-verified until the secret is set (owner: Stripe dashboard signing secret) and a real payment flows."
    }
   },
   {
@@ -2908,13 +2909,13 @@
    "status": {
     "BV": "U",
     "TT": "U",
-    "AG": "Y",
+    "AG": "G",
     "GH": "R",
     "ST": "U",
     "CT": "R",
     "DG": "U"
    },
-   "evidence": "docs/soc2-retention-and-governance.md; RentSpire SOC 2 readiness is a separate gate | worker CT 2026-11-22: Fetching comptrove.com and its obvious sub-pages (/privacy, /terms, /help, /docs, /sitemap.xml, /robots.txt) surfaced none of the three PASS-benchmark elements: (1) no trust page — the only trust-center result found was for a different entity, AcaTrove at acatrove.com [[11](https://apis.io/security/ | worker GH 2026-11-22: No buyer-facing security/compliance evidence could be observed for minutegig.com: search results did not surface any minutegig.com trust page, SOC 2 status, or security questionnaire pack [[1](https://oneminutego.com/sitemap.xml?lang=en)][[2](https://www.minutegroup.com/policies/terms-and-conditions",
+   "evidence": "[batch 45, 2026-11-27] Live: https://ai.spaincos.com/trust serves the AG trust center (noindex, buyer-facing): SOC 2 Type II inclusion status (honest — program active, not certified), 12-month retention matrix from docs/soc2-retention-and-governance.md, change-management protections, monitoring posture, sub-processors, questionnaire-pack request path. Sweep-checked 'ag trust center' + 'bv /trust 404'. PR #682; site deploy live.",
    "fix": "Trust center page per product"
   },
   {
