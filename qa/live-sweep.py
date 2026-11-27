@@ -71,6 +71,13 @@ def main():
     a = body.decode("utf-8", "replace")
     fails += not check("ag ws bypass reaches shell", st == 200 and "spa-restore" in a)
 
+    # v360 (U-TRU-21): AG trust center live, noindex (buyer-facing evidence page).
+    st, body = get(AG + "/trust")
+    a = body.decode("utf-8", "replace")
+    fails += not check("ag trust center", st == 200 and "Trust and security" in a and "noindex" in a)
+    st, body = get(BV + "/trust")
+    fails += not check("bv /trust 404 (AG-only)", st == 404)
+
     # pricing.json is only checked when the repo itself ships it (the canonical-source
     # feature lands via its own PR; the sweep must not file regressions for pending work).
     if (ROOT / "pricing.json").exists():
