@@ -4878,7 +4878,7 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
         const BAND_MAX = [1200, 2600, 4000][lp.cls] || 2600;
         const full363 = String(finalResponse.choices[0].message.content);
         const body363 = full363.replace(/\n## Sources[\s\S]*$/i, "");
-        if (body363.length > 2.8 * BAND_MAX && body363.length > 1500) {
+        if (body363.length > 1.6 * BAND_MAX && body363.length > 1500) { // v363b: 2.8x was too loose — replay row at 42.8x survived it
           try {
             const r363 = await fetch(callModelUrl, {
               method: "POST", headers: CM_HEADERS,
