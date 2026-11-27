@@ -4895,6 +4895,7 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
               const c363 = String(d363?.choices?.[0]?.message?.content || "").trim();
               if (c363.length > 300 && c363.length < body363.length * 0.75) {
                 finalResponse.choices[0].message.content = c363 + full363.slice(body363.length);
+                (finalResponse as any).x_len_condensed = { before: body363.length, after: c363.length, band: BAND_MAX };
               }
             }
           } catch (_e363) { /* keep original */ }
