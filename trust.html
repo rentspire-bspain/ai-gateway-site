@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust and security — ai.spaincos.com</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Security, compliance and data-governance evidence for ai.spaincos.com: SOC 2 readiness status, retention policy, change management, sub-processors, and how to request the questionnaire pack.">
+<style>
+  :root { --bg: #0C0E14; --fg: #E8ECF4; --muted: #9AA4B8; --border: #232A3A; --surface: #141824; --accent: #5B8CFF; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.65; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 26px; font-weight: 650; margin: 0 0 6px; }
+  .updated { color: var(--muted); font-size: 13px; margin-bottom: 36px; }
+  h2 { font-size: 17px; font-weight: 600; margin: 32px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  nav { font-size: 14px; margin-bottom: 24px; }
+  nav a { margin-right: 14px; }
+  a { color: #7FB4FF; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 24px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin: 20px 0; }
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; margin-right: 8px; }
+  .g { color: #6FE3A5; border-color: #2c5a41; }
+  .y { color: #F2D06B; border-color: #5a4f2c; }
+  .owner-note { color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); margin-top: 40px; padding-top: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <nav><a href="/">Workspace</a><a href="/docs.html">Docs</a><a href="/help.html">Help</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a></nav>
+  <h1>Trust and security</h1>
+  <p class="updated">Security, compliance and data-governance evidence for ai.spaincos.com &middot; Updated November 26, 2026</p>
+
+  <h2>Status at a glance</h2>
+  <div class="card">
+    <p><span class="badge y">SOC 2 Type II</span> Inclusion program active (since 2026-11-11) — not yet certified. Owner rulings recorded; audit-window evidence collection in progress.</p>
+    <p><span class="badge g">Data retention</span> 12-month conversation-retention policy live, enforced by a daily automated job with logged per-table outcomes.</p>
+    <p><span class="badge g">Change management</span> Integrity-only branch protection: required live-site verification check, force pushes and deletions blocked (admins included).</p>
+    <p><span class="badge g">Monitoring</span> Minute-scale estate heartbeat, 5-minute production sweeps, hourly data-layer test suites, regression auto-filing.</p>
+  </div>
+
+  <h2>SOC 2 readiness</h2>
+  <p>The platform is in a documented SOC 2 Type II inclusion program. The authoritative references are the <a href="/docs.html">governance record</a> (retention policy and change-management rulings) and the phased hardening plan maintained in the security repository. Evidence under collection: retention-job logs, change-management records (PR + required checks), access reviews, and the monitoring/incident record.</p>
+
+  <h2>Data retention (owner ruling)</h2>
+  <table>
+    <thead><tr><th>Data</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>Saved conversations</td><td>Deleted 12 months after last activity</td></tr>
+      <tr><td>Uploaded/imported documents</td><td>Deleted 12 months after creation</td></tr>
+      <tr><td>Revoked shares</td><td>Deleted 12 months after revocation</td></tr>
+      <tr><td>Incognito threads</td><td>24 hours</td></tr>
+      <tr><td>Operational logs</td><td>14-day trim (hygiene, not PII)</td></tr>
+      <tr><td>Legal holds</td><td>Documented holds suspend deletion, with reason and expiry</td></tr>
+    </tbody>
+  </table>
+  <p>Enforcement is automated (daily job, logged per table), not manual policy. Client-side caches are browser-local; the server policy is authoritative.</p>
+
+  <h2>How we build and run it</h2>
+  <ul>
+    <li>Every production change ships through a pull request with required checks; force pushes and branch deletions are blocked for everyone, including admins.</li>
+    <li>A post-deploy verification guard fails red if production does not match the shipped code.</li>
+    <li>Row-level security on user data; export and deletion available in-product.</li>
+    <li>Sub-processors: hosting/edge (Vercel), database and auth (Supabase), payments (Stripe). Current list available in the questionnaire pack.</li>
+  </ul>
+
+  <h2>Questionnaire pack</h2>
+  <p>A buyer security questionnaire pack (SOC 2 inclusion plan, sub-processor list, retention policy, change-management summary, incident record) is available on request. <a href="mailto:bspain@spaincos.com">Request the pack</a> — please include your entity and the intended evaluation.</p>
+
+  <p class="owner-note">ai.spaincos.com is a private workspace; this trust page is provided for buyers and counterparties. &middot; &copy; 2026 Spain Companies LLC</p>
+</main>
+</body>
+</html>
