@@ -3809,7 +3809,7 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
     // TARGET BAND, not "1-3 sentences": class short -> aim 600-1,200 chars; medium ->
     // 1,000-2,600; long -> 1,800-4,000. The regex gates (v360/v361b) remain as the
     // short-class fallback when the model is not confident.
-    const LEN_MODEL = { keys: ["attach","caps","chars","clause","deep","enum","masterdoc","qmarks","simple","short","w"], W: ' + json.dumps(json.load(open("qa/length-register-model.json"))["W"]) + ', B: ' + json.dumps(json.load(open("qa/length-register-model.json"))["B"]) + ' };
+    const LEN_MODEL = {"keys": ["attach", "caps", "chars", "clause", "deep", "enum", "masterdoc", "qmarks", "short", "simple", "w"], "W": [[-0.0005990143948987215, 0.4232975380700143, -0.3698186593544165, 0.36105325492748414, 0.5910103330165171, 0.2199516216770544, 2.407092124266285, 0.4571557809145847, 0.46877363123799143, 0.8405577556920786, -0.690222878568816], [-0.22283565549823292, -0.2238929775273712, -0.643666066807903, 0.10272473408675979, -0.8611939469190077, -0.039945888361231856, -1.7470207811138632, -0.22926823952295008, 0.22610857542407606, -0.044788080582264786, 0.8088885157027064], [0.2234346698931345, -0.19940456054264694, 1.0134847261623336, -0.46377798901423356, 0.27018361390248885, -0.1800057333158117, -0.660071343152412, -0.22788754139162856, -0.6948822066620423, -0.7957696751098066, -0.11866563713386549]], "B": [-0.7999632722506843, 0.7795518657834724, 0.020411406467214854]};
     const lenFeatures = (q: string) => {
       const words = q.split(/\s+/).filter(Boolean);
       const f: Record<string, number> = {
