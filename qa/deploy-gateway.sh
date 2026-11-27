@@ -55,10 +55,10 @@ sys.path.insert(0, "qa")
 import prelaunch
 tok = prelaunch.mint_token()
 st, body, _ = prelaunch.http("https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/gateway-chat", 90,
-    json.dumps({"messages":[{"role":"user","content":"Health check: what is 17 times 23?"}],"thread_id":"deploy-health","mode":"concise"}).encode(),
+    json.dumps({"messages":[{"role":"user","content":"Health check: reply with exactly the number 391 and nothing else."}],"thread_id":"deploy-health","mode":"concise"}).encode(),
     {"Authorization": f"Bearer {tok}", "apikey": prelaunch.ANON, "content-type": "application/json"})
 print(st)
-print(body[:400])
+print(body[:3000])
 EOF
 ) && [ "$(echo "$OUT" | head -1)" = "200" ]; do sleep 10; done
 if ! echo "$OUT" | grep -q "391"; then
