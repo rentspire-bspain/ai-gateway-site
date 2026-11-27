@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6ZwqRizEQA3YYsaC+xG3lXe8XDIIrZgUaAgwdS2Vd+g=' 'sha256-JkP+AmScOGvaGq6YGr3VPd2esWlailc7Ih41wUShoh4=' 'sha256-awrUxp/8yF09zIqg9R+DBua/ET+82mE1Zco/XFw0Y+M=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k=' ; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-tss/hUm0+G/SZiUAew9OQa3jfl9mlLauda/j3zpIVLU=' 'sha256-JkP+AmScOGvaGq6YGr3VPd2esWlailc7Ih41wUShoh4=' 'sha256-awrUxp/8yF09zIqg9R+DBua/ET+82mE1Zco/XFw0Y+M=' 'sha256-/suYy9M39qmjxeSFZqoEGZ6I2AkGsEUsFChq0pxLjZY=' 'sha256-KhRdsAMOudj/M/rrkiiEbbmnNlVHET4UskAZyPZ2WO8=' 'sha256-wXqtIWLf91O86NXe7ysmRHTic1QB99Xiy5AUnK2CG0k=' ; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://bnxermyboeigvwonfrzx.supabase.co https://geocoding-api.open-meteo.com https://api.open-meteo.com https://www.google.com; worker-src 'self' blob:; frame-src https://adscendmedia.com https://*.adscendmedia.com https://ayetstudios.com https://*.ayetstudios.com; media-src 'self' blob: data: https:; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
@@ -4327,12 +4327,23 @@ function generateRelated(query, answer) {
   // (a) the model's own suggested follow-ups win, used as written
   const suggested = extractSuggestedFollowups(answer);
   if (suggested) return suggested;
-  // (b) fallback: runnable next-step commands (v179 — actionable, not questions)
+  // (b) fallback (v361, owner complaint 2026-11-27: "next steps are generic and have no
+  // relevance to the prior response/chain"): when the model's own follow-ups are missing,
+  // ANCHOR the pills to this turn's query and answer instead of showing static templates.
+  const subject = String(query || "").replace(/[?.!]+$/, "").trim().split(/\s+/).slice(0, 7).join(" ");
+  if (subject.length > 10) {
+    return [
+      `Go deeper: ${subject}`,
+      `What are the main risks or trade-offs with ${subject}?`,
+      `Give me a concrete example of ${subject}`,
+      `What changed recently about ${subject}?`
+    ];
+  }
   return [
-    "Summarize the key points in a 5-row table",
-    "Rank the main risks and trade-offs by severity",
-    "Build a step-by-step action plan with owners and dates",
-    "Draft a one-page brief from the full answer"
+    `Summarize the key points in a 5-row table`,
+    `Rank the main risks and trade-offs by severity`,
+    `Build a step-by-step action plan with owners and dates`,
+    `Draft a one-page brief from the full answer`
   ];
 }
 
