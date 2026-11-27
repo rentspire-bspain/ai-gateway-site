@@ -33,6 +33,19 @@ def sql(query):
          ' -H "authorization: Bearer $PPLX_CRED_VALUE" -H "content-type: application/json"'
          ' --data-binary @/tmp/q.json'],
         capture_output=True, text=True, timeout=60)
+    for attempt in range(4):
+        try:
+            return json.loads(out.stdout)
+        except Exception:
+            if attempt == 3: raise
+            time.sleep(3)
+            out = subprocess.run(["pplx","credentials","run",
+             "custom-cred:d2732368-0d3a-4666-a914-1a195e4180d9@api.supabase.com",
+             "--","sh","-c",
+             'curl -s -X POST "https://api.supabase.com/v1/projects/bnxermyboeigvwonfrzx/database/query"'
+             ' -H "authorization: Bearer $PPLX_CRED_VALUE" -H "content-type: application/json"'
+             ' --data-binary @/tmp/q.json'],
+            capture_output=True, text=True, timeout=60)
     return json.loads(out.stdout)
 
 def sample_threads(n, seed):
