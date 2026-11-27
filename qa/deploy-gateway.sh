@@ -44,7 +44,7 @@ RESP=$(pplx credentials run custom-cred:d2732368-0d3a-4666-a914-1a195e4180d9@api
   curl -sS -m 600 -X POST "https://api.supabase.com/v1/projects/$PROJ/functions/deploy?slug=$SLUG" \
   -F "metadata=<metadata.json;type=application/json" "${ARGS[@]}")
 echo "$RESP" | grep -o '"version":[0-9]*' | head -1
-if ! echo "$RESP" | grep -q '"status":"ACTIVE"'; then echo "[deploy] FAILED"; exit 1; fi
+if ! echo "$RESP" | grep -q "ACTIVE" || echo "$RESP" | grep -q "Failed to bundle"; then echo "[deploy] FAILED: $RESP"; exit 1; fi
 
 # ---------- MANDATORY POST-DEPLOY HEALTH GATE (cannot be skipped) ----------
 cd - >/dev/null
