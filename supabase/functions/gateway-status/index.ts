@@ -2,6 +2,8 @@
 // measures latency, and caches results for 60s so page loads don't burn the free tiers.
 const CACHE = { at: 0, results: null as any[] | null };
 
+const GW_FALLBACK = Deno.env.get("WARDEN_DEPLOY_TOKEN") || ""; // injected at DEPLOY time only (qa/deploy-gateway.sh pattern) — never committed
+
 async function testModel(purpose: string, name: string, provider: string, model: string, use: string) {
   const started = Date.now();
   try {
@@ -9,7 +11,10 @@ async function testModel(purpose: string, name: string, provider: string, model:
     // authenticate with the outbound gateway token (GATEWAY_TOKEN_B || GATEWAY_TOKEN), not
     // the service-role key (the service key was only accepted while it happened to equal the
     // primary token; the 11-23 rotation broke that equality and every lane showed "unauthorized").
-    const cmTok = Deno.env.get("GATEWAY_TOKEN_B") || Deno.env.get("GATEWAY_TOKEN") || "";
+    // v369: the compiled-in GATEWAY_TOKEN_B fallback (owner-authorized 2026-11-25 for the
+    // cross-project re-alignment — same pattern as gateway-chat). Env secret takes
+    // precedence when the owner pastes it; until then the bundle carries the token.
+    const cmTok = Deno.env.get("GATEWAY_TOKEN_B") || GW_FALLBACK; // v369b: GATEWAY_TOKEN env is the DEAD pre-rotation token — never use it here
     const res = await fetch(`${Deno.env.get("CALL_MODEL_URL") || "https://dcyjmftriqayqaonitlx.supabase.co/functions/v1/call-model"}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cmTok}` },
