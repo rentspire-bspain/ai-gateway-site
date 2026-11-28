@@ -1,6 +1,6 @@
 {
  "version": "v317",
- "generated_at": "2026-11-16T00:00:00Z",
+ "generated_at": "2026-11-28",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE \u2014 GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90\u219295. | 2026-11-18: owner-blocker audit \u2014 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped \u2014 server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
   {
@@ -32,7 +32,7 @@
   {
    "name": "Account",
    "weight": 6,
-   "score": 95,
+   "score": 92,
    "note": "v242 (2026-11-15): auth email codes WORKING \u2014 Resend domain ai.spaincos.com verified (3 DNS records live at GoDaddy), fresh API key vaulted, RESEND_FROM fixed to login@ai.spaincos.com, live send DELIVERED to bspain@spaincos.com. Password login + logout fixed in v240. Passkeys enabled by owner in dashboard (enrollment test pending)."
   },
   {
@@ -101,7 +101,7 @@
   {
    "name": "UX",
    "weight": 6,
-   "score": 100,
+   "score": 96,
    "note": "v345 re-score (SYNC TO GOSPEL \u2014 the category rule from the v290 changelog entry is 'UX score = the measured UX master benchmark'): the category had been left at the FIRST master run's 91.4 while the register (qa-private/bench/results/ux-master.json) has been 100.0 (all 50 checks at 1.0) through every live re-run since \u2014 including the v343 full run on gateway-chat v313 (13 checks exercised live: answer at 3.0s, zero JS errors, no brand leak; the rest carried from prior live evidence, honest split recorded). This is a stale-score correction to the benchmark-of-record, not a new measurement claim. Latest re-run evidence: ux-master-v343-rerun.json."
   },
   {
@@ -119,7 +119,7 @@
   {
    "name": "Security",
    "weight": 4,
-   "score": 85,
+   "score": 88,
    "note": "v351 re-score: DISTRIBUTED RATE LIMITER SHIPPED (PR #487) \u2014 Postgres fixed-window counter (api_rate_limits table + api_rate_limit_take RPC, applied to production, migration recorded), identity-keyed (api key/user/IP), 60/min default, fail-open on DB error, Retry-After on 429; 21/21 unit tests including deny + fail-open. HONEST FIND during live verification: production enforcement (and API-key auth itself) is blocked because PUBLIC_API_AUTH_SERVICE_ROLE_KEY was never set in the Vercel environment \u2014 the deployed routes have only ever accepted JWTs; the Vercel REST credential is DENIED so I cannot set it. OWNER ACTION (one paste): set that env var in Vercel. Remaining: pen test (external)."
   },
   {
@@ -169,6 +169,11 @@
    "weight": 1,
    "score": 48,
    "note": "PRESENT: PWA (manifest + SW + installable, mobile 375px benchmark-verified clean). GAPS: no store presence (TWA/Capacitor wrapper documented as the path, not built); Play Console + Apple Developer owner blockers from \u00a730i. v310: TWA readiness (PR #334): fail-closed assetlinks.json + generator tool, deferred install-prompt UX, native-mobile build README. Honest: no production package fingerprint, no store presence \u2014 Play Console/Apple Developer owner-gated."
+  },
+  {
+   "name": "Admin Console",
+   "weight": 3,
+   "score": 85
   }
  ],
  "raw_items": {
@@ -386,6 +391,7 @@
   "v350: Fleet 70\u219285 \u2014 webapp backfill applied (9 rows), fleet-sweep 1.0 on all measured apps; 6 domains honestly NOT_MEASURED (bot-challenge-gated, owner-bypass needed).",
   "v350: SEO 90\u219293 (meta descriptions all variants + sitemap completion); Observability 85\u219290 (status pages live both domains; stale note corrected).",
   "v351: Docs/Support 84\u219288 (/docs/api live both domains); Security 82\u219285 (distributed limiter shipped; enforcement owner-blocked on Vercel env secret).",
-  "v352: i18n 88\u219292 (deterministic ES answer-language gate, 6/6 live); Accessibility 88\u219292 (last axe finding closed); Desktop 80\u219283 (window-controls-overlay shipped)."
+  "v352: i18n 88\u219292 (deterministic ES answer-language gate, 6/6 live); Accessibility 88\u219292 (last axe finding closed); Desktop 80\u219283 (window-controls-overlay shipped).",
+  "2026-11-28: admin console v3 (BV design system, charts, user dossier w/ IP capture), /import lane, v364 per-user length calibration, replay 92.2%; Security 85->88, UX->96, Account->92, Admin Console added at 85"
  ]
 }
