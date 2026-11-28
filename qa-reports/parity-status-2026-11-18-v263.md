@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-28, v363)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-28, v364)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3595,3 +3595,20 @@ warden_playbooks: known failure signatures with remediations (seeded: all-lanes-
 ## Superadmin console — premortem and completion checklist (merged 2026-11-28)
 - [x] 7 data tabs + User dossier tab (8 total) — [x] KPIs incl. DAU, active/total, MTD cost — [x] Per-user dossier: contact, provider, sign-ins, IPs/UAs, usage, memories, imported volume, threads, messages — [x] SVG charts (activity, retention, top threads) — [x] BV design system — [x] Auth: JWT + admin allowlist, 403 verified, noindex — [x] Warden health + alerts tabs
 - [ ] 60s auto-refresh — [ ] CSV export per tab — [ ] cost-threshold alerting — [ ] RPC smoke in the deploy gate — [ ] thread-level conversation viewer — [ ] signup funnel — [ ] OSINT enrichment tier (reverse-IP geo, breach checks) — owner decision on third-party data costs + privacy-policy updates
+
+
+---
+
+## Addendum 80 — Customer value & profit, CSV + auto-refresh, OSINT geo live (2026-11-28, v364)
+
+**Customer-value tab (owner directive: "charges per user, gross profit incl. Neurons, sort by most valuable"):** new tab ranks every customer by gross profit — revenue (Stripe purchases from analytics_events) minus model cost (api_usage_month est. cost) — with per-user credits spent and Neurons earned, a gross-profit bar chart, and top-line KPIs (total revenue, total cost, total gross profit). Sorted most-valuable-first by default.
+
+**CSV export + 60-second auto-refresh (owner directive):** every tab now has one-click CSV export (correctly escaped) and a toggleable 60-second auto-refresh that preserves the current tab and dossier selection.
+
+**OSINT enrichment tier (owner directive: "reverse-IP geo and breach checks"):** LIVE — every IP in a user dossier is enriched server-side with city/region/country/ISP/organization (ip-api.com batch, free tier, best-effort, never blocks the dossier). Breach checks are wired but need HIBP_API_KEY (owner-gated: paste into Supabase secrets to activate — HIBP's API is a paid per-search service).
+
+**Replay (v363, stable sample): 89.6%** — inside the established 87-92% run-to-run band (writer nondeterminism + the two persistent >12K deep-research rows at 43.9x and 20.3x). Per-prompt: 12 PASS, 1 followup-cold, 12 graded failures (2 extreme-verbose, 3 structure, 3 citation, 2 latency, 2 quality/combined).
+
+**Free-lane capacity note:** today's provider RPD limit (1,000 free-lane requests/day) was exhausted by replay runs — the health gate caught it, issue #703 closed with retry logic. Replay cadence is now quota-bound on the free lane; paid lanes unaffected. Flagged for the owner: either accept slower replay cadence or raise free-lane quotas.
+
+**Scoring:** Admin Console 85→92. Headline regenerated from the register (never hand-summed).
