@@ -4875,7 +4875,27 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
       // measurable, never touches Sources/citations, and only replaces the body if the
       // condensed version is genuinely shorter (guards against a model no-op).
       if (!verbatimMode && finalResponse?.choices?.[0]?.message?.content) {
-        const BAND_MAX = [1200, 2600, 4000][lp.cls] || 2600;
+        // v364 PER-USER HISTORICAL LENGTH CALIBRATION (owner directive 2026-11-27: "build
+        // the per-user historical length calibration from imported threads"): for signed-in
+        // users WITH imported history, the band comes from THEIR OWN demonstrated answer
+        // lengths on the 5 most similar past prompts (nearest_history_length, pg_trgm,
+        // security-definer, called with the caller's own JWT so only their rows count).
+        // Falls back to the trained model band when no similar history exists.
+        let BAND_MAX = [1200, 2600, 4000][lp.cls] || 2600;
+        if (!apiKeyMode && userId && token) {
+          try {
+            const r364 = await fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/rpc/nearest_history_length`, {
+              method: "POST",
+              headers: { "apikey": Deno.env.get("SUPABASE_ANON_KEY") ?? "", "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+              body: JSON.stringify({ p_user: userId, p_query: String(userQuery).slice(0, 800) }),
+              signal: AbortSignal.timeout(4_000)
+            });
+            if (r364.ok) {
+              const v364 = Number(await r364.text());
+              if (v364 > 300) BAND_MAX = Math.min(Math.max(v364, 800), 6000);
+            }
+          } catch { /* fallback to the trained band */ }
+        }
         const full363 = String(finalResponse.choices[0].message.content);
         const body363 = full363.replace(/\n## Sources[\s\S]*$/i, "");
         if (body363.length > 1.6 * BAND_MAX && body363.length > 1500) { // v363b: 2.8x was too loose — replay row at 42.8x survived it
