@@ -92,8 +92,10 @@ async function runCheck(c: any, ctx: any): Promise<{ ok: boolean; detail: string
     if (c.kind === "lanes") {
       const r = await fetch(`${SB}/functions/v1/gateway-status`, { signal: AbortSignal.timeout(60_000) });
       const d = await r.json();
-      const fails = (d.results || []).filter((x: any) => x.status !== "pass").map((x: any) => x.name);
-      return { ok: fails.length === 0, detail: fails.length ? "failing: " + fails.join(", ") : `${(d.results || []).length} lanes pass` };
+      // v368: "quota" = OpenRouter free-tier daily limit (known capacity condition, not a defect)
+      const fails = (d.results || []).filter((x: any) => x.status !== "pass" && x.status !== "quota").map((x: any) => x.name);
+      const quota = (d.results || []).filter((x: any) => x.status === "quota").map((x: any) => x.name);
+      return { ok: fails.length === 0, detail: fails.length ? "failing: " + fails.join(", ") : `${(d.results || []).length} lanes pass` + (quota.length ? ` (free-tier quota: ${quota.join(", ")})` : "") };
     }
     if (c.kind === "brand") {
       const r = await fetch(c.url, { signal: AbortSignal.timeout(30_000) });

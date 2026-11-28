@@ -12,16 +12,22 @@ async function testModel(purpose: string, name: string, provider: string, model:
     const cmTok = Deno.env.get("GATEWAY_TOKEN_B") || Deno.env.get("GATEWAY_TOKEN") || "";
     const res = await fetch(`${Deno.env.get("CALL_MODEL_URL") || "https://dcyjmftriqayqaonitlx.supabase.co/functions/v1/call-model"}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cmTok}`,
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cmTok}` },
       body: JSON.stringify({ purpose, messages: [{ role: "user", content: "Reply with exactly: OK" }], max_tokens: 512 }),
       signal: AbortSignal.timeout(25_000),
     });
     const data = await res.json();
     const content = data?.choices?.[0]?.message?.content ?? "";
     const ok = res.ok && content.length > 0;
+    // v368 QUOTA-AWARE LANE STATUS: OpenRouter's free-tier daily limit (1000/day) is a
+    // KNOWN capacity condition (burned by benchmark/replay runs), not a lane defect.
+    // The 11-28 alert storm showed Qwen + Flint flapping "fail" daily on quota resets.
+    // A quota 429 now reports status "quota" (degraded, expected) instead of "fail", so
+    // the warden only alerts on REAL lane failures. Paid lanes are unaffected.
+    const isQuota = !res.ok && (data?.error?.code === 429 || /free-models-per-day|rate limit/i.test(String(data?.error?.message || "")));
     return {
       name, provider, model, use,
-      status: ok ? "pass" : "fail",
+      status: ok ? "pass" : (isQuota ? "quota" : "fail"),
       latency_ms: Date.now() - started,
       returned_model: data?.model ?? null,
       fallback_from: data?.x_fallback_from ?? null,
