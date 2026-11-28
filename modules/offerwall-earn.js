@@ -8,6 +8,15 @@
 (function () {
   "use strict";
   var URL_ = "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/neurons-claim";
+  var FUNNEL_URL = "https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/offer-funnel";
+  var S_ = window.__offerwallFunnel || (window.__offerwallFunnel = {});
+  function funnel(stage) {
+    if (S_[stage]) return; S_[stage] = 1; // once per page load
+    if (!S.token) return;
+    try {
+      fetch(FUNNEL_URL, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + S.token }, body: JSON.stringify({ stage: stage, source: "bv_earn_tab" }) }).catch(function () {});
+    } catch (_e) { /* analytics must never break the tab */ }
+  }
   var ADSCEND_PUB_ID = "", ADSCEND_ADWALL_ID = ""; // set when Adscend approves the profile
 
   /* ---- ad-network consent gate (F-01, v161) ----
@@ -163,6 +172,7 @@
         })
         .then(function (d) {
           if (!d || !S.alive) return;
+          funnel("view");
           var bal = d.balance != null ? d.balance : d.neurons;
           var n = body.querySelector(".oe-bal-n");
           if (n && bal != null) {
@@ -228,6 +238,7 @@
       ph.style.display = "flex";
       return false;
     }
+    funnel("click");
     frame.src = "https://adscendmedia.com/adwall/publisher/" + ADSCEND_PUB_ID +
       "/profile/" + ADSCEND_ADWALL_ID + "?subid1=" + encodeURIComponent(S.user);
     ph.style.display = "none";
