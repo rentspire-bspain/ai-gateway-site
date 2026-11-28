@@ -3834,6 +3834,19 @@ if (!apiKeyMode && !incognito && userId && digestOn) {
       return { cls: p.indexOf(Math.max(...p)), p };
     };
     const lenReg = (intent.complexity === "simple" && !(qEnumeration && (intent as any).needs_search)) || (qShort && !qMultiPart && !qEnumeration && !(intent as any).needs_search && intent.complexity !== "complex" && intent.complexity !== "extreme");
+    // v365 USER EVENT CAPTURE (owner directive: per-user dossier — IP, user agent):
+    // best-effort, fire-and-forget; never blocks or fails the request.
+    if (userId && !apiKeyMode) {
+      try {
+        const ipV = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "";
+        const uaV = (req.headers.get("user-agent") || "").slice(0, 300);
+        if (ipV) fetch(`${Deno.env.get("SUPABASE_URL")}/rest/v1/user_events`, {
+          method: "POST",
+          headers: { "apikey": Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, ip: ipV, user_agent: uaV })
+        }).catch(() => {});
+      } catch { /* never fatal */ }
+    }
     const lp = lenPredict(String(userQuery));
     const BANDS = ["600 and 1,200 characters", "1,000 and 2,600 characters", "1,800 and 4,000 characters"];
     capped.push({ role: "system", content: "LENGTH REGISTER (trained on the user's own Perplexity history, " + BANDS.length + " classes): aim for a TOTAL answer length between " + BANDS[lp.cls] + " — the user's prior assistant consistently produced answers in this band for questions like this one. Do not pad beyond the band; do not cut substance to go under it. " + (lenReg ? "For this simple lookup, lead with the direct answer in the first sentence." : "") });
