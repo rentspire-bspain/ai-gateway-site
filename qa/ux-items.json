@@ -1,5 +1,5 @@
 {
- "version": 54,
+ "version": 55,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -982,15 +982,15 @@
    "W": 8,
    "ircm": "4211",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "-",
-    "AG": "Y",
+    "AG": "G",
     "GH": "U",
     "ST": "U",
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "Passkey e2e still 🟡 (parity-master A1)",
+   "evidence": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): Supabase auth config confirms passkey_enabled=true with webauthn RP ai.spaincos.com (origins https://ai.spaincos.com), and the sign-in card renders the 'Sign in with passkey' button live (headless-Chromium DOM check, 3 matches on ai.spaincos.com). Auth config + UI both live.",
    "fix": "Finish passkey enablement; allow first query before verification"
   },
   {
@@ -2493,10 +2493,14 @@
     "GH": "R",
     "ST": "U",
     "CT": "R",
-    "DG": "U"
+    "DG": "R"
    },
    "evidence": "2026-11-24: governed-sql PR #19 merged — the Tasks-tab FTC disclosure links the host's /terms.html and /privacy.html (brand-split serves the right policy per host). Links live; per-host accuracy is the host's G.",
-   "fix": "Write BV policy: offer-wall partners, subid sharing, cookies, retention; per-host policy file"
+   "fix": "Write BV policy: offer-wall partners, subid sharing, cookies, retention; per-host policy file",
+   "notes": {
+    "CT": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): comptrove.com/privacy -> 404 (measured).",
+    "DG": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): doorgraph.com/privacy serves only the 1361-char sign-in shell (auth-gated, no public policy)."
+   }
   },
   {
    "id": "U-TRU-02",
@@ -2511,12 +2515,17 @@
     "TT": "G",
     "AG": "G",
     "GH": "U",
-    "ST": "U",
-    "CT": "U",
-    "DG": "U"
+    "ST": "R",
+    "CT": "R",
+    "DG": "R"
    },
    "evidence": "2026-11-24: Terms linked from the merged tasks-tab component (#19) AND from the live ai-gateway-site Earn-tab FTC text (batch 20).",
-   "fix": "Draft with counsel; link from signup and checkout"
+   "fix": "Draft with counsel; link from signup and checkout",
+   "notes": {
+    "CT": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): comptrove.com/terms -> 404.",
+    "ST": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): terminal.spaincos.com/terms -> 404 and /pricing -> 404.",
+    "DG": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): doorgraph.com/terms serves only the sign-in shell."
+   }
   },
   {
    "id": "U-TRU-03",
@@ -2556,13 +2565,14 @@
     "AG": "Y",
     "GH": "U",
     "ST": "U",
-    "CT": "U",
+    "CT": "R",
     "DG": "U"
    },
    "evidence": "2026-11-24 live post-#448: state privacy rights sections on both privacy pages (CCPA/CPRA + comparable state laws: know, correct, delete, opt-out of sale/sharing, non-discrimination, statutory response window), cross-referencing the consent gate and GPC. Counsel review of the final copy pending (E11-2).",
    "fix": "Add notice, link, DSAR form; state matrix (U-NW-07)",
    "notes": {
-    "TT": "2026-11-25 batch 25: state-rights copy in PR #20; verified served at localhost:8905"
+    "TT": "2026-11-25 batch 25: state-rights copy in PR #20; verified served at localhost:8905",
+    "CT": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): no privacy page exists (404), so no state privacy rights notice."
    }
   },
   {

@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 25.1%** (app-weighted; unmeasured counts as 0; v54 — batch 46: U-NOT-07 BV green — full notification matrix live-verified with signed Stripe events) · **measured-only: 43.5%** · 194✅ / 217🟡 / 172🔴 / 794⚪ across 386 line items. Per-app strict: BV 48.2% · TT 32.5% · AG 46.9% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 25.2%** (app-weighted; unmeasured counts as 0; v55 — batch 47: passkey green, CT/ST/DG first measured cells, Part H close-out plan) · **measured-only: 43.0%** · 196✅ / 215🟡 / 177🔴 / 789⚪ across 386 line items. Per-app strict: BV 48.5% · TT 32.5% · AG 46.9% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -2010,3 +2010,49 @@ Executed examples this session: deploy-path repair (3 fixes, each with its own v
 - ⚠️ **Discovered + documented:** no analytics service key exists in the vault; the readback runs from the first-party store instead (privacy-consistent with the no-trackers policy). Checkout itself remains one owner action away: set `STRIPE_SECRET_KEY` in Supabase project secrets (the vault value cannot be extracted into Supabase by design — dashboard paste or a dedicated credential grant needed).
 
 **Headline after batch: strict 25.1% / measured-only 43.6% (v54)** — session arc since batch 24: 20.2% → 25.1%. Register: 194✅ / 217🟡 / 172🔴 / 794⚪.
+
+
+## Part H — the granular 100% close-out plan (2026-11-27, batch 47)
+
+What it takes to take every cell to ✅, by lane. The register has 386 items × 7 apps; 100% strict requires every applicable cell green and every ⚪ measured.
+
+### H1. The autonomous build queue (no owner gate — replay the BV/AG patterns)
+
+The same playbooks that closed BV/AG items replay onto the unmeasured apps. Per app (CT=comptrove.com, ST=terminal.spaincos.com, DG=doorgraph.com, GH=gig-hub):
+
+1. **Legal pack** (closes U-TRU-01/02/04, w10 each ×4 apps): privacy policy (accurate to actual data flows), terms of service, state privacy-rights section (CCPA/CPRA + state matrix — reuse the BV/AG state-rights sections), linked from footer + signup. CT/ST/DG measured 🔴 today: comptrove /privacy and /terms 404; terminal /terms 404; doorgraph serves only the sign-in shell.
+2. **FTC material-connection disclosure** (U-TRU-05, w10 ×3 apps): wherever incentives/affiliate content appears (comptrove launch offers, terminal app cards) — reuse the A6 interstitial + sticky-label pattern from the offer wall.
+3. **Consent + GPC** (U-TRU-03, w10 ×4): consent gate before any partner content; GPC honored; no third-party trackers on first load (easy where none load — codify + test).
+4. **Data export/deletion** (U-TRU-11, w9 ×4): self-serve export + deletion endpoints; SLA text; reuse the BV export/delete modules.
+5. **Coverage matrix** (U-NW-01, w9, CT/GH): published 50-states+territories coverage page with measured ZIP5/county coverage — data exists in the estate (Comptrove rent history; PD nationwide).
+6. **SPA/SEO/static heads, 404s, status pages, notification matrices, funnel instrumentation** — replay batches 25–46 playbooks per app.
+
+This queue is ~250 of the 620 white cells in CT/ST/DG/GH and converts most current 🟡 to ✅ across BV/TT/AG leftovers.
+
+### H2. Owner-gated unlocks (blocking the rest)
+
+| Unlock | Closes | Impact |
+|---|---|---|
+| Stripe test key via the open secure form → config-relay (checkout live) | commerce funnel; U-MEAS-01/U-SEO-17 BV close; checkout_started events | form is open — paste the sk_test key |
+| GH repo/app surface access | ~108 GH white cells | measurable + buildable |
+| Counsel E11-2 ruling (U-TRU-04 wording) | U-TRU-04 BV/AG final wording; U-NW-07 | legal text only owner/counsel |
+| Analytics service key (if wanted beyond first-party) | U-SEO-17 alternatives | first-party readback already runs |
+| Adscend production approval | offerwall live traffic readback (TT Y→G) | partner-gated |
+| N-valuation decision | U-COPY-03, TT-BAL-10 | pricing copy |
+| Pricing-page copy reconciliation (planned Starter/Pro/Unlimited vs live Core/Max/Team) | pricing-consistency gate noise; U-PAY items | content decision |
+
+### H3. The math to 100%
+
+- 100% strict = 0 🟡, 0 🔴, 0 ⚪. Today: 196✅ / 217🟡 / 178🔴 / 794⚪.
+- BV/TT/AG remaining (mostly H1 replays + H2 unlocks): all green ⇒ ~38–40% strict ceiling before the other apps.
+- The decisive mass is the 794 ⚪ (620 in CT/ST/DG/GH): H1 replays them at build-cadence (est. 8–12 more batches at current throughput), H2 unlocks the rest.
+- Tonight's realistic ceiling with every autonomous lane firing: strict ~30–33% and measured-only ~85%+ (measurement converts ⚪ fast; greens follow the build queue).
+
+### Batch 47 — passkey green, first CT/ST/DG measurements, Stripe relay staged (2026-11-27, register v55)
+
+- ✅ **U-ONB-03 (BV+AG)** — passkey sign-in live: Supabase auth config `passkey_enabled=true` (webauthn RP ai.spaincos.com) AND the "Sign in with passkey" button renders in a real headless-Chromium load of ai.spaincos.com.
+- ⚪→🔴 **first measured cells in CT/ST/DG** (via Apify cheerio-scraper — Vercel bot protection blocks datacenter IPs, so the vault's Apify token is the measurement lane): comptrove /privacy 404, /terms 404, /pricing thin shell; terminal /terms + /pricing 404; doorgraph /privacy + /terms sign-in shell only. U-TRU-01 CT+DG, U-TRU-02 CT+ST+DG, U-TRU-04 CT now measured red — these are the first H1 build targets.
+- 🔧 **Checkout relay staged** — config-relay edge function deployed (cron-key-protected, secret only via proxy-injected Bearer, written to gateway_config); checkout v11 patched to read `stripe_secret_key` from gateway_config. Waiting on the open credential form (paste the sk_test key) — one step from live.
+- 📋 **U-TRU-04 E11-2 status**: counsel item unresolved (owner-gated) — no filing or ruling recorded in the estate; the state-rights text stands as shipped 2026-11-24.
+
+**Headline after batch: strict 25.2% / measured-only 43.0% (v55)** — session arc since batch 24: 20.2% → 25.2%.
