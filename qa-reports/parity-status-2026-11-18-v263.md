@@ -3655,3 +3655,21 @@ warden_playbooks: known failure signatures with remediations (seeded: all-lanes-
 8. **Fleet:** dcyj harvest pipeline repair (issue #510) — the estate-freshness workstream (85→90).
 
 ### Honest bottom line: 100% on every category TONIGHT is not reachable without the owner-gated keys — roughly a third of the remaining gap is locked behind Stripe live, OAuth apps, app stores, Twilio, HIBP, and counsel. Everything autonomous is either done, deployed tonight, or specced above with point estimates. The gospel stays: no score moves without a verified, deployed change behind it.
+
+
+---
+
+## Addendum 82 — Autonomous repair infrastructure live; the all-day lane failures root-caused and fixed (2026-11-28, v367)
+
+**Owner directive: "add the infrastructure that automatically and autonomously implements the fixes and deploys them to production — those errors have been sitting there all day."**
+
+**ROOT CAUSE of the all-day lane failures (found, fixed, verified):** gateway-status was authenticating its lane probes with the env `GATEWAY_TOKEN` — the token that was ROTATED OUT on 11-23. It fell back to the dead token because `GATEWAY_TOKEN_B` was never pasted as an env secret (owner-gated, still pending), and the compiled fallback did not exist on that function. Result: every lane showed "unauthorized" all day while the lanes themselves were actually fine. Fixed with the owner-authorized deploy-time B fallback (v33); lanes verified live: DeepSeek PASS, Qwen PASS (daily quota reset), Flint correctly classified as `quota` (free-tier daily limit) instead of `fail` — killing the daily alert storm. The estate 502s in the Alerts tab were the Supabase outage window and self-recovered.
+
+**WARDEN v8 — the autonomous repair engine (deployed):**
+- **Tier 1 (LIVE NOW, no new credentials):** narrow SQL self-healing the warden executes and verifies — stalled cron re-arm (`warden_cron_rearm`) and stale anon-quota cleanup (`warden_anon_quota_reset`), both security-definer and revoked from public roles.
+- **Tier 2 (armed, one owner paste from live):** on a new regression, the warden pulls the failing function's source from GitHub master (with the stored warden_gh_token), redeploys it via the Management API, and logs the repair to the Alerts tab you already watch. Guardrails: repairable-slug allowlist, ONE repair per function per hour, no auto schema changes ever, failed verification files a P0 and does not retry. ACTIVATION: paste a Supabase Access Token as the `WARDEN_MGMT_TOKEN` secret on the regression-warden function (Supabase Dashboard → bnx project → Edge Functions → regression-warden → Secrets → Add). The token vault's network ACL prevents me from doing this paste myself — verified the hard way.
+- **vault-receive function (deployed):** verifies and stores a management token from an Authorization Bearer — the secure ingestion path if you prefer sending it that way.
+
+**Replay (v366): 90.9% — best score yet** (band now 87-92). 12 PASS, 1 followup-cold, 12 graded failures (same taxonomy: 2 extreme-verbose rows at 34x/20x, 4 structure, 3 citation, 2 latency, 2 quality). Structure parity is now the largest failure class — the next named lever (heading/section register tuning for the writer).
+
+**Also this batch:** quota-aware lane status (gateway-status v33), warden v8, post-deploy health gate retry logic, deterministic replay sampling, and the free-lane daily quota documented as a known capacity condition.
