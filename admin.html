@@ -4,36 +4,44 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Admin Console</title>
+<title>Superadmin Console</title>
 <style>
-:root { --bg:#0d1117; --panel:#161b22; --line:#30363d; --txt:#e6edf3; --mut:#8b949e; --acc:#3fb950; --red:#f85149; }
+:root { --bg:#0d1117; --panel:#161b22; --line:#30363d; --txt:#e6edf3; --mut:#8b949e; --acc:#3fb950; --red:#f85149; --yel:#d29922; }
 * { box-sizing:border-box; }
-body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
-header { padding:14px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:var(--bg); z-index:5; }
-h1 { font-size:16px; margin:0; }
-main { max-width:1200px; margin:0 auto; padding:20px; }
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-bottom:20px; }
-.card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px; }
-.card h3 { margin:0 0 8px; font-size:12px; color:var(--mut); text-transform:uppercase; letter-spacing:.05em; }
-.big { font-size:28px; font-weight:600; }
+body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.5 -apple-system,"Segoe UI",Roboto,sans-serif; }
+header { padding:12px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:var(--bg); z-index:5; }
+h1 { font-size:15px; margin:0; }
+main { max-width:1400px; margin:0 auto; padding:18px 20px 80px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:18px; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
+.card h3 { margin:0 0 6px; font-size:11px; color:var(--mut); text-transform:uppercase; letter-spacing:.04em; }
+.big { font-size:22px; font-weight:600; }
+.sub { font-size:11px; color:var(--mut); margin-top:2px; }
 table { width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
-th, td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); font-size:13px; }
-th { color:var(--mut); font-weight:600; position:sticky; top:0; background:var(--panel); }
+th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); font-size:12.5px; }
+th { color:var(--mut); font-weight:600; position:sticky; top:0; background:var(--panel); cursor:pointer; }
 tr:last-child td { border-bottom:none; }
-.search { padding:8px 12px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--txt); width:280px; }
-button { padding:8px 14px; border-radius:6px; border:1px solid var(--line); background:var(--panel); color:var(--txt); cursor:pointer; }
+td.num, th.num { text-align:right; }
+.search { padding:7px 10px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--txt); width:260px; }
+button { padding:6px 12px; border-radius:6px; border:1px solid var(--line); background:var(--panel); color:var(--txt); cursor:pointer; font-size:12.5px; }
 button:hover { border-color:var(--acc); }
 .err { color:var(--red); }
 .mut { color:var(--mut); }
-.tabs { display:flex; gap:8px; margin-bottom:16px; }
-.tab { padding:6px 14px; border-radius:20px; border:1px solid var(--line); cursor:pointer; }
+.ok { color:var(--acc); } .bad { color:var(--red); } .warn { color:var(--yel); }
+.tabs { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
+.tab { padding:5px 13px; border-radius:16px; border:1px solid var(--line); cursor:pointer; font-size:12.5px; }
 .tab.on { background:var(--acc); color:#04170a; border-color:var(--acc); font-weight:600; }
-#login { max-width:360px; margin:80px auto; text-align:center; }
-#login input { width:100%; margin:6px 0; padding:10px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--txt); }
+.bar { height:8px; background:#21262d; border-radius:4px; overflow:hidden; }
+.bar>div { height:100%; background:var(--acc); }
+#login { max-width:340px; margin:70px auto; text-align:center; }
+#login input { width:100%; margin:5px 0; padding:9px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--txt); }
+.back { margin-bottom:10px; }
+.role-chip { display:inline-block; padding:1px 8px; border-radius:10px; font-size:10.5px; border:1px solid var(--line); color:var(--mut); }
+.role-chip.you { border-color:var(--acc); color:var(--acc); }
 </style>
 </head>
 <body>
-<header><h1>Superadmin Console</h1><div><span class="mut" id="who"></span> <button id="refresh">Refresh</button> <button id="logout">Sign out</button></div></header>
+<header><h1>Superadmin Console — full estate</h1><div><span class="mut" id="who"></span> <button id="refresh">Refresh</button> <button id="logout">Sign out</button></div></header>
 <div id="login">
   <h2>Admin sign-in</h2>
   <input id="email" type="email" placeholder="Email">
@@ -42,75 +50,101 @@ button:hover { border-color:var(--acc); }
   <p class="err" id="loginerr"></p>
 </div>
 <main id="main" hidden>
-  <div class="grid">
-    <div class="card"><h3>Signups (30d)</h3><div class="big" id="k-signups">–</div></div>
-    <div class="card"><h3>Active threads (30d)</h3><div class="big" id="k-threads">–</div></div>
-    <div class="card"><h3>Messages (30d)</h3><div class="big" id="k-msgs">–</div></div>
-    <div class="card"><h3>Total users</h3><div class="big" id="k-users">–</div></div>
-  </div>
-  <div class="tabs">
-    <div class="tab on" data-t="users">Users</div>
-    <div class="tab" data-t="searches">Recent searches</div>
-    <div class="tab" data-t="activity">Activity by day</div>
-  </div>
-  <input class="search" id="q" placeholder="Filter…">
+  <div class="grid" id="kpis"></div>
+  <div class="tabs" id="tabs"></div>
   <div id="pane"></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SB_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
 const sb = window.supabase.createClient(SB_URL, "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb", { auth: { persistSession: true } });
-let DATA = null;
+let D = null;
 const $ = (s) => document.querySelector(s);
+const TABS = [
+  ["users", "Users"], ["searches", "Recent searches"], ["activity", "Activity by day"],
+  ["retention", "Retention cohorts"], ["usage", "Usage & cost"], ["health", "Warden health"],
+  ["alerts", "Alerts"],
+];
+const fmt = (n) => Number(n || 0).toLocaleString();
 
-async function load() {
+async function load(detailUser) {
   $("#login").hidden = true; $("#main").hidden = false;
   const tok = (await sb.auth.getSession()).data.session?.access_token;
-  const r = await fetch(SB_URL + "/functions/v1/admin-console", { method: "POST", headers: { authorization: "Bearer " + tok, "content-type": "application/json" }, body: "{}" });
-  if (!r.ok) { $("#pane").innerHTML = '<p class="err">' + r.status + " — " + (await r.text()).slice(0, 200) + "</p>"; return; }
-  DATA = await r.json();
-  const s = DATA.signups_30d || [], a = DATA.activity_30d || [], u = DATA.users || [];
-  $("#k-signups").textContent = s.reduce((n, x) => n + Number(x.n || 0), 0);
-  $("#k-threads").textContent = a.reduce((n, x) => n + Number(x.threads || 0), 0);
-  $("#k-msgs").textContent = a.reduce((n, x) => n + Number(x.messages || 0), 0);
-  $("#k-users").textContent = u.length;
-  render($(".tab.on").dataset.t);
+  const r = await fetch(SB_URL + "/functions/v1/admin-console" + (detailUser ? "?user=" + encodeURIComponent(detailUser) : ""), { method: "POST", headers: { authorization: "Bearer " + tok, "content-type": "application/json" }, body: "{}" });
+  if (!r.ok) { $("#pane").innerHTML = '<p class="err">' + r.status + " — " + (await r.text()).slice(0, 300) + "</p>"; return; }
+  D = await r.json();
+  renderKpis(); render($(".tab.on") ? $(".tab.on").dataset.t : "users");
 }
+function renderKpis() {
+  const dau = D.dau_30d || [], users = D.users || [], act = D.activity_30d || [];
+  const today = dau.length ? dau[dau.length - 1] : null;
+  const wau = new Set((dau.slice(-7)).map(x => x.day)).size ? dau.slice(-7).reduce((n, x) => n + Number(x.dau || 0), 0) : 0; // sum of daily distincts (upper bound)
+  const msgs30 = act.reduce((n, x) => n + Number(x.messages || 0), 0);
+  const activeUsers30 = users.filter(u => u.messages > 0).length;
+  const k = [
+    ["Signups 30d", fmt((D.signups_30d || []).reduce((n, x) => n + Number(x.n || 0), 0))],
+    ["DAU today", today ? fmt(today.dau) : "0", "messages " + fmt(today ? today.posters : 0)],
+    ["Threads 30d", fmt(act.reduce((n, x) => n + Number(x.threads || 0), 0))],
+    ["Messages 30d", fmt(msgs30)],
+    ["Users (active/total)", activeUsers30 + " / " + users.length],
+    ["Cost this month", "$" + fmt((D.usage || []).reduce((n, x) => n + Number(x.est_cost || 0), 0).toFixed(2))],
+  ];
+  $("#kpis").innerHTML = k.map(x => '<div class="card"><h3>' + x[0] + '</h3><div class="big">' + x[1] + '</div>' + (x[2] ? '<div class="sub">' + x[2] + "</div>" : "") + "</div>").join("");
+}
+function th(label, cls) { return "<th" + (cls ? ' class="' + cls + '"' : "") + ">" + label + "</th>"; }
 function render(t) {
-  const q = ($("#q").value || "").toLowerCase();
-  let html = "";
+  const q = ($("#q") ? $("#q").value : "").toLowerCase();
+  $("#tabs").innerHTML = TABS.map(([id, label]) => '<div class="tab' + (id === t ? " on" : "") + '" data-t="' + id + '">' + label + "</div>").join("");
+  let rows = "";
   if (t === "users") {
-    html = "<table><tr><th>Email</th><th>Threads</th><th>Messages</th><th>Last active</th></tr>" +
-      (DATA.users || []).filter(u => (u.email || "").toLowerCase().includes(q)).map(u =>
-        `<tr><td>${u.email || ""}</td><td>${u.threads || 0}</td><td>${u.messages || 0}</td><td class="mut">${u.last_active ? new Date(u.last_active).toLocaleString() : "—"}</td></tr>`).join("") + "</table>";
+    rows = "<input class='search' id='q' placeholder='Filter by email…' value='" + ($("#q") ? $("#q").value : "") + "'><p></p><table><tr>" + th("Email") + th("Threads", "num") + th("Messages", "num") + th("First thread") + th("Last active") + th("") + "</tr>" +
+      (D.users || []).filter(u => (u.email || "").toLowerCase().includes(q)).map(u =>
+        "<tr><td>" + u.email + "</td><td class='num'>" + fmt(u.threads) + "</td><td class='num'>" + fmt(u.messages) + "</td><td class='mut'>" + (u.first_thread ? new Date(u.first_thread).toLocaleDateString() : "—") + "</td><td class='mut'>" + (u.last_active ? new Date(u.last_active).toLocaleString() : "never") + "</td><td><button onclick='load(" + JSON.stringify(JSON.stringify(u.user_id)) + ")'>View</button></td></tr>").join("") + "</table>";
   } else if (t === "searches") {
-    html = "<table><tr><th>When</th><th>User</th><th>Thread</th><th>Query</th></tr>" +
-      (DATA.recent_searches || []).filter(s => (String(s.query) + String(s.email)).toLowerCase().includes(q)).map(s =>
-        `<tr><td class="mut">${new Date(s.created_at).toLocaleString()}</td><td>${s.email || ""}</td><td>${(s.thread_title || "").slice(0, 60)}</td><td>${String(s.query || "").slice(0, 300)}</td></tr>`).join("") + "</table>";
-  } else {
-    html = "<table><tr><th>Day</th><th>Signups</th><th>Threads</th><th>Messages</th></tr>" +
-      merge().map(d => `<tr><td>${d.day}</td><td>${d.signup || 0}</td><td>${d.threads || 0}</td><td>${d.messages || 0}</td></tr>`).join("") + "</table>";
+    rows = "<input class='search' id='q' placeholder='Filter queries or users…'><p></p><table><tr>" + th("When") + th("User") + th("Thread") + th("Query") + "</tr>" +
+      (D.recent_searches || []).filter(s => (String(s.query) + String(s.email)).toLowerCase().includes(q)).map(s =>
+        "<tr><td class='mut'>" + new Date(s.created_at).toLocaleString() + "</td><td>" + s.email + "</td><td>" + (s.thread_title || "").slice(0, 50) + "</td><td>" + String(s.query || "").slice(0, 400) + "</td></tr>").join("") + "</table>";
+  } else if (t === "activity") {
+    const max = Math.max(...(D.activity_30d || []).map(x => Number(x.messages || 0)), 1);
+    rows = "<table><tr>" + th("Day") + th("Signups", "num") + th("Threads", "num") + th("Messages", "num") + th("Volume") + "</tr>" +
+      (D.activity_30d || []).map(a => { const d = (D.signups_30d || []).find(s => s.day === a.day) || {}; return "<tr><td>" + a.day + "</td><td class='num'>" + (d.n || 0) + "</td><td class='num'>" + fmt(a.threads) + "</td><td class='num'>" + fmt(a.messages) + "</td><td><div class='bar'><div style='width:" + Math.round(100 * a.messages / max) + "%'></div></div></td></tr>"; }).join("") + "</table>";
+  } else if (t === "retention") {
+    rows = "<table><tr>" + th("Cohort week") + th("Size", "num") + th("W1", "num") + th("W2", "num") + th("W4", "num") + "</tr>" +
+      (D.retention || []).map(r => "<tr><td>" + r.week + "</td><td class='num'>" + fmt(r.cohort_size) + "</td><td class='num'>" + fmt(r.w1) + "</td><td class='num'>" + fmt(r.w2) + "</td><td class='num'>" + fmt(r.w4) + "</td></tr>").join("") + "</table>";
+  } else if (t === "usage") {
+    rows = "<table><tr>" + th("User") + th("Month") + th("Requests", "num") + th("Est. cost", "num") + "</tr>" +
+      (D.usage || []).map(u => "<tr><td>" + u.email + "</td><td>" + u.month + "</td><td class='num'>" + fmt(u.requests) + "</td><td class='num'>$" + Number(u.est_cost || 0).toFixed(2) + "</td></tr>").join("") + "</table>";
+  } else if (t === "health") {
+    rows = "<table><tr>" + th("Check") + th("Status") + th("Detail") + th("Run at") + "</tr>" +
+      (D.warden_health || []).map(w => "<tr><td>" + w.name + "</td><td class='" + (w.ok ? "ok" : "bad") + "'>" + (w.ok ? "OK" : "FAIL") + "</td><td class='mut'>" + String(w.detail || "").slice(0, 140) + "</td><td class='mut'>" + new Date(w.run_at).toLocaleString() + "</td></tr>").join("") + "</table>";
+  } else if (t === "alerts") {
+    rows = "<table><tr>" + th("When") + th("Kind") + th("Check") + th("Detail") + th("Issue") + "</tr>" +
+      (D.warden_alerts || []).map(a => "<tr><td class='mut'>" + new Date(a.run_at).toLocaleString() + "</td><td>" + a.kind + "</td><td>" + a.name + "</td><td class='mut'>" + String(a.detail || "").slice(0, 200) + "</td><td>" + (a.issue_url ? "<a href='" + a.issue_url + "' target='_blank'>issue</a>" : "—") + "</td></tr>").join("") + "</table>";
+  } else if (t === "detail") {
+    const u = D.user_detail; if (!u) { rows = "<p class='mut'>No user selected.</p>"; }
+    else {
+      const prof = u.profile || {};
+      rows = "<button class='back' onclick='load()'>← All users</button>" +
+        "<div class='grid'><div class='card'><h3>Memories</h3><div class='big'>" + fmt(prof.memories) + "</div></div><div class='card'><h3>Imported threads</h3><div class='big'>" + fmt(prof.imported_threads) + "</div></div><div class='card'><h3>Imported messages</h3><div class='big'>" + fmt(prof.imported_msgs) + "</div></div></div>" +
+        "<h3 style='margin:10px 0'>Threads</h3><table><tr>" + th("Title") + th("Messages", "num") + th("First") + th("Last") + "</tr>" +
+        (u.threads || []).map(t => "<tr><td>" + (t.title || "(untitled)").slice(0, 80) + "</td><td class='num'>" + fmt(t.messages) + "</td><td class='mut'>" + new Date(t.first_msg).toLocaleDateString() + "</td><td class='mut'>" + new Date(t.last_msg).toLocaleDateString() + "</td></tr>").join("") + "</table>" +
+        "<h3 style='margin:16px 0 8px'>Message history (latest 200)</h3><table><tr>" + th("When") + th("Role") + th("Content") + "</tr>" +
+        (u.messages || []).map(m => "<tr><td class='mut'>" + new Date(m.created_at).toLocaleString() + "</td><td>" + m.role + "</td><td>" + String(m.content || "").slice(0, 300) + "</td></tr>").join("") + "</table>";
+    }
   }
-  $("#pane").innerHTML = html;
-}
-function merge() {
-  const m = {};
-  for (const s of DATA.signups_30d || []) m[s.day] = { day: s.day, signup: Number(s.n || 0) };
-  for (const a of DATA.activity_30d || []) m[a.day] = Object.assign(m[a.day] || { day: a.day }, { threads: Number(a.threads || 0), messages: Number(a.messages || 0) });
-  return Object.values(m).sort((x, y) => y.day.localeCompare(x.day));
+  $("#pane").innerHTML = rows;
+  if ($("#q")) $("#q").oninput = () => render($(".tab.on").dataset.t);
+  document.querySelectorAll(".tab").forEach(el => el.onclick = () => { document.querySelectorAll(".tab").forEach(x => x.classList.remove("on")); el.classList.add("on"); render(el.dataset.t); });
 }
 document.addEventListener("DOMContentLoaded", async () => {
   const sess = (await sb.auth.getSession()).data.session;
-  if (sess) { $("#who").textContent = sess.user.email; load(); }
-  else $("#login").hidden = false;
+  if (sess) { $("#who").textContent = sess.user.email; load(); } else $("#login").hidden = false;
   $("#signin").onclick = async () => {
     const { error } = await sb.auth.signInWithPassword({ email: $("#email").value, password: $("#pass").value });
     if (error) $("#loginerr").textContent = error.message; else { $("#who").textContent = $("#email").value; load(); }
   };
   $("#logout").onclick = async () => { await sb.auth.signOut(); location.reload(); };
-  $("#refresh").onclick = load;
-  $("#q").oninput = () => render($(".tab.on").dataset.t);
-  document.querySelectorAll(".tab").forEach(t => t.onclick = () => { document.querySelectorAll(".tab").forEach(x => x.classList.remove("on")); t.classList.add("on"); render(t.dataset.t); });
+  $("#refresh").onclick = () => load();
 });
 </script>
 </body>

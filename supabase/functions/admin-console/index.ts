@@ -39,8 +39,29 @@ Deno.serve(async (req) => {
 
     // recent searches (latest 200 user messages across all users)
     const recent = await (await fetch(`${SB}/rest/v1/rpc/admin_recent_searches?limit=200`, { method: "POST", headers: H, body: "{}" })).json().catch(() => []);
-
-    return json({ admin: email, generated_at: new Date().toISOString(), signups_30d: signups, activity_30d: activity, users, recent_searches: recent }, 200, cors);
+    // v365 RICH CONSOLE (owner directive 2026-11-27: "embarrassingly sparse — no analytics,
+    // no breakdown by users"): DAU + per-day volume, weekly retention cohorts, per-user
+    // usage/cost, warden health + alerts, and per-user drilldown (threads + messages +
+    // memories + imported volume).
+    const rpc = async (fn: string, body: any = {}) => await (await fetch(`${SB}/rest/v1/rpc/${fn}`, { method: "POST", headers: H, body: JSON.stringify(body) })).json().catch(() => []);
+    const [dau, retention, usage, wardenHealth, wardenAlerts] = await Promise.all([
+      rpc("admin_dau"), rpc("admin_retention"), rpc("admin_usage"), rpc("admin_warden_health"), rpc("admin_warden_alerts"),
+    ]);
+    // per-user drilldown (POST ?user=<uuid> via body)
+    let detail: any = null;
+    const wantUser = String((req as any).__user || "");
+    const url = new URL(req.url);
+    const qUser = url.searchParams.get("user");
+    const bodyUser = wantUser || qUser;
+    if (bodyUser) {
+      const [threads, msgs, prof] = await Promise.all([
+        rpc("admin_user_threads", { p_user: bodyUser, p_limit: 100 }),
+        rpc("admin_user_messages", { p_user: bodyUser, p_limit: 200 }),
+        rpc("admin_user_profile_detail", { p_user: bodyUser }),
+      ]);
+      detail = { user_id: bodyUser, threads, messages: msgs, profile: (prof || [])[0] || null };
+    }
+    return json({ admin: email, generated_at: new Date().toISOString(), signups_30d: signups, activity_30d: activity, users, recent_searches: recent, dau_30d: dau, retention: retention, usage: usage, warden_health: wardenHealth, warden_alerts: wardenAlerts, user_detail: detail }, 200, cors);
   } catch (e) {
     return json({ error: String(e) }, 500, cors);
   }
