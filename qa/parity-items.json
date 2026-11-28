@@ -1,6 +1,6 @@
 {
  "version": "v317",
- "generated_at": "2026-11-28",
+ "generated_at": "2026-11-28b",
  "note": "v242 (2026-11-15 late UTC): RESEND EMAIL DELIVERY LIVE \u2014 GoDaddy DNS records added via Comet (TXT resend._domainkey.ai DKIM + CNAME rsend.ai + CNAME send.ai), Resend domain ai.spaincos.com VERIFIED (Forge Ready), fresh API key created and vaulted as RESEND_API_KEY, RESEND_FROM corrected to login@ai.spaincos.com; auth-email-relay live send DELIVERED (Resend Logs: bspain@spaincos.com \"Delivered\", 517745 sign-in code). Student verification unblocked (send path now has a working provider; end-to-end test queued). Gateway v237 deployed: D4 replay fix (complex prompts now get the full 4,000-token budget; truncation retry raised to 6,000 tokens + second-pass continuation merge), D3 COMET fix (claim-can't rewrite now fires on cometAsk with the \"cannot be executed from this session\" pattern). Account 90\u219295. | 2026-11-18: owner-blocker audit \u2014 5 of 7 blockers were STALE and are closed: (1) the 4 SQL migrations are APPLIED and live-verified via the Management API (skills, automations, webapp_stack view, ledgers all exist); (2) passkeys ENABLED (passkey_enabled=true, webauthn RP ai.spaincos.com, live-verified); (3) SHMT PR #3889 MERGED; (4) the runner daemon REDEPLOYED live by the parity session (weathered-star-8281 started, commit 4200cf1f1, apify_call job shipped \u2014 server-side Apify); (5) .edu student-verify closed by the Neurons session. Remaining genuinely-owner: OAuth app registrations (needs each platform's developer account) and Twilio credentials.",
  "categories": [
   {
@@ -173,7 +173,7 @@
   {
    "name": "Admin Console",
    "weight": 3,
-   "score": 85
+   "score": 92
   }
  ],
  "raw_items": {
@@ -392,6 +392,7 @@
   "v350: SEO 90\u219293 (meta descriptions all variants + sitemap completion); Observability 85\u219290 (status pages live both domains; stale note corrected).",
   "v351: Docs/Support 84\u219288 (/docs/api live both domains); Security 82\u219285 (distributed limiter shipped; enforcement owner-blocked on Vercel env secret).",
   "v352: i18n 88\u219292 (deterministic ES answer-language gate, 6/6 live); Accessibility 88\u219292 (last axe finding closed); Desktop 80\u219283 (window-controls-overlay shipped).",
-  "2026-11-28: admin console v3 (BV design system, charts, user dossier w/ IP capture), /import lane, v364 per-user length calibration, replay 92.2%; Security 85->88, UX->96, Account->92, Admin Console added at 85"
+  "2026-11-28: admin console v3 (BV design system, charts, user dossier w/ IP capture), /import lane, v364 per-user length calibration, replay 92.2%; Security 85->88, UX->96, Account->92, Admin Console added at 85",
+  "2026-11-28b: customer-value tab (revenue/cost/gross profit, ranked), CSV export + 60s auto-refresh all tabs, reverse-IP geo in dossiers; Admin Console 85->92; replay 89.6% (stable band 87-92%)"
  ]
 }
