@@ -1,5 +1,5 @@
 {
- "version": 57,
+ "version": 58,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -2491,15 +2491,16 @@
     "TT": "Y",
     "AG": "G",
     "GH": "R",
-    "ST": "U",
+    "ST": "G",
     "CT": "G",
-    "DG": "R"
+    "DG": "G"
    },
-   "evidence": "[batch 48, 2026-11-28] Live (Apify lane): comptrove.com/privacy 200 — CCPA/CPRA + state-matrix rights section, GPC honored, export/deletion with 30-day SLA (3,322 chars); comptrove.com/terms 200 — refunds/reversals section (2,731 chars); clean URLs via vercel.json rewrites; footer links fixed from dead #/ anchors to the real pages. rentspire-comps PR #150; deploy 3487ebd.",
+   "evidence": "[batch 50, 2026-11-28] Live (Apify lane): doorgraph.com/privacy.html 200 — privacy policy accurate to DoorGraph's evidence-room data flows (named access, per-room audit trails, legal holds, revocable access) with CCPA/CPRA + state matrix, GPC, 30-day deletion SLA; counsel-review flag preserved on operator identity. information-central PRs #90/#91; production deploy dpl_EwBRtNi9.",
    "fix": "Write BV policy: offer-wall partners, subid sharing, cookies, retention; per-host policy file",
    "notes": {
     "CT": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): comptrove.com/privacy -> 404 (measured).",
-    "DG": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): doorgraph.com/privacy serves only the 1361-char sign-in shell (auth-gated, no public policy)."
+    "DG": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): doorgraph.com/privacy serves only the 1361-char sign-in shell (auth-gated, no public policy).",
+    "ST": "[batch 50, 2026-11-28] Live (Apify lane): terminal.spaincos.com/privacy 200 — CCPA/CPRA + state matrix, GPC honored, export/deletion with 30-day SLA; /terms 200 with refunds/reversals section; clean-URL rewrites. spain-terminal-shell PR #702."
    }
   },
   {
@@ -2515,7 +2516,7 @@
     "TT": "G",
     "AG": "G",
     "GH": "U",
-    "ST": "R",
+    "ST": "G",
     "CT": "G",
     "DG": "R"
    },
@@ -2523,7 +2524,7 @@
    "fix": "Draft with counsel; link from signup and checkout",
    "notes": {
     "CT": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): comptrove.com/terms -> 404.",
-    "ST": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): terminal.spaincos.com/terms -> 404 and /pricing -> 404.",
+    "ST": "[batch 50, 2026-11-28] Live (Apify lane): terminal.spaincos.com/privacy 200 — CCPA/CPRA + state matrix, GPC honored, export/deletion with 30-day SLA; /terms 200 with refunds/reversals section; clean-URL rewrites. spain-terminal-shell PR #702.",
     "DG": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): doorgraph.com/terms serves only the sign-in shell."
    }
   },
@@ -2564,7 +2565,7 @@
     "TT": "G",
     "AG": "Y",
     "GH": "U",
-    "ST": "U",
+    "ST": "G",
     "CT": "G",
     "DG": "U"
    },
@@ -2572,7 +2573,8 @@
    "fix": "Add notice, link, DSAR form; state matrix (U-NW-07)",
    "notes": {
     "TT": "2026-11-25 batch 25: state-rights copy in PR #20; verified served at localhost:8905",
-    "CT": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): no privacy page exists (404), so no state privacy rights notice."
+    "CT": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): no privacy page exists (404), so no state privacy rights notice.",
+    "ST": "[batch 50, 2026-11-28] Live (Apify lane): terminal.spaincos.com/privacy 200 — CCPA/CPRA + state matrix, GPC honored, export/deletion with 30-day SLA; /terms 200 with refunds/reversals section; clean-URL rewrites. spain-terminal-shell PR #702."
    }
   },
   {
@@ -4055,7 +4057,7 @@
    "W": 7,
    "ircm": "3202",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "-",
     "AG": "Y",
     "GH": "-",
@@ -4063,7 +4065,7 @@
     "CT": "R",
     "DG": "R"
    },
-   "evidence": "None",
+   "evidence": "[batch 50, 2026-11-28] Full funnel instrumentation live: engagement (query->completion, measured 97-99% daily), commerce (checkout_started -> purchase -> payment_failed/reversal, batch 46/49), and offer funnel (offer_view + offer_click via the JWT-verified offer-funnel function — live-verified with eval-bot rows in analytics_events; offer_verified logged server-side by offerwall-postback v11). All stages land in the first-party store, zero trackers. PRs #45/#722.",
    "fix": "Define events; first-party store",
    "notes": {
     "BV": "[batch 49, 2026-11-28] CHECKOUT LIVE (test mode): signed-in POST /functions/v1/checkout {plan:core} returns a real Stripe Checkout Session URL (cs_test_a06TyP9I...); server-side checkout_started event recorded in analytics_events (n=1, 06:10:32Z). Chain: vault credential -> config-relay (proxy-injected Bearer, never printed) -> gateway_config stripe_secret_key -> checkout v11 -> Stripe API. Commerce funnel now instrumented end-to-end: checkout_started -> purchase (stripe-webhook v14, payment_failed/reversal also live-verified batch 46). Stays Y: offer funnel (view->click->verified) not yet instrumented in analytics_events.",
