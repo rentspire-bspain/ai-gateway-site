@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-27, v361)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-28, v362)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3554,3 +3554,26 @@ warden_playbooks: known failure signatures with remediations (seeded: all-lanes-
 **Replay per-prompt table (v341):** 8 PASS clean, 1 followup-cold, 13 FAIL (see report for full prompts): 5 length (2 extreme-verbose, 3 over-trim), 4 structure, 4 citation-parity, 2 latency, 2 quality.
 
 **Honest position:** length parity on this sample has plateaued at ~87-89% with the current stack. The enforcement works and is verified; the residual is the tiny-original class, which needs either the per-user historical calibration (specced above) or accepting that a research assistant legitimately answers some 150-character Perplexity answers with more depth. That is a product decision, not an engineering gap — flagging it for the owner.
+
+
+---
+
+## Addendum 78 — v364 calibration + depth-positive scoring (92.2%), superadmin console v2 (2026-11-28, v362)
+
+**v364 PER-USER HISTORICAL LENGTH CALIBRATION (deployed v343, health-gated):** nearest_history_length() (pg_trgm) finds the 5 most similar past prompts in the signed-in user's imported history and calibrates the enforcement band to THEIR demonstrated answer length; the trained model band is the fallback. Called with the caller's own JWT — only their rows count.
+
+**Depth-positive scoring (owner directive: "you need to go deeper than a 150-character Perplexity reply — won't that make the deep research far stronger?"):** the replay no longer penalizes depth. Length fails only when an answer is too SHORT (<0.4x and <400 chars) or extremely bloated (>20x or >12,000 chars).
+
+**Replay (v343, stable sample): 92.2%** (was 86.4% pre-v364/scoring — the jump is the combination of the per-user calibration, the working condense pass, and the owner-corrected scoring). Per-prompt: 11 PASS clean, 1 followup-cold, 13 graded failures — 1 extreme-verbosity row (36x, deep research answer >12K chars), 4 structure-parity, 3 citation-parity, 2 latency, plus combined rows. Remaining levers unchanged: citation-parity retry, async lane, structure-register tuning.
+
+**Superadmin console v2 (owner directive: 'embarrassingly sparse — no analytics, no breakdown by users'):** rebuilt as 7 tabs — Users (with per-user drilldown: threads with counts/dates, latest 200 messages with full content, memories, imported volume), Recent searches (filterable), Activity by day (volume bars), Retention cohorts (W1/W2/W4), Usage & cost (per-user monthly requests + est. cost), Warden health (last hour of all check results), Alerts (last 25 with issue links). KPIs: signups, DAU today, threads, messages, active/total users, month-to-date cost. All backed by 8 new security-definer SQL functions (admin_user_threads, admin_user_messages, admin_dau, admin_retention, admin_usage, admin_warden_health, admin_warden_alerts, admin_user_profile_detail), all revoked from public/anon/authenticated, admin allowlist unchanged, non-admin 403 verified. Premortem (10 failure modes with guards) and full completion checklist delivered as a shared asset; next-batch items: 60s auto-refresh, CSV exports, cost-threshold alerting, RPC smoke in the deploy gate, thread-level drilldown, signup funnel.
+
+## Owner-gated items — exact steps for the 100% push (unchanged, restated with steps)
+1. **Stripe live mode:** create the live secret key + webhook signing secret in the Stripe dashboard; paste sk_live_... and whsec_... into Supabase secrets (STRIPE_LIVE_KEY, STRIPE_WEBHOOK_SECRET). The checkout form is open and waiting.
+2. **Email OAuth:** register a Google OAuth app with redirect https://ai.spaincos.com/api/oauth-callback; paste client id/secret into gateway_config. Email sending is otherwise relay-only.
+3. **PUBLIC_API_AUTH_SERVICE_ROLE_KEY:** paste into Vercel env — this ACTIVATES API-key auth and the distributed rate limiter (currently inert).
+4. **Deploy PAT:** paste a GitHub PAT into Supabase secrets — unlocks warden auto-rollback and richer GitHub filing.
+5. **GATEWAY_TOKEN_B as env on BOTH projects:** replaces the owner-authorized deploy-bundle fallback for good.
+6. **App stores:** Play Console ($25) + Apple Developer ($99) — unlocks NativeMobile category completion.
+7. **Legal counsel review:** the BoundView checklist is delivered as a shared asset; counsel sign-off closes the Legal category.
+8. **Fleet bypass tokens** for the 6 bot-challenge-gated domains; **Comptrove dollar pricing** decision.
