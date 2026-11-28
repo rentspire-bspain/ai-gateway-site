@@ -126,9 +126,12 @@ function render(t) {
   const q = ($("#q") ? $("#q").value : "").toLowerCase();
   let rows = "";
   if (t === "value") {
-    const uv = D.user_value || [];
+    const seg = $("#seg") ? $("#seg").value : "all";
+    let uv = (D.user_value || []).filter(x => seg === "all" ? true : seg === "paying" ? Number(x.revenue_usd||0) > 0 : Number(x.revenue_usd||0) <= 0);
+    const segCtl = "<select id='seg' class='search' style='width:200px'><option value='all'" + (seg==="all"?" selected":"") + ">All customers</option><option value='paying'" + (seg==="paying"?" selected":"") + ">Paying only</option><option value='free'" + (seg==="free"?" selected":"") + ">Free only</option></select>";
+    uv = uv.slice();
     const kpis = [["Total revenue", "$" + uv.reduce((n,x)=>n+Number(x.revenue_usd||0),0).toFixed(2)], ["Total cost", "$" + uv.reduce((n,x)=>n+Number(x.cost_usd||0),0).toFixed(2)], ["Gross profit", "$" + uv.reduce((n,x)=>n+Number(x.gross_profit_usd||0),0).toFixed(2)]];
-    rows = "<div class='kpis'>" + kpis.map(x=>"<div class='kpi'><h3>"+x[0]+"</h3><div class='big'>"+x[1]+"</div></div>").join("") + "</div>" +
+    rows = segCtl + "<p></p><div class='kpis'>" + kpis.map(x=>"<div class='kpi'><h3>"+x[0]+"</h3><div class='big'>"+x[1]+"</div></div>").join("") + "</div>" +
       "<div class='chart'><h3>Gross profit by customer</h3>" + barsvg(uv.slice(0,12), x=>Math.max(0,Number(x.gross_profit_usd||0))+0.01, x=>x.email, 760, 22) + "</div>" +
       "<table><tr>"+th("Rank")+th("Email")+th("Revenue","num")+th("Model cost","num")+th("Gross profit","num")+th("Credits spent","num")+th("Neurons earned","num")+"</tr>" +
       uv.map((x,i)=>"<tr><td class='mut'>"+(i+1)+"</td><td><b>"+x.email+"</b></td><td class='num'>$"+Number(x.revenue_usd||0).toFixed(2)+"</td><td class='num'>$"+Number(x.cost_usd||0).toFixed(2)+"</td><td class='num'><b>$"+Number(x.gross_profit_usd||0).toFixed(2)+"</b></td><td class='num'>"+fmt(x.credits_spent)+"</td><td class='num'>"+fmt(x.neurons_earned)+"</td></tr>").join("") + "</table>";
@@ -184,6 +187,7 @@ function render(t) {
   }
   $("#pane").innerHTML = rows;
   if ($("#q")) $("#q").oninput = () => render($(".tab.on").dataset.t);
+  if ($("#seg")) $("#seg").onchange = () => render("value");
   document.querySelectorAll(".tab").forEach(el => el.onclick = () => { document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on")); el.classList.add("on"); render(el.dataset.t); });
 }
 document.addEventListener("DOMContentLoaded", async () => {
