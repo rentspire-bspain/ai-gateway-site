@@ -2061,7 +2061,7 @@ This queue is ~250 of the 620 white cells in CT/ST/DG/GH and converts most curre
 ### Batch 48 — Comptrove legal pack live: CT's first greens (2026-11-28, register v56)
 
 - ✅ **U-TRU-01 / U-TRU-02 / U-TRU-04 (CT, w10 each)** — comptrove.com now serves the full legal pack at clean URLs: /privacy with the CCPA/CPRA + state-matrix rights section (GPC honored), data export/deletion with a 30-day SLA; /terms with a refunds-and-reversals section; footer links fixed from dead #/ anchors. The pages existed at .html paths since 11-21 but the clean URLs 404'd and the footer pointed nowhere — measured red in batch 47, fixed and live-verified in batch 48 (Apify lane, both 200 with all content checks green). rentspire-comps PR #150, deploy 3487ebd.
-- 📈 First strict-weight movement outside BV/TT/AG: CT strict 2.6% → 8.3%. The H1 replay queue works — the same playbook (legal pack → clean URLs → footer links → state-rights section) now runs for terminal.spaincos.com and doorgraph.com next.
+- 📈 First strict-weight movement outside BV/TT/AG: CT strict 2.6% → 5.2%. The H1 replay queue works — the same playbook (legal pack → clean URLs → footer links → state-rights section) now runs for terminal.spaincos.com and doorgraph.com next.
 - 🔜 Still pending from H2: the Stripe test key form (checkout one paste away), GH repo access, counsel E11-2.
 
 **Headline after batch: strict 25.7% / measured-only 44.8% (v56)** — session arc since batch 24: 20.2% → 25.7%.
