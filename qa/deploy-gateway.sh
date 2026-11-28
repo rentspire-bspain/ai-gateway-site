@@ -61,6 +61,27 @@ print(st)
 print(body[:3000])
 EOF
 ) && [ "$(echo "$OUT" | head -1)" = "200" ]; do sleep 10; done
+# v366: transient free-lane RPD exhaustion (provider daily limit) is a KNOWN condition,
+# not a deploy defect — retry up to 3 times over ~3 minutes before failing.
+for attempt in 1 2 3; do
+  if echo "$OUT" | grep -q "391"; then break; fi
+  if echo "$OUT" | grep -q "Rate limit reached\|could not be generated"; then
+    echo "[health] attempt $attempt hit provider rate limit — waiting 60s and retrying"
+    sleep 60
+    OUT=$(python3 - <<'EOF2'
+import sys, json
+sys.path.insert(0, "qa")
+import prelaunch
+tok = prelaunch.mint_token()
+st, body, _ = prelaunch.http("https://bnxermyboeigvwonfrzx.supabase.co/functions/v1/gateway-chat", 90,
+    json.dumps({"messages":[{"role":"user","content":"Health check: reply with exactly the number 391 and nothing else."}],"thread_id":"deploy-health","mode":"concise"}).encode(),
+    {"Authorization": f"Bearer {tok}", "apikey": prelaunch.ANON, "content-type": "application/json"})
+print(st)
+print(body[:3000])
+EOF2
+)
+  fi
+done
 if ! echo "$OUT" | grep -q "391"; then
   echo "[health] FAIL — gateway did not answer correctly:"
   echo "$OUT"
