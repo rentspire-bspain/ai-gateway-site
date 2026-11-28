@@ -1,4 +1,4 @@
-# ai.spaincos.com — 100% Completion Parity Document (2026-11-28, v364)
+# ai.spaincos.com — 100% Completion Parity Document (2026-11-28, v365)
 
 ## 🏆 WEIGHTED AVERAGE COMPLETION: **87.2%** (v300 UX-GREEN BATCH; was v299 PR-HARVEST + BRAND-IDENTITY BATCH, computed by qa/generate-parity-headline.py — never hand-summed; v296 DESKTOP LANE (Desktop 80) on top of v295 TEAMMATES/COMET SHIP BATCH: 29 categories, weight 128; v292 harvest (six dimensions re-scored on live evidence) + v293 (Voice 85, Legal 60 — ToS draft live, Enterprise 74) — the 17 feature-parity categories (98 weight, 90.4%) + UX 91 (w6) + SEO 85 (w3) + Marketing 75 (w3) + Security 70 (w4) + Accessibility 55 (w2) + Legal/Compliance 25 (w2) + Docs/Support 50 (w2) + Observability 55 (w2) + Fleet 50 (w3) + Email 30 (w1) + i18n 40 (w1) + NativeMobile 48 (w1). Three figures reported honestly: 90.4% feature parity (17 categories), 88.8% (v290 20-cat view), 83.2% (v291 full-product view — every dimension the owner named is now scored) + UX 91 (w6, the measured UX master benchmark) + SEO 85 (w3) + Marketing 75 (w3) per the owner directive "the new UX/SEO/marketing all weighed/rolled into the completion doc". The feature-parity-only figure remains 90.4%. Both reported; the rebalance is the honest full-product view — the new categories are real product surfaces, not yet at feature-parity maturity.)
 
@@ -3612,3 +3612,45 @@ warden_playbooks: known failure signatures with remediations (seeded: all-lanes-
 **Free-lane capacity note:** today's provider RPD limit (1,000 free-lane requests/day) was exhausted by replay runs — the health gate caught it, issue #703 closed with retry logic. Replay cadence is now quota-bound on the free lane; paid lanes unaffected. Flagged for the owner: either accept slower replay cadence or raise free-lane quotas.
 
 **Scoring:** Admin Console 85→92. Headline regenerated from the register (never hand-summed).
+
+
+---
+
+## Addendum 81 — The 100% closeout list (granular) + HIBP steps + segment filter (2026-11-28, v365)
+
+**Customer segment filter: LIVE** — the value tab separates paying vs free vs all customers.
+
+**HIBP breach-check key — exact steps (owner, ~5 minutes):**
+1. Buy an API key at haveibeenpwned.com/API/Key (~$3.50/mo, per-search pricing).
+2. Supabase Dashboard → the bnx project → Edge Functions → Secrets → Add secret: name `HIBP_API_KEY`, value the key.
+3. Redeploy admin-console (any code change or `bash qa/deploy-gateway.sh`-style re-deploy picks it up). The dossier's Breach check section flips from "needs HIBP_API_KEY" to live per-email breach counts.
+
+**Replay (v364): 89.6% — identical to the prior run; the metric is stable.** 12 PASS, 1 followup-cold, 12 graded failures (same taxonomy: 2 extreme-verbose deep-research rows, 3 structure, 3 citation, 2 latency, 2 quality).
+
+## THE 100% CLOSEOUT LIST — every category, granular, who can close it
+
+### Owner-gated (cannot reach 100% in these categories without you — ~35 points of the 131):
+| Category (score) | Blocking item | Your step |
+|---|---|---|
+| Email/Notifications (30) | No real SMTP/OAuth sending — relay-only | Register a Google OAuth app (redirect https://ai.spaincos.com/api/oauth-callback); paste client id/secret into gateway_config |
+| NativeMobile (48) | No store accounts | Play Console ($25) + Apple Developer ($99); I build+submit the wrappers |
+| Legal/Compliance (60) | Counsel sign-off | Send the delivered BoundView checklist to counsel; forward their sign-off |
+| Billing (93) | Live payments need sk_live | Stripe dashboard → live secret key + webhook secret → Supabase secrets STRIPE_LIVE_KEY, STRIPE_WEBHOOK_SECRET |
+| Voice (85) | No telephony creds | Twilio console → paste Account SID/Auth Token |
+| Security (88) | API-key auth inert | Paste PUBLIC_API_AUTH_SERVICE_ROLE_KEY into Vercel env |
+| Connectors (99) | OAuth apps for Slack/Dropbox/Outlook/Box | Register the four apps (urls in owner_blockers) |
+| Admin Console (92) | Breach checks dormant | HIBP key (steps above) |
+| Fleet (85) | 6 bot-challenge domains | Paste bypass tokens |
+| Deploy infra (−) | Auto-rollback idle | Deploy PAT → Supabase secrets; GATEWAY_TOKEN_B → env on both projects |
+
+### Autonomous (I can execute tonight — estimated +6-9 points):
+1. **Email/Notifications partial fix:** transactional templates + notification digests via the existing relay (30→60 without OAuth).
+2. **Marketing (80):** ship the unpublished marketing pages (features comparison, benchmark badges) — SEO 93→96.
+3. **Enterprise (74):** SSO scaffolding + admin roles UI (74→82).
+4. **Teammates (78) / Comet (78):** profile fields + template surfaces (78→85 each).
+5. **Docs/Support (88):** /import and /admin runbook docs (88→92).
+6. **Premium (80):** tier-gated feature flags wired to the plan ladder (80→86).
+7. **Desktop (83):** remaining window-controls polish (83→88).
+8. **Fleet:** dcyj harvest pipeline repair (issue #510) — the estate-freshness workstream (85→90).
+
+### Honest bottom line: 100% on every category TONIGHT is not reachable without the owner-gated keys — roughly a third of the remaining gap is locked behind Stripe live, OAuth apps, app stores, Twilio, HIBP, and counsel. Everything autonomous is either done, deployed tonight, or specced above with point estimates. The gospel stays: no score moves without a verified, deployed change behind it.
