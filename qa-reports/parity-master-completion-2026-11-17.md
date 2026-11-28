@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 25.7%** (app-weighted; unmeasured counts as 0; v56 — batch 48: Comptrove legal pack live, CT's first greens) · **measured-only: 44.8%** · 199✅ / 215🟡 / 174🔴 / 789⚪ across 386 line items. Per-app strict: BV 48.5% · TT 32.5% · AG 46.9% · GH 11.3% · ST 7.9% · CT 8.3% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 25.7%** (app-weighted; unmeasured counts as 0; v57 — batch 49: checkout LIVE in test mode, commerce funnel instrumented) · **measured-only: 44.8%** · 199✅ / 215🟡 / 174🔴 / 789⚪ across 386 line items. Per-app strict: BV 48.5% · TT 32.5% · AG 46.9% · GH 11.3% · ST 7.9% · CT 5.2% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -2065,3 +2065,13 @@ This queue is ~250 of the 620 white cells in CT/ST/DG/GH and converts most curre
 - 🔜 Still pending from H2: the Stripe test key form (checkout one paste away), GH repo access, counsel E11-2.
 
 **Headline after batch: strict 25.7% / measured-only 44.8% (v56)** — session arc since batch 24: 20.2% → 25.7%.
+
+
+### Batch 49 — checkout LIVE (test mode): the full purchase chain works (2026-11-28, register v57)
+
+- ✅ **Checkout is live.** The owner pasted the Stripe test key into the secure credential form; it flowed vault → config-relay (proxy-injected Bearer, never printed in any body or log) → `gateway_config.stripe_secret_key` → checkout v11. Live-verified end to end: a signed-in `POST /functions/v1/checkout {plan:"core"}` returned a real Stripe Checkout Session URL (`cs_test_a06TyP9I…`), and the server-side `checkout_started` event landed in `analytics_events` (06:10:32Z).
+- ✅ **Commerce funnel fully instrumented:** checkout_started (checkout fn) → purchase (stripe-webhook v14, secret in gateway_config) → payment_failed / reversal (batch 46 readback). Conversion rate = purchases / checkout_started, zero trackers, first-party only.
+- 🟡 U-MEAS-01 / U-SEO-17 BV stay 🟡 by strict discipline: the offer funnel (view→click→verified) is not yet instrumented in `analytics_events`, and UTM parameters are not yet preserved in checkout_started payloads — both are the remaining increments, both now precisely scoped.
+- Test-mode notes: no real charge is possible until a live key is added; the webhook endpoint (we_1UgcEc…) is test mode.
+
+**Headline after batch: strict 25.7% / measured-only 44.8% (v57)** — session arc since batch 24: 20.2% → 25.7%.

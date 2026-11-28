@@ -1,5 +1,5 @@
 {
- "version": 56,
+ "version": 57,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -3297,7 +3297,7 @@
    "evidence": "Policy says no analytics trackers; leaves marketing blind",
    "fix": "First-party cookieless analytics + consent mode",
    "notes": {
-    "BV": "[batch 46] Server-side first-party funnel readback runs (no third-party trackers — policy-consistent); UTM preservation not yet measured; stays Y.",
+    "BV": "[batch 49, 2026-11-28] CHECKOUT LIVE (test mode): signed-in POST /functions/v1/checkout {plan:core} returns a real Stripe Checkout Session URL (cs_test_a06TyP9I...); server-side checkout_started event recorded in analytics_events (n=1, 06:10:32Z). Chain: vault credential -> config-relay (proxy-injected Bearer, never printed) -> gateway_config stripe_secret_key -> checkout v11 -> Stripe API. Commerce funnel now instrumented end-to-end: checkout_started -> purchase (stripe-webhook v14, payment_failed/reversal also live-verified batch 46). Stays Y: UTM parameters not yet preserved in checkout_started payloads.",
     "AG": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): same shared backend funnel"
    }
   },
@@ -4066,7 +4066,7 @@
    "evidence": "None",
    "fix": "Define events; first-party store",
    "notes": {
-    "BV": "[batch 46] Funnel readback executed from the first-party store (analytics_events): 14-day query->completion 97-99% daily (e.g. 2026-11-26: 1728 queries / 1718 completions / 2 users); heartbeat rows 2036+. Commerce funnel checkout_started->purchase = 0 traffic (checkout test-mode key not yet in project env). Offer funnel (view->click->verified) not instrumented in analytics_events yet. Stays Y: landing->signup->first answer ->upgrade and offer funnels not fully measured.",
+    "BV": "[batch 49, 2026-11-28] CHECKOUT LIVE (test mode): signed-in POST /functions/v1/checkout {plan:core} returns a real Stripe Checkout Session URL (cs_test_a06TyP9I...); server-side checkout_started event recorded in analytics_events (n=1, 06:10:32Z). Chain: vault credential -> config-relay (proxy-injected Bearer, never printed) -> gateway_config stripe_secret_key -> checkout v11 -> Stripe API. Commerce funnel now instrumented end-to-end: checkout_started -> purchase (stripe-webhook v14, payment_failed/reversal also live-verified batch 46). Stays Y: offer funnel (view->click->verified) not yet instrumented in analytics_events.",
     "AG": "2026-11-25 batch 31 (governed-sql PR #23): first-party taxonomy defined (query/completion/share/checkout_started/purchase over analytics_events) with a CI sync test locking doc-to-code; funnels computable (engagement, monetization, virality). Funnel readback surface pending"
    }
   },
