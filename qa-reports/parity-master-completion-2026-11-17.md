@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 25.2%** (app-weighted; unmeasured counts as 0; v55 — batch 47: passkey green, CT/ST/DG first measured cells, Part H close-out plan) · **measured-only: 43.0%** · 196✅ / 215🟡 / 177🔴 / 789⚪ across 386 line items. Per-app strict: BV 48.5% · TT 32.5% · AG 46.9% · GH 11.3% · ST 7.9% · CT 2.6% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 25.7%** (app-weighted; unmeasured counts as 0; v56 — batch 48: Comptrove legal pack live, CT's first greens) · **measured-only: 44.8%** · 199✅ / 215🟡 / 174🔴 / 789⚪ across 386 line items. Per-app strict: BV 48.5% · TT 32.5% · AG 46.9% · GH 11.3% · ST 7.9% · CT 8.3% · DG 2.8%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -2056,3 +2056,12 @@ This queue is ~250 of the 620 white cells in CT/ST/DG/GH and converts most curre
 - 📋 **U-TRU-04 E11-2 status**: counsel item unresolved (owner-gated) — no filing or ruling recorded in the estate; the state-rights text stands as shipped 2026-11-24.
 
 **Headline after batch: strict 25.2% / measured-only 43.0% (v55)** — session arc since batch 24: 20.2% → 25.2%.
+
+
+### Batch 48 — Comptrove legal pack live: CT's first greens (2026-11-28, register v56)
+
+- ✅ **U-TRU-01 / U-TRU-02 / U-TRU-04 (CT, w10 each)** — comptrove.com now serves the full legal pack at clean URLs: /privacy with the CCPA/CPRA + state-matrix rights section (GPC honored), data export/deletion with a 30-day SLA; /terms with a refunds-and-reversals section; footer links fixed from dead #/ anchors. The pages existed at .html paths since 11-21 but the clean URLs 404'd and the footer pointed nowhere — measured red in batch 47, fixed and live-verified in batch 48 (Apify lane, both 200 with all content checks green). rentspire-comps PR #150, deploy 3487ebd.
+- 📈 First strict-weight movement outside BV/TT/AG: CT strict 2.6% → 5.2%. The H1 replay queue works — the same playbook (legal pack → clean URLs → footer links → state-rights section) now runs for terminal.spaincos.com and doorgraph.com next.
+- 🔜 Still pending from H2: the Stripe test key form (checkout one paste away), GH repo access, counsel E11-2.
+
+**Headline after batch: strict 25.7% / measured-only 44.8% (v56)** — session arc since batch 24: 20.2% → 25.7%.

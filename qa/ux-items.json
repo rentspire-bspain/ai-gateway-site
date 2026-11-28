@@ -1,5 +1,5 @@
 {
- "version": 55,
+ "version": 56,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -2492,10 +2492,10 @@
     "AG": "G",
     "GH": "R",
     "ST": "U",
-    "CT": "R",
+    "CT": "G",
     "DG": "R"
    },
-   "evidence": "2026-11-24: governed-sql PR #19 merged — the Tasks-tab FTC disclosure links the host's /terms.html and /privacy.html (brand-split serves the right policy per host). Links live; per-host accuracy is the host's G.",
+   "evidence": "[batch 48, 2026-11-28] Live (Apify lane): comptrove.com/privacy 200 — CCPA/CPRA + state-matrix rights section, GPC honored, export/deletion with 30-day SLA (3,322 chars); comptrove.com/terms 200 — refunds/reversals section (2,731 chars); clean URLs via vercel.json rewrites; footer links fixed from dead #/ anchors to the real pages. rentspire-comps PR #150; deploy 3487ebd.",
    "fix": "Write BV policy: offer-wall partners, subid sharing, cookies, retention; per-host policy file",
    "notes": {
     "CT": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): comptrove.com/privacy -> 404 (measured).",
@@ -2516,10 +2516,10 @@
     "AG": "G",
     "GH": "U",
     "ST": "R",
-    "CT": "R",
+    "CT": "G",
     "DG": "R"
    },
-   "evidence": "2026-11-24: Terms linked from the merged tasks-tab component (#19) AND from the live ai-gateway-site Earn-tab FTC text (batch 20).",
+   "evidence": "[batch 48, 2026-11-28] Live (Apify lane): comptrove.com/privacy 200 — CCPA/CPRA + state-matrix rights section, GPC honored, export/deletion with 30-day SLA (3,322 chars); comptrove.com/terms 200 — refunds/reversals section (2,731 chars); clean URLs via vercel.json rewrites; footer links fixed from dead #/ anchors to the real pages. rentspire-comps PR #150; deploy 3487ebd.",
    "fix": "Draft with counsel; link from signup and checkout",
    "notes": {
     "CT": "[batch 47, 2026-11-27] Measured live via Apify cheerio-scraper (Vercel bot protection blocks datacenter IPs): comptrove.com/terms -> 404.",
@@ -2565,10 +2565,10 @@
     "AG": "Y",
     "GH": "U",
     "ST": "U",
-    "CT": "R",
+    "CT": "G",
     "DG": "U"
    },
-   "evidence": "2026-11-24 live post-#448: state privacy rights sections on both privacy pages (CCPA/CPRA + comparable state laws: know, correct, delete, opt-out of sale/sharing, non-discrimination, statutory response window), cross-referencing the consent gate and GPC. Counsel review of the final copy pending (E11-2).",
+   "evidence": "[batch 48, 2026-11-28] Live (Apify lane): comptrove.com/privacy 200 — CCPA/CPRA + state-matrix rights section, GPC honored, export/deletion with 30-day SLA (3,322 chars); comptrove.com/terms 200 — refunds/reversals section (2,731 chars); clean URLs via vercel.json rewrites; footer links fixed from dead #/ anchors to the real pages. rentspire-comps PR #150; deploy 3487ebd.",
    "fix": "Add notice, link, DSAR form; state matrix (U-NW-07)",
    "notes": {
     "TT": "2026-11-25 batch 25: state-rights copy in PR #20; verified served at localhost:8905",
