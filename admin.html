@@ -66,7 +66,7 @@ a { color: var(--citation-text); }
 </style>
 </head>
 <body>
-<header><div class="hwrap"><h1>Superadmin Console</h1><div><span class="mut" id="who"></span>&nbsp;&nbsp;<button id="refresh">Refresh</button> <button id="logout">Sign out</button></div></div></header>
+<header><div class="hwrap"><h1>Superadmin Console</h1><div><span class="mut" id="who"></span>&nbsp;&nbsp;<button id="csv">Export CSV</button> <button id="refresh">Refresh</button> <button id="autorefresh" title="Auto-refreshes every 60 seconds">Auto: on</button> <button id="logout">Sign out</button></div></div></header>
 <div id="login">
   <h2 style="font-family:var(--font-serif);font-size:24px;margin-bottom:8px">Admin sign-in</h2>
   <p class="mut" style="margin-bottom:16px;font-size:14px">Sign in with your admin account.</p>
@@ -86,7 +86,7 @@ const SB_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
 const sb = window.supabase.createClient(SB_URL, "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb", { auth: { persistSession: true } });
 let D = null;
 const $ = (s) => document.querySelector(s);
-const TABS = [["users","Users"],["dossier","User dossier"],["searches","Recent searches"],["activity","Activity"],["retention","Retention"],["usage","Usage & cost"],["health","Warden health"],["alerts","Alerts"]];
+const TABS = [["value","Customer value"],["users","Users"],["dossier","User dossier"],["searches","Recent searches"],["activity","Activity"],["retention","Retention"],["usage","Usage & cost"],["health","Warden health"],["alerts","Alerts"]];
 const fmt = (n) => Number(n || 0).toLocaleString();
 const when = (t) => t ? new Date(t).toLocaleString() : "—";
 
@@ -125,7 +125,14 @@ function render(t) {
   $("#tabs").innerHTML = TABS.map(([id,label]) => '<div class="tab'+(id===t?" on":"")+'" data-t="'+id+'">'+label+"</div>").join("");
   const q = ($("#q") ? $("#q").value : "").toLowerCase();
   let rows = "";
-  if (t === "users") {
+  if (t === "value") {
+    const uv = D.user_value || [];
+    const kpis = [["Total revenue", "$" + uv.reduce((n,x)=>n+Number(x.revenue_usd||0),0).toFixed(2)], ["Total cost", "$" + uv.reduce((n,x)=>n+Number(x.cost_usd||0),0).toFixed(2)], ["Gross profit", "$" + uv.reduce((n,x)=>n+Number(x.gross_profit_usd||0),0).toFixed(2)]];
+    rows = "<div class='kpis'>" + kpis.map(x=>"<div class='kpi'><h3>"+x[0]+"</h3><div class='big'>"+x[1]+"</div></div>").join("") + "</div>" +
+      "<div class='chart'><h3>Gross profit by customer</h3>" + barsvg(uv.slice(0,12), x=>Math.max(0,Number(x.gross_profit_usd||0))+0.01, x=>x.email, 760, 22) + "</div>" +
+      "<table><tr>"+th("Rank")+th("Email")+th("Revenue","num")+th("Model cost","num")+th("Gross profit","num")+th("Credits spent","num")+th("Neurons earned","num")+"</tr>" +
+      uv.map((x,i)=>"<tr><td class='mut'>"+(i+1)+"</td><td><b>"+x.email+"</b></td><td class='num'>$"+Number(x.revenue_usd||0).toFixed(2)+"</td><td class='num'>$"+Number(x.cost_usd||0).toFixed(2)+"</td><td class='num'><b>$"+Number(x.gross_profit_usd||0).toFixed(2)+"</b></td><td class='num'>"+fmt(x.credits_spent)+"</td><td class='num'>"+fmt(x.neurons_earned)+"</td></tr>").join("") + "</table>";
+  } else if (t === "users") {
     rows = "<input class='search' id='q' placeholder='Search users by email…' value='" + ($("#q")?$("#q").value:"") + "'><p></p><table><tr>" + th("Email") + th("Threads","num") + th("Messages","num") + th("First thread") + th("Last active") + th("") + "</tr>" +
       (D.users||[]).filter(u=>(u.email||"").toLowerCase().includes(q)).map(u =>
         "<tr><td><b>"+u.email+"</b></td><td class='num'>"+fmt(u.threads)+"</td><td class='num'>"+fmt(u.messages)+"</td><td class='mut'>"+(u.first_thread?new Date(u.first_thread).toLocaleDateString():"—")+"</td><td class='mut'>"+when(u.last_active)+"</td><td><button onclick='load("+JSON.stringify(JSON.stringify(u.user_id))+")'>Open dossier</button></td></tr>").join("") + "</table>";
@@ -144,7 +151,8 @@ function render(t) {
         "<div class='row'><span class='mut'>Account created</span><b>"+when(d.created_at)+"</b></div>" +
         "<div class='row'><span class='mut'>Last sign-in</span><b>"+when(d.last_sign_in)+"</b></div></div>" +
         "<div class='dcard' style='margin-top:14px'><h3>IP addresses & devices</h3>" +
-        ((d.ips||[]).length ? d.ips.map(x => "<div class='row'><b>"+x.ip+"</b><span class='faint'>"+String(x.ua||"").slice(0,60)+" · "+when(x.at)+"</span></div>").join("") : "<p class='faint'>No IP captures yet — capture began 2026-11-28 (v365). IPs and user agents now log on every request.</p>") + "</div>" +
+        ((d.ips||[]).length ? d.ips.map(x => { const g=(d.geo||[]).find(y=>y.query===x.ip)||{}; return "<div class='row'><b>"+x.ip+"</b><span class='faint'>"+[g.city,g.regionName,g.country].filter(Boolean).join(', ')+" · "+(g.isp||'')+(g.isp&&String(x.ua||'').slice(0,40)?' · ':'')+String(x.ua||'').slice(0,40)+"</span></div>"; }).join("") : "<p class='faint'>No IP captures yet — capture began 2026-11-28 (v365). IPs and user agents now log on every request.</p>") + "</div>" +
+        "<div class='dcard' style='margin-top:14px'><h3>Breach check</h3><p class='faint'>"+(d.breach_check||'—')+"</p></div>" +
         "<div class='dcard' style='margin-top:14px'><h3>Usage & cost</h3>" +
         ((d.usage||[]).map(x => "<div class='row'><span class='mut'>"+x.month+"</span><span>"+fmt(x.requests)+" requests · $"+Number(x.cost||0).toFixed(2)+"</span></div>").join("") || "<p class='faint'>No metered usage yet.</p>") + "</div></div><div>" +
         "<div class='dcard'><h3>Activity summary</h3><div class='row'><span class='mut'>Memories</span><b>"+fmt(u.profile?.memories)+"</b></div><div class='row'><span class='mut'>Imported threads</span><b>"+fmt(u.profile?.imported_threads)+"</b></div><div class='row'><span class='mut'>Imported messages</span><b>"+fmt(u.profile?.imported_msgs)+"</b></div><div class='row'><span class='mut'>Live threads</span><b>"+fmt(u.threads?.length)+"</b></div></div>" +
@@ -187,6 +195,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   $("#logout").onclick = async () => { await sb.auth.signOut(); location.reload(); };
   $("#refresh").onclick = () => load();
+  let AUTO = true, lastTab = () => $(".tab.on") ? $(".tab.on").dataset.t : "users";
+  $("#autorefresh").onclick = () => { AUTO = !AUTO; $("#autorefresh").textContent = "Auto: " + (AUTO ? "on" : "off"); };
+  setInterval(() => { if (AUTO && !document.hidden) { const t = lastTab(); const u = D && D.user_detail ? D.user_detail.user_id : null; load(u && t === "dossier" ? u : undefined).then(() => {}); } }, 60000);
+  $("#csv").onclick = () => {
+    const t = lastTab();
+    const map = { value: ["email","revenue_usd","cost_usd","gross_profit_usd","credits_spent","neurons_earned"], users: ["email","threads","messages","first_thread","last_active"], searches: ["created_at","email","thread_title","query"], activity: ["day","threads","messages"], retention: ["week","cohort_size","w1","w2","w4"], usage: ["email","month","requests","est_cost"], health: ["name","ok","detail","run_at"], alerts: ["run_at","kind","name","detail","issue_url"] };
+    const src = { value: D.user_value||[], users: D.users||[], searches: D.recent_searches||[], activity: D.activity_30d||[], retention: D.retention||[], usage: D.usage||[], health: D.warden_health||[], alerts: D.warden_alerts||[] }[t] || [];
+    const cols = map[t] || [];
+    const csv = [cols.join(",")].concat(src.map(r => cols.map(c => '"' + String(r[c] ?? "").replace(/"/g,'""').replace(/\r?\n/g," ") + '"').join(","))).join("\n");
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "boundview-admin-" + t + "-" + new Date().toISOString().slice(0,10) + ".csv"; a.click();
+  };
 });
 </script>
 </body>

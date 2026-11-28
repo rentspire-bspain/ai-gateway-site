@@ -44,9 +44,10 @@ Deno.serve(async (req) => {
     // usage/cost, warden health + alerts, and per-user drilldown (threads + messages +
     // memories + imported volume).
     const rpc = async (fn: string, body: any = {}) => await (await fetch(`${SB}/rest/v1/rpc/${fn}`, { method: "POST", headers: H, body: JSON.stringify(body) })).json().catch(() => []);
-    const [dau, retention, usage, wardenHealth, wardenAlerts] = await Promise.all([
-      rpc("admin_dau"), rpc("admin_retention"), rpc("admin_usage"), rpc("admin_warden_health"), rpc("admin_warden_alerts"),
+    const [dau, retention, usage, wardenHealth, wardenAlerts, userValue] = await Promise.all([
+      rpc("admin_dau"), rpc("admin_retention"), rpc("admin_usage"), rpc("admin_warden_health"), rpc("admin_warden_alerts"), rpc("admin_user_value"),
     ]);
+    }
     // per-user drilldown (POST ?user=<uuid> via body)
     let detail: any = null;
     const wantUser = String((req as any).__user || "");
@@ -61,8 +62,22 @@ Deno.serve(async (req) => {
         rpc("admin_user_dossier", { p_user: bodyUser }),
       ]);
       detail = { user_id: bodyUser, threads, messages: msgs, profile: (prof || [])[0] || null, dossier: Array.isArray(dossier) ? dossier[0] : dossier };
+    // v367 OSINT ENRICHMENT (owner directive 2026-11-28): reverse-IP geolocation for
+    // every IP in the requested dossier (ip-api.com, free tier, server-side, best-effort).
+    // Breach checks activate when HIBP_API_KEY is set (owner-gated — see completion doc).
+    if (bodyUser && detail) {
+      try {
+        const ips = ((detail.dossier || {}).ips || []).map((x: any) => String(x.ip || "")).filter((x: string) => /^\d+\.\d+\.\d+\.\d+$/.test(x)).slice(0, 8);
+        if (ips.length) {
+          const geo = await (await fetch(`http://ip-api.com/batch?fields=status,country,regionName,city,isp,org,query`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(ips), signal: AbortSignal.timeout(6_000) })).json().catch(() => []);
+          if (Array.isArray(geo)) (detail.dossier as any).geo = geo;
+        }
+      } catch { /* enrichment never blocks the dossier */ }
+      const hibp = Deno.env.get("HIBP_API_KEY") || "";
+      (detail.dossier as any).breach_check = hibp ? "configured" : "needs HIBP_API_KEY (owner-gated)";
+
     }
-    return json({ admin: email, generated_at: new Date().toISOString(), signups_30d: signups, activity_30d: activity, users, recent_searches: recent, dau_30d: dau, retention: retention, usage: usage, warden_health: wardenHealth, warden_alerts: wardenAlerts, user_detail: detail }, 200, cors);
+    return json({ admin: email, generated_at: new Date().toISOString(), signups_30d: signups, activity_30d: activity, users, recent_searches: recent, dau_30d: dau, retention: retention, usage: usage, warden_health: wardenHealth, warden_alerts: wardenAlerts, user_detail: detail, user_value: userValue }, 200, cors);
   } catch (e) {
     return json({ error: String(e) }, 500, cors);
   }
