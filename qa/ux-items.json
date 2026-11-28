@@ -1,5 +1,5 @@
 {
- "version": 53,
+ "version": 54,
  "date": "2026-11-20",
  "statuses": {
   "G": 100,
@@ -2423,7 +2423,7 @@
    "W": 7,
    "ircm": "4210",
    "status": {
-    "BV": "Y",
+    "BV": "G",
     "TT": "Y",
     "AG": "U",
     "GH": "-",
@@ -2431,7 +2431,7 @@
     "CT": "U",
     "DG": "U"
    },
-   "evidence": "TT notifies only on in-tab delta",
+   "evidence": "[batch 46, 2026-11-27] FULL matrix live-verified. Five lanes: (1) earn verified -> offerwall_credit (live batch 41); (2) cap hit -> offerwall_capped (live batch 41); (3) expiry -> neuron_expiry daily DB job notify_neuron_expiry (deployed, runs clean); (4) payment failure and (5) reversal -> stripe-webhook v14 with STRIPE_WEBHOOK_SECRET (test-mode endpoint we_1UgcEcEobD5Y9peiSmCsZ5ee, secret in gateway_config): signed invoice.payment_failed and charge.refunded events delivered payment_failed + reversal inbox notifications to the eval-bot user (verified by SQL readback of public.notifications), bad signatures rejected 400. PRs #33/#39; governed-sql test _tests/notification-matrix.test.mjs.",
    "fix": "Event → notification matrix with tests",
    "notes": {
     "TT": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): PR #27 merged — postback now inserts offerwall_credit/offerwall_capped inbox notifications (fire-and-forget, lock test 3/3); Y until a live postback readback (needs Adscend traffic)",
@@ -3287,7 +3287,7 @@
    "evidence": "Policy says no analytics trackers; leaves marketing blind",
    "fix": "First-party cookieless analytics + consent mode",
    "notes": {
-    "BV": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): funnel live (checkout_started + purchase both in first-party analytics_events, PRs #22/#28 merged); Y pending a readback surface",
+    "BV": "[batch 46] Server-side first-party funnel readback runs (no third-party trackers — policy-consistent); UTM preservation not yet measured; stays Y.",
     "AG": "2026-11-25 batch 41 (all 12 queued PRs merged, live readbacks run): same shared backend funnel"
    }
   },
@@ -4056,7 +4056,7 @@
    "evidence": "None",
    "fix": "Define events; first-party store",
    "notes": {
-    "BV": "2026-11-25 batch 31 (governed-sql PR #23): first-party taxonomy defined (query/completion/share/checkout_started/purchase over analytics_events) with a CI sync test locking doc-to-code; funnels computable (engagement, monetization, virality). Funnel readback surface pending",
+    "BV": "[batch 46] Funnel readback executed from the first-party store (analytics_events): 14-day query->completion 97-99% daily (e.g. 2026-11-26: 1728 queries / 1718 completions / 2 users); heartbeat rows 2036+. Commerce funnel checkout_started->purchase = 0 traffic (checkout test-mode key not yet in project env). Offer funnel (view->click->verified) not instrumented in analytics_events yet. Stays Y: landing->signup->first answer ->upgrade and offer funnels not fully measured.",
     "AG": "2026-11-25 batch 31 (governed-sql PR #23): first-party taxonomy defined (query/completion/share/checkout_started/purchase over analytics_events) with a CI sync test locking doc-to-code; funnels computable (engagement, monetization, virality). Funnel readback surface pending"
    }
   },
