@@ -110,7 +110,14 @@ def score(orig, mine):
     checks = {}
     checks["nonempty"] = len(m) > 30
     ratio = (len(m) / max(len(orig[1]), 1))
-    checks["length_parity"] = 0.4 <= ratio <= 3.0
+    # v364 DEPTH-POSITIVE SCORING (owner directive 2026-11-27: "you need to go deeper than
+    # a 150-character Perplexity reply — won't that make the deep research far stronger?"):
+    # depth beyond a terse original is a FEATURE. Length fails only when (a) too SHORT
+    # (ratio < 0.4 with an absolute floor of 400 chars on the substantive rows), or
+    # (b) extremely bloated (ratio > 20 or answer > 12,000 chars).
+    too_short = ratio < 0.4 and len(m) < 400
+    too_long = ratio > 20 or len(m) > 12000
+    checks["length_parity"] = not (too_short or too_long)
     def struct(t):
         return {"h": bool(re.search(r"^#{1,4} ", t, re.M)), "l": bool(re.search(r"^\s*[-*] ", t, re.M)),
                 "b": "**" in t}
