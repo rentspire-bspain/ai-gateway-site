@@ -200,7 +200,7 @@ Pollfish (Prodege; web plugin + API, revenue share, S2S callbacks) · **inBrain*
 **2026-11-20 · v262 · append directly after PART D of `parity-master-completion-2026-11-17.md` (v261).** This part turns "is the experience flawless for every user?" into a working QA instrument: every line carries an item ID, a pass benchmark, a **WTD AVG factor** (weighted-average weight), a status, evidence, and fix/repair guidance. It uses the same convention as the v261 headline: a weighted sum divided by total weight, computed by a script and never hand-summed.
 
 **Headline (computed by `qa/generate-ux-headline.py` from `qa/ux-items.json`):**
-**Part E portfolio UX readiness, strict: 25.7%** (app-weighted; unmeasured counts as 0; v57 — batch 49: checkout LIVE in test mode, commerce funnel instrumented) · **measured-only: 44.8%** · 199✅ / 215🟡 / 174🔴 / 789⚪ across 386 line items. Per-app strict: BV 48.5% · TT 32.5% · AG 46.9% · GH 11.3% · ST 7.9% · CT 5.2% · DG 2.8%.
+**Part E portfolio UX readiness, strict: 26.3%** (app-weighted; unmeasured counts as 0; v58 — batch 50: ST+DG legal packs live, offer funnel instrumented, U-MEAS-01 BV green) · **measured-only: 47.0%** · 204✅ / 214🟡 / 172🔴 / 787⚪ across 386 line items. Per-app strict: BV 48.8% · TT 32.5% · AG 46.9% · GH 11.3% · ST 12.4% · CT 5.2% · DG 4.5%.
 **How to read the number.** The v261 headline (90.4%) measures *capability parity*. Part E measures *experience readiness* and is deliberately harsher: a check nobody has measured is ⚪ and scores 0, because an unproven experience is not a flawless one. The score rises by fixing 🔴 items and by measuring ⚪ items; both are tracked separately so measuring never hides a failure.
 
 > **Evidence basis and limits.** Statuses come from (1) files in the workspace (`ai-gateway-site`, `offerwall-tasks-tab`, `gig-hub-mockup`, pricing model, memory notes) and (2) live server-side probes run 2026-11-20 against boundview.com, ai.spaincos.com, comptrove.com, rentspire.com and minutegig.com (headers, robots, sitemap, manifest, privacy, 404 behavior). No browser, device or screen-reader testing was possible in this environment, so those checks are ⚪ or marked from code only. Spain Terminal, Comptrove and DoorGraph source code is not in this workspace; their statuses come from memory notes and the SHMT roadmap and are mostly ⚪ by design.
@@ -2075,3 +2075,13 @@ This queue is ~250 of the 620 white cells in CT/ST/DG/GH and converts most curre
 - Test-mode notes: no real charge is possible until a live key is added; the webhook endpoint (we_1UgcEc…) is test mode.
 
 **Headline after batch: strict 25.7% / measured-only 44.8% (v57)** — session arc since batch 24: 20.2% → 25.7%.
+
+
+### Batch 50 — ST + DG legal packs live, offer funnel fully instrumented (2026-11-28, register v58)
+
+- ✅ **U-TRU-01 / U-TRU-02 / U-TRU-04 (ST, w10 each)** — terminal.spaincos.com legal pack live at clean URLs: /privacy (CCPA/CPRA + state matrix, GPC honored, export/deletion with 30-day SLA), /terms (refunds/reversals, public-records disclaimer). Live-verified via Apify. spain-terminal-shell PR #702.
+- ✅ **U-TRU-01 (DG, w10)** — doorgraph.com/privacy.html publicly reachable (middleware allowlist fix, PR #91) and live-verified: evidence-room-accurate privacy policy with state rights, GPC, 30-day SLA; counsel-review flag preserved on operator identity. U-TRU-02 DG stays 🔴: the terms page remains a counsel-gated draft placeholder (E11-2 adjacent). Deployed via Vercel API (dpl_EwBRtNi9) after discovering the DG project's git auto-deploy had also silently stopped — source-to-production closure per Part G.
+- ✅ **U-MEAS-01 (BV, w7) 🟡→✅** — the offer funnel is now fully instrumented in the first-party store: offer_view / offer_click via the new JWT-verified offer-funnel function (live-verified with eval-bot rows; anonymous calls 401), offer_verified logged server-side by offerwall-postback v11, and both earn surfaces (BV tab + tasks-tab) wired to fire view on first poll and click on wall open. Engagement + commerce + offer funnels all measured, zero trackers.
+- 🔎 DG deploy-path finding: information-central-staging had no git link and its deploys had silently stopped (same class as the ai-gateway incident, batch 43) — now deployed via the API and recorded here as a Part G pattern.
+
+**Headline after batch: strict 26.3% / measured-only 47.0% (v58)** — session arc since batch 24: 20.2% → 26.3%. ST strict 7.9% → 12.4%; DG 2.8% → 4.5%.
