@@ -1,56 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Superadmin Console</title>
+<link rel="icon" href="/icons/boundview-favicon-48.webp">
+<link rel="stylesheet" href="/fonts/fonts.css" onerror="">
 <style>
-:root { --bg:#0d1117; --panel:#161b22; --line:#30363d; --txt:#e6edf3; --mut:#8b949e; --acc:#3fb950; --red:#f85149; --yel:#d29922; }
-* { box-sizing:border-box; }
-body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.5 -apple-system,"Segoe UI",Roboto,sans-serif; }
-header { padding:12px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:var(--bg); z-index:5; }
-h1 { font-size:15px; margin:0; }
-main { max-width:1400px; margin:0 auto; padding:18px 20px 80px; }
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:18px; }
-.card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px; }
-.card h3 { margin:0 0 6px; font-size:11px; color:var(--mut); text-transform:uppercase; letter-spacing:.04em; }
-.big { font-size:22px; font-weight:600; }
-.sub { font-size:11px; color:var(--mut); margin-top:2px; }
-table { width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
-th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); font-size:12.5px; }
-th { color:var(--mut); font-weight:600; position:sticky; top:0; background:var(--panel); cursor:pointer; }
-tr:last-child td { border-bottom:none; }
-td.num, th.num { text-align:right; }
-.search { padding:7px 10px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--txt); width:260px; }
-button { padding:6px 12px; border-radius:6px; border:1px solid var(--line); background:var(--panel); color:var(--txt); cursor:pointer; font-size:12.5px; }
-button:hover { border-color:var(--acc); }
-.err { color:var(--red); }
-.mut { color:var(--mut); }
-.ok { color:var(--acc); } .bad { color:var(--red); } .warn { color:var(--yel); }
-.tabs { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
-.tab { padding:5px 13px; border-radius:16px; border:1px solid var(--line); cursor:pointer; font-size:12.5px; }
-.tab.on { background:var(--acc); color:#04170a; border-color:var(--acc); font-weight:600; }
-.bar { height:8px; background:#21262d; border-radius:4px; overflow:hidden; }
-.bar>div { height:100%; background:var(--acc); }
-#login { max-width:340px; margin:70px auto; text-align:center; }
-#login input { width:100%; margin:5px 0; padding:9px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--txt); }
-.back { margin-bottom:10px; }
-.role-chip { display:inline-block; padding:1px 8px; border-radius:10px; font-size:10.5px; border:1px solid var(--line); color:var(--mut); }
-.role-chip.you { border-color:var(--acc); color:var(--acc); }
+/* BoundView design system — exact tokens from the main app */
+:root {
+  --radius: 12px; --radius-sm: 8px; --radius-xs: 6px;
+  --font-sans: "pplxSans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "pplxSerif", Georgia, serif;
+  --bg: #FCFCF9; --bg-elevated: #F4F4F1; --bg-surface: #FBFBFB; --bg-input: #FFFFFF;
+  --border: rgba(11,40,51,.08); --border-light: rgba(11,40,51,.13);
+  --text: #0F1111; --text-muted: #5D6660; --text-faint: #636B67;
+  --accent: #14646B; --accent-hover: #0F4F55; --accent-light: rgba(61,149,149,.1);
+  --citation-bg: rgba(11,40,51,.05); --citation-text: #14646B; --error: #B91C1C;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; }
+header { border-bottom: 1px solid var(--border); background: var(--bg-surface); position: sticky; top: 0; z-index: 5; }
+.hwrap { max-width: 1240px; margin: 0 auto; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+h1 { font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
+main { max-width: 1240px; margin: 0 auto; padding: 24px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 12px; margin-bottom: 22px; }
+.kpi { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+.kpi h3 { font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+.kpi .big { font-size: 26px; font-weight: 600; letter-spacing: -.02em; font-family: var(--font-sans); }
+.kpi .sub { font-size: 12.5px; color: var(--text-faint); margin-top: 2px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+.tab { padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 13.5px; color: var(--text-muted); border: 1px solid transparent; }
+.tab:hover { background: var(--bg-elevated); }
+.tab.on { background: var(--accent-light); color: var(--accent); border-color: var(--accent); font-weight: 600; }
+table { width: 100%; border-collapse: collapse; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+th, td { text-align: left; padding: 9px 13px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+th { color: var(--text-muted); font-weight: 600; background: var(--bg-elevated); font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--citation-bg); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.search { padding: 9px 14px; border-radius: 999px; border: 1px solid var(--border-light); background: var(--bg-input); color: var(--text); width: 300px; font: inherit; font-size: 14px; margin-bottom: 14px; }
+.search:focus { outline: 2px solid var(--accent); }
+button { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border-light); background: var(--bg-surface); color: var(--text); cursor: pointer; font: inherit; font-size: 13px; }
+button:hover { border-color: var(--accent); color: var(--accent); }
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.mut { color: var(--text-muted); } .faint { color: var(--text-faint); font-size: 12.5px; }
+.ok { color: #0E8345; font-weight: 600; } .bad { color: var(--error); font-weight: 600; } .warn { color: #B07C0A; font-weight: 600; }
+.chart { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 18px; }
+.chart h3 { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.bar { height: 10px; background: var(--bg-elevated); border-radius: 5px; overflow: hidden; }
+.bar>div { height: 100%; background: var(--accent); border-radius: 5px; }
+.dossier-grid { display: grid; grid-template-columns: 340px 1fr; gap: 18px; align-items: start; }
+.dcard { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.dcard h3 { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: .04em; }
+.dcard .row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13.5px; border-bottom: 1px solid var(--border); }
+.dcard .row:last-child { border-bottom: none; }
+.dcard .row b { font-weight: 500; }
+.avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 600; margin-bottom: 12px; }
+h2.sec { font-family: var(--font-serif); font-size: 21px; font-weight: 600; margin: 4px 0 14px; }
+#login { max-width:380px; margin:90px auto; text-align:center; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 34px; }
+#login input { width: 100%; margin: 6px 0; padding: 11px 14px; border-radius: var(--radius-xs); border: 1px solid var(--border-light); background: var(--bg-input); color: var(--text); font: inherit; }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11.5px; background: var(--accent-light); color: var(--accent); }
+a { color: var(--citation-text); }
 </style>
 </head>
 <body>
-<header><h1>Superadmin Console — full estate</h1><div><span class="mut" id="who"></span> <button id="refresh">Refresh</button> <button id="logout">Sign out</button></div></header>
+<header><div class="hwrap"><h1>Superadmin Console</h1><div><span class="mut" id="who"></span>&nbsp;&nbsp;<button id="refresh">Refresh</button> <button id="logout">Sign out</button></div></div></header>
 <div id="login">
-  <h2>Admin sign-in</h2>
+  <h2 style="font-family:var(--font-serif);font-size:24px;margin-bottom:8px">Admin sign-in</h2>
+  <p class="mut" style="margin-bottom:16px;font-size:14px">Sign in with your admin account.</p>
   <input id="email" type="email" placeholder="Email">
   <input id="pass" type="password" placeholder="Password">
-  <button id="signin">Sign in</button>
-  <p class="err" id="loginerr"></p>
+  <button class="primary" id="signin" style="width:100%;margin-top:8px">Sign in</button>
+  <p class="bad" id="loginerr" style="font-size:13px"></p>
 </div>
 <main id="main" hidden>
-  <div class="grid" id="kpis"></div>
+  <div class="kpis" id="kpis"></div>
   <div class="tabs" id="tabs"></div>
   <div id="pane"></div>
 </main>
@@ -60,81 +86,97 @@ const SB_URL = "https://bnxermyboeigvwonfrzx.supabase.co";
 const sb = window.supabase.createClient(SB_URL, "sb_publishable_nrmUxUfyytgCscz8zfQ9Cw_LapbvKIb", { auth: { persistSession: true } });
 let D = null;
 const $ = (s) => document.querySelector(s);
-const TABS = [
-  ["users", "Users"], ["searches", "Recent searches"], ["activity", "Activity by day"],
-  ["retention", "Retention cohorts"], ["usage", "Usage & cost"], ["health", "Warden health"],
-  ["alerts", "Alerts"],
-];
+const TABS = [["users","Users"],["dossier","User dossier"],["searches","Recent searches"],["activity","Activity"],["retention","Retention"],["usage","Usage & cost"],["health","Warden health"],["alerts","Alerts"]];
 const fmt = (n) => Number(n || 0).toLocaleString();
+const when = (t) => t ? new Date(t).toLocaleString() : "—";
 
 async function load(detailUser) {
   $("#login").hidden = true; $("#main").hidden = false;
   const tok = (await sb.auth.getSession()).data.session?.access_token;
   const r = await fetch(SB_URL + "/functions/v1/admin-console" + (detailUser ? "?user=" + encodeURIComponent(detailUser) : ""), { method: "POST", headers: { authorization: "Bearer " + tok, "content-type": "application/json" }, body: "{}" });
-  if (!r.ok) { $("#pane").innerHTML = '<p class="err">' + r.status + " — " + (await r.text()).slice(0, 300) + "</p>"; return; }
+  if (!r.ok) { $("#pane").innerHTML = '<p class="bad">' + r.status + " — " + (await r.text()).slice(0, 300) + "</p>"; return; }
   D = await r.json();
   renderKpis(); render($(".tab.on") ? $(".tab.on").dataset.t : "users");
 }
 function renderKpis() {
-  const dau = D.dau_30d || [], users = D.users || [], act = D.activity_30d || [];
+  const act = D.activity_30d || [], dau = D.dau_30d || [], users = D.users || [];
   const today = dau.length ? dau[dau.length - 1] : null;
-  const wau = new Set((dau.slice(-7)).map(x => x.day)).size ? dau.slice(-7).reduce((n, x) => n + Number(x.dau || 0), 0) : 0; // sum of daily distincts (upper bound)
-  const msgs30 = act.reduce((n, x) => n + Number(x.messages || 0), 0);
-  const activeUsers30 = users.filter(u => u.messages > 0).length;
   const k = [
-    ["Signups 30d", fmt((D.signups_30d || []).reduce((n, x) => n + Number(x.n || 0), 0))],
-    ["DAU today", today ? fmt(today.dau) : "0", "messages " + fmt(today ? today.posters : 0)],
-    ["Threads 30d", fmt(act.reduce((n, x) => n + Number(x.threads || 0), 0))],
-    ["Messages 30d", fmt(msgs30)],
-    ["Users (active/total)", activeUsers30 + " / " + users.length],
-    ["Cost this month", "$" + fmt((D.usage || []).reduce((n, x) => n + Number(x.est_cost || 0), 0).toFixed(2))],
+    ["Signups (30 days)", fmt((D.signups_30d||[]).reduce((n,x)=>n+Number(x.n||0),0)), "across " + fmt(users.length) + " total users"],
+    ["Active today", today ? fmt(today.dau) : "0", fmt(today ? today.posters : 0) + " messages"],
+    ["Threads (30 days)", fmt(act.reduce((n,x)=>n+Number(x.threads||0),0))],
+    ["Messages (30 days)", fmt(act.reduce((n,x)=>n+Number(x.messages||0),0))],
+    ["Users with activity", users.filter(u=>u.messages>0).length + " of " + users.length, "rest are dormant or test accounts"],
+    ["Est. cost (month)", "$" + (D.usage||[]).reduce((n,x)=>n+Number(x.est_cost||0),0).toFixed(2), "per-user breakdown in Usage tab"],
   ];
-  $("#kpis").innerHTML = k.map(x => '<div class="card"><h3>' + x[0] + '</h3><div class="big">' + x[1] + '</div>' + (x[2] ? '<div class="sub">' + x[2] + "</div>" : "") + "</div>").join("");
+  $("#kpis").innerHTML = k.map(x => '<div class="kpi"><h3>'+x[0]+'</h3><div class="big">'+x[1]+'</div>'+(x[2]?'<div class="sub">'+x[2]+'</div>':'')+'</div>').join("");
 }
-function th(label, cls) { return "<th" + (cls ? ' class="' + cls + '"' : "") + ">" + label + "</th>"; }
+function th(l,c){return "<th"+(c?' class="'+c+'"':"")+">"+l+"</th>";}
+function barsvg(rows, valFn, labelFn, w, rowH) {
+  w = w || 760; rowH = rowH || 22;
+  const vals = rows.map(valFn), max = Math.max(...vals, 1);
+  return '<svg width="100%" viewBox="0 0 ' + w + ' ' + (rows.length*rowH+8) + '" style="max-width:' + w + 'px" role="img">' +
+    rows.map((r,i) => { const v = vals[i], bw = Math.max(2, Math.round((w-220) * v / max));
+      return '<text x="0" y="' + (i*rowH+15) + '" font-size="11.5" fill="#5D6660" font-family="inherit">' + (labelFn(r)||"").toString().slice(0,26) + '</text>' +
+      '<rect x="130" y="' + (i*rowH+4) + '" width="' + bw + '" height="' + (rowH-9) + '" rx="4" fill="#14646B"/>' +
+      '<text x="' + (134+bw) + '" y="' + (i*rowH+15) + '" font-size="11.5" fill="#0F1111">' + fmt(v) + '</text>'; }).join("") + '</svg>';
+}
 function render(t) {
+  $("#tabs").innerHTML = TABS.map(([id,label]) => '<div class="tab'+(id===t?" on":"")+'" data-t="'+id+'">'+label+"</div>").join("");
   const q = ($("#q") ? $("#q").value : "").toLowerCase();
-  $("#tabs").innerHTML = TABS.map(([id, label]) => '<div class="tab' + (id === t ? " on" : "") + '" data-t="' + id + '">' + label + "</div>").join("");
   let rows = "";
   if (t === "users") {
-    rows = "<input class='search' id='q' placeholder='Filter by email…' value='" + ($("#q") ? $("#q").value : "") + "'><p></p><table><tr>" + th("Email") + th("Threads", "num") + th("Messages", "num") + th("First thread") + th("Last active") + th("") + "</tr>" +
-      (D.users || []).filter(u => (u.email || "").toLowerCase().includes(q)).map(u =>
-        "<tr><td>" + u.email + "</td><td class='num'>" + fmt(u.threads) + "</td><td class='num'>" + fmt(u.messages) + "</td><td class='mut'>" + (u.first_thread ? new Date(u.first_thread).toLocaleDateString() : "—") + "</td><td class='mut'>" + (u.last_active ? new Date(u.last_active).toLocaleString() : "never") + "</td><td><button onclick='load(" + JSON.stringify(JSON.stringify(u.user_id)) + ")'>View</button></td></tr>").join("") + "</table>";
-  } else if (t === "searches") {
-    rows = "<input class='search' id='q' placeholder='Filter queries or users…'><p></p><table><tr>" + th("When") + th("User") + th("Thread") + th("Query") + "</tr>" +
-      (D.recent_searches || []).filter(s => (String(s.query) + String(s.email)).toLowerCase().includes(q)).map(s =>
-        "<tr><td class='mut'>" + new Date(s.created_at).toLocaleString() + "</td><td>" + s.email + "</td><td>" + (s.thread_title || "").slice(0, 50) + "</td><td>" + String(s.query || "").slice(0, 400) + "</td></tr>").join("") + "</table>";
-  } else if (t === "activity") {
-    const max = Math.max(...(D.activity_30d || []).map(x => Number(x.messages || 0)), 1);
-    rows = "<table><tr>" + th("Day") + th("Signups", "num") + th("Threads", "num") + th("Messages", "num") + th("Volume") + "</tr>" +
-      (D.activity_30d || []).map(a => { const d = (D.signups_30d || []).find(s => s.day === a.day) || {}; return "<tr><td>" + a.day + "</td><td class='num'>" + (d.n || 0) + "</td><td class='num'>" + fmt(a.threads) + "</td><td class='num'>" + fmt(a.messages) + "</td><td><div class='bar'><div style='width:" + Math.round(100 * a.messages / max) + "%'></div></div></td></tr>"; }).join("") + "</table>";
-  } else if (t === "retention") {
-    rows = "<table><tr>" + th("Cohort week") + th("Size", "num") + th("W1", "num") + th("W2", "num") + th("W4", "num") + "</tr>" +
-      (D.retention || []).map(r => "<tr><td>" + r.week + "</td><td class='num'>" + fmt(r.cohort_size) + "</td><td class='num'>" + fmt(r.w1) + "</td><td class='num'>" + fmt(r.w2) + "</td><td class='num'>" + fmt(r.w4) + "</td></tr>").join("") + "</table>";
-  } else if (t === "usage") {
-    rows = "<table><tr>" + th("User") + th("Month") + th("Requests", "num") + th("Est. cost", "num") + "</tr>" +
-      (D.usage || []).map(u => "<tr><td>" + u.email + "</td><td>" + u.month + "</td><td class='num'>" + fmt(u.requests) + "</td><td class='num'>$" + Number(u.est_cost || 0).toFixed(2) + "</td></tr>").join("") + "</table>";
-  } else if (t === "health") {
-    rows = "<table><tr>" + th("Check") + th("Status") + th("Detail") + th("Run at") + "</tr>" +
-      (D.warden_health || []).map(w => "<tr><td>" + w.name + "</td><td class='" + (w.ok ? "ok" : "bad") + "'>" + (w.ok ? "OK" : "FAIL") + "</td><td class='mut'>" + String(w.detail || "").slice(0, 140) + "</td><td class='mut'>" + new Date(w.run_at).toLocaleString() + "</td></tr>").join("") + "</table>";
-  } else if (t === "alerts") {
-    rows = "<table><tr>" + th("When") + th("Kind") + th("Check") + th("Detail") + th("Issue") + "</tr>" +
-      (D.warden_alerts || []).map(a => "<tr><td class='mut'>" + new Date(a.run_at).toLocaleString() + "</td><td>" + a.kind + "</td><td>" + a.name + "</td><td class='mut'>" + String(a.detail || "").slice(0, 200) + "</td><td>" + (a.issue_url ? "<a href='" + a.issue_url + "' target='_blank'>issue</a>" : "—") + "</td></tr>").join("") + "</table>";
-  } else if (t === "detail") {
-    const u = D.user_detail; if (!u) { rows = "<p class='mut'>No user selected.</p>"; }
+    rows = "<input class='search' id='q' placeholder='Search users by email…' value='" + ($("#q")?$("#q").value:"") + "'><p></p><table><tr>" + th("Email") + th("Threads","num") + th("Messages","num") + th("First thread") + th("Last active") + th("") + "</tr>" +
+      (D.users||[]).filter(u=>(u.email||"").toLowerCase().includes(q)).map(u =>
+        "<tr><td><b>"+u.email+"</b></td><td class='num'>"+fmt(u.threads)+"</td><td class='num'>"+fmt(u.messages)+"</td><td class='mut'>"+(u.first_thread?new Date(u.first_thread).toLocaleDateString():"—")+"</td><td class='mut'>"+when(u.last_active)+"</td><td><button onclick='load("+JSON.stringify(JSON.stringify(u.user_id))+")'>Open dossier</button></td></tr>").join("") + "</table>";
+  } else if (t === "dossier") {
+    const u = D.user_detail;
+    if (!u) rows = "<p class='mut'>Open a user from the Users tab to see their full dossier — contact info, sign-in history, IP addresses, activity, threads, and message history.</p>";
     else {
-      const prof = u.profile || {};
-      rows = "<button class='back' onclick='load()'>← All users</button>" +
-        "<div class='grid'><div class='card'><h3>Memories</h3><div class='big'>" + fmt(prof.memories) + "</div></div><div class='card'><h3>Imported threads</h3><div class='big'>" + fmt(prof.imported_threads) + "</div></div><div class='card'><h3>Imported messages</h3><div class='big'>" + fmt(prof.imported_msgs) + "</div></div></div>" +
-        "<h3 style='margin:10px 0'>Threads</h3><table><tr>" + th("Title") + th("Messages", "num") + th("First") + th("Last") + "</tr>" +
-        (u.threads || []).map(t => "<tr><td>" + (t.title || "(untitled)").slice(0, 80) + "</td><td class='num'>" + fmt(t.messages) + "</td><td class='mut'>" + new Date(t.first_msg).toLocaleDateString() + "</td><td class='mut'>" + new Date(t.last_msg).toLocaleDateString() + "</td></tr>").join("") + "</table>" +
-        "<h3 style='margin:16px 0 8px'>Message history (latest 200)</h3><table><tr>" + th("When") + th("Role") + th("Content") + "</tr>" +
-        (u.messages || []).map(m => "<tr><td class='mut'>" + new Date(m.created_at).toLocaleString() + "</td><td>" + m.role + "</td><td>" + String(m.content || "").slice(0, 300) + "</td></tr>").join("") + "</table>";
+      const d = u.dossier || {};
+      const ini = (d.full_name || d.email || "?").trim()[0] || "?";
+      rows = "<button class='back' onclick='load()'>← All users</button><h2 class='sec'>"+(d.full_name || d.email || "User")+"</h2><div class='dossier-grid'><div>" +
+        "<div class='dcard'><div class='avatar'>"+ini.toUpperCase()+"</div>" +
+        "<div class='row'><span class='mut'>Email</span><b>"+(d.email||"—")+"</b></div>" +
+        "<div class='row'><span class='mut'>Full name</span><b>"+(d.full_name||"—")+"</b></div>" +
+        "<div class='row'><span class='mut'>Phone</span><b>"+(d.phone||"—")+"</b></div>" +
+        "<div class='row'><span class='mut'>Sign-in provider</span><b>"+(d.provider||"email")+"</b></div>" +
+        "<div class='row'><span class='mut'>Account created</span><b>"+when(d.created_at)+"</b></div>" +
+        "<div class='row'><span class='mut'>Last sign-in</span><b>"+when(d.last_sign_in)+"</b></div></div>" +
+        "<div class='dcard' style='margin-top:14px'><h3>IP addresses & devices</h3>" +
+        ((d.ips||[]).length ? d.ips.map(x => "<div class='row'><b>"+x.ip+"</b><span class='faint'>"+String(x.ua||"").slice(0,60)+" · "+when(x.at)+"</span></div>").join("") : "<p class='faint'>No IP captures yet — capture began 2026-11-28 (v365). IPs and user agents now log on every request.</p>") + "</div>" +
+        "<div class='dcard' style='margin-top:14px'><h3>Usage & cost</h3>" +
+        ((d.usage||[]).map(x => "<div class='row'><span class='mut'>"+x.month+"</span><span>"+fmt(x.requests)+" requests · $"+Number(x.cost||0).toFixed(2)+"</span></div>").join("") || "<p class='faint'>No metered usage yet.</p>") + "</div></div><div>" +
+        "<div class='dcard'><h3>Activity summary</h3><div class='row'><span class='mut'>Memories</span><b>"+fmt(u.profile?.memories)+"</b></div><div class='row'><span class='mut'>Imported threads</span><b>"+fmt(u.profile?.imported_threads)+"</b></div><div class='row'><span class='mut'>Imported messages</span><b>"+fmt(u.profile?.imported_msgs)+"</b></div><div class='row'><span class='mut'>Live threads</span><b>"+fmt(u.threads?.length)+"</b></div></div>" +
+        "<div class='chart' style='margin-top:14px'><h3>Top threads by messages</h3>" + barsvg((u.threads||[]).slice(0,10), x=>Number(x.messages||0), x=>(x.title||"untitled"), 700, 22) + "</div>" +
+        "<div class='dcard' style='margin-top:14px'><h3>Message history (latest "+fmt((u.messages||[]).length)+")</h3><table><tr>"+th("When")+th("Role")+th("Content")+"</tr>" +
+        (u.messages||[]).map(m => "<tr><td class='mut' style='white-space:nowrap'>"+when(m.created_at)+"</td><td>"+(m.role==="user"?"<span class='pill'>user</span>":"<span class='pill'>assistant</span>")+"</td><td>"+String(m.content||"").slice(0,400)+"</td></tr>").join("") + "</table></div></div></div>";
     }
+  } else if (t === "searches") {
+    rows = "<input class='search' id='q' placeholder='Filter by user or query text…'><p></p><table><tr>"+th("When")+th("User")+th("Thread")+th("Query")+"</tr>" +
+      (D.recent_searches||[]).filter(s=>(String(s.query)+String(s.email)).toLowerCase().includes(q)).map(s => "<tr><td class='mut' style='white-space:nowrap'>"+when(s.created_at)+"</td><td>"+s.email+"</td><td class='mut'>"+(s.thread_title||"").slice(0,50)+"</td><td>"+String(s.query||"").slice(0,500)+"</td></tr>").join("") + "</table>";
+  } else if (t === "activity") {
+    const max = Math.max(...(D.activity_30d||[]).map(x=>Number(x.messages||0)),1);
+    rows = "<div class='chart'><h3>Messages per day (30 days)</h3>" + barsvg((D.activity_30d||[]).slice().reverse(), x=>Number(x.messages||0), x=>String(x.day).slice(5), 760, 24) + "</div>" +
+      "<table><tr>"+th("Day")+th("Signups","num")+th("Threads","num")+th("Messages","num")+th("Volume")+"</tr>" +
+      (D.activity_30d||[]).map(a => { const sd=(D.signups_30d||[]).find(s=>s.day===a.day)||{}; return "<tr><td>"+a.day+"</td><td class='num'>"+(sd.n||0)+"</td><td class='num'>"+fmt(a.threads)+"</td><td class='num'>"+fmt(a.messages)+"</td><td><div class='bar'><div style='width:"+Math.round(100*a.messages/max)+"%'></div></div></td></tr>"; }).join("") + "</table>";
+  } else if (t === "retention") {
+    rows = "<div class='chart'><h3>Weekly cohort return rates</h3>" + barsvg((D.retention||[]).slice().reverse(), x=>Number(x.w1||0), x=>"W"+String(x.week).slice(5), 500, 24) + "</div>" +
+      "<table><tr>"+th("Cohort week")+th("Size","num")+th("Week 1","num")+th("Week 2","num")+th("Week 4","num")+"</tr>" +
+      (D.retention||[]).map(r => "<tr><td>"+r.week+"</td><td class='num'>"+fmt(r.cohort_size)+"</td><td class='num'>"+fmt(r.w1)+"</td><td class='num'>"+fmt(r.w2)+"</td><td class='num'>"+fmt(r.w4)+"</td></tr>").join("") + "</table>";
+  } else if (t === "usage") {
+    rows = "<table><tr>"+th("User")+th("Month")+th("Requests","num")+th("Est. cost","num")+"</tr>" +
+      (D.usage||[]).map(u => "<tr><td>"+u.email+"</td><td>"+u.month+"</td><td class='num'>"+fmt(u.requests)+"</td><td class='num'>$"+Number(u.est_cost||0).toFixed(2)+"</td></tr>").join("") + "</table>";
+  } else if (t === "health") {
+    rows = "<table><tr>"+th("Check")+th("Status")+th("Detail")+th("Run at")+"</tr>" +
+      (D.warden_health||[]).map(w => "<tr><td><b>"+w.name+"</b></td><td class='"+(w.ok?"ok":"bad")+"'>"+(w.ok?"● OK":"● FAIL")+"</td><td class='mut'>"+String(w.detail||"").slice(0,140)+"</td><td class='mut'>"+when(w.run_at)+"</td></tr>").join("") + "</table>";
+  } else if (t === "alerts") {
+    rows = "<table><tr>"+th("When")+th("Kind")+th("Check")+th("Detail")+th("Issue")+"</tr>" +
+      (D.warden_alerts||[]).map(a => "<tr><td class='mut'>"+when(a.run_at)+"</td><td>"+a.kind+"</td><td><b>"+a.name+"</b></td><td class='mut'>"+String(a.detail||"").slice(0,220)+"</td><td>"+(a.issue_url?"<a href='"+a.issue_url+"' target='_blank'>view issue</a>":"—")+"</td></tr>").join("") + "</table>";
   }
   $("#pane").innerHTML = rows;
   if ($("#q")) $("#q").oninput = () => render($(".tab.on").dataset.t);
-  document.querySelectorAll(".tab").forEach(el => el.onclick = () => { document.querySelectorAll(".tab").forEach(x => x.classList.remove("on")); el.classList.add("on"); render(el.dataset.t); });
+  document.querySelectorAll(".tab").forEach(el => el.onclick = () => { document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on")); el.classList.add("on"); render(el.dataset.t); });
 }
 document.addEventListener("DOMContentLoaded", async () => {
   const sess = (await sb.auth.getSession()).data.session;

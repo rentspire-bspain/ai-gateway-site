@@ -54,12 +54,13 @@ Deno.serve(async (req) => {
     const qUser = url.searchParams.get("user");
     const bodyUser = wantUser || qUser;
     if (bodyUser) {
-      const [threads, msgs, prof] = await Promise.all([
+      const [threads, msgs, prof, dossier] = await Promise.all([
         rpc("admin_user_threads", { p_user: bodyUser, p_limit: 100 }),
         rpc("admin_user_messages", { p_user: bodyUser, p_limit: 200 }),
         rpc("admin_user_profile_detail", { p_user: bodyUser }),
+        rpc("admin_user_dossier", { p_user: bodyUser }),
       ]);
-      detail = { user_id: bodyUser, threads, messages: msgs, profile: (prof || [])[0] || null };
+      detail = { user_id: bodyUser, threads, messages: msgs, profile: (prof || [])[0] || null, dossier: Array.isArray(dossier) ? dossier[0] : dossier };
     }
     return json({ admin: email, generated_at: new Date().toISOString(), signups_30d: signups, activity_30d: activity, users, recent_searches: recent, dau_30d: dau, retention: retention, usage: usage, warden_health: wardenHealth, warden_alerts: wardenAlerts, user_detail: detail }, 200, cors);
   } catch (e) {
